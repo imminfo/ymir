@@ -1,0 +1,4 @@
+D genes	Sequences
+Dseg1	GGAC
+Dseg2	TTTA
+Dseg3	AAAC

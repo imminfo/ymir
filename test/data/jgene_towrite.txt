@@ -1,0 +1,3 @@
+Vgene	Sequences
+Jseg1	GGG
+Jseg2	TTT

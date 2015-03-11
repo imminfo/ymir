@@ -1,0 +1,4 @@
+V genes	Sequences
+Vseg1	ACT
+Vseg2	GGG
+Vseg3	CCC

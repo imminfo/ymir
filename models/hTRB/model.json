@@ -1,0 +1,52 @@
+{
+  "name": "Human T-cell receptor beta chain model",
+  "comment": "Insert comments for this model here",
+  "recombination": "VDJ",
+  "hypermutations": false,
+  "segments": {
+    "variable": "vsegments.txt",
+    "joining": "jsegments.txt",
+    "diversity": "dsegments.txt"
+  },
+  "probtables": {
+    "v": {
+      "file": "p.vj.txt",
+      "laplace": 0,
+      "type": "matrix"
+    },
+    "j.d": {
+      "file": "p.jd.txt",
+      "laplace": 0,
+      "type": "matrix"
+    },
+    "v.del": {
+      "file": "p.v.del.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "segdepend": true
+    },
+    "j.del": {
+      "file": "p.j.del.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "segdepend": true
+    },
+    "d.del": {
+      "file": "p.d.del.txt",
+      "laplace": 0,
+      "type": "matrix.list",
+      "segdepend": true
+    },
+    "ins.len": {
+      "file": "p.ins.len.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "segdepend": false
+    },
+    "ins.nucl": {
+      "file": "p.ins.nucl.txt",
+      "laplace": 0,
+      "type": "matrix"
+    }
+  }
+}

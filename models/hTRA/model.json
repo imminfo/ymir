@@ -1,0 +1,45 @@
+{
+  "name": "Human T-cell receptor alpha chain model",
+  "comment": "Insert comments for this model here",
+  "recombination": "VJ",
+  "hypermutations": false,
+  "segments": {
+    "variable": "vsegments.txt",
+    "joining": "jsegments.txt"
+  },
+  "probtables": {
+    "v.j": {
+      "file": "p.vj.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "skip.first.column": true
+    },
+    "v.del": {
+      "file": "p.v.del.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "seg.depend": true,
+      "skip.first.column": true
+    },
+    "j.del": {
+      "file": "p.j.del.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "seg.depend": true,
+      "skip.first.column": true
+    },
+    "ins.len": {
+      "file": "p.ins.len.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "seg.depend": false,
+      "skip.first.column": true
+    },
+    "ins.nucl": {
+      "file": "p.ins.nucl.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "skip.first.column": true
+    }
+  }
+}

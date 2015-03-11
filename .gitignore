@@ -26,3 +26,5 @@
 *.exe
 *.out
 *.app
+include
+mitcr.alpha2.txt

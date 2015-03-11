@@ -1,0 +1,15 @@
+{
+  "name": "MiXCR",
+  "comment": "Parser for MiXCR repertoire files",
+  "sep": "\t",
+  "1-based": true,
+  "nuc.seq": "CDR3 nucleotide sequence",
+  "aa.seq": "CDR3 amino acid sequence",
+  "V": "V hits",
+  "D": "D hits",
+  "J": "J hits",
+  "V.end": "Last V nucleotide position",
+  "D5": "First D nucleotide position",
+  "D3": "Last D nucleotide position",
+  "J.start": "First J nucleotide position"
+}

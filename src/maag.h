@@ -35,7 +35,7 @@ namespace ymir {
     * \class MAAG
     *
     * \brief Multi-Alignment Assembly Graph - basic class for representing
-    * all possible generation scenario of a nucleotide or amino acid sequence of an immune receptor.
+    * all possible generation scenarios of a nucleotide or amino acid sequence of an immune receptor.
     */
     class MAAG : protected ProbMMC {
 

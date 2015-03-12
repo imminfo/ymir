@@ -167,14 +167,10 @@ namespace ymir {
         }
 
 
-        node_ind_t chainSize() const {
-            return _chain.size();
-        }
+        node_ind_t chainSize() const { return _chain.size(); }
 
 
-        matrix_ind_t nodeSize(node_ind_t node_i) const {
-            return _chain[node_i].size();
-        }
+        matrix_ind_t nodeSize(node_ind_t node_i) const { return _chain[node_i].size(); }
 
 
         /**
@@ -206,11 +202,11 @@ namespace ymir {
         }
 
 
-        MMCSlice<_Scalar> slice() const {
-            // ???
-            // ???
-            // ???
-        }
+//        MMCSlice<_Scalar> slice() const {
+//            // ???
+//            // ???
+//            // ???
+//        }
 
 
     protected:

@@ -65,20 +65,6 @@ namespace ymir {
 
 
         /**
-        * \brief Compute and return full assembling probability of this sequence with specific gene segments alignments.
-        *
-        * \return Slice assembling probability.
-        */
-        numeric sliceProbability() const {
-//            matrix_t res(this->_chain[0]);
-//            for (matrix_ind i = 1; i < this->_chain.size(); i++) {
-//                res = res * this->_chain[i];
-//            }
-//            return res(0,0);
-        }
-
-
-        /**
         * \brief Compute and return full assembling probability of this sequence (i.e., with all gene segments alignments).
         *
         * \return Full assembling probability.
@@ -90,6 +76,14 @@ namespace ymir {
 //            }
 //            return res(0,0);
         }
+
+
+        ///@{
+        eventind_t nV() { return _n_v; }
+        eventind_t nJ() { return _n_j; }
+        eventind_t nD() { return _n_d; }
+        ///@}
+
 
 
     protected:

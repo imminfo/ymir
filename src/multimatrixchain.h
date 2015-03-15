@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef _MULTIMATRIXCHAIN_H
-#define _MULTIMATRIXCHAIN_H
+#ifndef _MULTIMATRIXCHAIN_H_
+#define _MULTIMATRIXCHAIN_H_
 
 
 #include <vector>

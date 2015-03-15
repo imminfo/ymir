@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef _ASSEMBLYGRAPH_H
-#define _ASSEMBLYGRAPH_H
+#ifndef _ASSEMBLYGRAPH_H_
+#define _ASSEMBLYGRAPH_H_
 
 
 #include "iterator"

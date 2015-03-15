@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef _MAAG_H
-#define _MAAG_H
+#ifndef _MAAG_H_
+#define _MAAG_H_
 
 
 #include "multimatrixchain.h"
@@ -43,7 +43,41 @@ namespace ymir {
 
     protected:
 
-        struct
+        /**
+        * \struct GeneSegment
+        */
+        struct GeneSegment {
+
+        public:
+
+            GeneSegment(eventind_t n) {
+                _n = n;
+                _prob = new prob_t[_n];
+                _indices = new eventind_t[_n];
+            }
+
+
+            virtual ~GeneSegment() {
+                delete [] _prob;
+                delete [] _indices;
+            }
+
+
+            prob_t prob(eventind_t i) const { return _prob[i]; }
+
+
+            eventind_t event_index(eventind_t i) const { return _indices[i]; }
+
+
+            eventind_t size() const { return _n; }
+
+        private:
+
+            eventind_t _n;
+            prob_t *_prob;  // Either J or D-J joint probability (matrix J-D).
+            eventind_t *_indices;
+
+        };
 
     public:
 
@@ -69,19 +103,37 @@ namespace ymir {
         *
         * \return Full assembling probability.
         */
-        numeric fullProbability() const {
-//            matrix_t res(this->_chain[0]);
-//            for (matrix_ind i = 1; i < this->_chain.size(); i++) {
-//                res = res * this->_chain[i];
-//            }
-//            return res(0,0);
+        numeric fullProbability(eventind_t v_index, eventind_t j_index = 0) const {
+            // P(Vi) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji) * P(Ji)
+            return (_vdata->prob(v_index) *        // P(Vi)
+                    _chain[0][v_index] *           // P(#dels | Vi)
+                    _chain[1][0] *                 // P(V-J insertion seq)
+                    _chain[2][j_index] *           // P(#dels | Ji)
+                    _jdata->prob(j_index))(0, 0);  // P(Ji)
+        }
+        numeric fullProbability(eventind_t v_index, eventind_t d_index, eventind_t j_index = 0) const {
+            // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
+            return (_vdata->prob(v_index) *   // P(Vi)
+                    _chain[0][v_index] *      // P(#dels | Vi)
+                    _chain[1][0] *            // P(V-D3' insertion seq)
+                    _chain[2][d_index] *      // P(D5'-D3' deletions | Di)
+                    _chain[3][0] *            // P(D5'-J insertion seq)
+                    _chain[4][j_index] *      // P(#dels | Ji)
+                    _jdata->prob(j_index * _ddata->size() + d_index))(0, 0);  // P(Ji & Di)
         }
 
 
         ///@{
-        eventind_t nV() { return _n_v; }
-        eventind_t nJ() { return _n_j; }
-        eventind_t nD() { return _n_d; }
+        eventind_t nV() { return _vdata->size(); }
+        eventind_t nJ() { return _jdata->size(); }
+        eventind_t nD() { return _ddata->size(); }
+        ///@}
+
+
+        ///@{
+        eventind_t vgene(uint8_t i) { return _vdata->event_index(i); }
+        eventind_t jgene(uint8_t i) { return _jdata->event_index(i)]; }
+        eventind_t dgene(uint8_t i) { return _ddata->event_index(i); }
         ///@}
 
 
@@ -90,10 +142,7 @@ namespace ymir {
 
         EventIndMMC *_events;  /** Matrix of indices of events for each edge. */
 
-        // gene segment metadata structure
-        eventind_t *_vind, *_jind, *_dind;
-        prob_t *_vprobs, *_jprobs, *_dprobs;  // ??? DJ joint probability;
-        eventind_t _n_v, _n_j, _n_d;
+        GeneSegment *_vdata, *_jdata, *_ddata;
 
         seq_len_t *_seq_poses;  /** Vector of the initial clonal sequence's positions for each vertex. */
         seq_len_t _seq_len;  /** Size of the initial clonal sequence. */

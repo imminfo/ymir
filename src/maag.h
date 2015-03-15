@@ -30,6 +30,8 @@
 
 namespace ymir {
 
+    class MAAG;
+
 
     /**
     * \class MAAG
@@ -38,6 +40,10 @@ namespace ymir {
     * all possible generation scenarios of a nucleotide or amino acid sequence of an immune receptor.
     */
     class MAAG : protected ProbMMC {
+
+    protected:
+
+        struct
 
     public:
 

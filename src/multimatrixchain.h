@@ -120,8 +120,10 @@ namespace ymir {
                 _vec = new matrix_t[n];
                 for (matrix_ind_t i = 0; i < _n; ++i) {
                     _vec[i].resize(rows, cols);
-                    // fill with some value???
+                    _vec[i].fill(0);
                 }
+                // _vec = new matrix_t*[n];
+                // _vec[i] = new matrix_t(rows, cols);
             }
 
 
@@ -136,7 +138,7 @@ namespace ymir {
 
             matrix_ind_t size() const { return _n; }
 
-            matrix_t *ptr(matrix_ind_t mat_i) const { return _vec + mat_i; }
+//            matrix_t *ptr(matrix_ind_t mat_i) const { return _vec + mat_i; }
 
         protected:
 

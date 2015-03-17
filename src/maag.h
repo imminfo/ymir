@@ -52,17 +52,23 @@ namespace ymir {
 
             GeneSegment(eventind_t n) {
                 _n = n;
-                _indices = new eventind_t[_n];
+                _event_indices = new eventind_t[_n];
+                _gene_indices = new segindex_t[_n];
             }
 
 
             virtual ~GeneSegment() {
-                delete [] _indices;
+                delete [] _event_indices;
+                delete [] _gene_indices;
             }
 
 
-            eventind_t event_index(eventind_t i) const { return _indices[i]; }
-            eventind_t& event_index(eventind_t i) { return _indices[i]; }
+            segindex_t gene_index(eventind_t i) const { return _gene_indices[i]; }
+            segindex_t& gene_index(eventind_t i) { return _gene_indices[i]; }
+
+
+            eventind_t event_index(eventind_t i) const { return _event_indices[i]; }
+            eventind_t& event_index(eventind_t i) { return _event_indices[i]; }
 
 
             eventind_t size() const { return _n; }
@@ -70,7 +76,8 @@ namespace ymir {
         private:
 
             eventind_t _n;
-            eventind_t *_indices;
+            eventind_t *_event_indices;
+            segindex_t *_gene_indices;
 
         };
 
@@ -87,9 +94,10 @@ namespace ymir {
             }
         }
 
+
         virtual ~MAAG() {
             if (_events) { delete _events; }
-            // delete [] _seq_poses;
+             delete [] _seq_poses;
         }
 
 
@@ -127,9 +135,9 @@ namespace ymir {
 
 
         ///@{
-        eventind_t vgene(uint8_t i) { return _vdata->event_index(i); }
-        eventind_t jgene(uint8_t i) { return _jdata->event_index(i); }
-        eventind_t dgene(uint8_t i) { return _ddata->event_index(i); }
+        segindex_t vgene(uint8_t i) { return _vdata->gene_index(i); }
+        segindex_t jgene(uint8_t i) { return _jdata->gene_index(i); }
+        segindex_t dgene(uint8_t i) { return _ddata->gene_index(i); }
         ///@}
 
 

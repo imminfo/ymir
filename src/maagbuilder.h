@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef _YMIR_MAAGBUILDER_H_
-#define _YMIR_MAAGBUILDER_H_
+#ifndef _MAAGBUILDER_H_
+#define _MAAGBUILDER_H_
 
 
 #include "maag.h"
@@ -34,6 +34,14 @@ namespace ymir {
 
 
     class MAAGBuilder : protected MAAG {
+
+    protected:
+
+        /**
+        *
+        */
+        typedef tuple<segindex_t, prob_t, eventind_t, segindex_t> gene_info;
+
     public:
 
 
@@ -46,11 +54,37 @@ namespace ymir {
         }
 
 
+        MAAG build() {
+
+        }
+
+
+        void reset() { delete _maag; }
+
+
+        void addVariableGene(segindex_t v_index
+                , eventind_t v_event
+                , prob_t v_prob) {
+
+        }
+
+
+        void addVariableDeletion(eventind_t v_order
+                , eventind_t event_index
+                , prob_t event_prob) {
+
+        }
+
+        void addJoiningGene() {}
+
+        void addDiversityGene() {}
 
 
     protected:
 
+        MAAG *_maag;
+        vector<gene_info> _vgenes, _jgenes, _dgenes;
     };
 }
 
-#endif //_YMIR_MAAGBUILDER_H_
+#endif //_MAAGBUILDER_H_

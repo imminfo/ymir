@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef _REPERTOIRE_H
-#define _REPERTOIRE_H
+#ifndef _REPERTOIRE_H_
+#define _REPERTOIRE_H_
 
 
 #include "vector"

@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef _MARKOV_CHAIN_H
-#define _MARKOV_CHAIN_H
+#ifndef _MARKOV_CHAIN_H_
+#define _MARKOV_CHAIN_H_
 
 
 #include "string"
@@ -102,28 +102,28 @@ namespace ymir {
         }
 
 
-        const event_matrix_t& nuc_prob_table() const {
-
-        }
-
-
-        const event_matrix_t& aa_prob_table() const {
-
-        }
+//        const event_matrix_t& nuc_prob_table() const {
+//
+//        }
 
 
-        const event_matrix_t& generateAminoAcidProbTable() {
+//        const event_matrix_t& aa_prob_table() const {
+//
+//        }
 
-        }
+
+//        const event_matrix_t& generateAminoAcidProbTable() {
+//
+//        }
 
 
         bool readAminoAcidProbTable() {
-
+            return false;
         }
 
 
         bool writeAminoAcidProbTable() const {
-
+            return false;
         }
 
 

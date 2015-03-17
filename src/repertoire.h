@@ -204,14 +204,19 @@ namespace ymir {
         }
 
 
-        ClonalRepertoireView codingSequences() const {
+        virtual ~ClonalRepertoireView() {
 
         }
 
 
-        ClonalRepertoireView noncodingSequences() const {
+//        ClonalRepertoireView codingSequences() const {
+//
+//        }
 
-        }
+
+//        ClonalRepertoireView noncodingSequences() const {
+//
+//        }
 
     };
 

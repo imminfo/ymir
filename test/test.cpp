@@ -6,7 +6,7 @@
  * and generation of artificial sequences of T-cell receptors data.
  *
  *
- * Copyright 2015 Vadim Nazarov <vdm dot nazarov at gmail dot com>
+ * Copyright 2015 Vadim Nazarov <vadim dot nazarov at mailbox dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,13 +38,13 @@
 #include <iostream>
 #include <list>
 
+#include "matrixchain.h"
 #include "modelparametervector.h"
-#include "assemblygraph.h"
 #include "genesegment.h"
 #include "clone.h"
 #include "parser.h"
 #include "markovchain.h"
-#include "statisticalinferencealgorithm.h"
+//#include "statisticalinferencealgorithm.h"
 
 #include "maagbuilder.h"
 
@@ -880,6 +880,7 @@ int main() {
     // Test for Multi-Matrix Chains
     YMIR_TEST(test_mmc(), "Multi-Matrix chain fail")
 
+    // Tests for MAAG / MAAG builder
     YMIR_TEST(test_maag_vj(), "MAAG VJ test failed")
     YMIR_TEST(test_maag_vdj(), "MAAG VDJ test failed")
 

@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef _TOOLS_H
-#define _TOOLS_H
+#ifndef _TOOLS_H_
+#define _TOOLS_H_
 
 
 #include <string>
@@ -56,9 +56,9 @@ namespace ymir {
     }
 
 
-    string translate(const string& nuc_seq) {
-
-    }
+//    string translate(const string& nuc_seq) {
+//
+//    }
 
 }
 

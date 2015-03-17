@@ -21,11 +21,11 @@
  * limitations under the License.
  */
 
-#ifndef _ASSEMBLINGSTATISTICALMODEL_H
-#define _ASSEMBLINGSTATISTICALMODEL_H
+#ifndef _ASSEMBLINGSTATISTICALMODEL_H_
+#define _ASSEMBLINGSTATISTICALMODEL_H_
 
 
-#include "assemblygraph.h"
+#include "maagbuilder.h"
 #include "repertoire.h"
 #include "genesegment.h"
 
@@ -41,9 +41,9 @@ namespace ymir {
     *
     * \return New struct with matrix with event probabilities and metadata.
     */
-    event_matrix_t read_event_matrix(const string& filepath) {
-
-    }
+//    event_matrix_t read_event_matrix(const string& filepath) {
+//
+//    }
 
 
 
@@ -101,7 +101,7 @@ namespace ymir {
     /**
     * \class AssemblingStatisticalModel
     */
-    class AssemblingStatisticalModel : protected AssemblyGraph {
+    class AssemblingStatisticalModel : protected MAAG {
 
         /**
         * \class SequenceGenerator
@@ -174,16 +174,16 @@ namespace ymir {
             EventFamilyIndexer() {};
 
 
-            eventind_t VgeneFamily(segindex_t Vseg) const {}
-            eventind_t VdelFamily(segindex_t Vseg) const {}
+            eventind_t VgeneFamily(segindex_t Vseg) const { return 0; }
+            eventind_t VdelFamily(segindex_t Vseg) const { return 0; }
 
-            eventind_t JgeneFamily(segindex_t Jseg) const {}
-            eventind_t JdelFamily(segindex_t Jseg) const {}
+            eventind_t JgeneFamily(segindex_t Jseg) const { return 0; }
+            eventind_t JdelFamily(segindex_t Jseg) const { return 0; }
 
-            eventind_t DgeneFamily(segindex_t Dseg) const {}
-            eventind_t DdelFamily(segindex_t Dseg, seq_len_t end5_dels, seq_len_t end3_dels) const {}
+            eventind_t DgeneFamily(segindex_t Dseg) const { return 0; }
+            eventind_t DdelFamily(segindex_t Dseg, seq_len_t end5_dels, seq_len_t end3_dels) const { return 0; }
 
-            eventind_t insLenFamily(segindex_t ins_len_order) const {}
+            eventind_t insLenFamily(segindex_t ins_len_order) const { return 0; }
 
         protected:
 
@@ -196,7 +196,7 @@ namespace ymir {
         /**
         *
         */
-        AssemblingStatisticalModel(const string& folderpath) : AssemblyGraph(false) {
+        AssemblingStatisticalModel(const string& folderpath) : MAAG(false) {
             _status = false;
             _genes = nullptr;
             _model_parameters = nullptr;
@@ -260,9 +260,9 @@ namespace ymir {
         *
         * \return Vector of assembly graphs.
         */
-        const vector<AssemblyGraph>& buildGraphs(const ClonalRepertoireView& repertoire, bool aminoacid = false) const {
-
-        }
+//        const vector<AssemblyGraph>& buildGraphs(const ClonalRepertoireView& repertoire, bool aminoacid = false) const {
+//
+//        }
 
 
         /**

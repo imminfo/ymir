@@ -52,21 +52,17 @@ namespace ymir {
 
             GeneSegment(eventind_t n) {
                 _n = n;
-                _prob = new prob_t[_n];
                 _indices = new eventind_t[_n];
             }
 
 
             virtual ~GeneSegment() {
-                delete [] _prob;
                 delete [] _indices;
             }
 
 
-            prob_t prob(eventind_t i) const { return _prob[i]; }
-
-
             eventind_t event_index(eventind_t i) const { return _indices[i]; }
+            eventind_t& event_index(eventind_t i) { return _indices[i]; }
 
 
             eventind_t size() const { return _n; }
@@ -74,7 +70,6 @@ namespace ymir {
         private:
 
             eventind_t _n;
-            prob_t *_prob;  // Either J or D-J joint probability (matrix J-D).
             eventind_t *_indices;
 
         };
@@ -92,12 +87,8 @@ namespace ymir {
             }
         }
 
-
         virtual ~MAAG() {
             if (_events) { delete _events; }
-            delete _vdata;
-            delete _jdata;
-            if (_ddata) { delete _ddata; }
             // delete [] _seq_poses;
         }
 
@@ -109,21 +100,22 @@ namespace ymir {
         */
         numeric fullProbability(eventind_t v_index, eventind_t j_index = 0) const {
             // P(Vi) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji) * P(Ji)
-            return (_vdata->prob(v_index) *        // P(Vi)
-                    _chain[0][v_index] *           // P(#dels | Vi)
-                    _chain[1][0] *                 // P(V-J insertion seq)
-                    _chain[2][j_index] *           // P(#dels | Ji)
-                    _jdata->prob(j_index))(0, 0);  // P(Ji)
+            return (_chain[0][v_index] *        // P(Vi)
+                    _chain[1][v_index] *        // P(#dels | Vi)
+                    _chain[2][0] *              // P(V-J insertion seq)
+                    _chain[3][j_index] *        // P(#dels | Ji)
+                    _chain[4][j_index])(0, 0);  // P(Ji)
         }
         numeric fullProbability(eventind_t v_index, eventind_t d_index, eventind_t j_index = 0) const {
             // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
-            return (_vdata->prob(v_index) *   // P(Vi)
-                    _chain[0][v_index] *      // P(#dels | Vi)
-                    _chain[1][0] *            // P(V-D3' insertion seq)
-                    _chain[2][d_index] *      // P(D5'-D3' deletions | Di)
-                    _chain[3][0] *            // P(D5'-J insertion seq)
-                    _chain[4][j_index] *      // P(#dels | Ji)
-                    _jdata->prob(j_index * _ddata->size() + d_index))(0, 0);  // P(Ji & Di)
+            return (_chain[0][v_index] *      // P(Vi)
+                    _chain[1][v_index] *      // P(#dels | Vi)
+                    _chain[2][0] *            // P(V-D3' insertion seq)
+                    _chain[3][d_index] *      // P(D5'-D3' deletions | Di)
+                    _chain[4][0] *            // P(D5'-J insertion seq)
+                    _chain[5][j_index] *      // P(#dels | Ji)
+                    _chain[6][0](j_index, d_index))(0, 0);  // P(Ji & Di)
+//                    _jdata->prob(j_index * _ddata->size() + d_index))(0, 0);  // P(Ji & Di)
         }
 
 

@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef _ALIGNER_H
-#define _ALIGNER_H
+#ifndef _ALIGNER_H_
+#define _ALIGNER_H_
 
 
 #include <string>
@@ -191,7 +191,7 @@ namespace ymir {
 
 
         virtual LocalAlignmentIndices alignLocal(const string& pattern, const string& text, seq_len_t match_min_len = 3) const {
-
+            return LocalAlignmentIndices(vector<seq_len_t>(1));
         }
 
     };

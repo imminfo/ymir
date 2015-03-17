@@ -97,7 +97,7 @@ namespace ymir {
         /**
         * \brief Probability of the given amino acid sequence.
         */
-        prob_t aaProbability(const string& sequence) const {
+        prob_t aaProbability(const string& sequence, seq_len_t left_shift = 0, seq_len_t right_shift = 0) const {
             return 0;
         }
 

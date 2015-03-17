@@ -95,6 +95,10 @@ namespace ymir {
 
         virtual ~MAAG() {
             if (_events) { delete _events; }
+            delete _vdata;
+            delete _jdata;
+            if (_ddata) { delete _ddata; }
+            // delete [] _seq_poses;
         }
 
 
@@ -132,7 +136,7 @@ namespace ymir {
 
         ///@{
         eventind_t vgene(uint8_t i) { return _vdata->event_index(i); }
-        eventind_t jgene(uint8_t i) { return _jdata->event_index(i)]; }
+        eventind_t jgene(uint8_t i) { return _jdata->event_index(i); }
         eventind_t dgene(uint8_t i) { return _ddata->event_index(i); }
         ///@}
 

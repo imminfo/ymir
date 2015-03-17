@@ -46,7 +46,7 @@
 #include "markovchain.h"
 #include "statisticalinferencealgorithm.h"
 
-#include "multimatrixchain.h"
+#include "maagbuilder.h"
 
 
 using namespace std;
@@ -552,30 +552,6 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
     cb.addDalignment(31, 8, 9, 11, 12);
     cb.addDalignment(31, 8, 9, 13, 14);
 
-//    Clone *c = cb.buildClone();
-//
-//    YMIR_ASSERT(c->sequence() == "nuclseq")
-//    YMIR_ASSERT(c->is_nucleotide())
-//    YMIR_ASSERT(c->is_vdj())
-//    YMIR_ASSERT(c->getV(0) == 10)
-//    YMIR_ASSERT(c->getVend(0) == 15)
-//    YMIR_ASSERT(c->getV(1) == 11)
-//    YMIR_ASSERT(c->getVend(1) == 25)
-//    YMIR_ASSERT(c->getV(2) == 12)
-//    YMIR_ASSERT(c->getVend(2) == 35)
-//    YMIR_ASSERT(c->getJ(0) == 20)
-//    YMIR_ASSERT(c->getJstart(0) == 21)
-//    YMIR_ASSERT(c->getD(0) == 30)
-//    YMIR_ASSERT(c->getDalignment(0, 0) == d_alignment_t(1,2,3,4))
-//    YMIR_ASSERT(c->getDalignment(0, 1) == d_alignment_t(1,2,5,6))
-//    YMIR_ASSERT(c->getD(1) == 31)
-//    YMIR_ASSERT(c->getDalignment(1, 0) == d_alignment_t(8,9,11,12))
-//    YMIR_ASSERT(c->getDalignment(1, 1) == d_alignment_t(8,9,13,14))
-//    YMIR_ASSERT(c->nV() == 3)
-//    YMIR_ASSERT(c->nJ() == 1)
-//    YMIR_ASSERT(c->nD() == 2)
-//    delete c;
-
     Clone c = cb.buildClone();
 
     YMIR_ASSERT(c.sequence() == "nuclseq")
@@ -743,6 +719,102 @@ YMIR_TEST_START(test_markovchain_aa)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_mmc)
+    /*
+    0-1:
+        .5
+    0-2:
+        2
+
+    1-1:
+        1 2 4
+    1-2:
+        2 3 0
+
+    2:
+        1 1 1
+        2 2 0
+        1 0 .5
+
+    3-1:
+        2
+        4
+        2
+    3-2:
+        3
+        4
+        5
+
+    4-1:
+        .2
+    4-2:
+        .4
+
+    prod 1-1-1 = 4.4
+    prod 2-1-2 = 52.8
+     */
+
+    ProbMMC mat;
+    YMIR_ASSERT(mat.addNode(2, 1, 1) == 0)
+    mat(0, 0, 0, 0) = .5;
+    mat(0, 1, 0, 0) = 2;
+
+    YMIR_ASSERT(mat.addNode(2, 1, 3) == 1)
+    mat(1, 0, 0, 0) = 1;
+    mat(1, 0, 0, 1) = 2;
+    mat(1, 0, 0, 2) = 4;
+    mat(1, 1, 0, 0) = 2;
+    mat(1, 1, 0, 1) = 3;
+    mat(1, 1, 0, 2) = 0;
+
+    YMIR_ASSERT(mat.addNode(1, 3, 3) == 2)
+    mat(2, 0, 0, 0) = 1;
+    mat(2, 0, 0, 1) = 1;
+    mat(2, 0, 0, 2) = 1;
+    mat(2, 0, 1, 0) = 2;
+    mat(2, 0, 1, 1) = 2;
+    mat(2, 0, 1, 2) = 0;
+    mat(2, 0, 2, 0) = 1;
+    mat(2, 0, 2, 1) = 0;
+    mat(2, 0, 2, 2) = .5;
+
+    YMIR_ASSERT(mat.addNode(2, 3, 1) == 3)
+    mat(3, 0, 0, 0) = 2;
+    mat(3, 0, 1, 0) = 4;
+    mat(3, 0, 2, 0) = 2;
+    mat(3, 1, 0, 0) = 3;
+    mat(3, 1, 1, 0) = 4;
+    mat(3, 1, 2, 0) = 5;
+
+    YMIR_ASSERT(mat.addNode(2, 1, 1) == 4)
+    mat(4, 0, 0, 0) = .2;
+    mat(4, 1, 0, 0) = .4;
+
+    YMIR_ASSERT((mat.matrix(0, 0)
+            * mat.matrix(1, 0)
+            * mat.matrix(2, 0)
+            * mat.matrix(3, 0)
+            * mat.matrix(4, 0))(0, 0) == 4.4)
+
+    YMIR_ASSERT((mat.matrix(0, 1)
+            * mat.matrix(1, 1)
+            * mat.matrix(2, 0)
+            * mat.matrix(3, 1)
+            * mat.matrix(4, 1))(0, 0) - 52.8 < 1e-14)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_maag_vj)
+    YMIR_ASSERT(false)
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_maag_vdj)
+    YMIR_ASSERT(false)
+YMIR_TEST_END
+
+
 struct TestInfo {
     string test_name;
     vector<string> failed_cases;
@@ -805,7 +877,11 @@ int main() {
     YMIR_TEST(test_markovchain_nuc(), "Markov chain nucleotide fail")
     YMIR_TEST(test_markovchain_aa(), "Markov chain amino acid fail")
 
-    // Tests for AssemblyGraph and AssemblyGraphBuilder classes.
+    // Test for Multi-Matrix Chains
+    YMIR_TEST(test_mmc(), "Multi-Matrix chain fail")
+
+    YMIR_TEST(test_maag_vj(), "MAAG VJ test failed")
+    YMIR_TEST(test_maag_vdj(), "MAAG VDJ test failed")
 
     // Tests for assembling statistical model (ASM) reading / writing files.
 

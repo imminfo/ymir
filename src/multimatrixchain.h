@@ -127,6 +127,15 @@ namespace ymir {
             }
 
 
+            Node(const Node& other) {
+                _n = other._n;
+                _vec = new matrix_t[_n];
+                for (matrix_ind_t i = 0; i < _n; ++i) {
+                    _vec[i] = other._vec[i];
+                }
+            }
+
+
             ~Node() { delete [] _vec; }
 
 
@@ -167,6 +176,9 @@ namespace ymir {
         const matrix_t& matrix(node_ind_t node_i, matrix_ind_t mat_i) const {
             return _chain[node_i][mat_i];
         }
+        matrix_t& matrix(node_ind_t node_i, matrix_ind_t mat_i) {
+            return _chain[node_i][mat_i];
+        }
 
 
         node_ind_t chainSize() const { return _chain.size(); }
@@ -198,7 +210,7 @@ namespace ymir {
         /**
         * \brief Add new node with pattern matrix.
         */
-        node_ind_t addNode(node_ind_t node_i, matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
+        node_ind_t addNode(matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
             _chain.push_back(Node(n_matrices, rows, cols));
             return _chain.size() - 1;
         }
@@ -230,7 +242,7 @@ namespace ymir {
     public:
 
         MMCSlice(typename MultiMatrixChain<_Scalar>::node_ind_t n) : _i(0), _n(n) {
-            this->_vec = new MultiMatrixChain<_Scalar>::matrix_t*[_n];
+            this->_vec = new typename MultiMatrixChain<_Scalar>::matrix_t*[_n];
         }
 
 

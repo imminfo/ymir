@@ -128,7 +128,7 @@ namespace ymir {
 
 
         /**
-        * \brief Parse text file with sequence alignment data and return constructed ClonotypeRepertoire.
+        * \brief Parse text file with sequence alignment data and return constructed Cloneset.
         *
         * Parse all lines in the file and return a repertoire. If no alignments found or any of align_* parameters
         * is true, create alignment using input aligner from function loadFile().
@@ -146,7 +146,7 @@ namespace ymir {
         *
         * \return True if found has been successfully processed, false otherwise.
         */
-        bool parse(const string& filepath, ClonotypeRepertoire *rep, const VDJRecombinationGenes& gene_segments,
+        bool parse(const string& filepath, Cloneset *rep, const VDJRecombinationGenes& gene_segments,
                 const AbstractAligner& aligner = NaiveNucleotideAligner(),
                 bool nuc_sequences = true,
                 AlignmentColumnOptions opts = AlignmentColumnOptions().setV(MAKE_IF_NOT_FOUND).setJ(MAKE_IF_NOT_FOUND).setD(MAKE_IF_NOT_FOUND)) {

@@ -192,6 +192,7 @@ namespace ymir {
             this->_map[name] = index;
             this->_vec.push_back(GeneSegment(name, seq, index));
         }
+
     };
 
 

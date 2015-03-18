@@ -94,17 +94,6 @@ namespace ymir {
 
     public:
 
-        MAAG() {
-            _events = nullptr;
-        }
-
-
-        MAAG(bool fill_event_indices) : MAAG() {
-            if (fill_event_indices) {
-                _events = new EventIndMMC();
-            }
-        }
-
 
         MAAG(const MAAG &other) {
             if (other._events) {
@@ -113,13 +102,6 @@ namespace ymir {
             _vdata = new GeneSegment(*other._vdata);
             _jdata = new GeneSegment(*other._jdata);
             if (other._ddata) { _ddata = new GeneSegment(*other._ddata); }
-        }
-
-
-        MAAG(const ClonotypeMetadata& clone) {
-            // ???
-            // ???
-            // ???
         }
 
 
@@ -183,6 +165,12 @@ namespace ymir {
 
         seq_len_t *_seq_poses;  /** Vector of the initial clonal sequence's positions for each vertex. */
         seq_len_t _seq_len;  /** Size of the initial clonal sequence. */
+        string _sequence;  /** Nucleotide or amino acid CDR3 sequence. */
+
+
+        MAAG() {
+            _events = nullptr;
+        }
 
     };
 }

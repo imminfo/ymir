@@ -193,35 +193,35 @@ namespace ymir {
     };
 
 
-//    typedef AbstractRepertoireView<Clonotype> ClonotypeRepertoireView;
+//    typedef AbstractRepertoireView<Clonotype> ClonesetView;
 
-    class ClonotypeRepertoireView : public AbstractRepertoireView<Clonotype> {
+    class ClonesetView : public AbstractRepertoireView<Clonotype> {
 
     public:
 
-        ClonotypeRepertoireView() {
+        ClonesetView() {
 
         }
 
 
-        virtual ~ClonotypeRepertoireView() {
+        virtual ~ClonesetView() {
 
         }
 
 
-//        ClonotypeRepertoireView codingSequences() const {
+//        ClonesetView codingSequences() const {
 //
 //        }
 
 
-//        ClonotypeRepertoireView noncodingSequences() const {
+//        ClonesetView noncodingSequences() const {
 //
 //        }
 
     };
 
 
-    typedef AbstractRepertoire<Clonotype> ClonotypeRepertoire;
+    typedef AbstractRepertoire<Clonotype> Cloneset;
 
 }
 

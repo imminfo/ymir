@@ -612,7 +612,7 @@ YMIR_TEST_START(test_mitcr)
     YMIR_ASSERT(V_err)
     YMIR_ASSERT(J_err)
 
-    ClonotypeRepertoire cr;
+    Cloneset cr;
     YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha.txt", &cr, vdj_genes))
 
     YMIR_ASSERT(cr.size() == 30)

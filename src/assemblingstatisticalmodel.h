@@ -379,6 +379,14 @@ namespace ymir {
             // make indexer here
         }
 
+
+        // resize deletions vectors to gene segment length
+        void resizeGeneDeletionsVector() {}
+
+        // grow deletions vectors (fill with zeros added rows) so
+        // all vectors will be of same length
+        void growGeneDeletionsVector() {}
+
     };
 
 

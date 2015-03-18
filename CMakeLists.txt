@@ -11,3 +11,4 @@ add_executable(Ymir ${SOURCE_FILES})
 
 include_directories(include)
 add_subdirectory(test)
+add_subdirectory(benchmark)

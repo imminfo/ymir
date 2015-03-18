@@ -102,6 +102,7 @@ namespace ymir {
             _vdata = new GeneSegment(*other._vdata);
             _jdata = new GeneSegment(*other._jdata);
             if (other._ddata) { _ddata = new GeneSegment(*other._ddata); }
+            if (other._sequence) { _sequence = new string(other._sequence); }
         }
 
 
@@ -111,6 +112,7 @@ namespace ymir {
             delete _jdata;
             if (_ddata) { delete _ddata; }
             delete [] _seq_poses;
+            if (_sequence) { delete _sequence; }
         }
 
 
@@ -156,6 +158,8 @@ namespace ymir {
         ///@}
 
 
+        // serialize MAAG
+
 
     protected:
 
@@ -165,11 +169,12 @@ namespace ymir {
 
         seq_len_t *_seq_poses;  /** Vector of the initial clonal sequence's positions for each vertex. */
         seq_len_t _seq_len;  /** Size of the initial clonal sequence. */
-        string _sequence;  /** Nucleotide or amino acid CDR3 sequence. */
+        string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
 
 
         MAAG() {
             _events = nullptr;
+            _sequence = nullptr;
         }
 
     };

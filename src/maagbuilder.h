@@ -54,9 +54,12 @@ namespace ymir {
         }
 
 
-        MAAG build() {
+        MAAG build(const ClonotypeMetadata &clonotype) {
 
         }
+
+
+        // void build(const ClonotypeMetadata &clonotype, MAAG* maag)
 
 
         void reset() { delete _maag; }
@@ -74,9 +77,9 @@ namespace ymir {
         }
 
 
-        void addVariableDeletion(eventind_t v_order
-                , eventind_t event_index
-                , prob_t event_prob) {
+        void addVariableGeneDeletion(eventind_t v_order
+                , eventind_t cur_del_index
+                , eventind_t max_del_index) {
 
         }
 
@@ -89,6 +92,8 @@ namespace ymir {
 
         MAAG *_maag;
         vector<gene_info> _vgenes, _jgenes, _dgenes;
+        ModelParameterVector *_param_vec;  // or just copy it ???
+
     };
 }
 

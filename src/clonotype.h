@@ -326,7 +326,7 @@ namespace ymir {
     * \brief Metadata clone: indices of events corresponding to
     * gene segments' alignment, deletions and nucleotide insertions.
     */
-    struct ClonotypeMetadata {
+    struct ClonotypeMetadata : public Clonotype {
 
     public:
 
@@ -347,8 +347,6 @@ namespace ymir {
 
         eventind_t *_v_indices, *_j_indices, *_d_indices; //* Indices of event families of aligned gene segments (family event indices). */
         seq_len_t *_v_dels, *_j_dels, *_d_dels; //* Number of deletions for each aligned gene segments. */
-
-        seq_len_t *_n_segments, *_n_D_segments; //* Number of aligned gene segments. */
 
         eventind_t *_ins_lens; //* Indices of families of insertions lengths. Size = _n_segments - 1 */
 

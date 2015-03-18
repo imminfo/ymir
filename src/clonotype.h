@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef _CLONE_H
-#define _CLONE_H
+#ifndef _CLONOTYPE_H
+#define _CLONOTYPE_H
 
 
 #include "types.h"
@@ -35,17 +35,17 @@ using namespace std;
 
 namespace ymir {
 
-    #define CLONEBUILDER_VSEG_DEFAULT_RESERVE_SIZE 3
-    #define CLONEBUILDER_JSEG_DEFAULT_RESERVE_SIZE 2
-    #define CLONEBUILDER_DSEG_DEFAULT_RESERVE_SIZE 40
+    #define CLONOTYPEBUILDER_VSEG_DEFAULT_RESERVE_SIZE 3
+    #define CLONOTYPEBUILDER_JSEG_DEFAULT_RESERVE_SIZE 2
+    #define CLONOTYPEBUILDER_DSEG_DEFAULT_RESERVE_SIZE 40
 
 
     /**
-    * \struct Clone
+    * \struct Clonotype
     */
-    struct Clone {
+    struct Clonotype {
 
-        Clone(const string& sequence, bool nucleotide, segindex_t *segments, segindex_t *n_segments,
+        Clonotype(const string& sequence, bool nucleotide, segindex_t *segments, segindex_t *n_segments,
                 seq_len_t *alignments, seq_len_t *n_D_alignments = nullptr) : seq(sequence), nucleotide(nucleotide) {
 
             this->segments = segments;
@@ -55,7 +55,7 @@ namespace ymir {
         }
 
 
-        Clone(const Clone& other) {
+        Clonotype(const Clonotype& other) {
             this->seq = other.seq;
             this->nucleotide = other.nucleotide;
 
@@ -87,7 +87,7 @@ namespace ymir {
         }
 
 
-        virtual ~Clone() {
+        virtual ~Clonotype() {
             if (this->segments) {
                 delete [] this->segments;
             }
@@ -165,32 +165,32 @@ namespace ymir {
         seq_len_t *n_D_alignments; //* Number of alignments (i.e., 4-tuples) for each aligned D segment; vector's length == n_segments[2] */
 
 
-        Clone() {}
+        Clonotype() {}
 
     };
 
 
     /**
-    * \class CloneBuilder
+    * \class ClonotypeBuilder
     */
-    class CloneBuilder : protected Clone {
+    class ClonotypeBuilder : protected Clonotype {
     public:
 
-        CloneBuilder() {
+        ClonotypeBuilder() {
             this->reset();
         }
 
 
-        virtual ~CloneBuilder() {
+        virtual ~ClonotypeBuilder() {
         }
 
 
         /**
         * \brief Build clone alignment structure with stored information.
         *
-        * \return Pointer to the newly created CloneAlignment object.
+        * \return Pointer to the newly created ClonotypeAlignment object.
         */
-        Clone buildClone() {
+        Clonotype buildClonotype() {
 //            segindex_t *n_segments = new segindex_t[3];
             n_segments = new segindex_t[3];
             n_segments[0] = this->_Vseg.size();
@@ -233,7 +233,7 @@ namespace ymir {
             }
 
 
-            Clone cla = Clone(this->seq, this->nucleotide, segments, n_segments, alignments, n_D_alignments);
+            Clonotype cla = Clonotype(this->seq, this->nucleotide, segments, n_segments, alignments, n_D_alignments);
 //            n_segments = nullptr;
 //            segments = nullptr;
 //            alignments = nullptr;
@@ -246,7 +246,7 @@ namespace ymir {
         /**
         * \brief Set sequence for building a clone.
         *
-        * \param seq Clone sequence.
+        * \param seq Clonotype sequence.
         */
         void setSequence(const string& seq) { this->seq = seq; }
 
@@ -295,19 +295,19 @@ namespace ymir {
             n_D_alignments = nullptr;
 
             this->_Vseg.clear();
-            this->_Vseg.reserve(CLONEBUILDER_VSEG_DEFAULT_RESERVE_SIZE);
+            this->_Vseg.reserve(CLONOTYPEBUILDER_VSEG_DEFAULT_RESERVE_SIZE);
             this->_Valign.clear();
-            this->_Valign.reserve(CLONEBUILDER_VSEG_DEFAULT_RESERVE_SIZE);
+            this->_Valign.reserve(CLONOTYPEBUILDER_VSEG_DEFAULT_RESERVE_SIZE);
 
             this->_Jseg.clear();
-            this->_Jseg.reserve(CLONEBUILDER_JSEG_DEFAULT_RESERVE_SIZE);
+            this->_Jseg.reserve(CLONOTYPEBUILDER_JSEG_DEFAULT_RESERVE_SIZE);
             this->_Jalign.clear();
-            this->_Jalign.reserve(CLONEBUILDER_JSEG_DEFAULT_RESERVE_SIZE);
+            this->_Jalign.reserve(CLONOTYPEBUILDER_JSEG_DEFAULT_RESERVE_SIZE);
 
             this->_Dseg.clear();
-            this->_Dseg.reserve(CLONEBUILDER_DSEG_DEFAULT_RESERVE_SIZE);
+            this->_Dseg.reserve(CLONOTYPEBUILDER_DSEG_DEFAULT_RESERVE_SIZE);
             this->_Dalign.clear();
-            this->_Dalign.reserve(CLONEBUILDER_DSEG_DEFAULT_RESERVE_SIZE * 4);
+            this->_Dalign.reserve(CLONOTYPEBUILDER_DSEG_DEFAULT_RESERVE_SIZE * 4);
             this->_n_Dalign.clear();
         }
 
@@ -321,21 +321,21 @@ namespace ymir {
 
 
     /**
-    * \struct CloneMetadata
+    * \struct ClonotypeMetadata
     *
     * \brief Metadata clone: indices of events corresponding to
     * gene segments' alignment, deletions and nucleotide insertions.
     */
-    struct CloneMetadata {
+    struct ClonotypeMetadata {
 
     public:
 
-        CloneMetadata(const Clone& clone) {
+        ClonotypeMetadata(const Clonotype& clone) {
 
         }
 
 
-        ~CloneMetadata() {
+        ~ClonotypeMetadata() {
 
         }
 

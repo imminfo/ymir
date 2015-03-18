@@ -29,7 +29,7 @@
 #include "iterator"
 
 #include "aligner.h"
-#include "clone.h"
+#include "clonotype.h"
 #include "parser.h"
 
 
@@ -193,35 +193,35 @@ namespace ymir {
     };
 
 
-//    typedef AbstractRepertoireView<Clone> ClonalRepertoireView;
+//    typedef AbstractRepertoireView<Clonotype> ClonotypeRepertoireView;
 
-    class ClonalRepertoireView : public AbstractRepertoireView<Clone> {
+    class ClonotypeRepertoireView : public AbstractRepertoireView<Clonotype> {
 
     public:
 
-        ClonalRepertoireView() {
+        ClonotypeRepertoireView() {
 
         }
 
 
-        virtual ~ClonalRepertoireView() {
+        virtual ~ClonotypeRepertoireView() {
 
         }
 
 
-//        ClonalRepertoireView codingSequences() const {
+//        ClonotypeRepertoireView codingSequences() const {
 //
 //        }
 
 
-//        ClonalRepertoireView noncodingSequences() const {
+//        ClonotypeRepertoireView noncodingSequences() const {
 //
 //        }
 
     };
 
 
-    typedef AbstractRepertoire<Clone> ClonalRepertoire;
+    typedef AbstractRepertoire<Clonotype> ClonotypeRepertoire;
 
 }
 

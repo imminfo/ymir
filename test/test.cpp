@@ -41,7 +41,7 @@
 #include "matrixchain.h"
 #include "modelparametervector.h"
 #include "genesegment.h"
-#include "clone.h"
+#include "clonotype.h"
 #include "parser.h"
 #include "markovchain.h"
 //#include "statisticalinferencealgorithm.h"
@@ -506,7 +506,7 @@ YMIR_TEST_START(test_clone)
     nd[0] = 2;
     nd[1] = 2;
 
-    Clone c("cloneseq", true, segs, nsegs, alignments, nd);
+    Clonotype c("cloneseq", true, segs, nsegs, alignments, nd);
     YMIR_ASSERT(c.is_vdj())
     YMIR_ASSERT(c.getV(0) == 1)
     YMIR_ASSERT(c.getV(1) == 2)
@@ -539,7 +539,7 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_clonebuilder_clonealign)
-    CloneBuilder cb;
+    ClonotypeBuilder cb;
 
     cb.setNucleotideSeq();
     cb.setSequence("nuclseq");
@@ -552,7 +552,7 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
     cb.addDalignment(31, 8, 9, 11, 12);
     cb.addDalignment(31, 8, 9, 13, 14);
 
-    Clone c = cb.buildClone();
+    Clonotype c = cb.buildClonotype();
 
     YMIR_ASSERT(c.sequence() == "nuclseq")
     YMIR_ASSERT(c.is_nucleotide())
@@ -612,7 +612,7 @@ YMIR_TEST_START(test_mitcr)
     YMIR_ASSERT(V_err)
     YMIR_ASSERT(J_err)
 
-    ClonalRepertoire cr;
+    ClonotypeRepertoire cr;
     YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha.txt", &cr, vdj_genes))
 
     YMIR_ASSERT(cr.size() == 30)
@@ -859,8 +859,8 @@ int main() {
     YMIR_TEST(test_vdjgenes_read(), "VDJRecombinationGenes file reading / writing fail")
 
     // Tests for clone, clone alignment and clone builder classes.
-    YMIR_TEST(test_clone(), "Clone, constructor / access fail")
-    YMIR_TEST(test_clonebuilder_clonealign(), "CloneBuilder, Clone building fail")
+    YMIR_TEST(test_clone(), "Clonotype, constructor / access fail")
+    YMIR_TEST(test_clonebuilder_clonealign(), "ClonotypeBuilder, Clonotype building fail")
 
     // Tests for default naive sequences aligners.
     YMIR_TEST(test_nuc_aligner(), "Naive nucleotide sequence aligner failed")

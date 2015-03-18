@@ -62,6 +62,11 @@ namespace ymir {
         void reset() { delete _maag; }
 
 
+        void setVariableGeneCount() {
+
+        }
+
+
         void addVariableGene(segindex_t v_index
                 , eventind_t v_event
                 , prob_t v_prob) {

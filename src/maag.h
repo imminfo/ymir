@@ -57,6 +57,17 @@ namespace ymir {
             }
 
 
+            GeneSegment(const GeneSegment &other) {
+                _n = other._n;
+                _event_indices = new eventind_t[_n];
+                _gene_indices = new segindex_t[_n];
+                for (eventind_t i = 0; i < _n; ++i) {
+                    _gene_indices[i] = other._gene_indices[i];
+                    _event_indices[i] = other._event_indices[i];
+                }
+            }
+
+
             virtual ~GeneSegment() {
                 delete [] _event_indices;
                 delete [] _gene_indices;
@@ -95,9 +106,29 @@ namespace ymir {
         }
 
 
+        MAAG(const MAAG &other) {
+            if (other._events) {
+                _events = new EventIndMMC(*other._events);
+            }
+            _vdata = new GeneSegment(*other._vdata);
+            _jdata = new GeneSegment(*other._jdata);
+            if (other._ddata) { _ddata = new GeneSegment(*other._ddata); }
+        }
+
+
+        MAAG(const ClonotypeMetadata& clone) {
+            // ???
+            // ???
+            // ???
+        }
+
+
         virtual ~MAAG() {
             if (_events) { delete _events; }
-             delete [] _seq_poses;
+            delete _vdata;
+            delete _jdata;
+            if (_ddata) { delete _ddata; }
+            delete [] _seq_poses;
         }
 
 
@@ -119,8 +150,10 @@ namespace ymir {
             return (_chain[0][v_index] *      // P(Vi)
                     _chain[1][v_index] *      // P(#dels | Vi)
                     _chain[2][0] *            // P(V-D3' insertion seq)
+//                    _chain[2][d_index] *            // P(V-D3' insertion seq)
                     _chain[3][d_index] *      // P(D5'-D3' deletions | Di)
                     _chain[4][0] *            // P(D5'-J insertion seq)
+//                    _chain[4][d_index] *            // P(D5'-J insertion seq)
                     _chain[5][j_index] *      // P(#dels | Ji)
                     _chain[6][0](j_index, d_index))(0, 0);  // P(Ji & Di)
 //                    _jdata->prob(j_index * _ddata->size() + d_index))(0, 0);  // P(Ji & Di)

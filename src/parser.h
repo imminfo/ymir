@@ -128,7 +128,7 @@ namespace ymir {
 
 
         /**
-        * \brief Parse text file with sequence alignment data and return constructed ClonalRepertoire.
+        * \brief Parse text file with sequence alignment data and return constructed ClonotypeRepertoire.
         *
         * Parse all lines in the file and return a repertoire. If no alignments found or any of align_* parameters
         * is true, create alignment using input aligner from function loadFile().
@@ -146,14 +146,14 @@ namespace ymir {
         *
         * \return True if found has been successfully processed, false otherwise.
         */
-        bool parse(const string& filepath, ClonalRepertoire *rep, const VDJRecombinationGenes& gene_segments,
+        bool parse(const string& filepath, ClonotypeRepertoire *rep, const VDJRecombinationGenes& gene_segments,
                 const AbstractAligner& aligner = NaiveNucleotideAligner(),
                 bool nuc_sequences = true,
                 AlignmentColumnOptions opts = AlignmentColumnOptions().setV(MAKE_IF_NOT_FOUND).setJ(MAKE_IF_NOT_FOUND).setD(MAKE_IF_NOT_FOUND)) {
 
             if (!_config_is_loaded) { return false; }
 
-            vector<Clone> clonevec;
+            vector<Clonotype> clonevec;
             clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
             ifstream ifs;
             ifs.open(filepath);
@@ -177,7 +177,7 @@ namespace ymir {
         bool _config_is_loaded;
 
 
-        virtual bool parseRepertoire(ifstream& ifs, vector<Clone>& vec,
+        virtual bool parseRepertoire(ifstream& ifs, vector<Clonotype>& vec,
                 const VDJRecombinationGenes& gene_segments,
                 const AbstractAligner& aligner,
                 bool nuc_sequences,
@@ -232,7 +232,7 @@ namespace ymir {
             vector<segindex_t> vseg, jseg, dseg;
             string temp_str;
 
-            CloneBuilder clone_builder;
+            ClonotypeBuilder clone_builder;
 
             int glob_index = 0;
             while (!ifs.eof()) {
@@ -349,7 +349,7 @@ namespace ymir {
                             cout << get_parser_name() + ": parsed " << glob_index << " clones" << endl;
                         }
 
-                        vec.push_back(clone_builder.buildClone());
+                        vec.push_back(clone_builder.buildClonotype());
                     }
                     line_stream.clear();
                 }
@@ -375,7 +375,7 @@ namespace ymir {
         }
 
 
-        void parseWordAlignment(const string& word, char sep, vector<segindex_t> &segvec, const GeneSegmentAlphabet& gsa, CloneBuilder &clone_builder, bool based1, char seg) {
+        void parseWordAlignment(const string& word, char sep, vector<segindex_t> &segvec, const GeneSegmentAlphabet& gsa, ClonotypeBuilder &clone_builder, bool based1, char seg) {
             stringstream word_stream(word);
             int aligned_chars = 0;
             if (word_stream.eof()) {

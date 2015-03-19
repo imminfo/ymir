@@ -336,14 +336,12 @@ namespace ymir {
 
 
         ~ClonotypeMetadata() {
-
+            delete [] _v_dels;
+            delete [] _j_dels;
+            delete [] _d_dels;
         }
 
     private:
-
-        bool _nucleotide, _vdj;
-
-        string _sequence;
 
         eventind_t *_v_indices, *_j_indices, *_d_indices; //* Indices of event families of aligned gene segments (family event indices). */
         seq_len_t *_v_dels, *_j_dels, *_d_dels; //* Number of deletions for each aligned gene segments. */

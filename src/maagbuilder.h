@@ -54,8 +54,15 @@ namespace ymir {
         }
 
 
-        MAAG build(const ClonotypeMetadata &clonotype) {
+        MAAG build(const Clonotype &clonotype, bool save_event_indices = false) {
+            _maag = new MAAG();
+            if (save_event_indices) {
+                _maag->_events = new EventIndMMC();
+            }
 
+            _maag->addNode();
+
+            return *_maag;
         }
 
 
@@ -63,29 +70,6 @@ namespace ymir {
 
 
         void reset() { delete _maag; }
-
-
-        void setVariableGeneCount() {
-
-        }
-
-
-        void addVariableGene(segindex_t v_index
-                , eventind_t v_event
-                , prob_t v_prob) {
-
-        }
-
-
-        void addVariableGeneDeletion(eventind_t v_order
-                , eventind_t cur_del_index
-                , eventind_t max_del_index) {
-
-        }
-
-        void addJoiningGene() {}
-
-        void addDiversityGene() {}
 
 
     protected:

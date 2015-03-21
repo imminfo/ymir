@@ -28,3 +28,4 @@
 *.app
 include
 mitcr.alpha2.txt
+jsoncpp.cpp

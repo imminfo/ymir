@@ -6,7 +6,7 @@
  * and generation of artificial sequences of T-cell receptors data.
  *
  *
- * Copyright 2015 Vadim Nazarov <vadim dot nazarov at mailbox dot com>
+ * Copyright 2015 Vadim Nazarov <vdn at mailbox dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

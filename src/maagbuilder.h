@@ -6,7 +6,7 @@
  * and generation of artificial sequences of T-cell receptors data.
  *
  *
- * Copyright 2015 Vadim Nazarov <vadim dot nazarov at mailbox dot com>
+ * Copyright 2015 Vadim Nazarov <vdn at mailbox dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,14 +55,7 @@ namespace ymir {
 
 
         MAAG build(const Clonotype &clonotype, bool save_event_indices = false) {
-            _maag = new MAAG();
-            if (save_event_indices) {
-                _maag->_events = new EventIndMMC();
-            }
 
-            _maag->addNode();
-
-            return *_maag;
         }
 
 
@@ -70,6 +63,15 @@ namespace ymir {
 
 
         void reset() { delete _maag; }
+
+
+        // void addVariableGene(vgene index, probability) {}
+
+        // void addVariableGeneDeletion(vgene index, cur_deletions index, max_deletions index)
+
+        // void addInsertionLengths(ins_order, start_ins_index, max_ins_len)
+
+        // void addMarkovChain(ins_order, start index)
 
 
     protected:

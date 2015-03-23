@@ -886,7 +886,9 @@ int main() {
 
     // Tests for assembling statistical model (ASM) reading / writing files.
 
-    // Test for computing full probabilities of repertoire with ASM.
+    // Test for computing full nucleotide probabilities of repertoire with ASM.
+
+    // Test for computing full amino acid probabilities of repertoire with ASM.
 
     // Tests for statistical inference of ASM parameters.
 

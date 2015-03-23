@@ -6,7 +6,7 @@
  * and generation of artificial sequences of T-cell receptors data.
  *
  *
- * Copyright 2015 Vadim Nazarov <vadim dot nazarov at mailbox dot com>
+ * Copyright 2015 Vadim Nazarov <vdn at mailbox dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ namespace ymir {
             _vdata = new GeneSegment(*other._vdata);
             _jdata = new GeneSegment(*other._jdata);
             if (other._ddata) { _ddata = new GeneSegment(*other._ddata); }
-            if (other._sequence) { _sequence = new string(other._sequence); }
+            if (other._sequence) { _sequence = new string(*other._sequence); }
         }
 
 

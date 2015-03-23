@@ -458,19 +458,20 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_clone)
-    segindex_t *segs = new segindex_t[6];
-    segs[0] = 1;
+    segindex_t *segs = new segindex_t[10];
+    segs[0] = 3;
     segs[1] = 2;
-    segs[2] = 3;
-    segs[3] = 4;
-    segs[4] = 5;
-    segs[5] = 6;
-    segs[6] = 7;
+    segs[2] = 2;
 
-    segindex_t *nsegs = new segindex_t[3];
-    nsegs[0] = 3;
-    nsegs[1] = 2;
-    nsegs[2] = 2;
+    segs[3] = 1;
+    segs[4] = 2;
+    segs[5] = 3;
+
+    segs[6] = 4;
+    segs[7] = 5;
+
+    segs[8] = 6;
+    segs[9] = 7;
 
     seq_len_t *alignments = new seq_len_t[3 + 2 + 2*4 + 2*4];
     // V
@@ -506,12 +507,13 @@ YMIR_TEST_START(test_clone)
     nd[0] = 2;
     nd[1] = 2;
 
-    Clonotype c("cloneseq", true, segs, nsegs, alignments, nd);
+    Clonotype c("cloneseq", true, segs, alignments, nd);
     YMIR_ASSERT(c.is_vdj())
     YMIR_ASSERT(c.getV(0) == 1)
     YMIR_ASSERT(c.getV(1) == 2)
     YMIR_ASSERT(c.getV(2) == 3)
     YMIR_ASSERT(c.getJ(0) == 4)
+    YMIR_ASSERT(c.getJ(1) == 5)
     YMIR_ASSERT(c.getD(0) == 6)
     YMIR_ASSERT(c.getD(1) == 7)
     YMIR_ASSERT(c.nV() == 3)

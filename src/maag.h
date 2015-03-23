@@ -168,6 +168,7 @@ namespace ymir {
         GeneSegment *_vdata, *_jdata, *_ddata;
 
         seq_len_t *_seq_poses;  /** Vector of the initial clonal sequence's positions for each vertex. */
+        seq_len_t _n_poses;
         string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
 
 

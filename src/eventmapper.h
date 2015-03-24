@@ -8,6 +8,7 @@
 
 #include "types.h"
 #include "unordered_map"
+#include "vector"
 
 
 namespace ymir {
@@ -15,6 +16,9 @@ namespace ymir {
     class EventMapper {
     public:
 
+        EventMapper(std::vector<eventind_t> _edges) {
+
+        }
 
         eventind_t V_gene(segindex_t v_index) {
 
@@ -58,7 +62,9 @@ namespace ymir {
     protected:
 
         std::unordered_map<segindex_t, eventind_t> _map;
-        
+        vector<eventind_t> _shifts;  /// Vector of shifts for family events: [0] - number of V segs, [1] - [0] + number of Js / J-D pairs,
+                                     /// [2]
+
     };
 }
 

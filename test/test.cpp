@@ -305,6 +305,16 @@ YMIR_TEST_START(test_model_param_vec_event_family)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_model_param_vec_vj)
+    YMIR_ASSERT(false)
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_model_param_vec_vdj)
+    YMIR_ASSERT(false)
+YMIR_TEST_END
+
+
 YMIR_TEST_START(test_genesegmentalphabet)
     vector<string> alvec1;
     vector<string> seqvec1;
@@ -852,6 +862,8 @@ int main() {
     YMIR_TEST(test_model_param_vec(), "ModelParameterVector fail")
     YMIR_TEST(test_model_param_vec_laplace(), "ModelParameterVector fail with laplace correction")
     YMIR_TEST(test_model_param_vec_event_family(), "ModelParameterVector fail with event family boundaries and access")
+    YMIR_TEST(test_model_param_vec_vj(), "ModelParameterVector fail at VJ access")
+    YMIR_TEST(test_model_param_vec_vdj(), "ModelParameterVector fail at VDJ access")
 
     // Tests for gene segments classes
     YMIR_TEST(test_genesegmentalphabet(), "GeneSegmentAlphabet initialisation and access fail")
@@ -872,8 +884,8 @@ int main() {
     YMIR_TEST(test_mitcr(), "MiTCR parser test w/ naive D alignment")
 
     // Tests for clonal repertoires and clonal repertoire views.
-    YMIR_TEST(test_clorep(), "ClonalRepertoire creating / access failed")
-    YMIR_TEST(test_clorep_view(), "ClonalRepertoireView creating / access failed")
+    YMIR_TEST(test_clorep(), "Cloneset creating / access failed")
+    YMIR_TEST(test_clorep_view(), "ClonesetView creating / access failed")
 
     // Tests for markov chain.
     YMIR_TEST(test_markovchain_nuc(), "Markov chain nucleotide fail")

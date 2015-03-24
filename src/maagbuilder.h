@@ -55,7 +55,8 @@ namespace ymir {
 
 
         MAAG build(const Clonotype &clonotype, bool save_event_indices = false) {
-
+//            return value optimisation
+//            return MAAG();
         }
 
 

@@ -28,6 +28,7 @@
 #include "maagbuilder.h"
 #include "repertoire.h"
 #include "genesegment.h"
+#include "clonotypeassembler.h"
 
 
 namespace ymir {
@@ -260,7 +261,7 @@ namespace ymir {
         VDJRecombinationGenes *_genes;
         ModelParameterVector *_model_parameters;
 
-        SequenceGenerator *_generator;
+        ClonotypeAssembler *_generator;
         EventFamilyIndexer *_indexer;
 
 

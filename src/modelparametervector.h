@@ -36,7 +36,30 @@ namespace ymir {
     * \class ModelParameterVector
     *
     * \brief Class for storing parameters of assembling statistical model. Note:
-    * event with index 0 (zero) is "null" event and always has zero probability.
+    * event with index 0 (zero) is "null" event and always has zero probability. Vector is ordered
+    * so for VJ or VDJ recombination specific family events stored in specific order.
+    *
+    * Vector with event's probabilities stored in specific order:
+    * VJ - recombination:
+    *   [0] - null family
+    *   [1] - Variable gene segment probability
+    *   [2] - J prob
+    *   [3 : 3 + [2] - [1]] - V deletions
+    *   [4] - J deletions
+    *   [5] - VJ insertion length
+    *   [6] - VJ insertion markov chain
+    *
+    * VDJ - recombination:
+    *   [0] - null family
+    *   [1] - Variable gene segment probability
+    *   [2] - J prob
+    *   [3] - V deletions
+    *   [4] - J deletions
+    *   [5] - VJ insertion length
+    *   [6] - VJ insertion markov chain
+    *
+    * Hypermutations added as the last element in the vector.
+    * Note: gene segment deletion probabilities stored in order of gene segment probabilities.
     */
     class ModelParameterVector {
     public:
@@ -86,6 +109,9 @@ namespace ymir {
         }
 
 
+        //============= VECTOR INDICES ACCESS =============//
+
+
         /**
         * \brief Get a probability of an event with the given event family's index and event's local index.
         *
@@ -131,11 +157,67 @@ namespace ymir {
             }
         }
 
+
+        //============= EVENT ACCESS =============//
+
+
+        inline eventind_t index_V_gene(segindex_t v_index) const { return _edges[1] + v_index; }
+        prob_t prob_V_gene(segindex_t v_index) const { return _vec[index_V_gene(v_index)]; }  // Hmmm...
+
+
+        inline eventind_t index_J_gene(segindex_t j_index) const { return _edges[2] + j_index; }
+        prob_t prob_J_gene(segindex_t j_index) const { return _vec[index_J_gene(j_index)]; }
+
+
+        inline eventind_t index_JD_genes(segindex_t j_index, segindex_t d_index) const { return _edges[2] + j_index * _d_gene_num + d_index; }
+        prob_t prob_JD_genes(segindex_t j_index, segindex_t d_index) const { return _vec[index_JD_genes(j_index, d_index)]; }
+
+
+        inline eventind_t index_V_del(segindex_t v_index, seq_len_t del_num) const { return _edges[3 + v_index] + del_num; }
+        prob_t prob_V_del(segindex_t v_index, seq_len_t del_num) const { return _vec[index_V_del(v_index, del_num)]; }
+
+
+        inline eventind_t index_J_del(segindex_t j_index, seq_len_t del_num) const { return _edges[3 + _edges[1]] + del_num; }
+        prob_t prob_J_del(segindex_t j_index, seq_len_t del_num) const { return _vec[index_J_del(j_index, del_num)]; }
+
+
+        inline eventind_t index_D_del(segindex_t d_index, seq_len_t d5_del_num, seq_len_t d3_del_num) const {
+            return 0;
+        }
+        prob_t prob_D_del(segindex_t d_index, seq_len_t d5_del_num, seq_len_t d3_del_num) const {
+            return _vec[index_D_del(d_index, d5_del_num, d3_del_num)];
+        }
+
+
+        inline eventind_t index_VJ_ins_len(seq_len_t ins_len) const {
+            return 0;
+        }
+        prob_t prob_VJ_ins_len(seq_len_t ins_len) const {
+            return _vec[index_VJ_ins_len(ins_len)];
+        }
+
+
+        inline eventind_t index_VD_ins_len(seq_len_t ins_len) const {
+            return 0;
+        }
+        prob_t prob_VD_ins_len(seq_len_t ins_len) const {
+            return _vec[index_VD_ins_len(ins_len)];
+        }
+
+
+        inline eventind_t index_DJ_ins_len(seq_len_t ins_len) const {
+            return 0;
+        }
+        prob_t prob_DJ_ins_len(seq_len_t ins_len) const {
+            return _vec[index_DJ_ins_len(ins_len)];
+        }
+
     private:
 
         vector<prob_t> _vec;
-        vector<eventind_t> _edges;
+        vector<eventind_t> _edges;  /** Vector with starting indices for each event family. */
         vector<prob_t> _laplace;
+        segindex_t _d_gene_num;
 
 
         /**

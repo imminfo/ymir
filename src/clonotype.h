@@ -228,12 +228,11 @@ namespace ymir {
 
 
             Clonotype cla = Clonotype(seq, nucleotide, segments, alignments, n_D_alignments);
-//            segments = nullptr;
-//            segments = nullptr;
-//            alignments = nullptr;
-//            n_D_alignments = nullptr;
             reset();
             return cla;
+
+//            return value optimisation:
+//            return Clonotype(seq, nucleotide, segments, alignments, n_D_alignments);
         }
 
 

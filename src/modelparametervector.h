@@ -21,6 +21,9 @@
  * limitations under the License.
  */
 
+#ifndef _MODELPARAMETERVECTOR_H_
+#define _MODELPARAMETERVECTOR_H_
+
 
 #include <vector>
 
@@ -66,14 +69,17 @@ namespace ymir {
 
         /**
         * \brief Construct the vector from the given vector of event probabilities and lengths of each event family (V deletions, insertions length, etc.).
+        * for the VJ-recombination model.
         *
         * \param param_vec Vector with event probabilities.
         * \param lens_vec Vector with lengths of each event family.
         * \param laplace_vec Vector with laplace correction value for each event family.
         * \param do_normalise Boolean, do normalisation of event families after initialising?
         */
-        ModelParameterVector(const vector<prob_t>& param_vec, const vector<eventind_t>& lens_vec,
-                const vector<prob_t>& laplace_vec = vector<prob_t>(), bool do_normalise = true)
+        ModelParameterVector(const vector<prob_t>& param_vec,
+                const vector<eventind_t>& lens_vec,
+                const vector<prob_t>& laplace_vec = vector<prob_t>(),
+                bool do_normalise = true)
         {
             _vec = vector<prob_t>();
             _vec.reserve(param_vec.size() + 1);
@@ -106,6 +112,28 @@ namespace ymir {
             if (do_normalise) {
                 this->normaliseEventFamilies();
             }
+        }
+
+
+        /**
+        * \brief Construct the vector from the given vector of event probabilities and lengths of each event family (V deletions, insertions length, etc.).
+        * for the VDJ-recombination model.
+        *
+        * \param param_vec Vector with event probabilities.
+        * \param lens_vec Vector with lengths of each event family.
+        * \param d_gene_max_dels Vector with number of maximal number of D'3 deletions for each Diversity segment.
+        * \param laplace_vec Vector with laplace correction value for each event family.
+        * \param do_normalise Boolean, do normalisation of event families after initialising?
+        */
+        ModelParameterVector(const vector<prob_t>& param_vec,
+                const vector<eventind_t>& lens_vec,
+                vector<seq_len_t> d_gene_max_dels,
+                const vector<prob_t>& laplace_vec = vector<prob_t>(),
+                bool do_normalise = true) : ModelParameterVector(param_vec, lens_vec, laplace_vec, do_normalise)
+        {
+
+            _d_gene_num = d_gene_max_dels.size();
+            _d_gene_max_dels = d_gene_max_dels;
         }
 
 
@@ -166,28 +194,28 @@ namespace ymir {
         //============= EVENT ACCESS =============//
 
 
-        inline eventind_t index_V_gene(segindex_t v_index) const { return _edges[1] + v_index; }
+        inline eventind_t index_V_gene(segindex_t v_index) const { return _edges[1] + v_index - 1; }
         prob_t prob_V_gene(segindex_t v_index) const { return _vec[index_V_gene(v_index)]; }  // Hmmm...
 
 
-        inline eventind_t index_J_gene(segindex_t j_index) const { return _edges[2] + j_index; }
+        inline eventind_t index_J_gene(segindex_t j_index) const { return _edges[2] + j_index - 1; }
         prob_t prob_J_gene(segindex_t j_index) const { return _vec[index_J_gene(j_index)]; }
 
 
-        inline eventind_t index_JD_genes(segindex_t j_index, segindex_t d_index) const { return _edges[2] + j_index * _d_gene_num + d_index; }
+        inline eventind_t index_JD_genes(segindex_t j_index, segindex_t d_index) const { return _edges[2] + (j_index - 1) * _d_gene_num + (d_index - 1); }
         prob_t prob_JD_genes(segindex_t j_index, segindex_t d_index) const { return _vec[index_JD_genes(j_index, d_index)]; }
 
 
-        inline eventind_t index_V_del(segindex_t v_index, seq_len_t del_num) const { return _edges[3 + v_index] + del_num; }
+        inline eventind_t index_V_del(segindex_t v_index, seq_len_t del_num) const { return _edges[3 + (v_index - 1)] + del_num; }
         prob_t prob_V_del(segindex_t v_index, seq_len_t del_num) const { return _vec[index_V_del(v_index, del_num)]; }
 
 
-        inline eventind_t index_J_del(segindex_t j_index, seq_len_t del_num) const { return _edges[3 + _edges[1]] + del_num; }
+        inline eventind_t index_J_del(segindex_t j_index, seq_len_t del_num) const { return _edges[3 + (_edges[2] - 1) + (j_index - 1)] + del_num; }
         prob_t prob_J_del(segindex_t j_index, seq_len_t del_num) const { return _vec[index_J_del(j_index, del_num)]; }
 
 
         inline eventind_t index_D_del(segindex_t d_index, seq_len_t d5_del_num, seq_len_t d3_del_num) const {
-            return _edges[3 + _edges[1] + _edges[2]] + d5_del_num*_d_gene_max_dels[d_index] + d3_del_num;
+            return _edges[3 + (_edges[2] - 1) + /* ??? */ _edges[2]] + d5_del_num*_d_gene_max_dels[d_index - 1] + d3_del_num;
         }
         prob_t prob_D_del(segindex_t d_index, seq_len_t d5_del_num, seq_len_t d3_del_num) const {
             return _vec[index_D_del(d_index, d5_del_num, d3_del_num)];
@@ -195,7 +223,7 @@ namespace ymir {
 
 
         inline eventind_t index_VJ_ins_len(seq_len_t ins_len) const {
-            return _edges[_edges.size() - 2] + ins_len;
+            return _edges[_edges.size() - 1 - 4 - 2] + ins_len;
         }
         prob_t prob_VJ_ins_len(seq_len_t ins_len) const {
             return _vec[index_VJ_ins_len(ins_len)];
@@ -203,7 +231,7 @@ namespace ymir {
 
 
         inline eventind_t index_VD_ins_len(seq_len_t ins_len) const {
-            return _edges[_edges.size() - 4] + ins_len;
+            return _edges[_edges.size() - 5] + ins_len;
         }
         prob_t prob_VD_ins_len(seq_len_t ins_len) const {
             return _vec[index_VD_ins_len(ins_len)];
@@ -211,10 +239,25 @@ namespace ymir {
 
 
         inline eventind_t index_DJ_ins_len(seq_len_t ins_len) const {
-            return _edges[_edges.size() - 3] + ins_len;
+            return _edges[_edges.size() - 4] + ins_len;
         }
         prob_t prob_DJ_ins_len(seq_len_t ins_len) const {
             return _vec[index_DJ_ins_len(ins_len)];
+        }
+
+
+        inline eventind_t index_VJ_ins_nuc() const {
+            return _edges[_edges.size() - 1 - 4 - 1];
+        }
+
+
+        inline eventind_t index_VD_ins_nuc() const {
+            return _edges[_edges.size()  - 1 - 8 - 1];
+        }
+
+
+        inline eventind_t index_DJ_ins_nuc() const {
+            return _edges[_edges.size() - 1 - 4 - 1];
         }
 
     private:
@@ -233,3 +276,5 @@ namespace ymir {
 
     };
 }
+
+#endif

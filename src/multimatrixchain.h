@@ -162,7 +162,7 @@ namespace ymir {
     public:
 
         MultiMatrixChain() {
-
+            _chain.clear();
         }
 
 
@@ -213,6 +213,11 @@ namespace ymir {
         node_ind_t addNode(matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
             _chain.push_back(Node(n_matrices, rows, cols));
             return _chain.size() - 1;
+        }
+
+
+        void swap(MultiMatrixChain<_Scalar> &other) {
+            _chain.swap(other._chain);
         }
 
 

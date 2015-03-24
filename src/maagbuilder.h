@@ -33,14 +33,10 @@ namespace ymir {
     class MAAGBuilder;
 
 
+    /**
+    * \class MAAGBuilder
+    */
     class MAAGBuilder : protected MAAG {
-
-    protected:
-
-        /**
-        *
-        */
-        typedef tuple<segindex_t, prob_t, eventind_t, segindex_t> gene_info;
 
     public:
 
@@ -54,32 +50,23 @@ namespace ymir {
         }
 
 
-        MAAG build(const Clonotype &clonotype, bool save_event_indices = false) {
+        MAAG build(const Clonotype &clonotype, bool full_build = false) {
+
+
 //            return value optimisation
 //            return MAAG();
         }
 
 
-        // void build(const ClonotypeMetadata &clonotype, MAAG* maag)
-
-
-        void reset() { delete _maag; }
-
-
-        // void addVariableGene(vgene index, probability) {}
-
-        // void addVariableGeneDeletion(vgene index, cur_deletions index, max_deletions index)
-
-        // void addInsertionLengths(ins_order, start_ins_index, max_ins_len)
-
-        // void addMarkovChain(ins_order, start index)
+//        MAAGRepertoire build(const Cloneset &cloneset, bool full_build = false) {
+//            // ???
+//        }
 
 
     protected:
 
-        MAAG *_maag;
-        vector<gene_info> _vgenes, _jgenes, _dgenes;
-        ModelParameterVector *_param_vec;  // or just copy it ???
+        ModelParameterVector *_param_vec;  // or just copy it?
+        VDJRecombinationGenes *_genes; // copy this too?
 
     };
 }

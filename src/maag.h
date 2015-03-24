@@ -42,7 +42,9 @@ namespace ymir {
     class MAAG : protected ProbMMC {
     public:
 
-
+        /**
+        *
+        */
         MAAG(const MAAG &other) {
             if (other._events) {
                 _events = new EventIndMMC(*other._events);
@@ -51,9 +53,35 @@ namespace ymir {
         }
 
 
+        /**
+        * Special swap constructor for MAAGs that will be used only for computation of
+        * the full probability.
+        */
+        MAAG(ProbMMC &prob_mcc) {
+            this->swap(prob_mcc);
+            _events = nullptr;
+            _sequence = nullptr;
+            _seq_poses = nullptr;
+            _n_poses = 0;
+        }
+
+
+        /**
+        * Special swap constructor for MAAGs that will be used for statistical inference.
+        */
+        MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, string sequence, seq_len_t *seq_poses, seq_len_t n_poses) {
+            this->swap(prob_mcc);
+            _events = new EventIndMMC();
+            _events->swap(eventind_mcc);
+            _sequence = new string(sequence);
+            _seq_poses = seq_poses;
+            _n_poses = n_poses;
+        }
+
+
         virtual ~MAAG() {
             if (_events) { delete _events; }
-            delete [] _seq_poses;
+            if (_seq_poses) { delete [] _seq_poses; }
             if (_sequence) { delete _sequence; }
         }
 
@@ -87,16 +115,16 @@ namespace ymir {
 
 
         ///@{
-//        eventind_t nV() { return _vdata->size(); }
-//        eventind_t nJ() { return _jdata->size(); }
-//        eventind_t nD() { return _ddata->size(); }
+        eventind_t nV() { return _chain[0].size(); }
+        eventind_t nJ() { return _chain[_chain.size() - 2].size(); }
+        eventind_t nD() { return (_chain.size() == 5) ? 0 : _chain[3].size(); }
         ///@}
 
 
         ///@{
-//        segindex_t vgene(uint8_t i) { return _vdata->gene_index(i); }
-//        segindex_t jgene(uint8_t i) { return _jdata->gene_index(i); }
-//        segindex_t dgene(uint8_t i) { return _ddata->gene_index(i); }
+//        segindex_t vgene(uint8_t i) { return _events ? (*_events)[0][i] : 0; }
+//        segindex_t jgene(uint8_t i) { return _events ? (*_events)[_chain.size() - 2][i] : 0; }
+//        segindex_t dgene(uint8_t i) { return 0; } // ???
         ///@}
 
 

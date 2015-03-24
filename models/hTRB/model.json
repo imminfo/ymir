@@ -35,7 +35,8 @@
       "file": "p.d.del.txt",
       "laplace": 0,
       "type": "matrix.list",
-      "segdepend": true
+      "segdepend": true,
+      "min.len": 3
     },
     "ins.len": {
       "file": "p.ins.len.txt",

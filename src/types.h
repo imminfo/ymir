@@ -38,16 +38,17 @@ namespace ymir {
     *
     * \brief Type of assembly scenario probabilities.
     */
+//    #define MPFR
     #ifdef MPFR
-    #include "Eigen/SOMETHING"
-    typedef mpreal numeric;
+    #include "Eigen/mpreal.h"
+    typedef mpfr::mpreal numeric;
 
     /**
     * \typedef prob_t
     *
     * \brief Type of stored probabilities of different events.
     */
-    typedef mpreal prob_t;
+    typedef mpfr::mpreal prob_t;
     #else
     /**
     * \typedef numeric

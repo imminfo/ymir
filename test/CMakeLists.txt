@@ -2,6 +2,7 @@ add_executable (Ymir-test test.cpp)
 
 include_directories(../src)
 include_directories(../include)
+include_directories(/usr/local/include/)
 
 enable_testing()
 

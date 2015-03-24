@@ -5,10 +5,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Xlang -fopenmp=libiomp5")
 
 set(SOURCE_FILES src/main.cpp)
-add_executable(Ymir ${SOURCE_FILES})
 
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/build")
 
 include_directories(include)
+include_directories(/usr/local/include/)
+
 add_subdirectory(test)
 add_subdirectory(benchmark)

@@ -40,58 +40,6 @@ namespace ymir {
     * all possible generation scenarios of a nucleotide or amino acid sequence of an immune receptor.
     */
     class MAAG : protected ProbMMC {
-
-    protected:
-
-        /**
-        * \struct GeneSegment
-        */
-        struct GeneSegment {
-
-        public:
-
-            GeneSegment(eventind_t n) {
-                _n = n;
-                _event_indices = new eventind_t[_n];
-                _gene_indices = new segindex_t[_n];
-            }
-
-
-            GeneSegment(const GeneSegment &other) {
-                _n = other._n;
-                _event_indices = new eventind_t[_n];
-                _gene_indices = new segindex_t[_n];
-                for (eventind_t i = 0; i < _n; ++i) {
-                    _gene_indices[i] = other._gene_indices[i];
-                    _event_indices[i] = other._event_indices[i];
-                }
-            }
-
-
-            virtual ~GeneSegment() {
-                delete [] _event_indices;
-                delete [] _gene_indices;
-            }
-
-
-            segindex_t gene_index(eventind_t i) const { return _gene_indices[i]; }
-            segindex_t& gene_index(eventind_t i) { return _gene_indices[i]; }
-
-
-            eventind_t event_index(eventind_t i) const { return _event_indices[i]; }
-            eventind_t& event_index(eventind_t i) { return _event_indices[i]; }
-
-
-            eventind_t size() const { return _n; }
-
-        private:
-
-            eventind_t _n;
-            eventind_t *_event_indices;
-            segindex_t *_gene_indices;
-
-        };
-
     public:
 
 
@@ -99,18 +47,12 @@ namespace ymir {
             if (other._events) {
                 _events = new EventIndMMC(*other._events);
             }
-            _vdata = new GeneSegment(*other._vdata);
-            _jdata = new GeneSegment(*other._jdata);
-            if (other._ddata) { _ddata = new GeneSegment(*other._ddata); }
             if (other._sequence) { _sequence = new string(*other._sequence); }
         }
 
 
         virtual ~MAAG() {
             if (_events) { delete _events; }
-            delete _vdata;
-            delete _jdata;
-            if (_ddata) { delete _ddata; }
             delete [] _seq_poses;
             if (_sequence) { delete _sequence; }
         }
@@ -145,16 +87,16 @@ namespace ymir {
 
 
         ///@{
-        eventind_t nV() { return _vdata->size(); }
-        eventind_t nJ() { return _jdata->size(); }
-        eventind_t nD() { return _ddata->size(); }
+//        eventind_t nV() { return _vdata->size(); }
+//        eventind_t nJ() { return _jdata->size(); }
+//        eventind_t nD() { return _ddata->size(); }
         ///@}
 
 
         ///@{
-        segindex_t vgene(uint8_t i) { return _vdata->gene_index(i); }
-        segindex_t jgene(uint8_t i) { return _jdata->gene_index(i); }
-        segindex_t dgene(uint8_t i) { return _ddata->gene_index(i); }
+//        segindex_t vgene(uint8_t i) { return _vdata->gene_index(i); }
+//        segindex_t jgene(uint8_t i) { return _jdata->gene_index(i); }
+//        segindex_t dgene(uint8_t i) { return _ddata->gene_index(i); }
         ///@}
 
 
@@ -165,9 +107,7 @@ namespace ymir {
 
         EventIndMMC *_events;  /** Matrix of indices of events for each edge. */
 
-        GeneSegment *_vdata, *_jdata, *_ddata;
-
-        seq_len_t *_seq_poses;  /** Vector of the initial clonal sequence's positions for each vertex. */
+        seq_len_t *_seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
         seq_len_t _n_poses;
         string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
 

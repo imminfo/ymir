@@ -104,34 +104,6 @@ namespace ymir {
     */
     class AssemblingStatisticalModel : protected MAAG {
 
-        /**
-        * \class EventFamilyIndexer
-        *
-        * \brief Clonal metadata maker by using indexing of event family indices
-        * from the given model parameter vector.
-        */
-        struct EventFamilyIndexer { // map v + del -> index and so on; CloneMetadata generator
-
-            EventFamilyIndexer() {};
-
-
-            eventind_t VgeneFamily(segindex_t Vseg) const { return 0; }
-            eventind_t VdelFamily(segindex_t Vseg) const { return 0; }
-
-            eventind_t JgeneFamily(segindex_t Jseg) const { return 0; }
-            eventind_t JdelFamily(segindex_t Jseg) const { return 0; }
-
-            eventind_t DgeneFamily(segindex_t Dseg) const { return 0; }
-            eventind_t DdelFamily(segindex_t Dseg, seq_len_t end5_dels, seq_len_t end3_dels) const { return 0; }
-
-            eventind_t insLenFamily(segindex_t ins_len_order) const { return 0; }
-
-        protected:
-
-            eventind_t a;
-
-        };
-
     public:
 
         /**
@@ -143,7 +115,6 @@ namespace ymir {
             _model_parameters = nullptr;
 
             _generator = nullptr;
-            _indexer = nullptr;
 
             _status = this->parseModelConfig(folderpath + "/model.json");
             if (_status) {
@@ -262,7 +233,6 @@ namespace ymir {
         ModelParameterVector *_model_parameters;
 
         ClonotypeAssembler *_generator;
-        EventFamilyIndexer *_indexer;
 
 
 

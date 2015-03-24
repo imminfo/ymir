@@ -158,6 +158,11 @@ namespace ymir {
         }
 
 
+        vector<prob_t>::const_iterator get_iterator(eventind_t i) const {
+            return _vec.begin() + i;
+        }
+
+
         //============= EVENT ACCESS =============//
 
 
@@ -182,7 +187,7 @@ namespace ymir {
 
 
         inline eventind_t index_D_del(segindex_t d_index, seq_len_t d5_del_num, seq_len_t d3_del_num) const {
-            return 0;
+            return _edges[3 + _edges[1] + _edges[2]] + d5_del_num*_d_gene_max_dels[d_index] + d3_del_num;
         }
         prob_t prob_D_del(segindex_t d_index, seq_len_t d5_del_num, seq_len_t d3_del_num) const {
             return _vec[index_D_del(d_index, d5_del_num, d3_del_num)];
@@ -190,7 +195,7 @@ namespace ymir {
 
 
         inline eventind_t index_VJ_ins_len(seq_len_t ins_len) const {
-            return 0;
+            return _edges[_edges.size() - 2] + ins_len;
         }
         prob_t prob_VJ_ins_len(seq_len_t ins_len) const {
             return _vec[index_VJ_ins_len(ins_len)];
@@ -198,7 +203,7 @@ namespace ymir {
 
 
         inline eventind_t index_VD_ins_len(seq_len_t ins_len) const {
-            return 0;
+            return _edges[_edges.size() - 4] + ins_len;
         }
         prob_t prob_VD_ins_len(seq_len_t ins_len) const {
             return _vec[index_VD_ins_len(ins_len)];
@@ -206,7 +211,7 @@ namespace ymir {
 
 
         inline eventind_t index_DJ_ins_len(seq_len_t ins_len) const {
-            return 0;
+            return _edges[_edges.size() - 3] + ins_len;
         }
         prob_t prob_DJ_ins_len(seq_len_t ins_len) const {
             return _vec[index_DJ_ins_len(ins_len)];
@@ -218,6 +223,7 @@ namespace ymir {
         vector<eventind_t> _edges;  /** Vector with starting indices for each event family. */
         vector<prob_t> _laplace;
         segindex_t _d_gene_num;
+        vector<seq_len_t> _d_gene_max_dels;
 
 
         /**

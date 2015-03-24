@@ -215,7 +215,7 @@ namespace ymir {
 
 
         inline eventind_t index_D_del(segindex_t d_index, seq_len_t d5_del_num, seq_len_t d3_del_num) const {
-            return _edges[3 + (_edges[2] - 1) + /* ??? */ _edges[2]] + d5_del_num*_d_gene_max_dels[d_index - 1] + d3_del_num;
+            return _edges[3 + (_edges[2] - 1) + 2 + (d_index - 1)] + d5_del_num*_d_gene_max_dels[d_index - 1] + d3_del_num;
         }
         prob_t prob_D_del(segindex_t d_index, seq_len_t d5_del_num, seq_len_t d3_del_num) const {
             return _vec[index_D_del(d_index, d5_del_num, d3_del_num)];
@@ -223,7 +223,7 @@ namespace ymir {
 
 
         inline eventind_t index_VJ_ins_len(seq_len_t ins_len) const {
-            return _edges[_edges.size() - 1 - 4 - 2] + ins_len;
+            return _edges[_edges.size() - 7] + ins_len; // - 1 - 4 - 2
         }
         prob_t prob_VJ_ins_len(seq_len_t ins_len) const {
             return _vec[index_VJ_ins_len(ins_len)];
@@ -231,7 +231,7 @@ namespace ymir {
 
 
         inline eventind_t index_VD_ins_len(seq_len_t ins_len) const {
-            return _edges[_edges.size() - 5] + ins_len;
+            return _edges[_edges.size() - 12] + ins_len; // - 1 - 8 - 3
         }
         prob_t prob_VD_ins_len(seq_len_t ins_len) const {
             return _vec[index_VD_ins_len(ins_len)];
@@ -239,7 +239,7 @@ namespace ymir {
 
 
         inline eventind_t index_DJ_ins_len(seq_len_t ins_len) const {
-            return _edges[_edges.size() - 4] + ins_len;
+            return _edges[_edges.size() - 11] + ins_len; // -1 - 8 - 2
         }
         prob_t prob_DJ_ins_len(seq_len_t ins_len) const {
             return _vec[index_DJ_ins_len(ins_len)];
@@ -247,17 +247,17 @@ namespace ymir {
 
 
         inline eventind_t index_VJ_ins_nuc() const {
-            return _edges[_edges.size() - 1 - 4 - 1];
+            return _edges[_edges.size() - 6]; // -1 - 4 - 1
         }
 
 
         inline eventind_t index_VD_ins_nuc() const {
-            return _edges[_edges.size()  - 1 - 8 - 1];
+            return _edges[_edges.size()  - 10]; // -1 - 8 - 1
         }
 
 
         inline eventind_t index_DJ_ins_nuc() const {
-            return _edges[_edges.size() - 1 - 4 - 1];
+            return _edges[_edges.size() - 6]; // -1 - 4 - 1
         }
 
     private:

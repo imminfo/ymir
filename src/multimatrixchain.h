@@ -116,14 +116,11 @@ namespace ymir {
         struct Node {
         public:
 
-            Node(matrix_ind_t n, dim_t rows, dim_t cols) : _n(n) {
-                _vec = new matrix_t[n];
-                for (matrix_ind_t i = 0; i < _n; ++i) {
-                    _vec[i].resize(rows, cols);
-                    _vec[i].fill(0);
-                }
-                // _vec = new matrix_t*[n];
-                // _vec[i] = new matrix_t(rows, cols);
+            Node() : _n(0) {}
+
+
+            Node(matrix_ind_t n, dim_t rows, dim_t cols) {
+                init(n, rows, cols);
             }
 
 
@@ -137,6 +134,18 @@ namespace ymir {
 
 
             ~Node() { delete [] _vec; }
+
+
+            void init(matrix_ind_t n, dim_t rows, dim_t cols) {
+                _n = n;
+                _vec = new matrix_t[n];
+                for (matrix_ind_t i = 0; i < _n; ++i) {
+                    _vec[i].resize(rows, cols);
+                    _vec[i].fill(0);
+                }
+                // _vec = new matrix_t*[n];
+                // _vec[i] = new matrix_t(rows, cols);
+            }
 
 
             ///@{
@@ -154,9 +163,6 @@ namespace ymir {
             matrix_t *_vec;
             matrix_ind_t _n;
 
-
-            Node() {}
-
         };
 
     public:
@@ -167,6 +173,11 @@ namespace ymir {
 
 
         virtual ~MultiMatrixChain() {
+        }
+
+
+        void resize(node_ind_t n_nodes) {
+            _chain.resize(n_nodes);
         }
 
 
@@ -212,9 +223,18 @@ namespace ymir {
         /**
         * \brief Add new node with pattern matrix.
         */
+        node_ind_t addNode() {
+            _chain.push_back(Node());
+            return _chain.size() - 1;
+        }
         node_ind_t addNode(matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
             _chain.push_back(Node(n_matrices, rows, cols));
             return _chain.size() - 1;
+        }
+
+
+        void initNode(node_ind_t node_i, matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
+            _chain[node_i].init(n_matrices, rows, cols);
         }
 
 

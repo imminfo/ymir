@@ -95,8 +95,6 @@ namespace ymir {
 //            // ???
 //        }
 
-    // vector<numeric> buildAndCompute(const Cloneset &cloneset)
-
 
     protected:
 
@@ -125,11 +123,11 @@ namespace ymir {
             // compute V deletions
             seq_len_t v_len = 0;
             segindex_t v_gene = 0;
-            probs.addNode(v_num, 1, 1);
-            probs.addNode(v_num, 1, len + 1);
+            probs.initNode(0, v_num, 1, 1);
+            probs.initNode(1, v_num, 1, len + 1);
             if (full_build) {
-                events.addNode(v_num, 1, 1);
-                events.addNode(v_num, 1, len + 1);
+                events.initNode(0, v_num, 1, 1);
+                events.initNode(1, v_num, 1, len + 1);
             }
             for (segindex_t v_index = 0; v_index < v_num; ++v_index) {
                 v_gene = clonotype.getV(v_index);
@@ -182,25 +180,19 @@ namespace ymir {
             // find max J alignment
             // WRONG BECAUSE WE HAVE J START NOT J ALIGNEMNT LENGTH
             segindex_t j_num = clonotype.nJ();
-            len = 0;
+            seq_len_t len = 0;
             for (int j_index = 0; j_index < j_num; ++j_index) {
                 if (clonotype.getVend(j_index) > len) {
                     len = clonotype.getJstart(j_index);
                 }
             }
 
-            // add VJ insertions node
-            probs.addNode(1, probs.nodeColumns(1), len + 1);
-            if (full_build) {
-                events.addNode(1, probs.nodeColumns(1), len + 1);
-            }
-
             // add J deletions and J gene nodes
-            probs.addNode(j_num, len + 1, 1);
-            probs.addNode(j_num, 1, 1);
+            probs.initNode(J_index_dels, j_num, len + 1, 1);
+            probs.initNode(J_index_genes,j_num, 1, 1);
             if (full_build) {
-                events.addNode(j_num, len + 1, 1);
-                events.addNode(j_num, 1, 1);
+                events.initNode(J_index_dels, j_num, len + 1, 1);
+                events.initNode(J_index_genes, j_num, 1, 1);
             }
 
             // compute J deletions

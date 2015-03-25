@@ -1180,37 +1180,37 @@ int main() {
     YMIR_TEST(test_model_param_vec_vdj(), "ModelParameterVector fail at VDJ access")
 
     // Tests for gene segments classes
-    YMIR_TEST(test_genesegmentalphabet(), "GeneSegmentAlphabet initialisation and access fail")
-    YMIR_TEST(test_vdjgenes2(), "VDJRecombinationGenes, 2 gene segments, initialisation and access fail")
-    YMIR_TEST(test_vdjgenes3(), "VDJRecombinationGenes, 3 gene segments, initialisation and access fail")
-    YMIR_TEST(test_genesegmentalphabet_read(), "GeneSegmentAlphabet file reading / writing fail")
-    YMIR_TEST(test_vdjgenes_read(), "VDJRecombinationGenes file reading / writing fail")
+    YMIR_TEST(test_genesegmentalphabet(), "GeneSegmentAlphabet initialisation and access")
+    YMIR_TEST(test_vdjgenes2(), "VDJRecombinationGenes, 2 gene segments, initialisation and access")
+    YMIR_TEST(test_vdjgenes3(), "VDJRecombinationGenes, 3 gene segments, initialisation and access")
+    YMIR_TEST(test_genesegmentalphabet_read(), "GeneSegmentAlphabet file reading / writing")
+    YMIR_TEST(test_vdjgenes_read(), "VDJRecombinationGenes file reading / writing")
 
     // Tests for clone, clone alignment and clone builder classes.
-    YMIR_TEST(test_clone(), "Clonotype, constructor / access fail")
-    YMIR_TEST(test_clonebuilder_clonealign(), "ClonotypeBuilder, Clonotype building fail")
+    YMIR_TEST(test_clone(), "Clonotype, constructor / access")
+    YMIR_TEST(test_clonebuilder_clonealign(), "ClonotypeBuilder, Clonotype building")
 
     // Tests for default naive sequences aligners.
-    YMIR_TEST(test_nuc_aligner(), "Naive nucleotide sequence aligner failed")
-    YMIR_TEST(test_aa_aligner(), "Naive amino acid sequence aligner failed")
+    YMIR_TEST(test_nuc_aligner(), "Naive nucleotide sequence aligner")
+    YMIR_TEST(test_aa_aligner(), "Naive amino acid sequence aligner")
 
     // Test for MiTCR parser.
     YMIR_TEST(test_mitcr(), "MiTCR parser test w/ naive D alignment")
 
     // Tests for clonal repertoires and clonal repertoire views.
-    YMIR_TEST(test_clorep(), "Cloneset creating / access failed")
-    YMIR_TEST(test_clorep_view(), "ClonesetView creating / access failed")
+    YMIR_TEST(test_clorep(), "Cloneset creating / access")
+    YMIR_TEST(test_clorep_view(), "ClonesetView creating / access")
 
     // Tests for markov chain.
-    YMIR_TEST(test_markovchain_nuc(), "Markov chain nucleotide fail")
-    YMIR_TEST(test_markovchain_aa(), "Markov chain amino acid fail")
+    YMIR_TEST(test_markovchain_nuc(), "Markov chain nucleotide")
+    YMIR_TEST(test_markovchain_aa(), "Markov chain amino acid")
 
     // Test for Multi-Matrix Chains
-    YMIR_TEST(test_mmc(), "Multi-Matrix chain fail")
+    YMIR_TEST(test_mmc(), "Multi-Matrix chain all interface")
 
     // Tests for MAAG / MAAG builder
-    YMIR_TEST(test_maag_vj(), "MAAG VJ test failed")
-    YMIR_TEST(test_maag_vdj(), "MAAG VDJ test failed")
+    YMIR_TEST(test_maag_vj(), "MAAG VJ building and computing")
+    YMIR_TEST(test_maag_vdj(), "MAAG VDJ building and computing")
 
     // Tests for assembling statistical model (ASM) reading / writing files.
 

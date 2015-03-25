@@ -123,9 +123,9 @@ namespace ymir {
 
         ///@{
         /** Get number of alignments for specific gene. */
-        seq_len_t nV() const { return segments[0]; }
-        seq_len_t nJ() const { return segments[1]; }
-        seq_len_t nD() const { return segments[2]; }
+        segindex_t nV() const { return segments[0]; }
+        segindex_t nJ() const { return segments[1]; }
+        segindex_t nD() const { return segments[2]; }
         ///@}
 
 
@@ -311,36 +311,6 @@ namespace ymir {
 
     };
 
-
-    /**
-    * \struct ClonotypeMetadata
-    *
-    * \brief Metadata clone: indices of events corresponding to
-    * gene segments' alignment, deletions and nucleotide insertions.
-    */
-    struct ClonotypeMetadata : public Clonotype {
-
-    public:
-
-        ClonotypeMetadata(const Clonotype& clone) {
-
-        }
-
-
-        ~ClonotypeMetadata() {
-            delete [] _v_dels;
-            delete [] _j_dels;
-            delete [] _d_dels;
-        }
-
-    private:
-
-        eventind_t *_v_indices, *_j_indices, *_d_indices; //* Indices of event families of aligned gene segments (family event indices). */
-        seq_len_t *_v_dels, *_j_dels, *_d_dels; //* Number of deletions for each aligned gene segments. */
-
-        eventind_t *_ins_lens; //* Indices of families of insertions lengths. Size = _segments - 1 */
-
-    };
 }
 
 #endif

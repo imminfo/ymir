@@ -45,7 +45,7 @@ namespace ymir {
         }
 
 
-        MarkovChain(vector<prob_t>::iterator start) : MarkovChain() {
+        MarkovChain(vector<prob_t>::const_iterator start) : MarkovChain() {
             this->updateProbabilities(start);
         }
 
@@ -138,7 +138,7 @@ namespace ymir {
         * for next nucleotide.
         */
         ///@{
-        void updateProbabilities(vector<prob_t>::iterator start) {
+        void updateProbabilities(vector<prob_t>::const_iterator start) {
             for (uint8_t i = 0; i < 16; ++i, ++start) {
                 this->_arr[i] = *start;
             }

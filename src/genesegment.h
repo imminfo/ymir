@@ -236,6 +236,15 @@ namespace ymir {
         }
 
 
+        VDJRecombinationGenes(const VDJRecombinationGenes &other) {
+            _V = new GeneSegmentAlphabet(*other._V);
+            _J = new GeneSegmentAlphabet(*other._J);
+            if (other._D) {
+                _D = new GeneSegmentAlphabet(*other._D);
+            }
+        }
+
+
         virtual ~VDJRecombinationGenes() {
             delete this->_V;
             delete this->_J;
@@ -250,9 +259,11 @@ namespace ymir {
         }
 
 
+        ///@{
         const GeneSegmentAlphabet& V() const { return *(this->_V); }
         const GeneSegmentAlphabet& J() const { return *(this->_J); }
         const GeneSegmentAlphabet& D() const { return *(this->_D); }
+        ///@}
 
 
         /**

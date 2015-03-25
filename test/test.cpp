@@ -1084,6 +1084,8 @@ YMIR_TEST_START(test_mmc)
     YMIR_ASSERT(mat.addNode(2, 1, 1) == 0)
     mat(0, 0, 0, 0) = .5;
     mat(0, 1, 0, 0) = 2;
+    YMIR_ASSERT(mat.nodeRows(0) == 1)
+    YMIR_ASSERT(mat.nodeColumns(0) == 1)
 
     YMIR_ASSERT(mat.addNode(2, 1, 3) == 1)
     mat(1, 0, 0, 0) = 1;
@@ -1092,6 +1094,8 @@ YMIR_TEST_START(test_mmc)
     mat(1, 1, 0, 0) = 2;
     mat(1, 1, 0, 1) = 3;
     mat(1, 1, 0, 2) = 0;
+    YMIR_ASSERT(mat.nodeRows(1) == 1)
+    YMIR_ASSERT(mat.nodeColumns(1) == 3)
 
     YMIR_ASSERT(mat.addNode(1, 3, 3) == 2)
     mat(2, 0, 0, 0) = 1;
@@ -1103,6 +1107,8 @@ YMIR_TEST_START(test_mmc)
     mat(2, 0, 2, 0) = 1;
     mat(2, 0, 2, 1) = 0;
     mat(2, 0, 2, 2) = .5;
+    YMIR_ASSERT(mat.nodeRows(2) == 3)
+    YMIR_ASSERT(mat.nodeColumns(2) == 3)
 
     YMIR_ASSERT(mat.addNode(2, 3, 1) == 3)
     mat(3, 0, 0, 0) = 2;

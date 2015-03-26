@@ -80,7 +80,7 @@ namespace ymir {
             for (seq_len_t i = 1; i < sequence.size(); ++i) {
                 res *= (*this)(nuc_hash(sequence[i - 1]), nuc_hash(sequence[i]));
             }
-            return res;
+            return sequence.size() ? res : 0;
         }
 
 
@@ -90,7 +90,7 @@ namespace ymir {
             for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
                 res *= (*this)(nuc_hash(*start), nuc_hash(*next));
             }
-            return res;
+            return sequence_len ? res : 0;
         }
 
 

@@ -26,6 +26,20 @@
 
 #define DEFAULT_SEQ_POSES_RESERVE 300
 
+#define VJ_CHAIN_SIZE 5
+#define VDJ_CHAIN_SIZE 7
+
+#define VARIABLE_GENES_MATRIX_INDEX 0
+#define VARIABLE_DELETIONS_MATRIX_INDEX 1
+#define JOINING_GENES_VJ_MATRIX_INDEX 3
+#define JOINING_DELETIONS_VJ_MATRIX_INDEX 4
+#define JOINING_GENES_VDJ_MATRIX_INDEX 5
+#define JOINING_DELETIONS_VDJ_MATRIX_INDEX 6
+#define DIVERSITY_GENES_MATRIX_INDEX 3
+#define VarJoi_INSERTIONS_MATRIX_INDEX 2
+#define VarDiv_INSERTIONS_MATRIX_INDEX 2
+#define DivJoi_INSERTIONS_MATRIX_INDEX 4
+
 
 #include "maag.h"
 
@@ -43,7 +57,7 @@ namespace ymir {
     public:
 
 
-        MAAGBuilder(const ModelParameterVector &param_vec, const VDJRecombinationGenes &genes) {
+        MAAGBuilder(const ModelParameterVector &param_vec, const VDJRecombinationGenes &genes) : MAAG() {
             _param_vec = new ModelParameterVector(param_vec);
             _genes = new VDJRecombinationGenes(genes);
         }
@@ -63,11 +77,11 @@ namespace ymir {
 
 
             if (!clonotype.is_vdj()) {
-                probs.resize(5);
-                if (full_build) { events.resize(5); }
+                probs.resize(VJ_CHAIN_SIZE);
+                if (full_build) { events.resize(VJ_CHAIN_SIZE); }
             } else {
-                probs.resize(7);
-                if (full_build) { events.resize(7); }
+                probs.resize(VDJ_CHAIN_SIZE);
+                if (full_build) { events.resize(VDJ_CHAIN_SIZE); }
             }
 
             this->buildVarible(clonotype, probs, events, seq_poses, full_build);
@@ -134,34 +148,34 @@ namespace ymir {
             // compute V deletions
             seq_len_t v_len = 0;
             segindex_t v_gene = 0;
-            probs.initNode(0, v_num, 1, 1);
-            probs.initNode(1, v_num, 1, len + 1);
+            probs.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
+            probs.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             if (full_build) {
-                events.initNode(0, v_num, 1, 1);
-                events.initNode(1, v_num, 1, len + 1);
+                events.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
+                events.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             }
             for (segindex_t v_index = 0; v_index < v_num; ++v_index) {
                 v_gene = clonotype.getV(v_index);
                 v_len = _genes->V()[v_gene].sequence.size();
 
-                probs(0, v_index, 0, 0) = _param_vec->prob_V_gene(v_gene); // probability of choosing this V gene segment
+                probs(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->prob_V_gene(v_gene); // probability of choosing this V gene segment
                 for (seq_len_t i = 0; i < len + 1; ++i) {
                     if (v_len - i >= 0) {
-                        probs(1, v_index, 0, i) = _param_vec->prob_V_del(v_gene, v_len - i); // probability of deletions
+                        probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->prob_V_del(v_gene, v_len - i); // probability of deletions
                     } else {
-                        probs(1, v_index, 0, i) = 0; // if exceeds length of V gene segment
+                        probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0; // if exceeds length of V gene segment
                     }
                     // probs(1, v_index, 0, i) = (v_len - i >= 0) ? _param_vec->prob_V_del(v_gene, v_len - i) : 0;
                     // OPTIMISATION: first find where zeros are start and then just fill this part of the vector with zeros without any "ifs"
                 }
 
                 if (full_build) {
-                    events(0, v_index, 0, 0) = _param_vec->index_V_gene(v_gene);
+                    events(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->index_V_gene(v_gene);
                     for (seq_len_t i = 0; i < len + 1; ++i) {
                         if (v_len - i >= 0) {
-                            events(1, v_index, 0, i) = _param_vec->index_V_del(v_gene, v_len - i);
+                            events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->index_V_del(v_gene, v_len - i);
                         } else {
-                            events(1, v_index, 0, i) = _param_vec->index_V_del(v_gene, 0);
+                            events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->index_V_del(v_gene, 0);
                         }
                     }
 
@@ -264,14 +278,14 @@ namespace ymir {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_VJ_ins_nuc()));
 
             int v_vertices = probs.nodeColumns(1), j_vertices = probs.nodeRows(3);
-            int max_size = _param_vec->max_VD_ins_len();
+            int max_size = _param_vec->max_VJ_ins_len();
             int insertion_len;
             bool good_insertion;
 
-            probs.initNode(3, 1, v_vertices, j_vertices);
+            probs.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
 
             if (full_build) {
-                events.initNode(3, 1, v_vertices, j_vertices);
+                events.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
             }
 
             for (int v_i = 0; v_i < v_vertices; ++v_i) {
@@ -279,14 +293,14 @@ namespace ymir {
                     insertion_len = seq_poses[j_i] - seq_poses[v_i] - 1;
                     good_insertion = (insertion_len >= 0) && (insertion_len < max_size);
                     if (good_insertion) {
-                        probs(3, 0, v_i, j_i - v_vertices) = mc.nucProbability(clonotype.seq_iterator(seq_poses[v_i]), insertion_len) * _param_vec->prob_VJ_ins_len(insertion_len);
+                        probs(VarJoi_INSERTIONS_MATRIX_INDEX, 0, v_i, j_i - v_vertices) = mc.nucProbability(clonotype.seq_iterator(seq_poses[v_i]), insertion_len) * _param_vec->prob_VJ_ins_len(insertion_len);
                         if (full_build) {
-                            events(3, 0, v_i, j_i - v_vertices) = _param_vec->index_VJ_ins_len(insertion_len);
+                            events(VarJoi_INSERTIONS_MATRIX_INDEX, 0, v_i, j_i - v_vertices) = _param_vec->index_VJ_ins_len(insertion_len);
                         }
                     } else {
-                        probs(3, 0, v_i, j_i - v_vertices) = 0;
+                        probs(VarJoi_INSERTIONS_MATRIX_INDEX, 0, v_i, j_i - v_vertices) = 0;
                         if (full_build) {
-                            events(3, 0, v_i, j_i - v_vertices) = 0;
+                            events(VarJoi_INSERTIONS_MATRIX_INDEX, 0, v_i, j_i - v_vertices) = 0;
                         }
                     }
                 }
@@ -314,7 +328,12 @@ namespace ymir {
         }
 
 
-        void buildInsertions() {
+        void buildInsertions(Clonotype& clonotype,
+                ProbMMC &probs,
+                EventIndMMC &events,
+                vector<seq_len_t> &seq_poses,
+                bool full_build,
+                const MarkovChain& mc) {
 
         }
 

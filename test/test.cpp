@@ -879,14 +879,14 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
 
     cb.setNucleotideSeq();
     cb.setSequence("nuclseq");
-    cb.addValignment(10, 15);
-    cb.addValignment(11, 25);
-    cb.addValignment(12, 35);
-    cb.addJalignment(20, 21);
-    cb.addDalignment(30, 1, 2, 3, 4);
-    cb.addDalignment(30, 1, 2, 5, 6);
-    cb.addDalignment(31, 8, 9, 11, 12);
-    cb.addDalignment(31, 8, 9, 13, 14);
+    cb.addValignment(10, 15)
+            .addValignment(11, 25)
+            .addValignment(12, 35)
+            .addJalignment(20, 21)
+            .addDalignment(30, 1, 2, 3, 4)
+            .addDalignment(30, 1, 2, 5, 6)
+            .addDalignment(31, 8, 9, 11, 12)
+            .addDalignment(31, 8, 9, 13, 14);
 
     Clonotype c = cb.buildClonotype();
 
@@ -1177,8 +1177,8 @@ YMIR_TEST_START(test_maag_vj)
     v2.push_back(3);
 
     // VJ ins len
-    v1.push_back(.76); v1.push_back(.24);
-    v2.push_back(2);
+    v1.push_back(.1); v1.push_back(.2); v1.push_back(.25); v1.push_back(.3); v1.push_back(.15);
+    v2.push_back(5);
 
     // VJ ins nuc
     // prev A
@@ -1204,31 +1204,42 @@ YMIR_TEST_START(test_maag_vj)
     alvec1.push_back("Vseg1");
     alvec1.push_back("Vseg2");
     alvec1.push_back("Vseg3");
-    seqvec1.push_back("ACT");
+    seqvec1.push_back("CCCG");
     seqvec1.push_back("GGG");
-    seqvec1.push_back("CCC");
+    seqvec1.push_back("CCCGGG");
 
     vector<string> alvec2;
     vector<string> seqvec2;
     alvec2.push_back("Jseg1");
     alvec2.push_back("Jseg2");
     alvec2.push_back("Jseg3");
-    seqvec2.push_back("GGG");
-    seqvec2.push_back("TTT");
-    seqvec2.push_back("AAA");
+    seqvec2.push_back("CCGTTT");
+    seqvec2.push_back("ATTT");
+    seqvec2.push_back("AGGTTT");
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
     MAAGBuilder maag_builder(mvec, genes);
 
     ClonotypeBuilder cl_builder;
+    // CCCG.AC.GGTTT
+    cl_builder.setSequence("CCCGACGGTTT")
+            .setNucleotideSeq()
+            .addValignment(1, 4)
+            .addValignment(3, 5)
+            .addJalignment(1, 4)
+            .addJalignment(2, 3)
+            .addJalignment(3, 5);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, false);
+    MAAG maag = maag_builder.build(clonotype, true);
 
-    maag = maag_builder.build(clonotype, true);
+    cout << maag.fullProbability(0, 0) << endl;
 
-    YMIR_ASSERT(false)
+//    YMIR_ASSERT(maag.fullProbability(0, 0))
+//    YMIR_ASSERT(maag.fullProbability(1, 2))
+
+
 YMIR_TEST_END
 
 
@@ -1305,7 +1316,7 @@ int main() {
     YMIR_TEST(test_mmc(), "Multi-Matrix chain all interface")
 
     // Tests for MAAG / MAAG builder
-//    YMIR_TEST(test_maag_vj(), "MAAG VJ building and computing")
+    YMIR_TEST(test_maag_vj(), "MAAG VJ building and computing")
     YMIR_TEST(test_maag_vdj(), "MAAG VDJ building and computing")
 
     // Tests for assembling statistical model (ASM) reading / writing files.

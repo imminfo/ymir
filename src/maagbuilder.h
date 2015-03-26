@@ -81,7 +81,8 @@ namespace ymir {
             }
 
             seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
-            for (int i = 0; i < seq_poses.size(); ++i) { seq_poses_arr[i] = seq_poses[i]; }
+            copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
+//            for (int i = 0; i < seq_poses.size(); ++i) { seq_poses_arr[i] = seq_poses[i]; }
 
             if (full_build) {
                 return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size());
@@ -100,11 +101,21 @@ namespace ymir {
 
         ModelParameterVector *_param_vec;  // or just copy it?
         VDJRecombinationGenes *_genes; // copy this too?
+        // MarkovChain *mc_alpha, *mc_beta;
 
 
         MAAGBuilder() {}
 
 
+        /**
+        * \brief Build probability and events matrices for Variable gene segments.
+        *
+        * \param clonotype Clonotype that used for building the graph.
+        * \param probs Multi-Matrix Chain with event probabilities.
+        * \param events Multi-Matrix Chain with event indices.
+        * \param seq_poses Vector of positions.
+        * \param full_build Boolean if build should be full.
+        */
         void buildVarible(const Clonotype &clonotype,
                 ProbMMC &probs,
                 EventIndMMC &events,
@@ -140,7 +151,8 @@ namespace ymir {
                     } else {
                         probs(1, v_index, 0, i) = 0; // if exceeds length of V gene segment
                     }
-
+                    // probs(1, v_index, 0, i) = (v_len - i >= 0) ? _param_vec->prob_V_del(v_gene, v_len - i) : 0;
+                    // OPTIMISATION: first find where zeros are start and then just fill this part of the vector with zeros without any "ifs"
                 }
 
                 if (full_build) {
@@ -162,30 +174,32 @@ namespace ymir {
         }
 
 
+        /**
+        * \brief Build probability and events matrices for Variable gene segments.
+        *
+        * \param clonotype Clonotype that used for building the graph.
+        * \param probs Multi-Matrix Chain with event probabilities.
+        * \param events Multi-Matrix Chain with event indices.
+        * \param seq_poses Vector of positions.
+        * \param full_build Boolean if build should be full.
+        */
         void buildJoining(const Clonotype &clonotype,
                 ProbMMC &probs,
                 EventIndMMC &events,
                 vector<seq_len_t> &seq_poses,
                 bool full_build) const
         {
-            int J_index_dels, J_index_genes;
-            if (!clonotype.is_vdj()) {
-                J_index_dels = 3;
-                J_index_genes = 4;
-            } else {
-                J_index_dels = 5;
-                J_index_genes = 6;
-            }
+            int J_index_dels = probs.chainSize() - 2, J_index_genes = probs.chainSize() - 1;
 
             // find max J alignment
-            // WRONG BECAUSE WE HAVE J START NOT J ALIGNEMNT LENGTH
             segindex_t j_num = clonotype.nJ();
-            seq_len_t len = 0;
+            seq_len_t len = clonotype.sequence().size();
             for (int j_index = 0; j_index < j_num; ++j_index) {
-                if (clonotype.getVend(j_index) > len) {
+                if (clonotype.getJstart(j_index) < len) {
                     len = clonotype.getJstart(j_index);
                 }
             }
+            len = clonotype.sequence().size() - len + 1;
 
             // add J deletions and J gene nodes
             probs.initNode(J_index_dels, j_num, len + 1, 1);
@@ -203,30 +217,27 @@ namespace ymir {
                 j_gene = clonotype.getJ(j_index);
                 j_len = _genes->J()[j_gene].sequence.size();
 
-                int J_DELS = 3;
-                int J_INDEX = 4;
-
-                probs(J_INDEX, j_index, 0, 0) = _param_vec->prob_J_gene(j_gene); // probability of choosing this J gene segment
-                for (seq_len_t i = len; i >= 0; --i) {
-                    if (j_len - i >= 0) {
-                        probs(J_DELS, j_index, i, 0) = _param_vec->prob_J_del(j_gene, j_len - i); // probability of deletions
+                probs(J_index_genes, j_index, 0, 0) = _param_vec->prob_J_gene(j_gene); // probability of choosing this J gene segment
+                for (seq_len_t i = 0; i < len + 1; ++i) {
+                    if (j_len - len - i >= 0) {
+                        probs(J_index_dels, j_index, i, 0) = _param_vec->prob_J_del(j_gene, j_len - len - i); // probability of deletions
                     } else {
-                        probs(J_DELS, j_index, i, 0) = 0; // if exceeds length of J gene segment
+                        probs(J_index_dels, j_index, i, 0) = 0; // if exceeds length of J gene segment
                     }
 
                 }
 
                 if (full_build) {
-                    events(J_INDEX, j_index, 0, 0) = _param_vec->index_J_gene(j_gene);
-                    for (seq_len_t i = len; i >= 0; --i) {
-                        if (j_len - i >= 0) {
-                            events(J_DELS, j_index, i, 0) = _param_vec->index_J_del(j_gene, j_len - i);
+                    events(J_index_genes, j_index, 0, 0) = _param_vec->index_J_gene(j_gene);
+                    for (seq_len_t i = 0; i < len + 1; ++i) {
+                        if (j_len - len - i >= 0) {
+                            events(J_index_dels, j_index, i, 0) = _param_vec->index_J_del(j_gene, j_len - len - i);
                         } else {
-                            events(J_DELS, j_index, i, 0) = 0;
+                            events(J_index_dels, j_index, i, 0) = 0;
                         }
                     }
 
-                    for (seq_len_t i = 0; i < len + 1; ++i) {
+                    for (seq_len_t i = clonotype.sequence().size() - len + 1; i < clonotype.sequence().size() + 1; ++i) {
                         seq_poses.push_back(i);
                     }
                 }

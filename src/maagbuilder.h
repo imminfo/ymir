@@ -55,7 +55,7 @@ namespace ymir {
         }
 
 
-        MAAG build(const Clonotype &clonotype, bool full_build = false) const {
+        MAAG build(/*const*/ Clonotype &clonotype, bool full_build = false) const {
             ProbMMC probs;
             EventIndMMC events;
             vector<seq_len_t> seq_poses;
@@ -255,13 +255,42 @@ namespace ymir {
         }
 
 
-        void buildVJinsertions(const Clonotype &clonotype,
+        void buildVJinsertions(/*const*/ Clonotype &clonotype,
                 ProbMMC &probs,
                 EventIndMMC &events,
                 vector<seq_len_t> &seq_poses,
                 bool full_build) const
         {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_VJ_ins_nuc()));
+
+            int v_vertices = probs.nodeColumns(1), j_vertices = probs.nodeRows(3);
+            int max_size = _param_vec->max_VD_ins_len();
+            int insertion_len;
+            bool good_insertion;
+
+            probs.initNode(3, 1, v_vertices, j_vertices);
+
+            if (full_build) {
+                events.initNode(3, 1, v_vertices, j_vertices);
+            }
+
+            for (int v_i = 0; v_i < v_vertices; ++v_i) {
+                for (int j_i = v_vertices; j_i < j_vertices + v_vertices; ++j_i) {
+                    insertion_len = seq_poses[j_i] - seq_poses[v_i] - 1;
+                    good_insertion = (insertion_len >= 0) && (insertion_len < max_size);
+                    if (good_insertion) {
+                        probs(3, 0, v_i, j_i - v_vertices) = mc.nucProbability(clonotype.seq_iterator(seq_poses[v_i]), insertion_len) * _param_vec->prob_VJ_ins_len(insertion_len);
+                        if (full_build) {
+                            events(3, 0, v_i, j_i - v_vertices) = _param_vec->index_VJ_ins_len(insertion_len);
+                        }
+                    } else {
+                        probs(3, 0, v_i, j_i - v_vertices) = 0;
+                        if (full_build) {
+                            events(3, 0, v_i, j_i - v_vertices) = 0;
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -282,6 +311,11 @@ namespace ymir {
                 bool full_build) const
         {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_DJ_ins_nuc()));
+        }
+
+
+        void buildInsertions() {
+
         }
 
     };

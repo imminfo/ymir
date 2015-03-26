@@ -243,25 +243,27 @@ namespace ymir {
         *
         * \param seq Clonotype sequence.
         */
-        void setSequence(const string& seq) { this->seq = seq; }
+        ClonotypeBuilder& setSequence(const string& seq) { this->seq = seq; return *this; }
 
 
         ///@{
-        void setNucleotideSeq() { nucleotide = true; }
-        void setAminoAcidSeq() { nucleotide = false; }
+        ClonotypeBuilder& setNucleotideSeq() { nucleotide = true; return *this; }
+        ClonotypeBuilder& setAminoAcidSeq() { nucleotide = false; return *this; }
         ///@}
 
 
         ///@{
-        void addValignment(segindex_t vseg, seq_len_t vend) {
+        ClonotypeBuilder& addValignment(segindex_t vseg, seq_len_t vend) {
             _Vseg.push_back(vseg);
             _Valign.push_back(vend);
+            return *this;
         }
-        void addJalignment(segindex_t jseg, seq_len_t jstart) {
+        ClonotypeBuilder& addJalignment(segindex_t jseg, seq_len_t jstart) {
             _Jseg.push_back(jseg);
             _Jalign.push_back(jstart);
+            return *this;
         }
-        void addDalignment(segindex_t dseg, seq_len_t dstart, seq_len_t dend, seq_len_t seqstart, seq_len_t seqend) {
+        ClonotypeBuilder& addDalignment(segindex_t dseg, seq_len_t dstart, seq_len_t dend, seq_len_t seqstart, seq_len_t seqend) {
             if (_Dseg.size() == 0 || dseg != _Dseg[_Dseg.size() - 1]) {
                 _n_Dalign.push_back(0);
             }
@@ -273,9 +275,11 @@ namespace ymir {
             _Dalign.push_back(dend);
             _Dalign.push_back(seqstart);
             _Dalign.push_back(seqend);
+            return *this;
         }
-        void addDalignment(segindex_t dseg, const d_alignment_t& dalignment) {
+        ClonotypeBuilder& addDalignment(segindex_t dseg, const d_alignment_t& dalignment) {
             addDalignment(dseg, dalignment.Dstart, dalignment.Dend, dalignment.seqstart, dalignment.seqend);
+            return *this;
         }
         ///@}
 

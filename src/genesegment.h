@@ -82,6 +82,15 @@ namespace ymir {
         }
 
 
+        GeneSegmentAlphabet(const GeneSegmentAlphabet &other) {
+            _name = other._name;
+            _map.clear();
+            _map.insert(other._map.begin(), other._map.end());
+            _vec.clear();
+            _vec.insert(_vec.begin(), other._vec.begin(), other._vec.end());
+        }
+
+
         virtual ~GeneSegmentAlphabet() {}
 
 
@@ -241,6 +250,8 @@ namespace ymir {
             _J = new GeneSegmentAlphabet(*other._J);
             if (other._D) {
                 _D = new GeneSegmentAlphabet(*other._D);
+            } else {
+                _D = nullptr;
             }
         }
 
@@ -248,9 +259,7 @@ namespace ymir {
         virtual ~VDJRecombinationGenes() {
             delete this->_V;
             delete this->_J;
-            if (this->_D != nullptr) {
-                delete this->_D;
-            }
+            if (_D) { delete this->_D; }
         }
 
 

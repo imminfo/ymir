@@ -91,7 +91,7 @@ namespace ymir {
         *
         * \return Full assembling probability.
         */
-        numeric fullProbability(eventind_t v_index, eventind_t j_index = 0) const {
+        numeric fullProbability(eventind_t v_index, eventind_t j_index) const {
             // P(Vi) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji) * P(Ji)
             return (_chain[0][v_index] *        // P(Vi)
                     _chain[1][v_index] *        // P(#dels | Vi)
@@ -99,7 +99,7 @@ namespace ymir {
                     _chain[3][j_index] *        // P(#dels | Ji)
                     _chain[4][j_index])(0, 0);  // P(Ji)
         }
-        numeric fullProbability(eventind_t v_index, eventind_t d_index, eventind_t j_index = 0) const {
+        numeric fullProbability(eventind_t v_index, eventind_t d_index, eventind_t j_index) const {
             // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
             return (_chain[0][v_index] *      // P(Vi)
                     _chain[1][v_index] *      // P(#dels | Vi)
@@ -152,6 +152,7 @@ namespace ymir {
         MAAG() {
             _events = nullptr;
             _sequence = nullptr;
+            _seq_poses = nullptr;
         }
 
     };

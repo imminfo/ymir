@@ -233,8 +233,8 @@ namespace ymir {
 
                 probs(J_index_genes, j_index, 0, 0) = _param_vec->prob_J_gene(j_gene); // probability of choosing this J gene segment
                 for (seq_len_t i = 0; i < len + 1; ++i) {
-                    if (j_len - len - i >= 0) {
-                        probs(J_index_dels, j_index, i, 0) = _param_vec->prob_J_del(j_gene, j_len - len - i); // probability of deletions
+                    if (j_len - len + i >= 0) {
+                        probs(J_index_dels, j_index, i, 0) = _param_vec->prob_J_del(j_gene, j_len - len + i); // probability of deletions
                     } else {
                         probs(J_index_dels, j_index, i, 0) = 0; // if exceeds length of J gene segment
                     }

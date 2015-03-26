@@ -1170,15 +1170,18 @@ YMIR_TEST_START(test_maag_vj)
     v2.push_back(4);
 
     // J del
-    v1.push_back(.4); v1.push_back(.6);
-    v2.push_back(2);
+    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3); v1.push_back(.34); v1.push_back(.03); v1.push_back(.06);
+    v2.push_back(6);
 
     v1.push_back(.125); v1.push_back(.175); v1.push_back(.7);
     v2.push_back(3);
 
+    v1.push_back(.1); v1.push_back(.2); v1.push_back(.3); v1.push_back(.4);
+    v2.push_back(4);
+
     // VJ ins len
-    v1.push_back(.1); v1.push_back(.2); v1.push_back(.25); v1.push_back(.3); v1.push_back(.15);
-    v2.push_back(5);
+    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.1);
+    v2.push_back(7);
 
     // VJ ins nuc
     // prev A
@@ -1227,9 +1230,9 @@ YMIR_TEST_START(test_maag_vj)
             .setNucleotideSeq()
             .addValignment(1, 4)
             .addValignment(3, 5)
-            .addJalignment(1, 4)
-            .addJalignment(2, 3)
-            .addJalignment(3, 5);
+            .addJalignment(1, 8)
+            .addJalignment(2, 9)
+            .addJalignment(3, 7);
     Clonotype clonotype = cl_builder.buildClonotype();
 
     MAAG maag = maag_builder.build(clonotype, true);

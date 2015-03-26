@@ -354,10 +354,13 @@ YMIR_TEST_START(test_model_param_vec_vj)
     v2.push_back(3);
 
     // VJ ins len
-    v1.push_back(.76);
-    v1.push_back(.24);
+    v1.push_back(.31);
+    v1.push_back(.39);
+    v1.push_back(.1);
+    v1.push_back(.1);
+    v1.push_back(.1);
 
-    v2.push_back(2);
+    v2.push_back(5);
 
     // VJ ins nuc
     // prev A
@@ -415,8 +418,10 @@ YMIR_TEST_START(test_model_param_vec_vj)
     YMIR_ASSERT(mvec.prob_J_del(2, 0) == .125)
     YMIR_ASSERT(mvec.prob_J_del(2, 2) == .7)
 
-    YMIR_ASSERT(mvec.prob_VJ_ins_len(0) == .76)
-    YMIR_ASSERT(mvec.prob_VJ_ins_len(1) == .24)
+    YMIR_ASSERT(mvec.prob_VJ_ins_len(0) - .31 < 1e-7)
+    YMIR_ASSERT(mvec.prob_VJ_ins_len(1) - .39 < 1e-7)
+    YMIR_ASSERT(mvec.prob_VJ_ins_len(2) - .1 < 1e-7)
+    YMIR_ASSERT(mvec.max_VJ_ins_len() == 4)
 
     YMIR_ASSERT(mvec[mvec.index_VJ_ins_nuc()] == .05)
     YMIR_ASSERT(mvec[mvec.index_VJ_ins_nuc() + 1] == .08)
@@ -614,10 +619,12 @@ YMIR_TEST_START(test_model_param_vec_vdj)
 
     YMIR_ASSERT(mvec.prob_VD_ins_len(0) == .76)
     YMIR_ASSERT(mvec.prob_VD_ins_len(1) == .24)
+    YMIR_ASSERT(mvec.max_VD_ins_len() == 1)
 
     YMIR_ASSERT(mvec.prob_DJ_ins_len(0) == .89)
     YMIR_ASSERT(mvec.prob_DJ_ins_len(1) == .10)
     YMIR_ASSERT(mvec.prob_DJ_ins_len(2) == .01)
+    YMIR_ASSERT(mvec.max_DJ_ins_len() == 2)
 
     YMIR_ASSERT(mvec[mvec.index_VD_ins_nuc()] == .05)
     YMIR_ASSERT(mvec[mvec.index_VD_ins_nuc() + 1] == .08)
@@ -648,10 +655,13 @@ YMIR_TEST_START(test_genesegmentalphabet)
     YMIR_ASSERT(gsa[3].sequence == gsa["Vseg3"].sequence)
 
     gsa.appendPalindromicNucleotides(2, 0);
+    YMIR_ASSERT(gsa[1].sequence == "GTACT")
 
     gsa.appendPalindromicNucleotides(0, 2);
+    YMIR_ASSERT(gsa[1].sequence == "GTACTAG")
 
     gsa.appendPalindromicNucleotides(2, 2);
+    YMIR_ASSERT(gsa[1].sequence == "CAGTACTAGCT")
 YMIR_TEST_END
 
 
@@ -957,7 +967,6 @@ YMIR_TEST_START(test_mitcr)
     YMIR_ASSERT(vdj_genes.J()[cr[2].getJ(0)].allele == "TRAJ8")
     YMIR_ASSERT(vdj_genes.J()[cr[2].getJ(1)].allele == "TRAJ18")
     YMIR_ASSERT(cr[2].nJ() == 2)
-
 YMIR_TEST_END
 
 
@@ -1036,7 +1045,6 @@ YMIR_TEST_START(test_markovchain_nuc)
 
     YMIR_ASSERT(mc.nucProbability(s) == .042);
     YMIR_ASSERT(mc.nucProbability(s.begin(), 4) == .042);
-
 YMIR_TEST_END
 
 
@@ -1133,11 +1141,90 @@ YMIR_TEST_START(test_mmc)
             * mat.matrix(2, 0)
             * mat.matrix(3, 1)
             * mat.matrix(4, 1))(0, 0) - 52.8 < 1e-14)
-
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_maag_vj)
+    vector<prob_t> v1;
+    vector<eventind_t> v2;
+
+    // V
+    v1.push_back(.5); v1.push_back(.25); v1.push_back(.25);
+    v2.push_back(3);
+
+    // J
+    v1.push_back(.1); v1.push_back(.9);
+    v2.push_back(2);
+
+    // V del
+    v1.push_back(.75); v1.push_back(.25);
+    v2.push_back(2);
+
+    v1.push_back(.4); v1.push_back(.5); v1.push_back(.1);
+    v2.push_back(3);
+
+    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
+    v2.push_back(4);
+
+    // J del
+    v1.push_back(.4); v1.push_back(.6);
+    v2.push_back(2);
+
+    v1.push_back(.125); v1.push_back(.175); v1.push_back(.7);
+    v2.push_back(3);
+
+    // VJ ins len
+    v1.push_back(.76); v1.push_back(.24);
+    v2.push_back(2);
+
+    // VJ ins nuc
+    // prev A
+    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+    v2.push_back(4);
+
+    // prev C
+    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
+    v2.push_back(4);
+
+    // prev G
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
+    v2.push_back(4);
+
+    // prev T
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
+    v2.push_back(4);
+
+    ModelParameterVector mvec(v1, v2);
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1");
+    alvec1.push_back("Vseg2");
+    alvec1.push_back("Vseg3");
+    seqvec1.push_back("ACT");
+    seqvec1.push_back("GGG");
+    seqvec1.push_back("CCC");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1");
+    alvec2.push_back("Jseg2");
+    alvec2.push_back("Jseg3");
+    seqvec2.push_back("GGG");
+    seqvec2.push_back("TTT");
+    seqvec2.push_back("AAA");
+
+    VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
+
+    MAAGBuilder maag_builder(mvec, genes);
+
+    ClonotypeBuilder cl_builder;
+    Clonotype clonotype = cl_builder.buildClonotype();
+
+    MAAG maag = maag_builder.build(clonotype, false);
+
+    maag = maag_builder.build(clonotype, true);
+
     YMIR_ASSERT(false)
 YMIR_TEST_END
 
@@ -1215,7 +1302,7 @@ int main() {
     YMIR_TEST(test_mmc(), "Multi-Matrix chain all interface")
 
     // Tests for MAAG / MAAG builder
-    YMIR_TEST(test_maag_vj(), "MAAG VJ building and computing")
+//    YMIR_TEST(test_maag_vj(), "MAAG VJ building and computing")
     YMIR_TEST(test_maag_vdj(), "MAAG VDJ building and computing")
 
     // Tests for assembling statistical model (ASM) reading / writing files.

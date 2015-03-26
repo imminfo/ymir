@@ -194,7 +194,9 @@ namespace ymir {
         //============= EVENT ACCESS =============//
 
 
-        inline eventind_t index_V_gene(segindex_t v_index) const { return _edges[1] + v_index - 1; }
+        inline eventind_t index_V_gene(segindex_t v_index) const {
+            return _edges[1] + v_index - 1;
+        }
         prob_t prob_V_gene(segindex_t v_index) const { return _vec[index_V_gene(v_index)]; }  // Hmmm...
 
 
@@ -228,6 +230,9 @@ namespace ymir {
         prob_t prob_VJ_ins_len(seq_len_t ins_len) const {
             return _vec[index_VJ_ins_len(ins_len)];
         }
+        eventind_t max_VJ_ins_len() const {
+            return this->eventFamilySize(_edges.size() - 7) - 1;
+        }
 
 
         inline eventind_t index_VD_ins_len(seq_len_t ins_len) const {
@@ -236,6 +241,9 @@ namespace ymir {
         prob_t prob_VD_ins_len(seq_len_t ins_len) const {
             return _vec[index_VD_ins_len(ins_len)];
         }
+        eventind_t max_VD_ins_len() const {
+            return this->eventFamilySize(_edges.size() - 12) - 1;
+        }
 
 
         inline eventind_t index_DJ_ins_len(seq_len_t ins_len) const {
@@ -243,6 +251,9 @@ namespace ymir {
         }
         prob_t prob_DJ_ins_len(seq_len_t ins_len) const {
             return _vec[index_DJ_ins_len(ins_len)];
+        }
+        eventind_t max_DJ_ins_len() const {
+            return this->eventFamilySize(_edges.size() - 11) - 1;
         }
 
 

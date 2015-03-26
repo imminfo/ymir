@@ -128,6 +128,15 @@ namespace ymir {
         ///@}
 
 
+        prob_t event_probability(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
+            return (*this)(node_i, mat_i, row, col);
+        }
+
+        eventind_t event_index(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
+            return _events ? (*_events)(node_i, mat_i, row, col) : 0;
+        };
+
+
         // serialize MAAG
 
 

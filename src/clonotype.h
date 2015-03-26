@@ -157,7 +157,7 @@ namespace ymir {
         bool nucleotide;
         segindex_t *segments; /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
                               /// vector of indices of segments, aligned on this clone: V1--V2--V3--J1--J2--D1--D2--...
-        seq_len_t *alignments; //* Vector of alignments for the clone. 1st N elements is V ends, than M elements is J starts, each other are 4-tuples for Ds alignment - (D start, D end, seq start, seq end) */
+        seq_len_t *alignments; //* Vector of 1-based alignments for the clone. 1st N elements is V ends, than M elements is J starts, each other are 4-tuples for Ds alignment - (D start, D end, seq start, seq end) */
         seq_len_t *n_D_alignments; //* Number of alignments (i.e., 4-tuples) for each aligned D segment; vector's length == segments[2] */
 
 

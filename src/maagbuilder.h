@@ -96,7 +96,6 @@ namespace ymir {
 
             seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
             copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
-//            for (int i = 0; i < seq_poses.size(); ++i) { seq_poses_arr[i] = seq_poses[i]; }
 
             if (full_build) {
                 return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size());
@@ -138,7 +137,7 @@ namespace ymir {
         {
             // find max V alignment
             seq_len_t len = 0;
-            segindex_t v_num = clonotype.nV();
+            segindex_t v_num = clonotype.nVar();
             for (int v_index = 0; v_index < v_num; ++v_index) {
                 if (clonotype.getVend(v_index) > len) {
                     len = clonotype.getVend(v_index);
@@ -156,7 +155,7 @@ namespace ymir {
                 events.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             }
             for (segindex_t v_index = 0; v_index < v_num; ++v_index) {
-                v_gene = clonotype.getV(v_index);
+                v_gene = clonotype.getVar(v_index);
                 v_len = _genes->V()[v_gene].sequence.size();
                 v_end = clonotype.getVend(v_index);
 
@@ -209,7 +208,7 @@ namespace ymir {
             int J_index_dels = probs.chainSize() - 2, J_index_genes = probs.chainSize() - 1;
 
             // find max J alignment
-            segindex_t j_num = clonotype.nJ();
+            segindex_t j_num = clonotype.nJoi();
             seq_len_t len = clonotype.sequence().size();
             for (int j_index = 0; j_index < j_num; ++j_index) {
                 if (clonotype.getJstart(j_index) < len) {
@@ -232,7 +231,7 @@ namespace ymir {
             seq_len_t j_start = 0;
 
             for (segindex_t j_index = 0; j_index < j_num; ++j_index) {
-                j_gene = clonotype.getJ(j_index);
+                j_gene = clonotype.getJoi(j_index);
                 j_len = _genes->J()[j_gene].sequence.size();
                 j_start = clonotype.getJstart(j_index);
 
@@ -266,21 +265,20 @@ namespace ymir {
         }
 
 
-        void buildDiversity(const Clonotype &clonotype,
-                ProbMMC &probs,
-                EventIndMMC &events,
-                vector<seq_len_t> &seq_poses,
-                bool full_build) const
+        void buildDiversity(const Clonotype &clonotype, ProbMMC &probs,
+                            EventIndMMC &events,
+                            vector<seq_len_t> &seq_poses,
+                            bool full_build) const
         {
 
         }
 
 
         void buildVJinsertions(/*const*/ Clonotype &clonotype,
-                ProbMMC &probs,
-                EventIndMMC &events,
-                vector<seq_len_t> &seq_poses,
-                bool full_build) const
+                                         ProbMMC &probs,
+                                         EventIndMMC &events,
+                                         vector<seq_len_t> &seq_poses,
+                                         bool full_build) const
         {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_VJ_ins_nuc()));
 
@@ -316,31 +314,33 @@ namespace ymir {
 
 
         void buildVDinsertions(const Clonotype &clonotype,
-                ProbMMC &probs,
-                EventIndMMC &events,
-                vector<seq_len_t> &seq_poses,
-                bool full_build) const
+                               ProbMMC &probs,
+                               EventIndMMC &events,
+                               vector<seq_len_t> &seq_poses,
+                               bool full_build) const
         {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_VD_ins_nuc()));
         }
 
 
         void buildDJinsertions(const Clonotype &clonotype,
-                ProbMMC &probs,
-                EventIndMMC &events,
-                vector<seq_len_t> &seq_poses,
-                bool full_build) const
+                               ProbMMC &probs,
+                               EventIndMMC &events,
+                               vector<seq_len_t> &seq_poses,
+                               bool full_build) const
         {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_DJ_ins_nuc()));
         }
 
 
         void buildInsertions(Clonotype& clonotype,
-                ProbMMC &probs,
-                EventIndMMC &events,
-                vector<seq_len_t> &seq_poses,
-                bool full_build,
-                const MarkovChain& mc) {
+                             ProbMMC &probs,
+                             EventIndMMC &events,
+                             vector<seq_len_t> &seq_poses,
+                             seq_len_t left_matrix_index,
+                             bool full_build,
+                             const MarkovChain& mc) const
+        {
 
         }
 

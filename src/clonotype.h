@@ -117,17 +117,17 @@ namespace ymir {
 
         ///@{
         /** Get index of aligned gene segment for specific gene. */
-        segindex_t getV(size_t index) const { return segments[3 + index]; }
-        segindex_t getJ(size_t index) const { return segments[3 + segments[0] + index]; }
-        segindex_t getD(size_t index) const { return segments[3 + segments[0] + segments[1] + index]; }
+        segindex_t getVar(size_t index) const { return segments[3 + index]; }
+        segindex_t getJoi(size_t index) const { return segments[3 + segments[0] + index]; }
+        segindex_t getDiv(size_t index) const { return segments[3 + segments[0] + segments[1] + index]; }
         ///@}
 
 
         ///@{
         /** Get number of alignments for specific gene. */
-        segindex_t nV() const { return segments[0]; }
-        segindex_t nJ() const { return segments[1]; }
-        segindex_t nD() const { return segments[2]; }
+        segindex_t nVar() const { return segments[0]; }
+        segindex_t nJoi() const { return segments[1]; }
+        segindex_t nDiv() const { return segments[2]; }
         ///@}
 
 

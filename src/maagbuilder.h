@@ -148,6 +148,7 @@ namespace ymir {
             // compute V deletions
             seq_len_t v_len = 0;
             segindex_t v_gene = 0;
+            seq_len_t v_end = 0;
             probs.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
             probs.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             if (full_build) {
@@ -157,10 +158,11 @@ namespace ymir {
             for (segindex_t v_index = 0; v_index < v_num; ++v_index) {
                 v_gene = clonotype.getV(v_index);
                 v_len = _genes->V()[v_gene].sequence.size();
+                v_end = clonotype.getVend(v_index);
 
                 probs(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->prob_V_gene(v_gene); // probability of choosing this V gene segment
                 for (seq_len_t i = 0; i < len + 1; ++i) {
-                    if (v_len - i >= 0) {
+                    if (v_len - i >= 0 && v_len - i <= v_end) {
                         probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->prob_V_del(v_gene, v_len - i); // probability of deletions
                     } else {
                         probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0; // if exceeds length of V gene segment
@@ -172,10 +174,10 @@ namespace ymir {
                 if (full_build) {
                     events(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->index_V_gene(v_gene);
                     for (seq_len_t i = 0; i < len + 1; ++i) {
-                        if (v_len - i >= 0) {
+                        if (v_len - i >= 0 && v_len - i <= v_end) {
                             events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->index_V_del(v_gene, v_len - i);
                         } else {
-                            events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->index_V_del(v_gene, 0);
+                            events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0;
                         }
                     }
 
@@ -226,14 +228,16 @@ namespace ymir {
             // compute J deletions
             seq_len_t j_len = 0;
             segindex_t j_gene = 0;
+            seq_len_t j_start = 0;
 
             for (segindex_t j_index = 0; j_index < j_num; ++j_index) {
                 j_gene = clonotype.getJ(j_index);
                 j_len = _genes->J()[j_gene].sequence.size();
+                j_start = clonotype.getJstart(j_index);
 
                 probs(J_index_genes, j_index, 0, 0) = _param_vec->prob_J_gene(j_gene); // probability of choosing this J gene segment
                 for (seq_len_t i = 0; i < len + 1; ++i) {
-                    if (j_len - len + i >= 0) {
+                    if (j_len - len + i >= 0 && j_len - len + i <= clonotype.sequence().size() - j_start) {
                         probs(J_index_dels, j_index, i, 0) = _param_vec->prob_J_del(j_gene, j_len - len + i); // probability of deletions
                     } else {
                         probs(J_index_dels, j_index, i, 0) = 0; // if exceeds length of J gene segment

@@ -1231,6 +1231,9 @@ YMIR_TEST_START(test_maag_vj)
 
     ClonotypeBuilder cl_builder;
     // CCCG.AC.GGTTT
+    // poses:
+    // vs: 0-1-2-3-4-5
+    // js: 7-8-9-10-11
     cl_builder.setSequence("CCCGACGGTTT")
             .setNucleotideSeq()
             .addValignment(1, 4)
@@ -1242,7 +1245,7 @@ YMIR_TEST_START(test_maag_vj)
 
     MAAG maag = maag_builder.build(clonotype, true);
 
-    maag.fullProbability(1, 1);
+//    maag.fullProbability(1, 1);
 
     YMIR_ASSERT(maag.event_index(0, 0, 0, 0) == mvec.index_V_gene(1))
     YMIR_ASSERT(maag.event_index(0, 1, 0, 0) == mvec.index_V_gene(3))
@@ -1261,21 +1264,22 @@ YMIR_TEST_START(test_maag_vj)
     YMIR_ASSERT(maag.event_index(1, 1, 0, 4) == mvec.index_V_del(3, 2))
     YMIR_ASSERT(maag.event_index(1, 1, 0, 5) == mvec.index_V_del(3, 1))
 
-    YMIR_ASSERT(maag.event_index(3, 0, 0, 0) == mvec.index_J_del(1, 6))
-    YMIR_ASSERT(maag.event_index(3, 0, 1, 0) == mvec.index_J_del(1, 5))
-    YMIR_ASSERT(maag.event_index(3, 0, 2, 0) == mvec.index_J_del(1, 4))
-    YMIR_ASSERT(maag.event_index(3, 0, 3, 0) == mvec.index_J_del(1, 3))
-    YMIR_ASSERT(maag.event_index(3, 0, 4, 0) == mvec.index_J_del(1, 2))
-    YMIR_ASSERT(maag.event_index(3, 0, 5, 0) == 0)
-//    YMIR_ASSERT(maag.event_index(3, 0, 6, 0) == 0)
+    YMIR_ASSERT(maag.event_index(2, 0, 0, 0) == mvec.index_VJ_ins_len(maag.position(6) - maag.position(0) - 1))
+    YMIR_ASSERT(maag.event_index(2, 0, 0, 1) == 0)
 
-    YMIR_ASSERT(maag.event_index(3, 2, 0, 0) == mvec.index_J_del(2, 6))
-    YMIR_ASSERT(maag.event_index(3, 2, 1, 0) == mvec.index_J_del(2, 5))
-    YMIR_ASSERT(maag.event_index(3, 2, 2, 0) == mvec.index_J_del(2, 4))
-    YMIR_ASSERT(maag.event_index(3, 2, 3, 0) == mvec.index_J_del(2, 3))
-    YMIR_ASSERT(maag.event_index(3, 2, 4, 0) == mvec.index_J_del(2, 2))
-    YMIR_ASSERT(maag.event_index(3, 2, 5, 0) == mvec.index_J_del(2, 1))
-//    YMIR_ASSERT(maag.event_index(3, 2, 6, 0) == 0)
+    YMIR_ASSERT(maag.event_index(3, 0, 0, 0) == 0)
+    YMIR_ASSERT(maag.event_index(3, 0, 1, 0) == mvec.index_J_del(1, 2))
+    YMIR_ASSERT(maag.event_index(3, 0, 2, 0) == mvec.index_J_del(1, 3))
+    YMIR_ASSERT(maag.event_index(3, 0, 3, 0) == mvec.index_J_del(1, 4))
+    YMIR_ASSERT(maag.event_index(3, 0, 4, 0) == mvec.index_J_del(1, 5))
+    YMIR_ASSERT(maag.event_index(3, 0, 5, 0) == mvec.index_J_del(1, 6))
+
+    YMIR_ASSERT(maag.event_index(3, 2, 0, 0) == mvec.index_J_del(3, 1))
+    YMIR_ASSERT(maag.event_index(3, 2, 1, 0) == mvec.index_J_del(3, 2))
+    YMIR_ASSERT(maag.event_index(3, 2, 2, 0) == mvec.index_J_del(3, 3))
+    YMIR_ASSERT(maag.event_index(3, 2, 3, 0) == mvec.index_J_del(3, 4))
+    YMIR_ASSERT(maag.event_index(3, 2, 4, 0) == mvec.index_J_del(3, 5))
+    YMIR_ASSERT(maag.event_index(3, 2, 5, 0) == mvec.index_J_del(3, 6))
 
     YMIR_ASSERT(maag.event_index(4, 0, 0, 0) == mvec.index_J_gene(1))
     YMIR_ASSERT(maag.event_index(4, 1, 0, 0) == mvec.index_J_gene(2))

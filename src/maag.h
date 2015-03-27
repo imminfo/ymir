@@ -92,7 +92,10 @@ namespace ymir {
         * \return Full assembling probability.
         */
         numeric fullProbability(eventind_t v_index, eventind_t j_index) const {
-            cout << _chain[3][0] << endl;
+//            for (int i = 0; i < _n_poses; ++i) {
+//                cout << (int) _seq_poses[i] << "  ";
+//            }
+//            cout << "end;" << endl;
             // P(Vi) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji) * P(Ji)
             return (_chain[0][v_index] *        // P(Vi)
                     _chain[1][v_index] *        // P(#dels | Vi)
@@ -136,6 +139,9 @@ namespace ymir {
         eventind_t event_index(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
             return _events ? (*_events)(node_i, mat_i, row, col) : 0;
         };
+
+
+        seq_len_t position(seq_len_t i) const { return _seq_poses[i]; }
 
 
         // serialize MAAG

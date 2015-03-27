@@ -162,7 +162,7 @@ namespace ymir {
 
                 probs(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->prob_V_gene(v_gene); // probability of choosing this V gene segment
                 for (seq_len_t i = 0; i < len + 1; ++i) {
-                    if (v_len - i >= 0 && v_len - i <= v_end) {
+                    if (v_len - i >= 0 && i <= v_end) {
                         probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->prob_V_del(v_gene, v_len - i); // probability of deletions
                     } else {
                         probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0; // if exceeds length of V gene segment
@@ -174,19 +174,20 @@ namespace ymir {
                 if (full_build) {
                     events(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->index_V_gene(v_gene);
                     for (seq_len_t i = 0; i < len + 1; ++i) {
-                        if (v_len - i >= 0 && v_len - i <= v_end) {
+                        if (v_len - i >= 0 && i <= v_end) {
                             events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->index_V_del(v_gene, v_len - i);
                         } else {
                             events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0;
                         }
                     }
-
-                    for (seq_len_t i = 0; i < len + 1; ++i) {
-                        seq_poses.push_back(i);
-                    }
                 }
             }
 
+            if (full_build) {
+                for (seq_len_t i = 0; i < len + 1; ++i) {
+                    seq_poses.push_back(i);
+                }
+            }
         }
 
 
@@ -237,7 +238,7 @@ namespace ymir {
 
                 probs(J_index_genes, j_index, 0, 0) = _param_vec->prob_J_gene(j_gene); // probability of choosing this J gene segment
                 for (seq_len_t i = 0; i < len + 1; ++i) {
-                    if (j_len - len + i >= 0 && j_len - len + i <= clonotype.sequence().size() - j_start) {
+                    if (j_len - len + i >= 0 && len - i <= clonotype.sequence().size() - j_start + 1) {
                         probs(J_index_dels, j_index, i, 0) = _param_vec->prob_J_del(j_gene, j_len - len + i); // probability of deletions
                     } else {
                         probs(J_index_dels, j_index, i, 0) = 0; // if exceeds length of J gene segment
@@ -248,16 +249,18 @@ namespace ymir {
                 if (full_build) {
                     events(J_index_genes, j_index, 0, 0) = _param_vec->index_J_gene(j_gene);
                     for (seq_len_t i = 0; i < len + 1; ++i) {
-                        if (j_len - len - i >= 0) {
-                            events(J_index_dels, j_index, i, 0) = _param_vec->index_J_del(j_gene, j_len - len - i);
+                        if (j_len - len + i >= 0 && len - i <= clonotype.sequence().size() - j_start + 1) {
+                            events(J_index_dels, j_index, i, 0) = _param_vec->index_J_del(j_gene, j_len - len + i);
                         } else {
                             events(J_index_dels, j_index, i, 0) = 0;
                         }
                     }
+                }
+            }
 
-                    for (seq_len_t i = clonotype.sequence().size() - len + 1; i < clonotype.sequence().size() + 1; ++i) {
-                        seq_poses.push_back(i);
-                    }
+            if (full_build) {
+                for (seq_len_t i = clonotype.sequence().size() - len + 1; i < clonotype.sequence().size() + 1; ++i) {
+                    seq_poses.push_back(i);
                 }
             }
         }
@@ -295,7 +298,7 @@ namespace ymir {
             for (int v_i = 0; v_i < v_vertices; ++v_i) {
                 for (int j_i = v_vertices; j_i < j_vertices + v_vertices; ++j_i) {
                     insertion_len = seq_poses[j_i] - seq_poses[v_i] - 1;
-                    good_insertion = (insertion_len >= 0) && (insertion_len < max_size);
+                    good_insertion = (insertion_len >= 0) && (insertion_len <= max_size);
                     if (good_insertion) {
                         probs(VarJoi_INSERTIONS_MATRIX_INDEX, 0, v_i, j_i - v_vertices) = mc.nucProbability(clonotype.seq_iterator(seq_poses[v_i]), insertion_len) * _param_vec->prob_VJ_ins_len(insertion_len);
                         if (full_build) {

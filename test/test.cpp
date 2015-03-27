@@ -38,7 +38,6 @@
 #include <iostream>
 #include <list>
 
-#include "matrixchain.h"
 #include "modelparametervector.h"
 #include "genesegment.h"
 #include "clonotype.h"
@@ -55,153 +54,6 @@ using namespace ymir;
 
 YMIR_TEST_START(test_basic)
 YMIR_ASSERT(1 == 1)
-YMIR_TEST_END
-
-
-YMIR_TEST_START(test_prob_matrixchain_cons)
-    ProbMatrixChain mat;
-    mat(0,0,0) = .5;
-
-    YMIR_ASSERT(mat(0,0,0) == .5)
-YMIR_TEST_END
-
-
-YMIR_TEST_START(test_prob_matrixchain_addmat)
-    ProbMatrixChain mat;
-    mat(0,0,0) = .5;
-    mat.addMatrix(10, 10);
-    mat(1,1,1) = .2;
-
-    YMIR_ASSERT(mat(1,1,1) == .2)
-YMIR_TEST_END
-
-
-YMIR_TEST_START(test_prob_matrixchain_sizes)
-    ProbMatrixChain mat;
-    mat(0,0,0) = .5;
-    mat.addMatrix(10, 10);
-    mat(1,1,1) = .2;
-    mat.addMatrix(10, 20);
-
-    YMIR_ASSERT(mat.rows(0) == 1)
-    YMIR_ASSERT(mat.cols(0) == 1)
-    YMIR_ASSERT(mat.rows(1) == 10)
-    YMIR_ASSERT(mat.cols(1) == 10)
-    YMIR_ASSERT(mat.rows(2) == 10)
-    YMIR_ASSERT(mat.cols(2) == 20)
-    YMIR_ASSERT(mat.matrices() == 3)
-YMIR_TEST_END
-
-
-YMIR_TEST_START(test_prob_matrixchain_chainprod_good_res)
-    /*
-    0:
-        .5
-
-    1:
-        1 2 4
-
-    2:
-        1 1 1
-        2 2 0
-        1 0 .5
-
-    3:
-        2
-        4
-        2
-
-    4:
-        .2
-
-    prod = 4.4
-     */
-    ProbMatrixChain mat;
-
-    mat(0,0,0) = .5;
-
-    mat.addMatrix(1, 3);
-    mat(0,0,1) = 1;
-    mat(0,1,1) = 2;
-    mat(0,2,1) = 4;
-
-    mat.addMatrix(3, 3);
-    mat(0,0,2) = 1;
-    mat(0,1,2) = 1;
-    mat(0,2,2) = 1;
-    mat(1,0,2) = 2;
-    mat(1,1,2) = 2;
-    mat(1,2,2) = 0;
-    mat(2,0,2) = 1;
-    mat(2,1,2) = 0;
-    mat(2,2,2) = .5;
-
-    mat.addMatrix(3, 1);
-    mat(0,0,3) = 2;
-    mat(1,0,3) = 4;
-    mat(2,0,3) = 2;
-
-    mat.addMatrix(1, 1);
-
-    mat(0,0,4) = .2;
-
-    YMIR_ASSERT(mat.chainProd() == 4.4)
-YMIR_TEST_END
-
-
-YMIR_TEST_START(test_prob_matrixchain_chainprod_good_noerr)
-    bool err;
-
-    ProbMatrixChain mat;
-
-    mat(0,0,0) = .5;
-
-    mat.addMatrix(1, 3);
-    mat(0,0,1) = 1;
-    mat(0,1,1) = 2;
-    mat(0,2,1) = 4;
-
-    mat.addMatrix(3, 3);
-    mat(0,0,2) = 1;
-    mat(0,1,2) = 1;
-    mat(0,2,2) = 1;
-    mat(1,0,2) = 2;
-    mat(1,1,2) = 2;
-    mat(1,2,2) = 0;
-    mat(2,0,2) = 1;
-    mat(2,1,2) = 0;
-    mat(2,2,2) = .5;
-
-    mat.addMatrix(3, 1);
-    mat(0,0,3) = 2;
-    mat(1,0,3) = 4;
-    mat(2,0,3) = 2;
-
-    mat.addMatrix(1, 1);
-
-    mat(0,0,4) = .2;
-
-    YMIR_ASSERT(err == false)
-YMIR_TEST_END
-
-
-YMIR_TEST_START(test_prob_matrixchain_chainprod_bad)
-    bool err;
-
-    ProbMatrixChain mat;
-
-    mat(0,0,0) = .5;
-
-    mat.addMatrix(1, 3);
-    mat(0,0,1) = 1;
-    mat(0,1,1) = 2;
-    mat(0,2,1) = 4;
-
-    mat.addMatrix(4, 3);  // chain product can be computed because of this.
-
-    mat.chainProd(&err);
-
-    YMIR_ASSERT(err == true)
 YMIR_TEST_END
 
 
@@ -1245,8 +1097,6 @@ YMIR_TEST_START(test_maag_vj)
 
     MAAG maag = maag_builder.build(clonotype, true);
 
-//    maag.fullProbability(1, 1);
-
     YMIR_ASSERT(maag.event_index(0, 0, 0, 0) == mvec.index_V_gene(1))
     YMIR_ASSERT(maag.event_index(0, 1, 0, 0) == mvec.index_V_gene(3))
 
@@ -1314,14 +1164,6 @@ int main() {
 
     //**************  TEST CASES  **************//
     YMIR_TEST(test_basic(), "basic test")
-
-    // Tests for MatrixChain class.
-    YMIR_TEST(test_prob_matrixchain_cons(), "MatrixChain constructor")
-    YMIR_TEST(test_prob_matrixchain_addmat(), "MatrixChain addMatrix()")
-    YMIR_TEST(test_prob_matrixchain_sizes(), "MatrixChain get rows/cols")
-    YMIR_TEST(test_prob_matrixchain_chainprod_good_res(), "MatrixChain chain product - result check")
-    YMIR_TEST(test_prob_matrixchain_chainprod_good_noerr(), "MatrixChain chain product - no error check")
-    YMIR_TEST(test_prob_matrixchain_chainprod_bad(), "MatrixChain chain product - error occured check")
 
     // Tests for ModelParameterVector
     YMIR_TEST(test_model_param_vec(), "ModelParameterVector fail")

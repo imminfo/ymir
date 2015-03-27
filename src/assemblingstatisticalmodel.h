@@ -292,11 +292,11 @@ namespace ymir {
 
 
         // resize deletions vectors to gene segment length
-        void resizeGeneDeletionsVector() {}
+        void removeTrailingZeros() {}
 
         // grow deletions vectors (fill with zeros added rows) so
         // all vectors will be of same length
-        void growGeneDeletionsVector() {}
+        void addTrailingZeros() {}
 
     };
 

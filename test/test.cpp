@@ -1237,8 +1237,6 @@ YMIR_TEST_START(test_maag_vj)
 
     MAAG maag = maag_builder.build(clonotype, true);
 
-    cout << maag.fullProbability(0, 0) << endl;
-
 //    YMIR_ASSERT(maag.fullProbability(0, 0))
 //    YMIR_ASSERT(maag.fullProbability(1, 2))
 

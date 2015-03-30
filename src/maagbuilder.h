@@ -284,12 +284,16 @@ namespace ymir {
         * \param seq_poses Vector of positions.
         * \param full_build Boolean if build should be full.
         */
-        void buildDiversity(const Clonotype &clonotype, ProbMMC &probs,
+        void buildDiversity(const Clonotype &clonotype,
+                            ProbMMC &probs,
                             EventIndMMC &events,
                             vector<seq_len_t> &seq_poses,
                             bool full_build) const
         {
+
+
             // (!!!) insert diversity gene seq poses BEFORE joining gene seq poses
+            // insert D3 and D5 positions
         }
 
 

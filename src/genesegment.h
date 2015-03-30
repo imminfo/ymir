@@ -94,24 +94,14 @@ namespace ymir {
         virtual ~GeneSegmentAlphabet() {}
 
 
-        const string& name() const {
-            return this->_name;
-        }
+        const string& name() const { return this->_name; }
 
 
-        const GeneSegment& operator[] (segindex_t index) const {
-            return this->_vec[index];
-        }
+        const GeneSegment& operator[] (segindex_t index) const { return this->_vec[index]; }
+        const GeneSegment& operator[] (const string& name) const { return this->_vec[this->_map.at(name)]; }
 
 
-        const GeneSegment& operator[] (const string& name) const {
-            return this->_vec[this->_map.at(name)];
-        }
-
-
-        segindex_t size() const {
-            return this->_vec.size();
-        }
+        segindex_t size() const { return this->_vec.size(); }
 
 
         /**

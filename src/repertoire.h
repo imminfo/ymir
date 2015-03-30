@@ -220,7 +220,7 @@ namespace ymir {
 //        }
 
 
-//        void translate() {
+//        ClonesetView translate() {
 //
 //        }
 

@@ -79,10 +79,11 @@ namespace ymir {
 
 
     /**
-    * \class EMAlgorithm
-    *
-    * \brief Implementation of EM-algorithm for statistical inference of assembling model parameters.
-    */
+     * \class EMAlgorithm
+     *
+     * \brief Implementation of the EM-algorithm for statistical inference of assembling model parameters.
+     * Classic version described in (Murugan et al 2012)
+     */
     class EMAlgorithm : public StatisticalInferenceAlgorithm {
     public:
 
@@ -97,7 +98,7 @@ namespace ymir {
     /**
     * \class OnlineEMAlgorithm
     *
-    * \brief Implementation of online EM-algorithm for statistical inference of assembling model parameters.
+    * \brief Implementation of the online EM-algorithm for statistical inference of assembling model parameters.
     */
     class OnlineEMAlgorithm : public StatisticalInferenceAlgorithm {
     public:

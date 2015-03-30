@@ -171,13 +171,13 @@ namespace ymir {
         * \brief Compute full assembling probabilities of clones from the given repertoire.
         *
         * \param repertoire Repertoire with alignments and event indices.
-        * \param aminoacid What probabilities will be computed - for nucleotide or amino acid sequences. If
+        * \param aminoacid What probabilities will be computed - of nucleotide or amino acid sequences. If
         * this parameter is false and some clone will have amino acid sequence, than error message will be generated to the output
         * and probability of this clone will set to zero.
         *
         * \return Vector of full assembling probabilities.
         */
-        vector<numeric> computeFullProbabilities(const ClonesetView& repertoire) const {
+        vector<numeric> computeFullProbabilities(const ClonesetView& repertoire, bool aminoacid = false) const {
 
         }
 
@@ -187,10 +187,11 @@ namespace ymir {
          *
          * \param repertoire Cloneset.
          * \param full_builder If true than build full MAAG (with additional matrices for event indices).
+         * \param aminoacid If true than build graphs of aminoacid CDR3 sequences, traslating the given repertoire first.
          *
          * \return Set of MAAGs.
          */
-        MAAGRepertoire buildGraphs(const ClonesetView& repertoire, bool full_build = true) const {
+        MAAGRepertoire buildGraphs(const ClonesetView& repertoire, bool full_build = true, bool aminoacid = false) const {
             _builder->build(repertoire);
         }
 
@@ -209,6 +210,11 @@ namespace ymir {
         }
 
 
+        /**
+         * \brief Access to the gene segments table.
+         *
+         * \return Const reference to the gene segments table.
+         */
         const VDJRecombinationGenes& gene_segments() const { return *_genes; }
 
 
@@ -317,12 +323,12 @@ namespace ymir {
 
 
         // resize deletions vectors to gene segment length
-        void removeTrailingZeros() {}
+        void removeTrailingZeros() const {}
 
 
         // grow deletions vectors (fill with zeros added rows) so
         // all vectors will be of same length
-        void addTrailingZeros() {}
+        void addTrailingZeros() const {}
 
 
         void make_builder() {

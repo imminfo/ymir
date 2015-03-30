@@ -139,16 +139,20 @@ namespace ymir {
             _builder = nullptr;
             _generator = nullptr;
 
-            _status = this->parseModelConfig(folderpath + "/model.json");
-            if (_status) {
-                _status = this->parseGeneSegments();
-                if (_status) {
-                    _status = this->parseEventProbabilities();
-                }
-            }
+//            _status = this->parseModelConfig(folderpath + "/model.json");
+//            if (_status) {
+//                _status = this->parseGeneSegments();
+//                if (_status) {
+//                    _status = this->parseEventProbabilities();
+//                }
+//            }
 
-//            _generator = new ClonotypeAssembler();
-            _builder = new MAAGBuilder(*_param_vec, *_genes);
+            _status = this->parseModelConfig(folderpath + "/model.json")
+                    && this->parseGeneSegments()
+                    && this->parseEventProbabilities();
+
+            this->make_builder();
+            this->make_assembler();
         }
 
 
@@ -305,7 +309,7 @@ namespace ymir {
 
 
         /**
-        * \brief Parse files with event probabilities matrices.
+        * \brief Parse files with event probabilities matrices and make ModelParameterVector.
         */
         virtual bool parseEventProbabilities() {
             // make indexer here
@@ -319,6 +323,18 @@ namespace ymir {
         // grow deletions vectors (fill with zeros added rows) so
         // all vectors will be of same length
         void addTrailingZeros() {}
+
+
+        void make_builder() {
+            if (_builder) { delete _builder; }
+            _builder = new MAAGBuilder(*_param_vec, *_genes);
+        }
+
+
+        void make_assembler() {
+            if (_generator) { delete _generator; }
+            /*_generator = new ClonotypeAssembler();*/
+        }
 
     };
 

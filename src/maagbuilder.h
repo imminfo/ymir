@@ -353,12 +353,12 @@ namespace ymir {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_VD_ins_nuc()));
 
             seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
-                    d_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
+                    d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
 
-            probs.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d_vertices);
+            probs.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d3_vertices);
 
             if (full_build) {
-                events.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d_vertices);
+                events.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d3_vertices);
             }
 
             this->buildInsertions(clonotype
@@ -372,7 +372,7 @@ namespace ymir {
                     , 0
                     , v_vertices - 1
                     , v_vertices
-                    , v_vertices + d_vertices - 1
+                    , v_vertices + d3_vertices - 1
                     , mc);
         }
 
@@ -395,13 +395,14 @@ namespace ymir {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_DJ_ins_nuc()));
 
             seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
-                    d_vertices = probs.nodeColumns(DIVERSITY_GENES_MATRIX_INDEX),
+                    d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX),
+                    d5_vertices = probs.nodeColumns(DIVERSITY_GENES_MATRIX_INDEX),
                     j_vertices = probs.nodeRows(JOINING_DELETIONS_VDJ_MATRIX_INDEX);
 
-            probs.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d_vertices, j_vertices);
+            probs.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d5_vertices, j_vertices);
 
             if (full_build) {
-                events.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d_vertices, j_vertices);
+                events.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d5_vertices, j_vertices);
             }
 
             this->buildInsertions(clonotype
@@ -412,10 +413,10 @@ namespace ymir {
                     , _param_vec->index_DJ_ins_len(0)
                     , _param_vec->max_DJ_ins_len()
                     , full_build
-                    , v_vertices
-                    , v_vertices + d_vertices - 1
-                    , v_vertices + d_vertices
-                    , v_vertices + d_vertices + j_vertices - 1
+                    , v_vertices + d3_vertices
+                    , v_vertices + d3_vertices + d5_vertices - 1
+                    , v_vertices + d3_vertices + d5_vertices
+                    , v_vertices + d3_vertices + d5_vertices + j_vertices - 1
                     , mc);
         }
 

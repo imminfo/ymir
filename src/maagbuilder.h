@@ -31,8 +31,8 @@
 
 #define VARIABLE_GENES_MATRIX_INDEX 0
 #define VARIABLE_DELETIONS_MATRIX_INDEX 1
-#define JOINING_GENES_VJ_MATRIX_INDEX 3
-#define JOINING_DELETIONS_VJ_MATRIX_INDEX 4
+#define JOINING_GENES_VJ_MATRIX_INDEX 4
+#define JOINING_DELETIONS_VJ_MATRIX_INDEX 3
 #define JOINING_GENES_VDJ_MATRIX_INDEX 5
 #define JOINING_DELETIONS_VDJ_MATRIX_INDEX 6
 #define DIVERSITY_GENES_MATRIX_INDEX 3
@@ -201,7 +201,7 @@ namespace ymir {
 
 
         /**
-        * \brief Build probability and events matrices for Variable gene segments.
+        * \brief Build probability and events matrices for Joining gene segments.
         *
         * \param clonotype Clonotype that used for building the graph.
         * \param probs Multi-Matrix Chain with event probabilities.
@@ -275,15 +275,33 @@ namespace ymir {
         }
 
 
+        /**
+        * \brief Build probability and events matrices for Diversity gene segments.
+        *
+        * \param clonotype Clonotype that used for building the graph.
+        * \param probs Multi-Matrix Chain with event probabilities.
+        * \param events Multi-Matrix Chain with event indices.
+        * \param seq_poses Vector of positions.
+        * \param full_build Boolean if build should be full.
+        */
         void buildDiversity(const Clonotype &clonotype, ProbMMC &probs,
                             EventIndMMC &events,
                             vector<seq_len_t> &seq_poses,
                             bool full_build) const
         {
-
+            // (!!!) insert diversity gene seq poses BEFORE joining gene seq poses
         }
 
 
+        /**
+        * \brief Build probability and events matrices for Variable-Joining gene segments insertions.
+        *
+        * \param clonotype Clonotype that used for building the graph.
+        * \param probs Multi-Matrix Chain with event probabilities.
+        * \param events Multi-Matrix Chain with event indices.
+        * \param seq_poses Vector of positions.
+        * \param full_build Boolean if build should be full.
+        */
         void buildVJinsertions(/*const*/ Clonotype &clonotype,
                                          ProbMMC &probs,
                                          EventIndMMC &events,
@@ -292,7 +310,8 @@ namespace ymir {
         {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_VJ_ins_nuc()));
 
-            seq_len_t v_vertices = probs.nodeColumns(1), j_vertices = probs.nodeRows(3);
+            seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                    j_vertices = probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
 
             probs.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
 
@@ -316,26 +335,108 @@ namespace ymir {
         }
 
 
-        void buildVDinsertions(const Clonotype &clonotype,
+        /**
+        * \brief Build probability and events matrices for Variable-Diversity gene segments insertions.
+        *
+        * \param clonotype Clonotype that used for building the graph.
+        * \param probs Multi-Matrix Chain with event probabilities.
+        * \param events Multi-Matrix Chain with event indices.
+        * \param seq_poses Vector of positions.
+        * \param full_build Boolean if build should be full.
+        */
+        void buildVDinsertions(Clonotype &clonotype,
                                ProbMMC &probs,
                                EventIndMMC &events,
                                vector<seq_len_t> &seq_poses,
                                bool full_build) const
         {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_VD_ins_nuc()));
+
+            seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                    d_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
+
+            probs.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d_vertices);
+
+            if (full_build) {
+                events.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d_vertices);
+            }
+
+            this->buildInsertions(clonotype
+                    , probs
+                    , events
+                    , seq_poses
+                    , VarDiv_INSERTIONS_MATRIX_INDEX
+                    , _param_vec->index_VD_ins_len(0)
+                    , _param_vec->max_VD_ins_len()
+                    , full_build
+                    , 0
+                    , v_vertices - 1
+                    , v_vertices
+                    , v_vertices + d_vertices - 1
+                    , mc);
         }
 
 
-        void buildDJinsertions(const Clonotype &clonotype,
+        /**
+        * \brief Build probability and events matrices for Diversity-Joining gene segments insertions.
+        *
+        * \param clonotype Clonotype that used for building the graph.
+        * \param probs Multi-Matrix Chain with event probabilities.
+        * \param events Multi-Matrix Chain with event indices.
+        * \param seq_poses Vector of positions.
+        * \param full_build Boolean if build should be full.
+        */
+        void buildDJinsertions(Clonotype &clonotype,
                                ProbMMC &probs,
                                EventIndMMC &events,
                                vector<seq_len_t> &seq_poses,
                                bool full_build) const
         {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_DJ_ins_nuc()));
+
+            seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                    d_vertices = probs.nodeColumns(DIVERSITY_GENES_MATRIX_INDEX),
+                    j_vertices = probs.nodeRows(JOINING_DELETIONS_VDJ_MATRIX_INDEX);
+
+            probs.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d_vertices, j_vertices);
+
+            if (full_build) {
+                events.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d_vertices, j_vertices);
+            }
+
+            this->buildInsertions(clonotype
+                    , probs
+                    , events
+                    , seq_poses
+                    , DivJoi_INSERTIONS_MATRIX_INDEX
+                    , _param_vec->index_DJ_ins_len(0)
+                    , _param_vec->max_DJ_ins_len()
+                    , full_build
+                    , v_vertices
+                    , v_vertices + d_vertices - 1
+                    , v_vertices + d_vertices
+                    , v_vertices + d_vertices + j_vertices - 1
+                    , mc);
         }
 
 
+        /**
+         * \brief General function for building insertions.
+         *
+         * \param clonotype Clonotype that used for building the graph.
+         * \param probs Multi-Matrix Chain with event probabilities.
+         * \param events Multi-Matrix Chain with event indices.
+         * \param seq_poses Vector of positions.
+         * \param ins_node_index Node of the event / prob matrix with insertions.
+         * \param null_insertion Event index of insertions of length zero.
+         * \param max_size Maximum size of the length of insertions.
+         * \param full_build Boolean if build should be full.
+         * \param left_vertices_start Starting index in seq_poses for the vertices in the left matrix.
+         * \param left_vertices_end Ending index in seq_poses for the vertices in the left matrix.
+         * \param right_vertices_start Starting index in seq_poses for the vertices in the right matrix.
+         * \param right_vertices_end Ending index in seq_poses for the vertices in the right matrix.
+         * \param mc MarkovChain that use for generation of N nucleotides.
+        */
         void buildInsertions(Clonotype& clonotype,
                              ProbMMC &probs,
                              EventIndMMC &events,
@@ -358,16 +459,17 @@ namespace ymir {
                     insertion_len = seq_poses[right_vertex_i] - seq_poses[left_vertex_i] - 1;
                     good_insertion = (insertion_len >= 0) && (insertion_len <= max_size);
                     if (good_insertion) {
-                        probs(ins_node_index, 0, left_vertex_i, right_vertex_i - right_vertices_start)
+                        probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
                                 = mc.nucProbability(clonotype.seq_iterator(seq_poses[left_vertex_i]), insertion_len)
                                   * _param_vec->getEventProbability(null_insertion + insertion_len);
                         if (full_build) {
-                            events(ins_node_index, 0, left_vertex_i, right_vertex_i - right_vertices_start) = null_insertion + insertion_len;
+                            events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
+                                    = null_insertion + insertion_len;
                         }
                     } else {
-                        probs(ins_node_index, 0, left_vertex_i, right_vertex_i - right_vertices_start) = 0;
+                        probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0;
                         if (full_build) {
-                            events(ins_node_index, 0, left_vertex_i, right_vertex_i - right_vertices_start) = 0;
+                            events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0;
                         }
                     }
                 }

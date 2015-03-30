@@ -105,9 +105,10 @@ namespace ymir {
         }
 
 
-//        MAAGRepertoire build(const Cloneset &cloneset, bool full_build = false) {
-//            // in parallel ???
-//        }
+        MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) {
+            // in parallel ???
+        }
+
 
         void replaceEventProbabilities(MAAG *maag) const {
 
@@ -115,9 +116,9 @@ namespace ymir {
         }
 
 
-//        void replaceEventProbabilities(MAAGRepertoire *repertoire) const {
-//          // in parallel ???
-//        }
+        void replaceEventProbabilities(MAAGRepertoire *repertoire) const {
+          // in parallel ???
+        }
 
 
     protected:

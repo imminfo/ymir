@@ -43,7 +43,7 @@
 #include "clonotype.h"
 #include "parser.h"
 #include "markovchain.h"
-//#include "statisticalinferencealgorithm.h"
+#include "statisticalinferencealgorithm.h"
 
 #include "maagbuilder.h"
 

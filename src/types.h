@@ -115,6 +115,28 @@ namespace ymir {
             return !((*this) == other);
         }
     };
+
+
+    struct NamedMatrix {
+
+    public:
+
+        NamedMatrix() {
+            column_names.resize(0);
+            row_names.resize(0);
+            matrix.resize(1, 1);
+        }
+
+
+        NamedMatrix(const vector<string>& column_names_,
+                    const vector<string>& row_names_,
+                    const Eigen::Matrix<prob_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>& matrix_)
+                : column_names(column_names_), row_names(row_names_), matrix(matrix_) {}
+
+        vector<string> column_names;
+        vector<string> row_names;
+        Eigen::Matrix<prob_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> matrix;
+    };
 }
 
 #endif

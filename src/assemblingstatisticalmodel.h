@@ -34,37 +34,64 @@
 namespace ymir {
 
     /**
-    * \function read_event_matrix
+    * \function read_matrix
     *
     * \brief
     *
     * \param filepath Path to the file with matrix, separated by spaces / tabs.
     *
-    * \return New struct with matrix with event probabilities and metadata.
+    * \return New struct with matrix.
     */
-//    event_matrix_t read_event_matrix(const string& filepath) {
-//
-//    }
+    NamedMatrix read_matrix(const string& filepath) {
+        vector<string> colnames, rownames;
+        vector<prob_t> values;
+
+        ifstream ifs;
+        ifs.open(filepath);
+
+        if (ifs.is_open()) {
+            stringstream line_stream;
+            string line, word;
+            int col = 0;
+            bool read_header = true;
+            while (!ifs.eof()) {
+                getline(ifs, line);
+                if (line[0] != '\n') {
+                    line_stream.str(line);
+                    if (read_header) {
+                        while (!line_stream.eof()) {
+                            getline(line_stream, word, '\t');
+                            colnames.push_back(word);
+                        }
+                        read_header = false;
+                    } else {
+                        getline(line_stream, word, '\t');
+                        rownames.push_back(word);
+                        while (!line_stream.eof()) {
+                            getline(line_stream, word, '\t');
+
+                        }
+                        ++col;
+                    }
+                    line_stream.clear();
+                }
+            }
+        } else {
+            cerr << "Matrix parsing error:" << endl << "\tinput file [" << filepath << "] not found" << endl;
+            return NamedMatrix();
+        }
 
 
 
+        // read first line with names
 
+        // put first element from each row to column names
 
-    // If input is layout:
-    // input/parser -> layout -> model/builder -> graph
-    // segment sequences required only for those segments w/o layout
+        // remove cell at the intersection of the first row and the first column
 
-    // If input is sequences:
-    // input/parser -> sequences -> layout -> model/builder -> graph
-    // inner aligner will do the work
-
-    // <!!!> input for ymir is default (layouts or sequences), but various parsers in Python, maybe..?
-    // therefore no pYmir package.
-    // for rYmir - parsers in R, sadly, but input are data frames, which will be
-    // transformed to Ymir's format by Rcpp.
-
-    // therefore no need for template model
-    // only abstract class and two childs for VJ- and VDJ-recombinations.
+        ifs.close();
+//        return NamedMatrix(colnames, rownames, Matrix<prob_t, Dynamic, Dynamic, ColMajor>(values.data()));
+    }
 
 
     // ymir probs --repertoire twb.txt --model TRB --parser mitcr.json
@@ -94,26 +121,22 @@ namespace ymir {
     // choose best / get all / get parameters for all
     // i.e., inference w/ or w/o inference of segments usage
 
-
-    //
-    //  MODEL BUILDER!!!!
-    //
-
     /**
     * \class AssemblingStatisticalModel
     */
-    class AssemblingStatisticalModel : protected MAAG {
+    class AssemblingStatisticalModel {
 
     public:
 
         /**
         *
         */
-        AssemblingStatisticalModel(const string& folderpath) : MAAG(false) {
+        AssemblingStatisticalModel(const string& folderpath) {
             _status = false;
             _genes = nullptr;
-            _model_parameters = nullptr;
+            _param_vec = nullptr;
 
+            _builder = nullptr;
             _generator = nullptr;
 
             _status = this->parseModelConfig(folderpath + "/model.json");
@@ -123,6 +146,9 @@ namespace ymir {
                     _status = this->parseEventProbabilities();
                 }
             }
+
+//            _generator = new ClonotypeAssembler();
+            _builder = new MAAGBuilder(*_param_vec, *_genes);
         }
 
 
@@ -130,9 +156,10 @@ namespace ymir {
         *
         */
         virtual ~AssemblingStatisticalModel() {
-            if (_genes) {
-                delete _genes;
-            }
+            if (_genes) { delete _genes; }
+            if (_param_vec) { delete _param_vec; }
+            if (_builder) { delete _builder; }
+            if (_generator) { delete _generator; }
         }
 
 
@@ -146,49 +173,35 @@ namespace ymir {
         *
         * \return Vector of full assembling probabilities.
         */
-        const vector<numeric>& computeFullProbabilities(const ClonesetView& repertoire, bool aminoacid = false) const {
-            // COMPUTE ALL GRAPHS -> COMPUTE ALL PROBABILITIES
-            vector<AssemblyGraph> graph_vec = this->buildGraphs(repertoire);
-//            vector<AssemblyGraph> graph_vec(this->buildGraphs(repertoire));  // which is slower???
-            vector<numeric> prob_vec;
-            prob_vec.reserve(graph_vec.size());
+        vector<numeric> computeFullProbabilities(const ClonesetView& repertoire) const {
 
-            // OMP cycle
-            for (size_t i = 0; i < graph_vec.size(); i++) {
-                prob_vec[i] = graph_vec[i].fullProbability();
-            }
-
-
-            // FOR EACH: COMPUTE ONE GRAPH -> GET PROBABILITY
-            // in cycle compute graph and get full probabilties? is it slower?
-            // omp cycle
         }
 
 
         /**
-        * \brief Build assembly graphs for the given repertoire with sequences alignments.
-        *
-        * \param repertoire Repertoire with alignments and event indices.
-        *
-        * \return Vector of assembly graphs.
-        */
-//        const vector<AssemblyGraph>& buildGraphs(const ClonalRepertoireView& repertoire, bool aminoacid = false) const {
-//
-//        }
+         * \brief Build a set of MAAGs from the given cloneset.
+         *
+         * \param repertoire Cloneset.
+         * \param full_builder If true than build full MAAG (with additional matrices for event indices).
+         *
+         * \return Set of MAAGs.
+         */
+        MAAGRepertoire buildGraphs(const ClonesetView& repertoire, bool full_build = true) const {
+            _builder->build(repertoire);
+        }
 
 
         /**
-        * \brief Generate artificial repertoire of sequences using this model.
-        *
-        * \return Artificial repertoire.
-        */
-        Cloneset generateSequences(size_t count = 1) const {
-            if (!_generator) {
-                // make generator
-            }
-
+         * \brief Generate artificial repertoire of sequences using this model.
+         *
+         * \param count Number of generated sequences.
+         * \param merge If true than return only unique clonotypes.
+         *
+         * \return Artificial repertoire.
+         */
+        Cloneset generateSequences(size_t count = 1, bool merge = false) const {
             // generate sequences
-//            return this->_generator->generate(count);
+//            return _generator->generate(count);
         }
 
 
@@ -222,21 +235,29 @@ namespace ymir {
         }
 
 
+        /**
+         * \brief Return if the model is in the ready-to-work state.
+         *
+         * \return True or false.
+         */
         bool status() const { return _status; }
 
     protected:
 
-        bool _status;
+        bool _status, _verbose;
 
         Json::Value _config;
         VDJRecombinationGenes *_genes;
-        ModelParameterVector *_model_parameters;
+        ModelParameterVector *_param_vec;
 
+        MAAGBuilder *_builder;
         ClonotypeAssembler *_generator;
 
 
-
-        AssemblingStatisticalModel() : AssemblyGraph(false) {}
+        /**
+         * \brief Private default constructor.
+         */
+        AssemblingStatisticalModel() {}
 
 
         /**
@@ -255,7 +276,7 @@ namespace ymir {
 
 
         /**
-        * \brief Parser gene segment JSON files and tables.
+        * \brief Parse gene segment JSON files and tables.
         */
         virtual bool parseGeneSegments() {
             string v_path = _config.get("segments", "genes").get("variable", "").asString(),
@@ -294,33 +315,13 @@ namespace ymir {
         // resize deletions vectors to gene segment length
         void removeTrailingZeros() {}
 
+
         // grow deletions vectors (fill with zeros added rows) so
         // all vectors will be of same length
         void addTrailingZeros() {}
 
     };
 
-
-    /*
-    Builder:
-
-    nucleotide sequence builder
-
-    amino acid sequence builder
-
-    build()
-    Clone, Metadata, ModelParameterVector
-    -> AssemblyGraph
-    ClonalRepertoireView, Metadata, ModelParameterVector
-    -> AssemblyGraphRepertoire
-
-    replaceEventProbabilities()
-    &AssemblyGraph, ModelParameterVector
-    -> bool
-    &AssemblyGraphRepertoire, ModelParameterVector
-    -> bool
-    */
-    // AssemblyGraphBuilder
 }
 
 

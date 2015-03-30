@@ -31,6 +31,7 @@
 #include "aligner.h"
 #include "clonotype.h"
 #include "parser.h"
+#include "maag.h"
 
 
 namespace ymir {
@@ -218,10 +219,17 @@ namespace ymir {
 //
 //        }
 
+//        void translate() {
+//
+//        }
+
     };
 
 
     typedef AbstractRepertoire<Clonotype> Cloneset;
+
+
+    typedef AbstractRepertoire<MAAG> MAAGRepertoire;
 
 }
 

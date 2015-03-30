@@ -67,7 +67,7 @@ namespace ymir {
         };
 
 
-        virtual bool statisticalInference(const ClonalRepertoireView& repertoire,
+        virtual bool statisticalInference(const ClonesetView& repertoire,
                 AssemblingStatisticalModel& model,
                 const AlgorithmParameters& algo_param = AlgorithmParameters()) const =0;
 
@@ -86,7 +86,7 @@ namespace ymir {
     class EMAlgorithm : public StatisticalInferenceAlgorithm {
     public:
 
-        virtual bool statisticalInference(const ClonalRepertoireView& repertoire,
+        virtual bool statisticalInference(const ClonesetView& repertoire,
                 AssemblingStatisticalModel& model,
                 const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10)) const {
 
@@ -102,7 +102,7 @@ namespace ymir {
     class OnlineEMAlgorithm : public StatisticalInferenceAlgorithm {
     public:
 
-        virtual bool statisticalInference(const ClonalRepertoireView& repertoire,
+        virtual bool statisticalInference(const ClonesetView& repertoire,
                 AssemblingStatisticalModel& model,
                 const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10).set("step.size", 2000)) const {
 

@@ -106,7 +106,17 @@ namespace ymir {
 
 
 //        MAAGRepertoire build(const Cloneset &cloneset, bool full_build = false) {
-//            // ???
+//            // in parallel ???
+//        }
+
+        void replaceEventProbabilities(MAAG *maag) const {
+
+
+        }
+
+
+//        void replaceEventProbabilities(MAAGRepertoire *repertoire) const {
+//          // in parallel ???
 //        }
 
 
@@ -282,10 +292,7 @@ namespace ymir {
         {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->index_VJ_ins_nuc()));
 
-            int v_vertices = probs.nodeColumns(1), j_vertices = probs.nodeRows(3);
-            int max_size = _param_vec->max_VJ_ins_len();
-            int insertion_len;
-            bool good_insertion;
+            seq_len_t v_vertices = probs.nodeColumns(1), j_vertices = probs.nodeRows(3);
 
             probs.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
 
@@ -293,23 +300,19 @@ namespace ymir {
                 events.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
             }
 
-            for (int v_i = 0; v_i < v_vertices; ++v_i) {
-                for (int j_i = v_vertices; j_i < j_vertices + v_vertices; ++j_i) {
-                    insertion_len = seq_poses[j_i] - seq_poses[v_i] - 1;
-                    good_insertion = (insertion_len >= 0) && (insertion_len <= max_size);
-                    if (good_insertion) {
-                        probs(VarJoi_INSERTIONS_MATRIX_INDEX, 0, v_i, j_i - v_vertices) = mc.nucProbability(clonotype.seq_iterator(seq_poses[v_i]), insertion_len) * _param_vec->prob_VJ_ins_len(insertion_len);
-                        if (full_build) {
-                            events(VarJoi_INSERTIONS_MATRIX_INDEX, 0, v_i, j_i - v_vertices) = _param_vec->index_VJ_ins_len(insertion_len);
-                        }
-                    } else {
-                        probs(VarJoi_INSERTIONS_MATRIX_INDEX, 0, v_i, j_i - v_vertices) = 0;
-                        if (full_build) {
-                            events(VarJoi_INSERTIONS_MATRIX_INDEX, 0, v_i, j_i - v_vertices) = 0;
-                        }
-                    }
-                }
-            }
+            this->buildInsertions(clonotype
+                    , probs
+                    , events
+                    , seq_poses
+                    , VarJoi_INSERTIONS_MATRIX_INDEX
+                    , _param_vec->index_VJ_ins_len(0)
+                    , _param_vec->max_VJ_ins_len()
+                    , full_build
+                    , 0
+                    , v_vertices - 1
+                    , v_vertices
+                    , v_vertices + j_vertices - 1
+                    , mc);
         }
 
 
@@ -337,11 +340,38 @@ namespace ymir {
                              ProbMMC &probs,
                              EventIndMMC &events,
                              vector<seq_len_t> &seq_poses,
-                             seq_len_t left_matrix_index,
+                             seq_len_t ins_node_index,
+                             eventind_t null_insertion,
+                             seq_len_t max_size,
                              bool full_build,
+                             seq_len_t left_vertices_start,
+                             seq_len_t left_vertices_end,
+                             seq_len_t right_vertices_start,
+                             seq_len_t right_vertices_end,
                              const MarkovChain& mc) const
         {
+            int insertion_len;
+            bool good_insertion;
 
+            for (size_t left_vertex_i = left_vertices_start; left_vertex_i <= left_vertices_end; ++left_vertex_i) {
+                for (size_t right_vertex_i = right_vertices_start; right_vertex_i <= right_vertices_end; ++right_vertex_i) {
+                    insertion_len = seq_poses[right_vertex_i] - seq_poses[left_vertex_i] - 1;
+                    good_insertion = (insertion_len >= 0) && (insertion_len <= max_size);
+                    if (good_insertion) {
+                        probs(ins_node_index, 0, left_vertex_i, right_vertex_i - right_vertices_start)
+                                = mc.nucProbability(clonotype.seq_iterator(seq_poses[left_vertex_i]), insertion_len)
+                                  * _param_vec->getEventProbability(null_insertion + insertion_len);
+                        if (full_build) {
+                            events(ins_node_index, 0, left_vertex_i, right_vertex_i - right_vertices_start) = null_insertion + insertion_len;
+                        }
+                    } else {
+                        probs(ins_node_index, 0, left_vertex_i, right_vertex_i - right_vertices_start) = 0;
+                        if (full_build) {
+                            events(ins_node_index, 0, left_vertex_i, right_vertex_i - right_vertices_start) = 0;
+                        }
+                    }
+                }
+            }
         }
 
     };

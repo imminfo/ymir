@@ -1142,6 +1142,11 @@ YMIR_TEST_START(test_maag_vdj)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_maag_builder_replace)
+    YMIR_ASSERT(false)
+YMIR_TEST_END
+
+
 struct TestInfo {
     string test_name;
     vector<string> failed_cases;
@@ -1204,6 +1209,7 @@ int main() {
     // Tests for MAAG / MAAG builder
     YMIR_TEST(test_maag_vj(), "MAAG VJ building and computing")
     YMIR_TEST(test_maag_vdj(), "MAAG VDJ building and computing")
+    YMIR_TEST(test_maag_builder_replace(), "MAAG Builder replace event probabilities")
 
     // Tests for assembling statistical model (ASM) reading / writing files.
 

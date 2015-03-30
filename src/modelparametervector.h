@@ -165,6 +165,9 @@ namespace ymir {
         *
         * \return Probability of the event.
         */
+        const prob_t& getEventProbability(eventind_t event_index) const {
+            return _vec[event_index];
+        }
         const prob_t& operator[] (eventind_t event_index) const {
             return _vec[event_index];
         }

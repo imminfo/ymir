@@ -38,14 +38,8 @@
 #include <iostream>
 #include <list>
 
-#include "modelparametervector.h"
-#include "genesegment.h"
-#include "clonotype.h"
 #include "parser.h"
-#include "markovchain.h"
 #include "statisticalinferencealgorithm.h"
-
-#include "maagbuilder.h"
 
 
 using namespace std;

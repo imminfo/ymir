@@ -33,6 +33,7 @@
 #include "aligner.h"
 #include "types.h"
 #include "repertoire.h"
+#include "genesegment.h"
 
 #include "jsoncpp.cpp"
 

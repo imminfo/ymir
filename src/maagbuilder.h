@@ -308,15 +308,33 @@ namespace ymir {
                 events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), clonotype.sequence().size(), clonotype.sequence().size());
             }
 
-            // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
-            segindex_t d_index = 0, num_ds = 0;
-            seq_len_t min_D_len = 0;
+            segindex_t d_index = 0;
+            seq_len_t min_D_len = 0, d_len = 0;
+            d_alignment_t d_alignment;
             for (int i = 0; i < clonotype.nDiv(); ++i) {
                 d_index = clonotype.getDiv(i);
-                num_ds = clonotype.nDalignments(d_index);
+                d_len = _genes->D()[d_index].sequence.size();
                 min_D_len = _param_vec->D_min_len(d_index);
 
-                
+                // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
+                for (int j = 0; j < clonotype.nDalignments(d_index); ++j) {
+                    d_alignment = clonotype.getDalignment(d_index, j);
+
+                    for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len; ++left_pos) {
+                        for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seqend; ++right_pos) {
+                            probs(DIVERSITY_GENES_MATRIX_INDEX, i, left_pos - 1, right_pos - 1) =
+                                    _param_vec->prob_D_del(d_index,
+                                                           d_alignment.Dstart + left_pos - d_alignment.seqstart,
+                                                           d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
+                            if (full_build) {
+                                events(DIVERSITY_GENES_MATRIX_INDEX, i, left_pos - 1, right_pos - 1) =
+                                        _param_vec->index_D_del(d_index,
+                                                                d_alignment.Dstart + left_pos - d_alignment.seqstart,
+                                                                d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
+                            }
+                        }
+                    }
+                }
             }
 
             // overhead by memory - just push all positions of the sequence from 1 to the last

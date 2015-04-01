@@ -112,7 +112,10 @@ namespace ymir {
         *
         * \return True if clone was assembled in VDJ-recombination; false otherwise.
         */
+        ///@{
+        bool is_vj() const { return segments[2] == 0; }
         bool is_vdj() const { return segments[2] > 0; }
+        ///@}
 
 
         ///@{

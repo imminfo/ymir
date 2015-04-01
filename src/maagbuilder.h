@@ -83,7 +83,7 @@ namespace ymir {
             seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
 
 
-            if (!clonotype.is_vdj()) {
+            if (clonotype.is_vj()) {
                 probs.resize(VJ_CHAIN_SIZE);
                 if (full_build) { events.resize(VJ_CHAIN_SIZE); }
             } else {
@@ -93,7 +93,7 @@ namespace ymir {
 
             this->buildVariable(clonotype, probs, events, seq_poses, full_build);
             this->buildJoining(clonotype, probs, events, seq_poses, full_build);
-            if (!clonotype.is_vdj()) {
+            if (clonotype.is_vj()) {
                 this->buildVJinsertions(clonotype, probs, events, seq_poses, full_build);
             } else {
                 this->buildDiversity(clonotype, probs, events, seq_poses, full_build);
@@ -248,15 +248,15 @@ namespace ymir {
             }
 
             // add J or J-D gene nodes
-            if (!clonotype.is_vdj()) {
+            if (clonotype.is_vj()) {
                 probs.initNode(J_index_genes, j_num, 1, 1);
                 if (full_build) {
                     events.initNode(J_index_genes, j_num, 1, 1);
                 }
             } else {
-                probs.initNode(J_index_genes, j_num, 1, 1);
+                probs.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
                 if (full_build) {
-                    events.initNode(J_index_genes, j_num, 1, 1);
+                    events.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
                 }
             }
 
@@ -270,7 +270,15 @@ namespace ymir {
                 j_len = _genes->J()[j_gene].sequence.size();
                 j_start = clonotype.getJstart(j_index);
 
-                probs(J_index_genes, j_index, 0, 0) = _param_vec->prob_J_gene(j_gene); // probability of choosing this J gene segment
+                if (clonotype.is_vj()) {
+                    probs(J_index_genes, j_index, 0, 0) = _param_vec->prob_J_gene(j_gene); // probability of choosing this J gene segment
+                } else {
+                    for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                        probs(J_index_genes, 0, j_index, d_index) =
+                                _param_vec->prob_JD_genes(j_gene, clonotype.getDiv(d_index)); // probability of choosing this J gene segment with other D genes
+                    }
+                }
+
                 for (seq_len_t i = 0; i < len + 1; ++i) {
                     if (j_len - len + i >= 0 && len - i <= clonotype.sequence().size() - j_start + 1) {
                         probs(J_index_dels, j_index, i, 0) = _param_vec->prob_J_del(j_gene, j_len - len + i); // probability of deletions
@@ -281,7 +289,15 @@ namespace ymir {
                 }
 
                 if (full_build) {
-                    events(J_index_genes, j_index, 0, 0) = _param_vec->index_J_gene(j_gene);
+                    if (clonotype.is_vj()) {
+                        events(J_index_genes, j_index, 0, 0) = _param_vec->index_J_gene(j_gene);
+                    } else {
+                        for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                            events(J_index_genes, 0, j_index, d_index) =
+                                    _param_vec->index_JD_genes(j_gene, clonotype.getDiv(d_index)); // probability of choosing this J gene segment with other D genes
+                        }
+                    }
+
                     for (seq_len_t i = 0; i < len + 1; ++i) {
                         if (j_len - len + i >= 0 && len - i <= clonotype.sequence().size() - j_start + 1) {
                             events(J_index_dels, j_index, i, 0) = _param_vec->index_J_del(j_gene, j_len - len + i);
@@ -333,8 +349,13 @@ namespace ymir {
                 for (int j = 0; j < clonotype.nDalignments(d_index); ++j) {
                     d_alignment = clonotype.getDalignment(d_index, j);
 
-                    for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len; ++left_pos) {
+                    cout << "D:" << (int) d_gene << "  Align:" << j << endl;
+
+                    for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len + 1; ++left_pos) {
+                        cout << (int) left_pos << ":";
                         for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seqend; ++right_pos) {
+                            cout << (int) right_pos << endl;
+
                             probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - 1, right_pos - 1) =
                                     _param_vec->prob_D_del(d_gene,
                                                            d_alignment.Dstart + left_pos - d_alignment.seqstart,

@@ -105,16 +105,20 @@ namespace ymir {
         }
         numeric fullProbability(eventind_t v_index, eventind_t d_index, eventind_t j_index) const {
             // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
-            return (_chain[0][v_index] *      // P(Vi)
-                    _chain[1][v_index] *      // P(#dels | Vi)
-                    _chain[2][0] *            // P(V-D3' insertion seq)
-//                    _chain[2][d_index] *            // P(V-D3' insertion seq)
-                    _chain[3][d_index] *      // P(D5'-D3' deletions | Di)
-                    _chain[4][0] *            // P(D5'-J insertion seq)
-//                    _chain[4][d_index] *            // P(D5'-J insertion seq)
-                    _chain[5][j_index] *      // P(#dels | Ji)
-                    _chain[6][0](j_index, d_index))(0, 0);  // P(Ji & Di)
-//                    _jdata->prob(j_index * _ddata->size() + d_index))(0, 0);  // P(Ji & Di)
+//            cout << _chain[3][d_index] << endl;
+            cout << "==========================" << endl;
+            cout << (_events->matrix(3, d_index)) << endl;
+            cout << "==========================" << endl;
+//            return (_chain[0][v_index] *      // P(Vi)
+//                    _chain[1][v_index] *      // P(#dels | Vi)
+//                    _chain[2][0] *            // P(V-D3' insertion seq)
+////                    _chain[2][d_index] *            // P(V-D3' insertion seq)
+//                    _chain[3][d_index] *      // P(D5'-D3' deletions | Di)
+//                    _chain[4][0] *            // P(D5'-J insertion seq)
+////                    _chain[4][d_index] *            // P(D5'-J insertion seq)
+//                    _chain[5][j_index] *      // P(#dels | Ji)
+//                    _chain[6][0](j_index, d_index))(0, 0);  // P(Ji & Di)
+////                    _jdata->prob(j_index * _ddata->size() + d_index))(0, 0);  // P(Ji & Di)
         }
 
 

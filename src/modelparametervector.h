@@ -287,7 +287,7 @@ namespace ymir {
         }
 
 
-        inline seq_len_t D_min_len(eventind_t d_index) const { return _d_gene_min_len[d_index]; }
+        inline seq_len_t D_min_len(eventind_t d_index) const { return _d_gene_min_len[d_index - 1]; }
 
     private:
 

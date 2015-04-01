@@ -240,12 +240,24 @@ namespace ymir {
             }
             len = clonotype.sequence().size() - len + 1;
 
-            // add J deletions and J gene nodes
+
+            // add J deletions nodes
             probs.initNode(J_index_dels, j_num, len + 1, 1);
-            probs.initNode(J_index_genes,j_num, 1, 1);
             if (full_build) {
                 events.initNode(J_index_dels, j_num, len + 1, 1);
-                events.initNode(J_index_genes, j_num, 1, 1);
+            }
+
+            // add J or J-D gene nodes
+            if (!clonotype.is_vdj()) {
+                probs.initNode(J_index_genes, j_num, 1, 1);
+                if (full_build) {
+                    events.initNode(J_index_genes, j_num, 1, 1);
+                }
+            } else {
+                probs.initNode(J_index_genes, j_num, 1, 1);
+                if (full_build) {
+                    events.initNode(J_index_genes, j_num, 1, 1);
+                }
             }
 
             // compute J deletions
@@ -308,13 +320,14 @@ namespace ymir {
                 events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), clonotype.sequence().size(), clonotype.sequence().size());
             }
 
-            segindex_t d_index = 0;
+            segindex_t d_index = 0, d_gene = 0;
             seq_len_t min_D_len = 0, d_len = 0;
             d_alignment_t d_alignment;
-            for (int i = 0; i < clonotype.nDiv(); ++i) {
-                d_index = clonotype.getDiv(i);
+
+            for (int d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                d_gene = clonotype.getDiv(d_index);
                 d_len = _genes->D()[d_index].sequence.size();
-                min_D_len = _param_vec->D_min_len(d_index);
+                min_D_len = _param_vec->D_min_len(d_gene);
 
                 // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
                 for (int j = 0; j < clonotype.nDalignments(d_index); ++j) {
@@ -322,13 +335,13 @@ namespace ymir {
 
                     for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len; ++left_pos) {
                         for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seqend; ++right_pos) {
-                            probs(DIVERSITY_GENES_MATRIX_INDEX, i, left_pos - 1, right_pos - 1) =
-                                    _param_vec->prob_D_del(d_index,
+                            probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - 1, right_pos - 1) =
+                                    _param_vec->prob_D_del(d_gene,
                                                            d_alignment.Dstart + left_pos - d_alignment.seqstart,
                                                            d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
                             if (full_build) {
-                                events(DIVERSITY_GENES_MATRIX_INDEX, i, left_pos - 1, right_pos - 1) =
-                                        _param_vec->index_D_del(d_index,
+                                events(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - 1, right_pos - 1) =
+                                        _param_vec->index_D_del(d_gene,
                                                                 d_alignment.Dstart + left_pos - d_alignment.seqstart,
                                                                 d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
                             }

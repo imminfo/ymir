@@ -9,7 +9,7 @@ overview
 - 3
 
 
-### Table of contents
+**Table of contents**
 - Quick start
 - - Compute assembly probabilities of human TCR-alpha data
 - - Perform statistical inference of parameters of generation model of human TCR-alpha
@@ -20,8 +20,8 @@ overview
 - Include Ymir library to your project
 
 
-## Quick start
-### Compute assembly probabilities of human TCR-alpha data
+**Quick start**
+***Compute assembly probabilities of human TCR-alpha data***
 
 
 ### Perform statistical inference of parameters of generation model of human TCR-alpha

@@ -9,7 +9,7 @@ overview
 - 3
 
 
-**Table of contents**
+*Table of contents*
 - Quick start
 - - Compute assembly probabilities of human TCR-alpha data
 - - Perform statistical inference of parameters of generation model of human TCR-alpha

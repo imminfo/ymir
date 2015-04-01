@@ -42,6 +42,9 @@
 
 
 #include "maag.h"
+#include "genesegment.h"
+#include "modelparametervector.h"
+#include "markovchain.h"
 
 
 namespace ymir {

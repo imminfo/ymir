@@ -206,7 +206,7 @@ namespace ymir {
             }
             int prev = 0;
             for (int i = segments[0] + segments[1]; i < segments[0] + segments[1] + segments[2]; ++i) {
-                segments[3 + i] = _Dseg[i - segments[0] - segments[1] + prev];
+                segments[3 + i] = _Dseg[prev];
                 prev += _n_Dalign[i - segments[0] - segments[1]];
             }
 

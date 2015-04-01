@@ -1276,12 +1276,12 @@ YMIR_TEST_START(test_maag_vdj)
 
     vector<string> alvec3;
     vector<string> seqvec3;
-    alvec2.push_back("Dseg1");
-    alvec2.push_back("Dseg2");
-    alvec2.push_back("Dseg3");
-    seqvec2.push_back("CCCGGAC");
-    seqvec2.push_back("ACCGGT");
-    seqvec2.push_back("GTTT");
+    alvec3.push_back("Dseg1");
+    alvec3.push_back("Dseg2");
+    alvec3.push_back("Dseg3");
+    seqvec3.push_back("GTTT");
+    seqvec3.push_back("ACCGGT");
+    seqvec3.push_back("CCCGGAC");
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
@@ -1337,16 +1337,27 @@ YMIR_TEST_START(test_maag_vdj)
     YMIR_ASSERT(maag.event_index(1, 1, 0, 4) == mvec.index_V_del(3, 2))
     YMIR_ASSERT(maag.event_index(1, 1, 0, 5) == mvec.index_V_del(3, 1))
 
+    YMIR_ASSERT(maag.event_index(2, 0, 0, 10) == 0)
+    YMIR_ASSERT(maag.event_index(2, 0, 5, 10) == mvec.index_VD_ins_len(5))
+    YMIR_ASSERT(maag.event_index(2, 0, 0, 0) == mvec.index_VD_ins_len(0))
+
+    YMIR_ASSERT(maag.event_index(3, 0, 1, 3) == mvec.index_D_del(2, 1, 2))
+    YMIR_ASSERT(maag.event_index(3, 0, 5, 7) == mvec.index_D_del(2, 2, 1))
+    YMIR_ASSERT(maag.event_index(3, 0, 6, 8) == mvec.index_D_del(2, 3, 0))
+    YMIR_ASSERT(maag.event_index(3, 0, 5, 8) == mvec.index_D_del(2, 2, 0))
+
     YMIR_ASSERT(maag.event_index(3, 2, 0, 0) == 0)
     YMIR_ASSERT(maag.event_index(3, 2, 5, 0) == 0)
     YMIR_ASSERT(maag.event_index(3, 2, 0, 3) == 0)
-//    cout << (int) maag.event_index(3, 2, 7, 10) << "!" << endl;
     YMIR_ASSERT(maag.event_index(3, 2, 7, 10) == mvec.index_D_del(1, 0, 0))
+    YMIR_ASSERT(maag.event_index(3, 2, 8, 10) == mvec.index_D_del(1, 1, 0))
+    YMIR_ASSERT(maag.event_index(3, 2, 7, 9) == mvec.index_D_del(1, 0, 1))
 
-    maag.fullProbability(0, 0, 0);
-    maag.fullProbability(0, 1, 0);
-    maag.fullProbability(0, 2, 0);
-
+    YMIR_ASSERT(maag.event_index(4, 0, 0, 0) == mvec.index_DJ_ins_len(5))
+    YMIR_ASSERT(maag.event_index(4, 0, 5, 4) == mvec.index_DJ_ins_len(4))
+    YMIR_ASSERT(maag.event_index(4, 0, 5, 5) == 0)
+    YMIR_ASSERT(maag.event_index(4, 0, 6, 1) == mvec.index_DJ_ins_len(0))
+    YMIR_ASSERT(maag.event_index(4, 0, 10, 2) == 0)
 
     YMIR_ASSERT(maag.event_index(5, 0, 0, 0) == 0)
     YMIR_ASSERT(maag.event_index(5, 0, 1, 0) == mvec.index_J_del(1, 2))
@@ -1368,6 +1379,18 @@ YMIR_TEST_START(test_maag_vdj)
     YMIR_ASSERT(maag.event_index(6, 0, 2, 0) == mvec.index_JD_genes(3, 2))
     YMIR_ASSERT(maag.event_index(6, 0, 2, 1) == mvec.index_JD_genes(3, 3))
     YMIR_ASSERT(maag.event_index(6, 0, 2, 2) == mvec.index_JD_genes(3, 1))
+
+    // i don't want to compute by hand all this crazy matrices!
+    // i've already tested chain products in previous tests!
+    // ):<
+    cout << (double) maag.fullProbability(0, 0, 0) << endl;
+    cout << (double) maag_builder.build(clonotype, false).fullProbability(0, 0, 0) << endl;
+    YMIR_ASSERT(maag.fullProbability(0, 0, 0) ==
+                        maag_builder.build(clonotype, false).fullProbability(0, 0, 0))
+    YMIR_ASSERT(maag.fullProbability(1, 1, 1) ==
+                        maag_builder.build(clonotype, false).fullProbability(1, 1, 1))
+    YMIR_ASSERT(maag.fullProbability(0, 2, 2) ==
+                        maag_builder.build(clonotype, false).fullProbability(0, 2, 2))
 
 YMIR_TEST_END
 

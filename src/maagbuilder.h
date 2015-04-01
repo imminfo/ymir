@@ -33,8 +33,8 @@
 #define VARIABLE_DELETIONS_MATRIX_INDEX 1
 #define JOINING_GENES_VJ_MATRIX_INDEX 4
 #define JOINING_DELETIONS_VJ_MATRIX_INDEX 3
-#define JOINING_GENES_VDJ_MATRIX_INDEX 5
-#define JOINING_DELETIONS_VDJ_MATRIX_INDEX 6
+#define JOINING_GENES_VDJ_MATRIX_INDEX 6
+#define JOINING_DELETIONS_VDJ_MATRIX_INDEX 5
 #define DIVERSITY_GENES_MATRIX_INDEX 3
 #define VarJoi_INSERTIONS_MATRIX_INDEX 2
 #define VarDiv_INSERTIONS_MATRIX_INDEX 2
@@ -340,30 +340,29 @@ namespace ymir {
             seq_len_t min_D_len = 0, d_len = 0;
             d_alignment_t d_alignment;
 
+            // find first and last indices for D gene matrix - find min seq start pos and max seq end pos
+            // among all D alignments
+
+
             for (int d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                 d_gene = clonotype.getDiv(d_index);
-                d_len = _genes->D()[d_index].sequence.size();
+                d_len = _genes->D()[d_gene].sequence.size();
                 min_D_len = _param_vec->D_min_len(d_gene);
 
                 // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
                 for (int j = 0; j < clonotype.nDalignments(d_index); ++j) {
                     d_alignment = clonotype.getDalignment(d_index, j);
 
-                    cout << "D:" << (int) d_gene << "  Align:" << j << endl;
-
                     for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len + 1; ++left_pos) {
-                        cout << (int) left_pos << ":";
                         for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seqend; ++right_pos) {
-                            cout << (int) right_pos << endl;
-
                             probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - 1, right_pos - 1) =
                                     _param_vec->prob_D_del(d_gene,
-                                                           d_alignment.Dstart + left_pos - d_alignment.seqstart,
+                                                           d_alignment.Dstart + left_pos - d_alignment.seqstart - 1,
                                                            d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
                             if (full_build) {
                                 events(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - 1, right_pos - 1) =
                                         _param_vec->index_D_del(d_gene,
-                                                                d_alignment.Dstart + left_pos - d_alignment.seqstart,
+                                                                d_alignment.Dstart + left_pos - d_alignment.seqstart - 1,
                                                                 d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
                             }
                         }

@@ -72,6 +72,10 @@ namespace ymir {
         }
 
 
+        /**
+         * \brief Build MAAGs from the given clonotypes.
+         */
+        ///@{
         MAAG build(/*const*/ Clonotype &clonotype, bool full_build = false) const {
             ProbMMC probs;
             EventIndMMC events;
@@ -87,7 +91,7 @@ namespace ymir {
                 if (full_build) { events.resize(VDJ_CHAIN_SIZE); }
             }
 
-            this->buildVarible(clonotype, probs, events, seq_poses, full_build);
+            this->buildVariable(clonotype, probs, events, seq_poses, full_build);
             this->buildJoining(clonotype, probs, events, seq_poses, full_build);
             if (!clonotype.is_vdj()) {
                 this->buildVJinsertions(clonotype, probs, events, seq_poses, full_build);
@@ -107,31 +111,36 @@ namespace ymir {
             }
         }
 
-
         MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) {
             // in parallel ???
         }
+        ///@}
 
 
+        /**
+         * \brief Replace event probabilities in the given MAAGs if they have stored event indices.
+         */
+        ///@{
         void replaceEventProbabilities(MAAG *maag) const {
 
 
         }
-
-
         void replaceEventProbabilities(MAAGRepertoire *repertoire) const {
           // in parallel ???
         }
+        ///@}
 
 
     protected:
 
         ModelParameterVector *_param_vec;  // or just copy it?
         VDJRecombinationGenes *_genes; // copy this too?
-        // MarkovChain *mc_alpha, *mc_beta;
 
 
-        MAAGBuilder() {}
+        /**
+         * \brief Private default constructor.
+         */
+        MAAGBuilder() : _param_vec(nullptr), _genes(nullptr) {}
 
 
         /**
@@ -143,7 +152,7 @@ namespace ymir {
         * \param seq_poses Vector of positions.
         * \param full_build Boolean if build should be full.
         */
-        void buildVarible(const Clonotype &clonotype,
+        void buildVariable(const Clonotype &clonotype,
                 ProbMMC &probs,
                 EventIndMMC &events,
                 vector<seq_len_t> &seq_poses,
@@ -294,10 +303,32 @@ namespace ymir {
                             vector<seq_len_t> &seq_poses,
                             bool full_build) const
         {
+            probs.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), clonotype.sequence().size(), clonotype.sequence().size());
+            if (full_build) {
+                events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), clonotype.sequence().size(), clonotype.sequence().size());
+            }
 
+            // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
+            segindex_t d_index = 0, num_ds = 0;
+            seq_len_t min_D_len = 0;
+            for (int i = 0; i < clonotype.nDiv(); ++i) {
+                d_index = clonotype.getDiv(i);
+                num_ds = clonotype.nDalignments(d_index);
+                min_D_len = _param_vec->D_min_len(d_index);
 
-            // (!!!) insert diversity gene seq poses BEFORE joining gene seq poses
+                
+            }
+
+            // overhead by memory - just push all positions of the sequence from 1 to the last
             // insert D3 and D5 positions
+            vector<seq_len_t> D35_poses;
+            D35_poses.reserve(clonotype.sequence().size() * 2);
+            for (seq_len_t i = 1; i < clonotype.sequence().size() + 1; ++i) { D35_poses.push_back(i); }
+            for (seq_len_t i = 1; i < clonotype.sequence().size() + 1; ++i) { D35_poses.push_back(i); }
+
+            // Note! insert diversity gene seq poses BEFORE joining gene seq poses
+            seq_poses.reserve(seq_poses.size() + D35_poses.size() + 2);  // +2 -> just in case (:
+            seq_poses.insert(seq_poses.begin() + probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX), D35_poses.begin(), D35_poses.end());
         }
 
 

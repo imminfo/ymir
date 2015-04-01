@@ -24,6 +24,8 @@
 #ifndef _MODELPARAMETERVECTOR_H_
 #define _MODELPARAMETERVECTOR_H_
 
+#define DEFAULT_DIV_GENE_MIN_LEN 3
+
 
 #include <vector>
 
@@ -126,14 +128,24 @@ namespace ymir {
         * \param do_normalise Boolean, do normalisation of event families after initialising?
         */
         ModelParameterVector(const vector<prob_t>& param_vec,
-                const vector<eventind_t>& lens_vec,
-                vector<seq_len_t> d_gene_max_dels,
-                const vector<prob_t>& laplace_vec = vector<prob_t>(),
-                bool do_normalise = true) : ModelParameterVector(param_vec, lens_vec, laplace_vec, do_normalise)
+                             const vector<eventind_t>& lens_vec,
+                             vector<seq_len_t> d_gene_max_dels,
+                             vector<seq_len_t> d_gene_min_len = vector<seq_len_t>(),
+                             const vector<prob_t>& laplace_vec = vector<prob_t>(),
+                             bool do_normalise = true)
+                : ModelParameterVector(param_vec, lens_vec, laplace_vec, do_normalise)
         {
 
             _d_gene_num = d_gene_max_dels.size();
             _d_gene_max_dels = d_gene_max_dels;
+            if (d_gene_min_len.size()) {
+                _d_gene_min_len = d_gene_min_len;
+            } else {
+                _d_gene_min_len.reserve(_d_gene_num);
+                for (int i = 0; i < _d_gene_num; ++i) {
+                    _d_gene_min_len.push_back(DEFAULT_DIV_GENE_MIN_LEN);
+                }
+            }
         }
 
 
@@ -274,6 +286,9 @@ namespace ymir {
             return _edges[_edges.size() - 6]; // -1 - 4 - 1
         }
 
+
+        inline seq_len_t D_min_len(eventind_t d_index) const { return _d_gene_min_len[d_index]; }
+
     private:
 
         vector<prob_t> _vec;
@@ -281,6 +296,7 @@ namespace ymir {
         vector<prob_t> _laplace;
         segindex_t _d_gene_num;
         vector<seq_len_t> _d_gene_max_dels;
+        vector<seq_len_t> _d_gene_min_len;
 
 
         /**

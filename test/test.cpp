@@ -32,7 +32,7 @@
 #define YMIR_ASSERT(expr) { if (!(expr)) { _failed_cases.push_back(#expr); } };
 #define YMIR_TEST_END return _failed_cases; }
 
-#define TEST_DATA_FOLDER string("/Volumes/HDD/dev/ymir/test/data/")
+#define TEST_DATA_FOLDER string("/Users/vdn/ymir/test/data/")
 
 
 #include <iostream>

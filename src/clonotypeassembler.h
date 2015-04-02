@@ -14,7 +14,10 @@ namespace ymir {
     class ClonotypeAssembler {
     public:
 
-
+        /**
+         *
+         */
+        ClonotypeAssembler( /* ModelParameterVector, VDJRecombinationGenes */ ) { }
 
     protected:
 

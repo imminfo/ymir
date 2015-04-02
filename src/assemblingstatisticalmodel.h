@@ -188,7 +188,7 @@ namespace ymir {
         vector<numeric> computeFullProbabilities(const ClonesetView& repertoire,
                                                  bool aminoacid = false,
                                                  MAAG_COMPUTE_PROB_ACTION action = MAX_PROBABILITY) const {
-
+//            return this->_builder->buildAndCompute(???);
         }
 
 

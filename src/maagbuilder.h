@@ -114,6 +114,13 @@ namespace ymir {
         ///@}
 
 
+        /*
+        numeric buildAndCompute(Clonotype &clonotype, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {}
+
+        vector<numeric> buildAndCompute(ClonesetView &cloneset, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {}
+        */
+
+
         /**
          * \brief Replace event probabilities in the given MAAGs if they have stored event indices.
          */

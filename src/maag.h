@@ -123,7 +123,6 @@ namespace ymir {
                         _chain[4][0] *            // P(D5'-J insertion seq)
                         _chain[5][j_index] *      // P(#dels | Ji)
                         _chain[6][0](j_index, d_index))(0, 0);  // P(Ji & Di)
-//                    _jdata->prob(j_index * _ddata->size() + d_index))(0, 0);  // P(Ji & Di)
             } else {
                 return 0;
             }
@@ -184,7 +183,7 @@ namespace ymir {
         ///@{
         eventind_t nVar() const { return _chain[0].size(); }
         eventind_t nJoi() const { return _chain[_chain.size() - 2].size(); }
-        eventind_t nDiv() const { return (_chain.size() == 5) ? 0 : _chain[3].size(); }
+        eventind_t nDiv() const { return (_chain.size() == VJ_CHAIN_SIZE) ? 0 : _chain[3].size(); }
         ///@}
 
 
@@ -223,9 +222,13 @@ namespace ymir {
 
         }
 
+        /**
+         * \brief Get is this MAAG was built from clonotype either with VJ or with VDJ recombination.
+         */
+        ///@{
         bool is_vj() const { return _chain.size() == VJ_CHAIN_SIZE; }
         bool is_vdj() const { return _chain.size() == VDJ_CHAIN_SIZE; }
-
+        ///@}
 
     protected:
 
@@ -236,6 +239,9 @@ namespace ymir {
         string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
 
 
+        /**
+         * \brief Default constructor.
+         */
         MAAG() {
             _events = nullptr;
             _sequence = nullptr;

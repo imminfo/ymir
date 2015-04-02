@@ -205,10 +205,8 @@ namespace ymir {
                 }
             }
 
-            if (full_build) {
-                for (seq_len_t i = 0; i < len + 1; ++i) {
-                    seq_poses.push_back(i);
-                }
+            for (seq_len_t i = 0; i < len + 1; ++i) {
+                seq_poses.push_back(i);
             }
         }
 
@@ -308,10 +306,8 @@ namespace ymir {
                 }
             }
 
-            if (full_build) {
-                for (seq_len_t i = clonotype.sequence().size() - len + 1; i < clonotype.sequence().size() + 1; ++i) {
-                    seq_poses.push_back(i);
-                }
+            for (seq_len_t i = clonotype.sequence().size() - len + 1; i < clonotype.sequence().size() + 1; ++i) {
+                seq_poses.push_back(i);
             }
         }
 

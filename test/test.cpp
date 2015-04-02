@@ -1383,8 +1383,7 @@ YMIR_TEST_START(test_maag_vdj)
     // i don't want to compute by hand all this crazy matrices!
     // i've already tested chain products in previous tests!
     // ):<
-    cout << (double) maag.fullProbability(0, 0, 0) << endl;
-    cout << (double) maag_builder.build(clonotype, false).fullProbability(0, 0, 0) << endl;
+    // also it's (A == B) not (A - B < eps) because this results are pretty precise on this toy example
     YMIR_ASSERT(maag.fullProbability(0, 0, 0) ==
                         maag_builder.build(clonotype, false).fullProbability(0, 0, 0))
     YMIR_ASSERT(maag.fullProbability(1, 1, 1) ==

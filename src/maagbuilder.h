@@ -122,8 +122,28 @@ namespace ymir {
          */
         ///@{
         void replaceEventProbabilities(MAAG *maag) const {
-
-
+//            if (maag->_events) {
+//                for (int node_i = 0; node_i < maag->_chain.size(); ++node_i) {
+//                    // either rebuild all insertions
+//                    if (maag->_chain.size() == VJ_CHAIN_SIZE && node_i == VarJoi_INSERTIONS_MATRIX_INDEX) {
+//
+//                    } else if (maag->_chain.size() == VDJ_CHAIN_SIZE && node_i == VarDiv_INSERTIONS_MATRIX_INDEX) {
+//
+//                    } else if (maag->_chain.size() == VDJ_CHAIN_SIZE && node_i == DivJoi_INSERTIONS_MATRIX_INDEX) {
+//
+//                    } else {
+//                        // or just replace all event probabilities with the new ones
+//                        for (int mat_i = 0; mat_i < maag->nodeSize(node_i); ++mat_i) {
+//                            for (int row_i = 0; row_i < maag->_chain[node_i][mat_i].rows(); ++row_i) {
+//                                for (int col_i = 0; col_i < maag->_chain[node_i][mat_i].cols(); ++col_i) {
+//                                    maag->_chain[node_i][mat_i](row_i, col_i) =
+//                                            _param_vec->getEventProbability(maag->_events->_chain[node_i][mat_i](row_i, col_i));
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
         }
         void replaceEventProbabilities(MAAGRepertoire *repertoire) const {
           // in parallel ???

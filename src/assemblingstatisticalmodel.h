@@ -152,8 +152,11 @@ namespace ymir {
                       && this->parseEventProbabilities();
 
             if (_status) {
+                cout << "Model is loaded successfully." << endl;
                 this->make_builder();
                 this->make_assembler();
+            } else {
+                cout << "Model is not loaded due to errors." << endl;
             }
         }
 
@@ -170,16 +173,21 @@ namespace ymir {
 
 
         /**
-        * \brief Compute full assembling probabilities of clones from the given repertoire.
-        *
-        * \param repertoire Repertoire with alignments and event indices.
-        * \param aminoacid What probabilities will be computed - of nucleotide or amino acid sequences. If
-        * this parameter is false and some clone will have amino acid sequence, than error message will be generated to the output
-        * and probability of this clone will set to zero.
-        *
-        * \return Vector of full assembling probabilities.
-        */
-        vector<numeric> computeFullProbabilities(const ClonesetView& repertoire, bool aminoacid = false) const {
+         * \brief Compute full assembling probabilities of clonotypes from the given repertoire.
+         * If some clonotypes have few alignments of some gene segments, than
+         * full probability of all combinations of gene segments will be computed and either summed
+         * or the max full probability will be chosen.
+         *
+         * \param repertoire Repertoire with alignments and event indices.
+         * \param aminoacid What probabilities will be computed - of nucleotide or amino acid sequences. If
+         * this parameter is false and some clone will have amino acid sequence, than error message will be generated to the output
+         * and probability of this clone will set to zero.
+         *
+         * \return Vector of full assembling probabilities.
+         */
+        vector<numeric> computeFullProbabilities(const ClonesetView& repertoire,
+                                                 bool aminoacid = false,
+                                                 MAAG_COMPUTE_PROB_ACTION action = MAX_PROBABILITY) const {
 
         }
 
@@ -193,7 +201,9 @@ namespace ymir {
          *
          * \return Set of MAAGs.
          */
-        MAAGRepertoire buildGraphs(const ClonesetView& repertoire, bool full_build = true, bool aminoacid = false) const {
+        MAAGRepertoire buildGraphs(const ClonesetView& repertoire,
+                                   bool full_build = true,
+                                   bool aminoacid = false) const {
             _builder->build(repertoire);
         }
 
@@ -202,7 +212,7 @@ namespace ymir {
          * \brief Generate artificial repertoire of sequences using this model.
          *
          * \param count Number of generated sequences.
-         * \param merge If true than return only unique clonotypes.
+         * \param merge If true than return only unique clonotypes with counts of occurrences for each clonotype.
          *
          * \return Artificial repertoire.
          */
@@ -280,6 +290,15 @@ namespace ymir {
             ifs.open(jsonpath);
             if (ifs.is_open()) {
                 ifs >> _config;
+                cout << "Statistical assembling model:\n\t" <<
+                        _config.get("name", "Nameless model").asString() <<
+                        "\n\t" <<
+                        _config.get("comment", "").asString() <<
+                        "\n\tRecombination:\t" <<
+                        _config.get("recombination", "no-recomb").asString() <<
+                        "\n\t" <<
+                        (_config.get("hypermutations", false).asBool() ? "Hypermutations" : "No hypermutations") <<
+                        endl;
                 return true;
             }
             cerr << "Assembling statistical model error:" << endl << "\t config .json file not found" << endl;

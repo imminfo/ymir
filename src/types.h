@@ -118,6 +118,9 @@ namespace ymir {
     };
 
 
+    /**
+     * \struct NamedVectoArray
+     */
     struct NamedVectorArray {
 
     public:
@@ -161,6 +164,15 @@ namespace ymir {
 
         vector<Vector> cols;
         unordered_map<string, int> map;
+    };
+
+
+    /**
+     * \enum MAAG_COMPUTE_PROB_ACTION
+     */
+    enum MAAG_COMPUTE_PROB_ACTION {
+        MAX_PROBABILITY,
+        SUM_PROBABILITY
     };
 }
 

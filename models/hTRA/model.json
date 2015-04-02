@@ -4,8 +4,16 @@
   "recombination": "VJ",
   "hypermutations": false,
   "segments": {
-    "variable": "vsegments.txt",
-    "joining": "jsegments.txt"
+    "variable": {
+      "file": "vsegments.txt",
+      "P.nuc.3'": 0,
+      "P.nuc.5'": 0
+    },
+    "joining": {
+      "file": "jsegments.txt",
+      "P.nuc.3'": 0,
+      "P.nuc.5'": 0
+    }
   },
   "probtables": {
     "v.j": {

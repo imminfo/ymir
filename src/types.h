@@ -153,6 +153,10 @@ namespace ymir {
             return cols[map[name]];
         }
 
+        Vector& operator[](int index) {
+            return cols[index];
+        }
+
         void push(int index, prob_t value) {
             cols[index].vec.push_back(value);
         }

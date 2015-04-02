@@ -43,13 +43,12 @@ namespace ymir {
     * \return New struct with matrix.
     */
     NamedVectorArray read_matrix(const string& filepath) {
-        vector<string> colnames, rownames;
-        vector<prob_t> values;
 
         ifstream ifs;
         ifs.open(filepath);
 
         if (ifs.is_open()) {
+            NamedVectorArray narr;
             stringstream line_stream;
             string line, word;
             int col = 0;
@@ -61,15 +60,16 @@ namespace ymir {
                     if (read_header) {
                         while (!line_stream.eof()) {
                             getline(line_stream, word, '\t');
-                            colnames.push_back(word);
+                            narr.addColumn(word);
                         }
                         read_header = false;
                     } else {
-                        getline(line_stream, word, '\t');
-                        rownames.push_back(word);
+                        getline(line_stream, word, '\t'); // skip row's name
+                        int i = 0;
                         while (!line_stream.eof()) {
                             getline(line_stream, word, '\t');
-
+                            narr.push(i, stod(word));  // MPFR?!?!?! I don't know
+                            ++i;
                         }
                         ++col;
                     }

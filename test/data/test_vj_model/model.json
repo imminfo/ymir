@@ -1,0 +1,53 @@
+{
+  "name": "Test model for some immune receptors",
+  "comment": "Cool comment about this model, yep",
+  "recombination": "VJ",
+  "hypermutations": false,
+  "segments": {
+    "variable": {
+      "file": "vsegments.txt",
+      "P.nuc.3'": 0,
+      "P.nuc.5'": 0
+    },
+    "joining": {
+      "file": "jsegments.txt",
+      "P.nuc.3'": 0,
+      "P.nuc.5'": 0
+    }
+  },
+  "probtables": {
+    "v.j": {
+      "file": "p.vj.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "skip.first.column": true
+    },
+    "v.del": {
+      "file": "p.v.del.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "seg.depend": true,
+      "skip.first.column": true
+    },
+    "j.del": {
+      "file": "p.j.del.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "seg.depend": true,
+      "skip.first.column": true
+    },
+    "ins.len": {
+      "file": "p.ins.len.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "seg.depend": false,
+      "skip.first.column": true
+    },
+    "ins.nucl": {
+      "file": "p.ins.nucl.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "skip.first.column": true
+    }
+  }
+}

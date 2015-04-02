@@ -82,6 +82,9 @@ namespace ymir {
         }
 
 
+        /**
+         * 
+         */
         virtual ~MAAG() {
             if (_events) { delete _events; }
             if (_seq_poses) { delete [] _seq_poses; }

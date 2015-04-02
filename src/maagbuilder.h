@@ -71,6 +71,11 @@ namespace ymir {
 
         /**
          * \brief Build MAAGs from the given clonotypes.
+         *
+         * \param clonotype Clonotype from which build the MAAG.
+         * \param cloneset Set of clonotypes from which build the repertoires of MAAGs.
+         * \param full_build If true than make MAAG with stored event indices.
+         * ???? \param aminoacid If true than build MAAGs from the aminoacid sequences.
          */
         ///@{
         MAAG build(/*const*/ Clonotype &clonotype, bool full_build = false) const {

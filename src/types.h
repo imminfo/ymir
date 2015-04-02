@@ -25,6 +25,7 @@
 #define _TYPES_H
 
 
+#include <unordered_map>
 #include "tuple"
 
 #include "Eigen/Dense"
@@ -117,25 +118,49 @@ namespace ymir {
     };
 
 
-    struct NamedMatrix {
+    struct NamedVectorArray {
 
     public:
 
-        NamedMatrix() {
-            column_names.resize(0);
-            row_names.resize(0);
-            matrix.resize(1, 1);
+        struct Vector {
+
+        public:
+
+            vector<prob_t> vec;
+            string name;
+
+            Vector(const string& name_) {
+                name = name_;
+                vec.clear();
+                vec.reserve(10);
+            }
+        };
+
+        NamedVectorArray() {
+            cols.clear();
+            cols.reserve(10);
+        }
+
+        void addColumn(const string& name) {
+            cols.push_back(name);
+            map[name] = cols.size() - 1;
+        }
+
+        Vector& operator[](const string& name) {
+            return cols[map[name]];
+        }
+
+        void push(int index, prob_t value) {
+            cols[index].vec.push_back(value);
+        }
+
+        string getName(int index) const {
+            return cols[index].name;
         }
 
 
-        NamedMatrix(const vector<string>& column_names_,
-                    const vector<string>& row_names_,
-                    const Eigen::Matrix<prob_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>& matrix_)
-                : column_names(column_names_), row_names(row_names_), matrix(matrix_) {}
-
-        vector<string> column_names;
-        vector<string> row_names;
-        Eigen::Matrix<prob_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> matrix;
+        vector<Vector> cols;
+        unordered_map<string, int> map;
     };
 }
 

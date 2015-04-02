@@ -42,7 +42,7 @@ namespace ymir {
     *
     * \return New struct with matrix.
     */
-    NamedMatrix read_matrix(const string& filepath) {
+    NamedVectorArray read_matrix(const string& filepath) {
         vector<string> colnames, rownames;
         vector<prob_t> values;
 
@@ -78,7 +78,7 @@ namespace ymir {
             }
         } else {
             cerr << "Matrix parsing error:" << endl << "\tinput file [" << filepath << "] not found" << endl;
-            return NamedMatrix();
+            return NamedVectorArray();
         }
 
 
@@ -148,11 +148,13 @@ namespace ymir {
 //            }
 
             _status = this->parseModelConfig(folderpath + "/model.json")
-                    && this->parseGeneSegments()
-                    && this->parseEventProbabilities();
+                      && this->parseGeneSegments()
+                      && this->parseEventProbabilities();
 
-            this->make_builder();
-            this->make_assembler();
+            if (_status) {
+                this->make_builder();
+                this->make_assembler();
+            }
         }
 
 
@@ -271,8 +273,8 @@ namespace ymir {
 
 
         /**
-        * \brief Parse JSON file with model parameters.
-        */
+         * \brief Parse JSON file with model parameters.
+         */
         virtual bool parseModelConfig(const string& jsonpath) {
             ifstream ifs;
             ifs.open(jsonpath);
@@ -286,8 +288,8 @@ namespace ymir {
 
 
         /**
-        * \brief Parse gene segment JSON files and tables.
-        */
+         * \brief Parse gene segment JSON files and tables.
+         */
         virtual bool parseGeneSegments() {
             string v_path = _config.get("segments", "genes").get("variable", "").asString(),
                    j_path = _config.get("segments", "genes").get("joining", "").asString(),
@@ -315,10 +317,13 @@ namespace ymir {
 
 
         /**
-        * \brief Parse files with event probabilities matrices and make ModelParameterVector.
-        */
+         * \brief Parse files with event probabilities matrices and make ModelParameterVector.
+         */
         virtual bool parseEventProbabilities() {
-            // make indexer here
+            // for each vector check size of gene segments and remove trailing zeros
+            // or get a message when some column is shorter than length
+
+            cerr << "Some problems here" << endl;
         }
 
 
@@ -331,15 +336,21 @@ namespace ymir {
         void addTrailingZeros() const {}
 
 
+        /**
+         * \brief Make MAAGBuilder with this model's parameters (event probabilities and gene segments).
+         */
         void make_builder() {
             if (_builder) { delete _builder; }
             _builder = new MAAGBuilder(*_param_vec, *_genes);
         }
 
 
+        /**
+         * \brief Make ClonotypeAssembler with this model's parameters (event probabilities and gene segments).
+         */
         void make_assembler() {
             if (_generator) { delete _generator; }
-            /*_generator = new ClonotypeAssembler();*/
+            /*_generator = new ClonotypeAssembler(*_param_vec, *_genes);*/
         }
 
     };

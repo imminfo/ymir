@@ -43,8 +43,8 @@ namespace ymir {
     public:
 
         /**
-        *
-        */
+         *
+         */
         MAAG(const MAAG &other) {
             if (other._events) {
                 _events = new EventIndMMC(*other._events);
@@ -54,9 +54,9 @@ namespace ymir {
 
 
         /**
-        * Special swap constructor for MAAGs that will be used only for computation of
-        * the full probability.
-        */
+         * \brief Special swap constructor for MAAGs that will be used only for computation of
+         * the full probability.
+         */
         MAAG(ProbMMC &prob_mcc) {
             this->swap(prob_mcc);
             _events = nullptr;
@@ -67,8 +67,8 @@ namespace ymir {
 
 
         /**
-        * Special swap constructor for MAAGs that will be used for statistical inference.
-        */
+         * \brief Special swap constructor for MAAGs that will be used for statistical inference.
+         */
         MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, string sequence, seq_len_t *seq_poses, seq_len_t n_poses) {
             this->swap(prob_mcc);
             _events = new EventIndMMC();
@@ -91,6 +91,7 @@ namespace ymir {
         *
         * \return Full assembling probability.
         */
+        ///@{
         numeric fullProbability(eventind_t v_index, eventind_t j_index) const {
             // P(Vi) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji) * P(Ji)
             return (_chain[0][v_index] *        // P(Vi)
@@ -112,35 +113,50 @@ namespace ymir {
                     _chain[6][0](j_index, d_index))(0, 0);  // P(Ji & Di)
 //                    _jdata->prob(j_index * _ddata->size() + d_index))(0, 0);  // P(Ji & Di)
         }
-
-
-        ///@{
-        eventind_t nV() { return _chain[0].size(); }
-        eventind_t nJ() { return _chain[_chain.size() - 2].size(); }
-        eventind_t nD() { return (_chain.size() == 5) ? 0 : _chain[3].size(); }
         ///@}
 
 
         ///@{
-//        segindex_t vgene(uint8_t i) { return _events ? (*_events)[0][i] : 0; }
-//        segindex_t jgene(uint8_t i) { return _events ? (*_events)[_chain.size() - 2][i] : 0; }
-//        segindex_t dgene(uint8_t i) { return 0; } // ???
+        eventind_t nVar() { return _chain[0].size(); }
+        eventind_t nJoi() { return _chain[_chain.size() - 2].size(); }
+        eventind_t nDiv() { return (_chain.size() == 5) ? 0 : _chain[3].size(); }
         ///@}
 
 
+        ///@{
+//        segindex_t getVar(uint8_t i) { return _events ? (*_events)[0][i] : 0; }
+//        segindex_t getJoi(uint8_t i) { return _events ? (*_events)[_chain.size() - 2][i] : 0; }
+//        segindex_t getDiv(uint8_t i) { return 0; } // ???
+        ///@}
+
+
+        /**
+         * \brief Access to event indices and event probabilities in the underlying matrices of the MAAG.
+         *
+         * \param node_i Index of the node.
+         * \param mat_i Index of the matrix in the node.
+         * \param row Which row to choose.
+         * \param col Which column to choose.
+         *
+         * \return Event probability or event index. In the second case zero will be returned if no event chain matrix
+         * is stored in this MAAG.
+         */
+        ///@{
         prob_t event_probability(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
             return (*this)(node_i, mat_i, row, col);
         }
-
         eventind_t event_index(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
             return _events ? (*_events)(node_i, mat_i, row, col) : 0;
         };
+        ///@}
 
 
         seq_len_t position(seq_len_t i) const { return _seq_poses[i]; }
 
 
-        // serialize MAAG
+        void serialize(const string& filepath) const {
+            
+        }
 
 
     protected:

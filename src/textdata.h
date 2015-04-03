@@ -17,28 +17,48 @@ namespace ymir {
         AbstractTDContainer() {
             _rownames.reserve(40);
             _colnames.reserve(40);
+            _laplace = 0;
         }
 
         virtual ~AbstractTDContainer() { }
+
+        void set_laplace(prob_t laplace) { _laplace = laplace; }
 
         void add_row_name(const string& name) { _rownames.push_back(name); }
 
         void add_column_name(const string& name) { _colnames.push_back(name); }
 
-        void addRow(const vector<prob_t> vec) = 0;
+        const vector<string>& rownames() const { return _rownames; }
+        
+        const vector<string>& colnames() const { return _colnames; }
 
-        void read(const string& filepath) = 0;
+        virtual void addRow(const vector<prob_t> vec) = 0;
+
+        virtual bool read(const string& filepath) = 0;
 
     protected:
 
         vector<string> _rownames;
         vector<string> _colnames;
+        prob_t _laplace;
 
     };
 
 
     struct TDVectorList : public AbstractTDContainer {
     public:
+
+        TDVectorList() : AbstractTDContainer() { }
+
+        virtual ~TDVectorList() { }
+
+        void addRow(const vector<prob_t> vec) {
+
+        }
+
+        bool read(const string& filepath) {
+            return false;
+        }
 
     protected:
 
@@ -48,6 +68,18 @@ namespace ymir {
     struct TDMatrix : public AbstractTDContainer  {
     public:
 
+        TDMatrix() : AbstractTDContainer()  { }
+
+        virtual ~TDMatrix() { }
+
+        void addRow(const vector<prob_t> vec) {
+
+        }
+
+        bool read(const string& filepath) {
+            return false;
+        }
+
     protected:
 
     };
@@ -55,6 +87,19 @@ namespace ymir {
 
     struct TDMatrixList : public AbstractTDContainer  {
     public:
+
+
+        TDMatrixList() : AbstractTDContainer()  { }
+
+        virtual ~TDMatrixList() { }
+
+        void addRow(const vector<prob_t> vec) {
+
+        }
+
+        bool read(const string& filepath) {
+            return false;
+        }
 
     protected:
 
@@ -104,6 +149,65 @@ namespace ymir {
         vector<Vector> cols;
         unordered_map<string, int> map;
     };
+
+
+    /**
+    * \function read_matrix
+    *
+    * \brief
+    *
+    * \param filepath Path to the file with matrix, separated by spaces / tabs.
+    *
+    * \return New struct with matrix.
+    */
+    NamedVectorArray read_vector_list(const string& filepath) {
+
+        ifstream ifs;
+        ifs.open(filepath);
+
+        if (ifs.is_open()) {
+            NamedVectorArray narr;
+            stringstream line_stream;
+            string line, word;
+            bool read_header = true;
+            while (!ifs.eof()) {
+                getline(ifs, line);
+                if (line[0] != '\n') {
+                    line_stream.str(line);
+                    if (read_header) {
+                        while (!line_stream.eof()) {
+                            getline(line_stream, word, '\t');
+                            narr.addColumn(word);
+                        }
+                        read_header = false;
+                    } else {
+                        getline(line_stream, word, '\t'); // skip row's name
+                        int i = 0;
+                        while (!line_stream.eof()) {
+                            getline(line_stream, word, '\t');
+                            narr.push(i, stod(word));  // MPFR?!?!?! I don't know
+                            ++i;
+                        }
+                    }
+                    line_stream.clear();
+                }
+            }
+            return narr;
+
+        } else {
+            cerr << "Matrix parsing error:" << endl << "\tinput file [" << filepath << "] not found" << endl;
+            return NamedVectorArray();
+        }
+
+        // read first line with names
+
+        // put first element from each row to column names
+
+        // remove cell at the intersection of the first row and the first column
+
+        ifs.close();
+//        return NamedMatrix(colnames, rownames, Matrix<prob_t, Dynamic, Dynamic, ColMajor>(values.data()));
+    }
 
 
 }

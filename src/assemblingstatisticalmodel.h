@@ -34,70 +34,6 @@
 
 namespace ymir {
 
-    /**
-    * \function read_matrix
-    *
-    * \brief
-    *
-    * \param filepath Path to the file with matrix, separated by spaces / tabs.
-    *
-    * \return New struct with matrix.
-    */
-    NamedVectorArray read_vector_list(const string& filepath) {
-
-        ifstream ifs;
-        ifs.open(filepath);
-
-        if (ifs.is_open()) {
-            NamedVectorArray narr;
-            stringstream line_stream;
-            string line, word;
-            bool read_header = true;
-            while (!ifs.eof()) {
-                getline(ifs, line);
-                if (line[0] != '\n') {
-                    line_stream.str(line);
-                    if (read_header) {
-                        while (!line_stream.eof()) {
-                            getline(line_stream, word, '\t');
-                            narr.addColumn(word);
-                        }
-                        read_header = false;
-                    } else {
-                        getline(line_stream, word, '\t'); // skip row's name
-                        int i = 0;
-                        while (!line_stream.eof()) {
-                            getline(line_stream, word, '\t');
-                            narr.push(i, stod(word));  // MPFR?!?!?! I don't know
-                            ++i;
-                        }
-                    }
-                    line_stream.clear();
-                }
-            }
-            return narr;
-
-        } else {
-            cerr << "Matrix parsing error:" << endl << "\tinput file [" << filepath << "] not found" << endl;
-            return NamedVectorArray();
-        }
-
-        // read first line with names
-
-        // put first element from each row to column names
-
-        // remove cell at the intersection of the first row and the first column
-
-        ifs.close();
-//        return NamedMatrix(colnames, rownames, Matrix<prob_t, Dynamic, Dynamic, ColMajor>(values.data()));
-    }
-
-
-    NamedVectorArray read_matrix(const string& filepath) {}
-
-    NamedVectorArray read_matrix_list(const string& filepath) {}
-
-
     // ymir probs --repertoire twb.txt --model TRB --parser mitcr.json
     // ymir probs -r twb.txt -m TRB -p mitcr.json
 
@@ -291,9 +227,9 @@ namespace ymir {
                         _config.get("name", "Nameless model").asString() <<
                         "\n\t(" <<
                         _config.get("comment", "").asString() <<
-                        ")\n\tRecombination:\t" <<
+                        ")\n\t" <<
                         _config.get("recombination", "VJ").asString() <<
-                        "\n\t" <<
+                        "-recombination  |  " <<
                         (_config.get("hypermutations", false).asBool() ? "Hypermutations" : "No hypermutations") <<
                         endl;
                 return true;
@@ -338,22 +274,15 @@ namespace ymir {
          * \brief Parse files with event probabilities matrices and make ModelParameterVector.
          */
         bool parseEventProbabilities() {
-            if (_config.get("recombination", "no-recomb").asString() == "VJ") {
-                return this->parserVJEventProbabilities();
+            Json::Value pt = _config.get("probtables", "no-prob");
+            if (pt.size()) {
+                for (int i = 0; i < pt.size(); ++i) {
+
+                }
+            } else {
+                cerr << "No information about probability events in the model .json file found." << endl;
+                return false;
             }
-            return this->parserVDJEventProbabilities();
-        }
-
-
-        bool parserVJEventProbabilities() {
-            // for each vector check size of gene segments and remove trailing zeros
-            // or get a message when some column is shorter than length
-        }
-
-
-        bool parserVDJEventProbabilities() {
-            // for each vector check size of gene segments and remove trailing zeros
-            // or get a message when some column is shorter than length
         }
 
 

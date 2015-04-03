@@ -1399,14 +1399,31 @@ YMIR_TEST_START(test_maag_builder_replace)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_model_vj)
+YMIR_TEST_START(test_model_vj_file)
     AssemblingStatisticalModel model(TEST_DATA_FOLDER + "test_vj_model/");
+    YMIR_ASSERT(model.status())
 
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_model_vdj)
-    YMIR_ASSERT(false)
+YMIR_TEST_START(test_model_vdj_file)
+    AssemblingStatisticalModel model(TEST_DATA_FOLDER + "test_vdj_model/");
+    YMIR_ASSERT(model.status())
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_model_vj_maag)
+    AssemblingStatisticalModel model(TEST_DATA_FOLDER + "test_vj_model/");
+    YMIR_ASSERT(model.status())
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_model_vdj_maag)
+    AssemblingStatisticalModel model(TEST_DATA_FOLDER + "test_vdj_model/");
+    YMIR_ASSERT(model.status())
+
 YMIR_TEST_END
 
 
@@ -1475,8 +1492,10 @@ int main() {
     YMIR_TEST(test_maag_builder_replace(), "MAAG Builder replace event probabilities")
 
     // Tests for assembling statistical model (ASM) reading / writing files.
-    YMIR_TEST(test_model_vj(), "VJ Model testing")
-    YMIR_TEST(test_model_vdj(), "VDJ Model testing")
+    YMIR_TEST(test_model_vj_file(), "VJ Model constructing from a file")
+    YMIR_TEST(test_model_vdj_file(), "VDJ Model constructing from a file")
+    YMIR_TEST(test_model_vj_maag(), "VJ Model creating MAAGs")
+    YMIR_TEST(test_model_vdj_maag(), "VDJ Model creating MAAGs")
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.
 

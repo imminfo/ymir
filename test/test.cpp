@@ -1401,6 +1401,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_model_vj)
     AssemblingStatisticalModel model(TEST_DATA_FOLDER + "test_vj_model/");
+
 YMIR_TEST_END
 
 

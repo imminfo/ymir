@@ -119,64 +119,18 @@ namespace ymir {
 
 
     /**
-     * \struct NamedVectoArray
-     */
-    struct NamedVectorArray {
-
-    public:
-
-        struct Vector {
-
-        public:
-
-            vector<prob_t> vec;
-            string name;
-
-            Vector(const string& name_) {
-                name = name_;
-                vec.clear();
-                vec.reserve(10);
-            }
-        };
-
-        NamedVectorArray() {
-            cols.clear();
-            cols.reserve(10);
-        }
-
-        void addColumn(const string& name) {
-            cols.push_back(name);
-            map[name] = cols.size() - 1;
-        }
-
-        Vector& operator[](const string& name) {
-            return cols[map[name]];
-        }
-
-        Vector& operator[](int index) {
-            return cols[index];
-        }
-
-        void push(int index, prob_t value) {
-            cols[index].vec.push_back(value);
-        }
-
-        string getName(int index) const {
-            return cols[index].name;
-        }
-
-
-        vector<Vector> cols;
-        unordered_map<string, int> map;
-    };
-
-
-    /**
      * \enum MAAG_COMPUTE_PROB_ACTION
      */
     enum MAAG_COMPUTE_PROB_ACTION {
         MAX_PROBABILITY,
         SUM_PROBABILITY
+    };
+
+
+    enum GENE_SEGMENTS {
+        VARIABLE,
+        JOINING,
+        DIVERSITY
     };
 }
 

@@ -25,6 +25,7 @@
 #define _ASSEMBLINGSTATISTICALMODEL_H_
 
 
+#include "textdata.h"
 #include "maagbuilder.h"
 #include "repertoire.h"
 #include "genesegment.h"
@@ -42,7 +43,7 @@ namespace ymir {
     *
     * \return New struct with matrix.
     */
-    NamedVectorArray read_matrix(const string& filepath) {
+    NamedVectorArray read_vector_list(const string& filepath) {
 
         ifstream ifs;
         ifs.open(filepath);
@@ -81,8 +82,6 @@ namespace ymir {
             return NamedVectorArray();
         }
 
-
-
         // read first line with names
 
         // put first element from each row to column names
@@ -92,6 +91,11 @@ namespace ymir {
         ifs.close();
 //        return NamedMatrix(colnames, rownames, Matrix<prob_t, Dynamic, Dynamic, ColMajor>(values.data()));
     }
+
+
+    NamedVectorArray read_matrix(const string& filepath) {}
+
+    NamedVectorArray read_matrix_list(const string& filepath) {}
 
 
     // ymir probs --repertoire twb.txt --model TRB --parser mitcr.json
@@ -131,21 +135,13 @@ namespace ymir {
         /**
         *
         */
-        AssemblingStatisticalModel(const string& folderpath) {
+        AssemblingStatisticalModel(const string& folderpath) : _model_path(folderpath + "/") {
             _status = false;
             _genes = nullptr;
             _param_vec = nullptr;
 
             _builder = nullptr;
             _generator = nullptr;
-
-//            _status = this->parseModelConfig(folderpath + "/model.json");
-//            if (_status) {
-//                _status = this->parseGeneSegments();
-//                if (_status) {
-//                    _status = this->parseEventProbabilities();
-//                }
-//            }
 
             _status = this->parseModelConfig(folderpath + "/model.json")
                       && this->parseGeneSegments()
@@ -269,6 +265,7 @@ namespace ymir {
         bool _status, _verbose;
 
         Json::Value _config;
+        string _model_path;
         VDJRecombinationGenes *_genes;
         ModelParameterVector *_param_vec;
 
@@ -285,17 +282,17 @@ namespace ymir {
         /**
          * \brief Parse JSON file with model parameters.
          */
-        virtual bool parseModelConfig(const string& jsonpath) {
+        bool parseModelConfig(const string& jsonpath) {
             ifstream ifs;
             ifs.open(jsonpath);
             if (ifs.is_open()) {
                 ifs >> _config;
                 cout << "Statistical assembling model:\n\t" <<
                         _config.get("name", "Nameless model").asString() <<
-                        "\n\t" <<
+                        "\n\t(" <<
                         _config.get("comment", "").asString() <<
-                        "\n\tRecombination:\t" <<
-                        _config.get("recombination", "no-recomb").asString() <<
+                        ")\n\tRecombination:\t" <<
+                        _config.get("recombination", "VJ").asString() <<
                         "\n\t" <<
                         (_config.get("hypermutations", false).asBool() ? "Hypermutations" : "No hypermutations") <<
                         endl;
@@ -309,27 +306,28 @@ namespace ymir {
         /**
          * \brief Parse gene segment JSON files and tables.
          */
-        virtual bool parseGeneSegments() {
-            cout << (int) ( _config.get("segments", Json::Value("")).get("variable", Json::Value("")).size()) << endl;
-
+        bool parseGeneSegments() {
             if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
                 cerr << "Assembling statistical model error:" << endl << "\t V(ariable) gene segments file not found" << endl;
                 return false;
             }
-            string v_path = _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
+            string v_path = _model_path + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
+
 
             if (_config.get("segments", Json::Value("")).get("joining", Json::Value("")).size() == 0) {
                 cerr << "Assembling statistical model error:" << endl << "\t J(oining) gene segments file not found" << endl;
                 return false;
             }
-            string j_path = _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
+            string j_path = _model_path + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
 
             bool vok, jok, dok = true;
             if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
                 _genes = new VDJRecombinationGenes("VJ.V", v_path, "VJ.J", j_path, &vok, &jok);
+                /* add P nucleotides */
             } else {
-                string d_path = _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
+                string d_path = _model_path + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
                 _genes = new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok);
+                /* add P nucleotides */
             }
 
             return vok && jok && dok;
@@ -339,21 +337,24 @@ namespace ymir {
         /**
          * \brief Parse files with event probabilities matrices and make ModelParameterVector.
          */
-        virtual bool parseEventProbabilities() {
-            // for each vector check size of gene segments and remove trailing zeros
-            // or get a message when some column is shorter than length
-
-            cerr << "Some problems here" << endl;
+        bool parseEventProbabilities() {
+            if (_config.get("recombination", "no-recomb").asString() == "VJ") {
+                return this->parserVJEventProbabilities();
+            }
+            return this->parserVDJEventProbabilities();
         }
 
 
-        // resize deletions vectors to gene segment length
-        void removeTrailingZeros() const {}
+        bool parserVJEventProbabilities() {
+            // for each vector check size of gene segments and remove trailing zeros
+            // or get a message when some column is shorter than length
+        }
 
 
-        // grow deletions vectors (fill with zeros added rows) so
-        // all vectors will be of same length
-        void addTrailingZeros() const {}
+        bool parserVDJEventProbabilities() {
+            // for each vector check size of gene segments and remove trailing zeros
+            // or get a message when some column is shorter than length
+        }
 
 
         /**

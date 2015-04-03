@@ -25,21 +25,21 @@
     "v.del": {
       "file": "p.v.del.txt",
       "laplace": 0,
-      "type": "matrix",
+      "type": "vector.list",
       "seg.depend": true,
       "skip.first.column": true
     },
     "j.del": {
       "file": "p.j.del.txt",
       "laplace": 0,
-      "type": "matrix",
+      "type": "vector.list",
       "seg.depend": true,
       "skip.first.column": true
     },
     "ins.len": {
       "file": "p.ins.len.txt",
       "laplace": 0,
-      "type": "matrix",
+      "type": "vector.list",
       "seg.depend": false,
       "skip.first.column": true
     },

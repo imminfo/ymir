@@ -1399,6 +1399,16 @@ YMIR_TEST_START(test_maag_builder_replace)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_model_vj)
+    AssemblingStatisticalModel model(TEST_DATA_FOLDER + "test_vj_model/");
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_model_vdj)
+    YMIR_ASSERT(false)
+YMIR_TEST_END
+
+
 struct TestInfo {
     string test_name;
     vector<string> failed_cases;
@@ -1464,6 +1474,8 @@ int main() {
     YMIR_TEST(test_maag_builder_replace(), "MAAG Builder replace event probabilities")
 
     // Tests for assembling statistical model (ASM) reading / writing files.
+    YMIR_TEST(test_model_vj(), "VJ Model testing")
+    YMIR_TEST(test_model_vdj(), "VDJ Model testing")
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.
 

@@ -51,7 +51,6 @@ namespace ymir {
             NamedVectorArray narr;
             stringstream line_stream;
             string line, word;
-            int col = 0;
             bool read_header = true;
             while (!ifs.eof()) {
                 getline(ifs, line);
@@ -71,11 +70,12 @@ namespace ymir {
                             narr.push(i, stod(word));  // MPFR?!?!?! I don't know
                             ++i;
                         }
-                        ++col;
                     }
                     line_stream.clear();
                 }
             }
+            return narr;
+
         } else {
             cerr << "Matrix parsing error:" << endl << "\tinput file [" << filepath << "] not found" << endl;
             return NamedVectorArray();
@@ -310,24 +310,25 @@ namespace ymir {
          * \brief Parse gene segment JSON files and tables.
          */
         virtual bool parseGeneSegments() {
-            string v_path = _config.get("segments", "genes").get("variable", "").asString(),
-                   j_path = _config.get("segments", "genes").get("joining", "").asString(),
-                   d_path = _config.get("segments", "genes").get("diversity", "").asString();
+            cout << (int) ( _config.get("segments", Json::Value("")).get("variable", Json::Value("")).size()) << endl;
 
-            if (v_path == "") {
+            if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
                 cerr << "Assembling statistical model error:" << endl << "\t V(ariable) gene segments file not found" << endl;
                 return false;
             }
+            string v_path = _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
 
-            if (j_path == "") {
+            if (_config.get("segments", Json::Value("")).get("joining", Json::Value("")).size() == 0) {
                 cerr << "Assembling statistical model error:" << endl << "\t J(oining) gene segments file not found" << endl;
                 return false;
             }
+            string j_path = _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
 
             bool vok, jok, dok = true;
-            if (d_path == "") {
+            if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
                 _genes = new VDJRecombinationGenes("VJ.V", v_path, "VJ.J", j_path, &vok, &jok);
             } else {
+                string d_path = _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
                 _genes = new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok);
             }
 

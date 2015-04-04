@@ -14,10 +14,11 @@ namespace ymir {
     struct AbstractTDContainer {
     public:
 
-        AbstractTDContainer() {
+        AbstractTDContainer(bool skip_first_column, prob_t laplace) {
             _rownames.reserve(40);
             _colnames.reserve(40);
-            _laplace = 0;
+            _laplace = laplace;
+            _skip_first_column = skip_first_column;
         }
 
         virtual ~AbstractTDContainer() { }
@@ -29,7 +30,7 @@ namespace ymir {
         void add_column_name(const string& name) { _colnames.push_back(name); }
 
         const vector<string>& rownames() const { return _rownames; }
-        
+
         const vector<string>& colnames() const { return _colnames; }
 
         virtual void addRow(const vector<prob_t> vec) = 0;
@@ -41,6 +42,15 @@ namespace ymir {
         vector<string> _rownames;
         vector<string> _colnames;
         prob_t _laplace;
+        bool _skip_first_column;
+
+
+        AbstractTDContainer() {
+            _rownames.reserve(40);
+            _colnames.reserve(40);
+            _laplace = 0;
+            _skip_first_column = true;
+        }
 
     };
 
@@ -48,7 +58,7 @@ namespace ymir {
     struct TDVectorList : public AbstractTDContainer {
     public:
 
-        TDVectorList() : AbstractTDContainer() { }
+        TDVectorList(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(skip_first_column, laplace) { }
 
         virtual ~TDVectorList() { }
 
@@ -62,13 +72,14 @@ namespace ymir {
 
     protected:
 
+        TDVectorList() : AbstractTDContainer() {}
     };
 
 
     struct TDMatrix : public AbstractTDContainer  {
     public:
 
-        TDMatrix() : AbstractTDContainer()  { }
+        TDMatrix(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(skip_first_column, laplace)  { }
 
         virtual ~TDMatrix() { }
 
@@ -82,6 +93,8 @@ namespace ymir {
 
     protected:
 
+        TDMatrix() : AbstractTDContainer() {}
+
     };
 
 
@@ -89,7 +102,7 @@ namespace ymir {
     public:
 
 
-        TDMatrixList() : AbstractTDContainer()  { }
+        TDMatrixList(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(skip_first_column, laplace)  { }
 
         virtual ~TDMatrixList() { }
 
@@ -103,52 +116,32 @@ namespace ymir {
 
     protected:
 
+        TDMatrixList() : AbstractTDContainer() {}
+
     };
 
 
-    /**
-     * \struct NamedVectoArray
-     */
-    struct NamedVectorArray {
-
-    public:
-
-        struct Vector {
-
-        public:
-
-            vector<prob_t> vec;
-            string name;
-
-            Vector(const string& name_) {
-                name = name_;
-                vec.clear();
-                vec.reserve(10);
+    AbstractTDContainer* read_textdata(const string& filepath,
+                                       const string& filetype,
+                                       bool skip_first_column,
+                                       prob_t laplace) {
+        AbstractTDContainer* container;
+        if (filetype == "matrix") {
+            container = new TDMatrix(skip_first_column, laplace);
+        } else if (filetype == "vector.list") {
+            container = new TDVectorList(skip_first_column, laplace);
+        } else if (filetype == "matrix.list") {
+            container = new TDMatrixList(skip_first_column, laplace);
+        } else {
+            if (filetype == "") {
+                cerr << "No file type for [" << filepath << "]" << endl;
+            } else {
+                cerr << "Unregonised file type of [" << filepath << "]:\n\t" << filetype << endl;
             }
-        };
-
-        NamedVectorArray() {
-            cols.clear();
-            cols.reserve(10);
+            container = nullptr;
         }
-
-        void addColumn(const string& name) {
-            cols.push_back(name);
-            map[name] = cols.size() - 1;
-        }
-
-        Vector& operator[](const string& name) { return cols[map[name]]; }
-
-        Vector& operator[](int index) { return cols[index]; }
-
-        void push(int index, prob_t value) { cols[index].vec.push_back(value); }
-
-        string getName(int index) const { return cols[index].name; }
-
-
-        vector<Vector> cols;
-        unordered_map<string, int> map;
-    };
+        return container;
+    }
 
 
     /**
@@ -160,54 +153,54 @@ namespace ymir {
     *
     * \return New struct with matrix.
     */
-    NamedVectorArray read_vector_list(const string& filepath) {
-
-        ifstream ifs;
-        ifs.open(filepath);
-
-        if (ifs.is_open()) {
-            NamedVectorArray narr;
-            stringstream line_stream;
-            string line, word;
-            bool read_header = true;
-            while (!ifs.eof()) {
-                getline(ifs, line);
-                if (line[0] != '\n') {
-                    line_stream.str(line);
-                    if (read_header) {
-                        while (!line_stream.eof()) {
-                            getline(line_stream, word, '\t');
-                            narr.addColumn(word);
-                        }
-                        read_header = false;
-                    } else {
-                        getline(line_stream, word, '\t'); // skip row's name
-                        int i = 0;
-                        while (!line_stream.eof()) {
-                            getline(line_stream, word, '\t');
-                            narr.push(i, stod(word));  // MPFR?!?!?! I don't know
-                            ++i;
-                        }
-                    }
-                    line_stream.clear();
-                }
-            }
-            return narr;
-
-        } else {
-            cerr << "Matrix parsing error:" << endl << "\tinput file [" << filepath << "] not found" << endl;
-            return NamedVectorArray();
-        }
-
-        // read first line with names
-
-        // put first element from each row to column names
-
-        // remove cell at the intersection of the first row and the first column
-
-        ifs.close();
-//        return NamedMatrix(colnames, rownames, Matrix<prob_t, Dynamic, Dynamic, ColMajor>(values.data()));
-    }
+//    NamedVectorArray read_vector_list(const string& filepath) {
+//
+//        ifstream ifs;
+//        ifs.open(filepath);
+//
+//        if (ifs.is_open()) {
+//            NamedVectorArray narr;
+//            stringstream line_stream;
+//            string line, word;
+//            bool read_header = true;
+//            while (!ifs.eof()) {
+//                getline(ifs, line);
+//                if (line[0] != '\n') {
+//                    line_stream.str(line);
+//                    if (read_header) {
+//                        while (!line_stream.eof()) {
+//                            getline(line_stream, word, '\t');
+//                            narr.addColumn(word);
+//                        }
+//                        read_header = false;
+//                    } else {
+//                        getline(line_stream, word, '\t'); // skip row's name
+//                        int i = 0;
+//                        while (!line_stream.eof()) {
+//                            getline(line_stream, word, '\t');
+//                            narr.push(i, stod(word));  // MPFR?!?!?! I don't know
+//                            ++i;
+//                        }
+//                    }
+//                    line_stream.clear();
+//                }
+//            }
+//            return narr;
+//
+//        } else {
+//            cerr << "Matrix parsing error:" << endl << "\tinput file [" << filepath << "] not found" << endl;
+//            return NamedVectorArray();
+//        }
+//
+//        // read first line with names
+//
+//        // put first element from each row to column names
+//
+//        // remove cell at the intersection of the first row and the first column
+//
+//        ifs.close();
+////        return NamedMatrix(colnames, rownames, Matrix<prob_t, Dynamic, Dynamic, ColMajor>(values.data()));
+//    }
 
 
 }

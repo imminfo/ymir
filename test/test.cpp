@@ -1400,28 +1400,28 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_model_vj_file)
-    AssemblingStatisticalModel model(TEST_DATA_FOLDER + "test_vj_model/");
+    ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
     YMIR_ASSERT(model.status())
 
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_model_vdj_file)
-    AssemblingStatisticalModel model(TEST_DATA_FOLDER + "test_vdj_model/");
+    ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vdj_model/");
     YMIR_ASSERT(model.status())
 
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_model_vj_maag)
-    AssemblingStatisticalModel model(TEST_DATA_FOLDER + "test_vj_model/");
+    ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
     YMIR_ASSERT(model.status())
 
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_model_vdj_maag)
-    AssemblingStatisticalModel model(TEST_DATA_FOLDER + "test_vdj_model/");
+    ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vdj_model/");
     YMIR_ASSERT(model.status())
 
 YMIR_TEST_END

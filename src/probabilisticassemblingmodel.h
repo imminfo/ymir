@@ -62,16 +62,18 @@ namespace ymir {
     // i.e., inference w/ or w/o inference of segments usage
 
     /**
-    * \class AssemblingStatisticalModel
+    * \class ProbabilisticAssemblingModel
     */
-    class AssemblingStatisticalModel {
+    class ProbabilisticAssemblingModel {
 
     public:
 
         /**
         *
         */
-        AssemblingStatisticalModel(const string& folderpath) : _model_path(folderpath + "/") {
+        ProbabilisticAssemblingModel(const string& folderpath) : _model_path(folderpath + "/") {
+            _vj_recomb = false;
+
             _status = false;
             _genes = nullptr;
             _param_vec = nullptr;
@@ -96,7 +98,7 @@ namespace ymir {
         /**
         *
         */
-        virtual ~AssemblingStatisticalModel() {
+        virtual ~ProbabilisticAssemblingModel() {
             if (_genes) { delete _genes; }
             if (_param_vec) { delete _param_vec; }
             if (_builder) { delete _builder; }
@@ -201,6 +203,7 @@ namespace ymir {
         bool _status, _verbose;
 
         Json::Value _config;
+        bool _vj_recomb;
         string _model_path;
         VDJRecombinationGenes *_genes;
         ModelParameterVector *_param_vec;
@@ -212,7 +215,7 @@ namespace ymir {
         /**
          * \brief Private default constructor.
          */
-        AssemblingStatisticalModel() {}
+        ProbabilisticAssemblingModel() {}
 
 
         /**
@@ -223,7 +226,8 @@ namespace ymir {
             ifs.open(jsonpath);
             if (ifs.is_open()) {
                 ifs >> _config;
-                cout << "Statistical assembling model:\n\t" <<
+                _vj_recomb = _config.get("recombination", "VJ").asString() == "VJ";
+                cout << "Probabilistic assembling model:\n\t" <<
                         _config.get("name", "Nameless model").asString() <<
                         "\n\t(" <<
                         _config.get("comment", "").asString() <<
@@ -234,7 +238,7 @@ namespace ymir {
                         endl;
                 return true;
             }
-            cerr << "Assembling statistical model error:" << endl << "\t config .json file not found" << endl;
+            cerr << "Probabilistic assembling model error:" << endl << "\t config .json file not found at [" << jsonpath << "]" << endl;
             return false;
         }
 
@@ -244,14 +248,14 @@ namespace ymir {
          */
         bool parseGeneSegments() {
             if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
-                cerr << "Assembling statistical model error:" << endl << "\t V(ariable) gene segments file not found" << endl;
+                cerr << "Probabilistic assembling model error:" << endl << "\t V(ariable) gene segments file not found" << endl;
                 return false;
             }
             string v_path = _model_path + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
 
 
             if (_config.get("segments", Json::Value("")).get("joining", Json::Value("")).size() == 0) {
-                cerr << "Assembling statistical model error:" << endl << "\t J(oining) gene segments file not found" << endl;
+                cerr << "Probabilistic assembling model error:" << endl << "\t J(oining) gene segments file not found" << endl;
                 return false;
             }
             string j_path = _model_path + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
@@ -276,9 +280,56 @@ namespace ymir {
         bool parseEventProbabilities() {
             Json::Value pt = _config.get("probtables", "no-prob");
             if (pt.size()) {
-                for (int i = 0; i < pt.size(); ++i) {
+                AbstractTDContainer *container;
+                string element = "";
+                for (Json::ArrayIndex i = 0; i < pt.size(); ++i) {
+                    if (container) { delete container; }
 
+                    element = pt.getMemberNames()[i];
+                    container = read_textdata(pt[element]["file"].asString(),
+                                  pt[element]["type"].asString(),
+                                  pt[element]["skip.first.column"].asBool(),
+                                  pt[element]["laplace"].asDouble());
+
+                    if (container) {
+                        if (_vj_recomb) {
+                            if (element == "v.j") {
+
+                            } else if (element == "v.del") {
+
+                            } else if (element == "j.del") {
+
+                            } else if (element == "ins.len") {
+
+                            } else if (element == "ins.nucl") {
+
+                            } else {
+                                cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl;
+                            }
+                        } else {
+                            if (element == "v") {
+
+                            } else if (element == "j.d") {
+
+                            } else if (element == "v.del") {
+
+                            } else if (element == "j.del") {
+
+                            } else if (element == "d.del") {
+
+                            } else if (element == "ins.len") {
+
+                            } else if (element == "ins.nucl") {
+
+                            } else {
+                                cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl;
+                            }
+                        }
+                    }
                 }
+
+                if (container) { delete container; }
+
             } else {
                 cerr << "No information about probability events in the model .json file found." << endl;
                 return false;

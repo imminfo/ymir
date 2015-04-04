@@ -25,7 +25,7 @@
 #define _STATISTICALINFERENCEALGORITHM_H
 
 
-#include "assemblingstatisticalmodel.h"
+#include "probabilisticassemblingmodel.h"
 
 #include "unordered_map"
 
@@ -42,7 +42,7 @@ namespace ymir {
     *
     * \brief Interface for algorithms for statistical inference of assembling model parameters.
     */
-    class StatisticalInferenceAlgorithm : protected AssemblingStatisticalModel {
+    class StatisticalInferenceAlgorithm : protected ProbabilisticAssemblingModel {
     public:
 
         struct AlgorithmParameters {
@@ -68,7 +68,7 @@ namespace ymir {
 
 
         virtual bool statisticalInference(const ClonesetView& repertoire,
-                AssemblingStatisticalModel& model,
+                ProbabilisticAssemblingModel & model,
                 const AlgorithmParameters& algo_param = AlgorithmParameters()) const =0;
 
 
@@ -88,7 +88,7 @@ namespace ymir {
     public:
 
         virtual bool statisticalInference(const ClonesetView& repertoire,
-                AssemblingStatisticalModel& model,
+                ProbabilisticAssemblingModel & model,
                 const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10)) const {
 
         }
@@ -104,7 +104,7 @@ namespace ymir {
     public:
 
         virtual bool statisticalInference(const ClonesetView& repertoire,
-                AssemblingStatisticalModel& model,
+                ProbabilisticAssemblingModel & model,
                 const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10).set("step.size", 2000)) const {
 
         }

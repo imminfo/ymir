@@ -26,21 +26,18 @@
       "file": "p.v.del.txt",
       "laplace": 0,
       "type": "vector.list",
-      "seg.depend": true,
       "skip.first.column": true
     },
     "j.del": {
       "file": "p.j.del.txt",
       "laplace": 0,
       "type": "vector.list",
-      "seg.depend": true,
       "skip.first.column": true
     },
     "ins.len": {
       "file": "p.ins.len.txt",
       "laplace": 0,
       "type": "vector.list",
-      "seg.depend": false,
       "skip.first.column": true
     },
     "ins.nucl": {
@@ -48,6 +45,9 @@
       "laplace": 0,
       "type": "matrix",
       "skip.first.column": true
+    },
+    "random.element": {
+      "file": "nofile"
     }
   }
 }

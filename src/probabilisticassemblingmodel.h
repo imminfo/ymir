@@ -96,8 +96,8 @@ namespace ymir {
 
 
         /**
-        *
-        */
+         *
+         */
         virtual ~ProbabilisticAssemblingModel() {
             if (_genes) { delete _genes; }
             if (_param_vec) { delete _param_vec; }
@@ -259,6 +259,7 @@ namespace ymir {
                 return false;
             }
             string j_path = _model_path + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
+
 
             bool vok, jok, dok = true;
             if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {

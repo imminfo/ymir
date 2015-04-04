@@ -1,4 +1,4 @@
-add_executable (Ymir-benchmark benchmark.cpp)
+add_executable (Benchmark benchmark.cpp)
 
 include_directories(../src)
 include_directories(../include)

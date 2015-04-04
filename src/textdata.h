@@ -121,6 +121,11 @@ namespace ymir {
     };
 
 
+    /**
+     * \function read_textdata
+     *
+     * \brief Read to the container data from the file with event probabilities.
+     */
     AbstractTDContainer* read_textdata(const string& filepath,
                                        const string& filetype,
                                        bool skip_first_column,

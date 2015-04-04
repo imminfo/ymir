@@ -1,4 +1,4 @@
-add_executable (Ymir-test test.cpp)
+add_executable (Test test.cpp)
 
 include_directories(../src)
 include_directories(../include)

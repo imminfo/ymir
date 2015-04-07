@@ -37,6 +37,36 @@ using namespace std;
 
 namespace ymir {
 
+
+    enum MODEL_VECTOR_TYPE {
+        PLAIN_VECTOR,
+        VJ_RECOMB,
+        VDJ_RECOMB
+    };
+
+
+    enum EVENT_CLASS {
+        NULL_EVENT = 0,
+
+        VJ_VAR_JOI_GEN = 1,
+        VJ_VAR_DEL = 2,
+        VJ_JOI_DEL = 3,
+        VJ_VAR_JOI_INS_LEN = 4,
+        VJ_VAR_JOI_INS_NUC = 5,
+        VJ_HYPMUT = 6,
+
+        VDJ_VAR_GENE = 1,
+        VDJ_JOI_DIV_GENE = 2,
+        VDJ_VAR_DEL = 3,
+        VDJ_JOI_DEL = 4,
+        VDJ_DIV_DEL = 5,
+        VDJ_VAR_DIV_INS_LEN = 6,
+        VDJ_DIV_JOI_INS_LEN = 7,
+        VDJ_VAR_DIV_INS_NUC = 8,
+        VDJ_DIV_JOI_INS_NUC = 9,
+        VDJ_HYPMUT = 10
+    };
+
     /**
     * \class ModelParameterVector
     *
@@ -91,22 +121,22 @@ namespace ymir {
                 _vec.push_back(param_vec[i]);
             }
 
-            _edges.reserve(lens_vec.size() + 2);
+            _edges.reserve(lens_vec.size() + 4);
 
             _edges.push_back(0);
             _edges.push_back(1);
-            eventind_t start_i = 0;
+            eventind_t shift_i = 1;
             if (v_gene_num) {
                 _v_gene_num = v_gene_num;
                 // insert VJ probabilities
                 _edges.push_back(_edges[1] + lens_vec[0]);
                 // insert null event family for consistency with VDJ recombination indices
                 _edges.push_back(_edges[1] + lens_vec[0] + 1);
-                start_i = 2;
+                shift_i = 2;
             }
 
-            for (eventind_t i = start_i; i < lens_vec.size(); ++i) {
-                _edges.push_back(_edges[i+1] + lens_vec[i]);
+            for (eventind_t i = 0; i < lens_vec.size(); ++i) {
+                _edges.push_back(_edges[i + shift_i] + lens_vec[i]);
             }
             _edges.push_back(_vec.size());
 
@@ -117,9 +147,9 @@ namespace ymir {
                 if (v_gene_num) {
                     _laplace.push_back(laplace_vec[0]);
                     _laplace.push_back(0);
-                    --start_i;
+//                    --start_i;
                 }
-                for (eventind_t i = start_i; i < laplace_vec.size(); ++i) {
+                for (eventind_t i = 0; i < laplace_vec.size(); ++i) {
                     _laplace.push_back(laplace_vec[i]);
                 }
             } else {
@@ -232,7 +262,7 @@ namespace ymir {
 
 
         inline eventind_t index_VJ_genes(segindex_t v_index, segindex_t j_index) const {
-            return _edges[1] + v_index - 1;
+            return _edges[1] + (v_index - 1) * _v_gene_num + (j_index - 1);
         }
         prob_t prob_VJ_genes(segindex_t v_index, segindex_t j_index) const {
             return _vec[index_VJ_genes(v_index, j_index)];
@@ -325,6 +355,15 @@ namespace ymir {
         ModelParameterVector() {}
 
 
+        /*
+         vector<eventind_t> _event_families; - or just edges
+
+         void initVJ() {}
+         void initVDJ() {}
+         void initPlain() {}
+
+
+        */
     };
 }
 

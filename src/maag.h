@@ -24,7 +24,7 @@
 #ifndef _MAAG_H_
 #define _MAAG_H_
 
-#define VJ_CHAIN_SIZE 5
+#define VJ_CHAIN_SIZE 4
 #define VDJ_CHAIN_SIZE 7
 
 
@@ -106,11 +106,11 @@ namespace ymir {
         numeric fullProbability(eventind_t v_index, eventind_t j_index) const {
             if (this->is_vj()) {
                 // P(Vi) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji) * P(Ji)
-                return (_chain[0][v_index] *        // P(Vi)
+                return (_chain[0][0](v_index, j_index) *  // P(Vi & Ji)
                         _chain[1][v_index] *        // P(#dels | Vi)
                         _chain[2][0] *              // P(V-J insertion seq)
-                        _chain[3][j_index] *        // P(#dels | Ji)
-                        _chain[4][j_index])(0, 0);  // P(Ji)
+                        _chain[3][j_index])         // P(#dels | Ji)
+                        .sum();
             } else {
                 return 0;
             }

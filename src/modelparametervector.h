@@ -79,9 +79,10 @@ namespace ymir {
         * \param do_normalise Boolean, do normalisation of event families after initialising?
         */
         ModelParameterVector(const vector<prob_t>& param_vec,
-                const vector<eventind_t>& lens_vec,
-                const vector<prob_t>& laplace_vec = vector<prob_t>(),
-                bool do_normalise = true)
+                             const vector<eventind_t>& lens_vec,
+                             segindex_t v_gene_num,
+                             const vector<prob_t>& laplace_vec = vector<prob_t>(),
+                             bool do_normalise = true)
         {
             _vec = vector<prob_t>();
             _vec.reserve(param_vec.size() + 1);
@@ -94,7 +95,17 @@ namespace ymir {
 
             _edges.push_back(0);
             _edges.push_back(1);
-            for (eventind_t i = 0; i < lens_vec.size(); ++i) {
+            eventind_t start_i = 0;
+            if (v_gene_num) {
+                _v_gene_num = v_gene_num;
+                // insert VJ probabilities
+                _edges.push_back(_edges[1] + lens_vec[0]);
+                // insert null event family for consistency with VDJ recombination indices
+                _edges.push_back(_edges[1] + lens_vec[0] + 1);
+                start_i = 2;
+            }
+
+            for (eventind_t i = start_i; i < lens_vec.size(); ++i) {
                 _edges.push_back(_edges[i+1] + lens_vec[i]);
             }
             _edges.push_back(_vec.size());
@@ -103,7 +114,12 @@ namespace ymir {
             if (laplace_vec.size()) {
                 _laplace.reserve(laplace_vec.size());
                 _laplace.push_back(0);
-                for (eventind_t i = 0; i < _edges.size() - 1; ++i) {
+                if (v_gene_num) {
+                    _laplace.push_back(laplace_vec[0]);
+                    _laplace.push_back(0);
+                    --start_i;
+                }
+                for (eventind_t i = start_i; i < laplace_vec.size(); ++i) {
                     _laplace.push_back(laplace_vec[i]);
                 }
             } else {
@@ -129,11 +145,11 @@ namespace ymir {
         */
         ModelParameterVector(const vector<prob_t>& param_vec,
                              const vector<eventind_t>& lens_vec,
-                             vector<seq_len_t> d_gene_max_dels,
-                             vector<seq_len_t> d_gene_min_len = vector<seq_len_t>(),
+                             const vector<seq_len_t>& d_gene_max_dels,
+                             const vector<seq_len_t>& d_gene_min_len = vector<seq_len_t>(),
                              const vector<prob_t>& laplace_vec = vector<prob_t>(),
                              bool do_normalise = true)
-                : ModelParameterVector(param_vec, lens_vec, laplace_vec, do_normalise)
+                : ModelParameterVector(param_vec, lens_vec, 0, laplace_vec, do_normalise)
         {
 
             _d_gene_num = d_gene_max_dels.size();
@@ -215,8 +231,12 @@ namespace ymir {
         prob_t prob_V_gene(segindex_t v_index) const { return _vec[index_V_gene(v_index)]; }  // Hmmm...
 
 
-        inline eventind_t index_J_gene(segindex_t j_index) const { return _edges[2] + j_index - 1; }
-        prob_t prob_J_gene(segindex_t j_index) const { return _vec[index_J_gene(j_index)]; }
+        inline eventind_t index_VJ_genes(segindex_t v_index, segindex_t j_index) const {
+            return _edges[1] + v_index - 1;
+        }
+        prob_t prob_VJ_genes(segindex_t v_index, segindex_t j_index) const {
+            return _vec[index_VJ_genes(v_index, j_index)];
+        }  // Hmmm...
 
 
         inline eventind_t index_JD_genes(segindex_t j_index, segindex_t d_index) const { return _edges[2] + (j_index - 1) * _d_gene_num + (d_index - 1); }
@@ -294,7 +314,7 @@ namespace ymir {
         vector<prob_t> _vec;
         vector<eventind_t> _edges;  /** Vector with starting indices for each event family. */
         vector<prob_t> _laplace;
-        segindex_t _d_gene_num;
+        segindex_t _d_gene_num, _v_gene_num;
         vector<seq_len_t> _d_gene_max_dels;
         vector<seq_len_t> _d_gene_min_len;
 
@@ -303,6 +323,7 @@ namespace ymir {
         * \brief Private default constructor.
         */
         ModelParameterVector() {}
+
 
     };
 }

@@ -67,7 +67,7 @@ YMIR_TEST_START(test_model_param_vec)
     v1.push_back(1);
     v2.push_back(2);
 
-    ModelParameterVector mvec(v1, v2);
+    ModelParameterVector mvec(v1, v2, 0);
 
     YMIR_ASSERT(mvec[0] == 0)
     YMIR_ASSERT(mvec[1] == .5)
@@ -101,7 +101,7 @@ YMIR_TEST_START(test_model_param_vec_laplace)
     v2.push_back(2);
     v3.push_back(0);
 
-    ModelParameterVector mvec(v1, v2, v3);
+    ModelParameterVector mvec(v1, v2, 0, v3);
     YMIR_ASSERT(mvec[0] == 0)
     YMIR_ASSERT(mvec[1] == .5)
     YMIR_ASSERT(mvec[2] == .25)
@@ -134,7 +134,7 @@ YMIR_TEST_START(test_model_param_vec_event_family)
     v2.push_back(2);
     v3.push_back(0);
 
-    ModelParameterVector mvec(v1, v2, v3);
+    ModelParameterVector mvec(v1, v2, 0, v3);
     YMIR_ASSERT(mvec.getEventProbability(0, 0) == 0)
     YMIR_ASSERT(mvec.getEventProbability(1, 0) == .5)
     YMIR_ASSERT(mvec.getEventProbability(1, 1) == .25)
@@ -155,18 +155,11 @@ YMIR_TEST_START(test_model_param_vec_vj)
     vector<prob_t> v1;
     vector<eventind_t> v2;
 
-    // V
-    v1.push_back(.5);
-    v1.push_back(.25);
-    v1.push_back(.25);
-
-    v2.push_back(3);
-
-    // J
-    v1.push_back(.1);
-    v1.push_back(.9);
-
-    v2.push_back(2);
+    // V-J
+    v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
+    v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
+    v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
+    v2.push_back(9);
 
     // V del
     v1.push_back(.75);
@@ -241,15 +234,12 @@ YMIR_TEST_START(test_model_param_vec_vj)
 
     v2.push_back(4);
 
-    ModelParameterVector mvec(v1, v2);
+    ModelParameterVector mvec(v1, v2, 3);
 
     YMIR_ASSERT(mvec[0] == 0)
 
-    YMIR_ASSERT(mvec.prob_V_gene(1) == .5)
-    YMIR_ASSERT(mvec.prob_V_gene(3) == .25)
-
-    YMIR_ASSERT(mvec.prob_J_gene(1) == .1)
-    YMIR_ASSERT(mvec.prob_J_gene(2) == .9)
+    YMIR_ASSERT(mvec.prob_VJ_genes(1, 2) == .025)
+    YMIR_ASSERT(mvec.prob_VJ_genes(3, 1) == .075)
 
     YMIR_ASSERT(mvec.prob_V_del(1, 0) == .75)
     YMIR_ASSERT(mvec.prob_V_del(1, 1) == .25)
@@ -1000,13 +990,11 @@ YMIR_TEST_START(test_maag_vj)
     vector<prob_t> v1;
     vector<eventind_t> v2;
 
-    // V
-    v1.push_back(.5); v1.push_back(.25); v1.push_back(.25);
-    v2.push_back(3);
-
-    // J
-    v1.push_back(.1); v1.push_back(.9);
-    v2.push_back(2);
+    // V-J
+    v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
+    v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
+    v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
+    v2.push_back(9);
 
     // V del
     v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
@@ -1054,7 +1042,7 @@ YMIR_TEST_START(test_maag_vj)
     v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
     v2.push_back(4);
 
-    ModelParameterVector mvec(v1, v2);
+    ModelParameterVector mvec(v1, v2, 3);
 
     vector<string> alvec1;
     vector<string> seqvec1;
@@ -1094,8 +1082,10 @@ YMIR_TEST_START(test_maag_vj)
 
     MAAG maag = maag_builder.build(clonotype, true);
 
-    YMIR_ASSERT(maag.event_index(0, 0, 0, 0) == mvec.index_V_gene(1))
-    YMIR_ASSERT(maag.event_index(0, 1, 0, 0) == mvec.index_V_gene(3))
+    YMIR_ASSERT(maag.event_index(0, 0, 0, 0) == mvec.index_VJ_genes(1, 1))
+    YMIR_ASSERT(maag.event_index(0, 0, 0, 1) == mvec.index_VJ_genes(1, 2))
+    YMIR_ASSERT(maag.event_index(0, 0, 1, 0) == mvec.index_VJ_genes(3, 1))
+    YMIR_ASSERT(maag.event_index(0, 0, 1, 2) == mvec.index_VJ_genes(3, 3))
 
     YMIR_ASSERT(maag.event_index(1, 0, 0, 0) == mvec.index_V_del(1, 4))
     YMIR_ASSERT(maag.event_index(1, 0, 0, 1) == mvec.index_V_del(1, 3))
@@ -1127,10 +1117,10 @@ YMIR_TEST_START(test_maag_vj)
     YMIR_ASSERT(maag.event_index(3, 2, 3, 0) == mvec.index_J_del(3, 4))
     YMIR_ASSERT(maag.event_index(3, 2, 4, 0) == mvec.index_J_del(3, 5))
     YMIR_ASSERT(maag.event_index(3, 2, 5, 0) == mvec.index_J_del(3, 6))
-
-    YMIR_ASSERT(maag.event_index(4, 0, 0, 0) == mvec.index_J_gene(1))
-    YMIR_ASSERT(maag.event_index(4, 1, 0, 0) == mvec.index_J_gene(2))
-    YMIR_ASSERT(maag.event_index(4, 2, 0, 0) == mvec.index_J_gene(3))
+//
+//    YMIR_ASSERT(maag.event_index(4, 0, 0, 0) == mvec.index_J_gene(1))
+//    YMIR_ASSERT(maag.event_index(4, 1, 0, 0) == mvec.index_J_gene(2))
+//    YMIR_ASSERT(maag.event_index(4, 2, 0, 0) == mvec.index_J_gene(3))
 YMIR_TEST_END
 
 
@@ -1400,8 +1390,12 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_model_vj_file)
+    ProbabilisticAssemblingModel model1(TEST_DATA_FOLDER + "randomfile");
+    YMIR_ASSERT(!model1.status())
+
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
     YMIR_ASSERT(model.status())
+
 
 YMIR_TEST_END
 

@@ -28,7 +28,6 @@
 
 #define VARIABLE_GENES_MATRIX_INDEX 0
 #define VARIABLE_DELETIONS_MATRIX_INDEX 1
-#define JOINING_GENES_VJ_MATRIX_INDEX 4
 #define JOINING_DELETIONS_VJ_MATRIX_INDEX 3
 #define JOINING_GENES_VDJ_MATRIX_INDEX 6
 #define JOINING_DELETIONS_VDJ_MATRIX_INDEX 5
@@ -189,7 +188,7 @@ namespace ymir {
         {
             // find max V alignment
             seq_len_t len = 0;
-            segindex_t v_num = clonotype.nVar();
+            segindex_t v_num = clonotype.nVar(), j_num = clonotype.nJoi();
             for (int v_index = 0; v_index < v_num; ++v_index) {
                 if (clonotype.getVend(v_index) > len) {
                     len = clonotype.getVend(v_index);
@@ -200,18 +199,37 @@ namespace ymir {
             seq_len_t v_len = 0;
             segindex_t v_gene = 0;
             seq_len_t v_end = 0;
-            probs.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
+
             probs.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             if (full_build) {
-                events.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
                 events.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
+            }
+
+            if (clonotype.is_vj()) {
+                probs.initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
+                if (full_build) {
+                    events.initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
+                }
+            } else {
+                probs.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
+                if (full_build) {
+                    events.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
+                }
             }
             for (segindex_t v_index = 0; v_index < v_num; ++v_index) {
                 v_gene = clonotype.getVar(v_index);
                 v_len = _genes->V()[v_gene].sequence.size();
                 v_end = clonotype.getVend(v_index);
 
-                probs(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->prob_V_gene(v_gene); // probability of choosing this V gene segment
+                if (clonotype.is_vj()) {
+                    // probability of choosing this V gene segment
+                    for (segindex_t j_index = 0; j_index < j_num; ++j_num) {
+                        probs(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index) = _param_vec->prob_VJ_genes(v_gene, clonotype.getJoi(j_index));
+                    }
+                } else {
+                    probs(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->prob_V_gene(v_gene); // probability of choosing this V gene segment
+                }
+
                 for (seq_len_t i = 0; i < len + 1; ++i) {
                     if (v_len - i >= 0 && i <= v_end) {
                         probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->prob_V_del(v_gene, v_len - i); // probability of deletions
@@ -223,7 +241,15 @@ namespace ymir {
                 }
 
                 if (full_build) {
-                    events(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->index_V_gene(v_gene);
+                    if (clonotype.is_vj()) {
+                        // probability of choosing this V gene segment
+                        for (segindex_t j_index = 0; j_index < j_num; ++j_num) {
+                            events(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index) = _param_vec->index_VJ_genes(v_gene, clonotype.getJoi(j_index));
+                        }
+                    } else {
+                        events(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->index_V_gene(v_gene);
+                    }
+
                     for (seq_len_t i = 0; i < len + 1; ++i) {
                         if (v_len - i >= 0 && i <= v_end) {
                             events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->index_V_del(v_gene, v_len - i);
@@ -255,7 +281,11 @@ namespace ymir {
                 vector<seq_len_t> &seq_poses,
                 bool full_build) const
         {
-            int J_index_dels = probs.chainSize() - 2, J_index_genes = probs.chainSize() - 1;
+            int J_index_dels = JOINING_DELETIONS_VJ_MATRIX_INDEX,
+                    J_index_genes = JOINING_GENES_VDJ_MATRIX_INDEX;
+            if (clonotype.is_vdj()) {
+                J_index_dels = JOINING_DELETIONS_VDJ_MATRIX_INDEX;
+            }
 
             // find max J alignment
             segindex_t j_num = clonotype.nJoi();
@@ -275,12 +305,7 @@ namespace ymir {
             }
 
             // add J or J-D gene nodes
-            if (clonotype.is_vj()) {
-                probs.initNode(J_index_genes, j_num, 1, 1);
-                if (full_build) {
-                    events.initNode(J_index_genes, j_num, 1, 1);
-                }
-            } else {
+            if (clonotype.is_vdj()) {
                 probs.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
                 if (full_build) {
                     events.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
@@ -297,9 +322,7 @@ namespace ymir {
                 j_len = _genes->J()[j_gene].sequence.size();
                 j_start = clonotype.getJstart(j_index);
 
-                if (clonotype.is_vj()) {
-                    probs(J_index_genes, j_index, 0, 0) = _param_vec->prob_J_gene(j_gene); // probability of choosing this J gene segment
-                } else {
+                if (clonotype.is_vdj()) {
                     for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                         probs(J_index_genes, 0, j_index, d_index) =
                                 _param_vec->prob_JD_genes(j_gene, clonotype.getDiv(d_index)); // probability of choosing this J gene segment with other D genes
@@ -316,9 +339,7 @@ namespace ymir {
                 }
 
                 if (full_build) {
-                    if (clonotype.is_vj()) {
-                        events(J_index_genes, j_index, 0, 0) = _param_vec->index_J_gene(j_gene);
-                    } else {
+                    if (clonotype.is_vdj()) {
                         for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                             events(J_index_genes, 0, j_index, d_index) =
                                     _param_vec->index_JD_genes(j_gene, clonotype.getDiv(d_index)); // probability of choosing this J gene segment with other D genes

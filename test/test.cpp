@@ -51,217 +51,102 @@ YMIR_ASSERT(1 == 1)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_model_param_vec)
-    vector<prob_t> v1;
-    vector<eventind_t> v2;
-    v1.push_back(4);
-    v1.push_back(2);
-    v1.push_back(2);
-    v2.push_back(3);
-
-    v1.push_back(4);
-    v1.push_back(4);
-    v2.push_back(2);
-
-    v1.push_back(3);
-    v1.push_back(1);
-    v2.push_back(2);
-
-    ModelParameterVector mvec(v1, v2, 0);
-
-    YMIR_ASSERT(mvec[0] == 0)
-    YMIR_ASSERT(mvec[1] == .5)
-    YMIR_ASSERT(mvec[2] == .25)
-    YMIR_ASSERT(mvec[3] == .25)
-    YMIR_ASSERT(mvec[4] == .5)
-    YMIR_ASSERT(mvec[5] == .5)
-    YMIR_ASSERT(mvec[6] == .75)
-    YMIR_ASSERT(mvec[7] == .25)
-YMIR_TEST_END
-
-
-YMIR_TEST_START(test_model_param_vec_laplace)
-    vector<prob_t> v1;
-    vector<eventind_t> v2;
-    vector<prob_t> v3;
-
-    v1.push_back(3);
-    v1.push_back(1);
-    v1.push_back(1);
-    v2.push_back(3);
-    v3.push_back(1);
-
-    v1.push_back(3.5);
-    v1.push_back(3.5);
-    v2.push_back(2);
-    v3.push_back(.5);
-
-    v1.push_back(3);
-    v1.push_back(1);
-    v2.push_back(2);
-    v3.push_back(0);
-
-    ModelParameterVector mvec(v1, v2, 0, v3);
-    YMIR_ASSERT(mvec[0] == 0)
-    YMIR_ASSERT(mvec[1] == .5)
-    YMIR_ASSERT(mvec[2] == .25)
-    YMIR_ASSERT(mvec[3] == .25)
-    YMIR_ASSERT(mvec[4] == .5)
-    YMIR_ASSERT(mvec[5] == .5)
-    YMIR_ASSERT(mvec[6] == .75)
-    YMIR_ASSERT(mvec[7] == .25)
-YMIR_TEST_END
-
-
-YMIR_TEST_START(test_model_param_vec_event_family)
-    vector<prob_t> v1;
-    vector<eventind_t> v2;
-    vector<prob_t> v3;
-
-    v1.push_back(3);
-    v1.push_back(1);
-    v1.push_back(1);
-    v2.push_back(3);
-    v3.push_back(1);
-
-    v1.push_back(3.5);
-    v1.push_back(3.5);
-    v2.push_back(2);
-    v3.push_back(.5);
-
-    v1.push_back(3);
-    v1.push_back(1);
-    v2.push_back(2);
-    v3.push_back(0);
-
-    ModelParameterVector mvec(v1, v2, 0, v3);
-    YMIR_ASSERT(mvec.getEventProbability(0, 0) == 0)
-    YMIR_ASSERT(mvec.getEventProbability(1, 0) == .5)
-    YMIR_ASSERT(mvec.getEventProbability(1, 1) == .25)
-    YMIR_ASSERT(mvec.getEventProbability(1, 2) == .25)
-    YMIR_ASSERT(mvec.getEventProbability(2, 0) == .5)
-    YMIR_ASSERT(mvec.getEventProbability(2, 1) == .5)
-    YMIR_ASSERT(mvec.getEventProbability(3, 0) == .75)
-    YMIR_ASSERT(mvec.getEventProbability(3, 1) == .25)
-
-    YMIR_ASSERT(mvec.eventFamilySize(0) == 1)
-    YMIR_ASSERT(mvec.eventFamilySize(1) == 3)
-    YMIR_ASSERT(mvec.eventFamilySize(2) == 2)
-    YMIR_ASSERT(mvec.eventFamilySize(3) == 2)
-YMIR_TEST_END
-
-
 YMIR_TEST_START(test_model_param_vec_vj)
     vector<prob_t> v1;
     vector<eventind_t> v2;
+    vector<eventind_t> v3;
+    vector<seq_len_t> v4;
 
     // V-J
     v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
     v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
     v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
     v2.push_back(9);
+    v3.push_back(???);
+    v4.push_back(???);
 
     // V del
-    v1.push_back(.75);
-    v1.push_back(.25);
-
+    v1.push_back(.75); v1.push_back(.25);
     v2.push_back(2);
 
-    v1.push_back(.4);
-    v1.push_back(.5);
-    v1.push_back(.1);
-
+    v1.push_back(.4); v1.push_back(.5); v1.push_back(.1);
     v2.push_back(3);
 
-    v1.push_back(.3);
-    v1.push_back(.1);
-    v1.push_back(.2);
-    v1.push_back(.4);
-
+    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
     v2.push_back(4);
 
     // J del
-    v1.push_back(.4);
-    v1.push_back(.6);
-
+    v1.push_back(.4); v1.push_back(.6);
     v2.push_back(2);
 
-    v1.push_back(.125);
-    v1.push_back(.175);
-    v1.push_back(.7);
-
+    v1.push_back(.125); v1.push_back(.175); v1.push_back(.7);
     v2.push_back(3);
 
     // VJ ins len
-    v1.push_back(.31);
-    v1.push_back(.39);
-    v1.push_back(.1);
-    v1.push_back(.1);
-    v1.push_back(.1);
-
+    v1.push_back(.31); v1.push_back(.39); v1.push_back(.1); v1.push_back(.1); v1.push_back(.1);
     v2.push_back(5);
 
     // VJ ins nuc
     // prev A
-    v1.push_back(.05);
-    v1.push_back(.08);
-    v1.push_back(.03);
-    v1.push_back(.84);
-
+    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
     v2.push_back(4);
 
     // prev C
-    v1.push_back(.4);
-    v1.push_back(.1);
-    v1.push_back(.3);
-    v1.push_back(.2);
-
+    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
     v2.push_back(4);
 
     // prev G
-    v1.push_back(.25);
-    v1.push_back(.1);
-    v1.push_back(.15);
-    v1.push_back(.2);
-
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
     v2.push_back(4);
 
     // prev T
-    v1.push_back(.25);
-    v1.push_back(.1);
-    v1.push_back(.25);
-    v1.push_back(.3);
-
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
     v2.push_back(4);
 
-    ModelParameterVector mvec(v1, v2, 3);
+    ModelParameterVector mvec(VJ_RECOMB, v1, v2, v3, v4);
 
     YMIR_ASSERT(mvec[0] == 0)
 
-    YMIR_ASSERT(mvec.prob_VJ_genes(1, 2) == .025)
-    YMIR_ASSERT(mvec.prob_VJ_genes(3, 1) == .075)
+    YMIR_ASSERT(mvec.mat_prob(VJ_VAR_JOI_INS_LEN, 1, 2) == .025)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 1, 2) == .025)
+    YMIR_ASSERT(mvec.mat_prob(VJ_VAR_JOI_INS_LEN, 3, 1) == .075)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 3, 1) == .075)
 
-    YMIR_ASSERT(mvec.prob_V_del(1, 0) == .75)
-    YMIR_ASSERT(mvec.prob_V_del(1, 1) == .25)
-    YMIR_ASSERT(mvec.prob_V_del(2, 0) == .4)
-    YMIR_ASSERT(mvec.prob_V_del(2, 1) == .5)
-    YMIR_ASSERT(mvec.prob_V_del(2, 2) == .1)
-    YMIR_ASSERT(mvec.prob_V_del(3, 0) == .3)
-    YMIR_ASSERT(mvec.prob_V_del(3, 3) == .4)
+    YMIR_ASSERT(mvec.vec_prob(VJ_VAR_DEL, 1, 0) == .75)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_DEL, 1, 0) == .75)
+    YMIR_ASSERT(mvec.vec_prob(VJ_VAR_DEL, 1, 1) == .25)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_DEL, 1, 1) == .25)
+    YMIR_ASSERT(mvec.vec_prob(VJ_VAR_DEL, 2, 0) == .4)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_DEL, 2, 0) == .4)
+    YMIR_ASSERT(mvec.vec_prob(VJ_VAR_DEL, 2, 1) == .5)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_DEL, 2, 1) == .5)
+    YMIR_ASSERT(mvec.vec_prob(VJ_VAR_DEL, 2, 2) == .1)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_DEL, 2, 2) == .1)
+    YMIR_ASSERT(mvec.vec_prob(VJ_VAR_DEL, 3, 0) == .3)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_DEL, 3, 0) == .3)
+    YMIR_ASSERT(mvec.vec_prob(VJ_VAR_DEL, 3, 3) == .4)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_DEL, 3, 3) == .4)
 
-    YMIR_ASSERT(mvec.prob_J_del(1, 0) == .4)
-    YMIR_ASSERT(mvec.prob_J_del(1, 1) == .6)
-    YMIR_ASSERT(mvec.prob_J_del(2, 0) == .125)
-    YMIR_ASSERT(mvec.prob_J_del(2, 2) == .7)
+    YMIR_ASSERT(mvec.vec_prob(VJ_JOI_DEL, 1, 0) == .4)
+    YMIR_ASSERT(mvec.event_prob(VJ_JOI_DEL, 1, 0) == .4)
+    YMIR_ASSERT(mvec.vec_prob(VJ_JOI_DEL, 1, 1) == .6)
+    YMIR_ASSERT(mvec.event_prob(VJ_JOI_DEL, 1, 1) == .6)
+    YMIR_ASSERT(mvec.vec_prob(VJ_JOI_DEL, 2, 0) == .125)
+    YMIR_ASSERT(mvec.event_prob(VJ_JOI_DEL, 2, 0) == .125)
+    YMIR_ASSERT(mvec.vec_prob(VJ_JOI_DEL, 2, 2) == .7)
+    YMIR_ASSERT(mvec.event_prob(VJ_JOI_DEL, 2, 2) == .7)
 
-    YMIR_ASSERT(mvec.prob_VJ_ins_len(0) - .31 < 1e-7)
-    YMIR_ASSERT(mvec.prob_VJ_ins_len(1) - .39 < 1e-7)
-    YMIR_ASSERT(mvec.prob_VJ_ins_len(2) - .1 < 1e-7)
+    YMIR_ASSERT(mvec.vec_prob(VJ_VAR_JOI_INS_LEN, 0) - .31 < 1e-7)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 0) - .31 < 1e-7)
+    YMIR_ASSERT(mvec.vec_prob(VJ_VAR_JOI_INS_LEN, 1) - .39 < 1e-7)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 1) == .7)
+    YMIR_ASSERT(mvec.vec_prob(VJ_VAR_JOI_INS_LEN, 2) - .1 < 1e-7)
+    YMIR_ASSERT(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 2) == .7)
     YMIR_ASSERT(mvec.max_VJ_ins_len() == 4)
 
-    YMIR_ASSERT(mvec[mvec.index_VJ_ins_nuc()] == .05)
-    YMIR_ASSERT(mvec[mvec.index_VJ_ins_nuc() + 1] == .08)
-    YMIR_ASSERT(mvec[mvec.index_VJ_ins_nuc() + 4] == .4)
+    YMIR_ASSERT(mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 1, 0)] == .05)
+    YMIR_ASSERT(mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 1, 0) + 1] == .08)
+    YMIR_ASSERT(mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 1, 0) + 4] == .4)
 YMIR_TEST_END
 
 
@@ -269,13 +154,13 @@ YMIR_TEST_START(test_model_param_vec_vdj)
     vector<prob_t> v1;
     vector<eventind_t> v2;
     vector<seq_len_t> v3;
+    vector<seq_len_t> v4;
 
     // V
-    v1.push_back(.5);
-    v1.push_back(.25);
-    v1.push_back(.25);
-
+    v1.push_back(.5); v1.push_back(.25); v1.push_back(.25);
     v2.push_back(3);
+    v3.push_back(???);
+    v4.push_back(???);
 
     // J-D (3 Js - 2 Ds)
     v1.push_back(.01); // first row
@@ -288,34 +173,20 @@ YMIR_TEST_START(test_model_param_vec_vdj)
     v2.push_back(6);
 
     // V del
-    v1.push_back(.75);
-    v1.push_back(.25);
-
+    v1.push_back(.75); v1.push_back(.25);
     v2.push_back(2);
 
-    v1.push_back(.4);
-    v1.push_back(.5);
-    v1.push_back(.1);
-
+    v1.push_back(.4); v1.push_back(.5); v1.push_back(.1);
     v2.push_back(3);
 
-    v1.push_back(.3);
-    v1.push_back(.1);
-    v1.push_back(.2);
-    v1.push_back(.4);
-
+    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
     v2.push_back(4);
 
     // J del
-    v1.push_back(.4);
-    v1.push_back(.6);
-
+    v1.push_back(.4); v1.push_back(.6);
     v2.push_back(2);
 
-    v1.push_back(.125);
-    v1.push_back(.175);
-    v1.push_back(.7);
-
+    v1.push_back(.125); v1.push_back(.175); v1.push_back(.7);
     v2.push_back(3);
 
     // D1 dels
@@ -340,126 +211,89 @@ YMIR_TEST_START(test_model_param_vec_vdj)
     v3.push_back(2);
 
     // VD ins len
-    v1.push_back(.76);
-    v1.push_back(.24);
-
+    v1.push_back(.76); v1.push_back(.24);
     v2.push_back(2);
 
     // DJ ins len
-    v1.push_back(.89);
-    v1.push_back(.10);
-    v1.push_back(.01);
-
+    v1.push_back(.89); v1.push_back(.10); v1.push_back(.01);
     v2.push_back(3);
 
     // VD ins nuc
     // prev A
-    v1.push_back(.05);
-    v1.push_back(.08);
-    v1.push_back(.03);
-    v1.push_back(.84);
-
+    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
     v2.push_back(4);
 
     // prev C
-    v1.push_back(.4);
-    v1.push_back(.1);
-    v1.push_back(.3);
-    v1.push_back(.2);
-
+    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
     v2.push_back(4);
 
     // prev G
-    v1.push_back(.25);
-    v1.push_back(.1);
-    v1.push_back(.15);
-    v1.push_back(.2);
-
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
     v2.push_back(4);
 
     // prev T
-    v1.push_back(.25);
-    v1.push_back(.1);
-    v1.push_back(.25);
-    v1.push_back(.3);
-
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
     v2.push_back(4);
 
     // DJ ins nuc
     // prev A
-    v1.push_back(.009);
-    v1.push_back(.06);
-    v1.push_back(.48);
-    v1.push_back(.451);
-
+    v1.push_back(.009); v1.push_back(.06); v1.push_back(.48); v1.push_back(.451);
     v2.push_back(4);
 
     // prev C
-    v1.push_back(.39);
-    v1.push_back(.01);
-    v1.push_back(.31);
-    v1.push_back(.29);
-
+    v1.push_back(.39); v1.push_back(.01); v1.push_back(.31); v1.push_back(.29);
     v2.push_back(4);
 
     // prev G
-    v1.push_back(.25);
-    v1.push_back(.1);
-    v1.push_back(.15);
-    v1.push_back(.2);
-
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
     v2.push_back(4);
 
     // prev T
-    v1.push_back(.25);
-    v1.push_back(.1);
-    v1.push_back(.25);
-    v1.push_back(.3);
-
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
     v2.push_back(4);
 
-    ModelParameterVector mvec(v1, v2, v3);
+    ModelParameterVector mvec(VDJ_RECOMB, v1, v2, v3, v4);
 
     YMIR_ASSERT(mvec[0] == 0)
 
-    YMIR_ASSERT(mvec.prob_V_gene(1) == .5)
-    YMIR_ASSERT(mvec.prob_V_gene(3) == .25)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_GEN, 1) == .5) // 0-based index !!!
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_GEN, 3) == .25)
 
-    YMIR_ASSERT(mvec.prob_JD_genes(1, 1) == .01)
-    YMIR_ASSERT(mvec.prob_JD_genes(1, 2) == .02)
-    YMIR_ASSERT(mvec.prob_JD_genes(3, 1) == .06)
-    YMIR_ASSERT(mvec.prob_JD_genes(3, 2) == .84)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_JOI_DIV_GEN, 1, 1) == .01)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_JOI_DIV_GEN, 1, 2) == .02)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_JOI_DIV_GEN, 3, 1) == .06)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_JOI_DIV_GEN, 3, 2) == .84)
 
-    YMIR_ASSERT(mvec.prob_V_del(1, 0) == .75)
-    YMIR_ASSERT(mvec.prob_V_del(1, 1) == .25)
-    YMIR_ASSERT(mvec.prob_V_del(2, 0) == .4)
-    YMIR_ASSERT(mvec.prob_V_del(2, 1) == .5)
-    YMIR_ASSERT(mvec.prob_V_del(2, 2) == .1)
-    YMIR_ASSERT(mvec.prob_V_del(3, 0) == .3)
-    YMIR_ASSERT(mvec.prob_V_del(3, 3) == .4)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_DEL, 1, 0) == .75)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_DEL, 1, 1) == .25)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_DEL, 2, 0) == .4)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_DEL, 2, 1) == .5)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_DEL, 2, 2) == .1)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_DEL, 3, 0) == .3)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_DEL, 3, 3) == .4)
 
-    YMIR_ASSERT(mvec.prob_J_del(1, 0) == .4)
-    YMIR_ASSERT(mvec.prob_J_del(1, 1) == .6)
-    YMIR_ASSERT(mvec.prob_J_del(2, 0) == .125)
-    YMIR_ASSERT(mvec.prob_J_del(2, 2) == .7)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_JOI_DEL, 1, 0) == .4)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_JOI_DEL, 1, 1) == .6)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_JOI_DEL, 2, 0) == .125)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_JOI_DEL, 2, 2) == .7)
 
-    YMIR_ASSERT(mvec.prob_D_del(1, 0, 0) == .17)
-    YMIR_ASSERT(mvec.prob_D_del(1, 0, 1) == .27)
-    YMIR_ASSERT(mvec.prob_D_del(1, 1, 0) == .37)
-    YMIR_ASSERT(mvec.prob_D_del(1, 1, 1) == .19)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_DIV_DEL, 1, 0, 0) == .17)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_DIV_DEL, 1, 0, 1) == .27)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_DIV_DEL, 1, 1, 0) == .37)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_DIV_DEL, 1, 1, 1) == .19)
 
-    YMIR_ASSERT(mvec.prob_D_del(2, 0, 0) == .11)
-    YMIR_ASSERT(mvec.prob_D_del(2, 0, 1) == .12)
-    YMIR_ASSERT(mvec.prob_D_del(2, 2, 0) == .15)
-    YMIR_ASSERT(mvec.prob_D_del(2, 2, 1) == .35)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_DIV_DEL, 2, 0, 0) == .11)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_DIV_DEL, 2, 0, 1) == .12)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_DIV_DEL, 2, 2, 0) == .15)
+    YMIR_ASSERT(mvec.mat_prob(VDJ_DIV_DEL, 2, 2, 1) == .35)
 
-    YMIR_ASSERT(mvec.prob_VD_ins_len(0) == .76)
-    YMIR_ASSERT(mvec.prob_VD_ins_len(1) == .24)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_DIV_INS_LEN, 0) == .76)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_VAR_DIV_INS_LEN, 1) == .24)
     YMIR_ASSERT(mvec.max_VD_ins_len() == 1)
 
-    YMIR_ASSERT(mvec.prob_DJ_ins_len(0) == .89)
-    YMIR_ASSERT(mvec.prob_DJ_ins_len(1) == .10)
-    YMIR_ASSERT(mvec.prob_DJ_ins_len(2) == .01)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_DIV_JOI_INS_LEN, 0) == .89)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_DIV_JOI_INS_LEN, 1) == .10)
+    YMIR_ASSERT(mvec.vec_prob(VDJ_DIV_JOI_INS_LEN, 2) == .01)
     YMIR_ASSERT(mvec.max_DJ_ins_len() == 2)
 
     YMIR_ASSERT(mvec[mvec.index_VD_ins_nuc()] == .05)
@@ -1445,11 +1279,8 @@ int main() {
     YMIR_TEST(test_basic(), "basic test")
 
     // Tests for ModelParameterVector
-    YMIR_TEST(test_model_param_vec(), "ModelParameterVector fail")
-    YMIR_TEST(test_model_param_vec_laplace(), "ModelParameterVector fail with laplace correction")
-    YMIR_TEST(test_model_param_vec_event_family(), "ModelParameterVector fail with event family boundaries and access")
-    YMIR_TEST(test_model_param_vec_vj(), "ModelParameterVector fail at VJ access")
-    YMIR_TEST(test_model_param_vec_vdj(), "ModelParameterVector fail at VDJ access")
+    YMIR_TEST(test_model_param_vec_vj(), "ModelParameterVector VJ access w/o laplace")
+    YMIR_TEST(test_model_param_vec_vdj(), "ModelParameterVector VDJ access w/o laplace")
 
     // Tests for gene segments classes
     YMIR_TEST(test_genesegmentalphabet(), "GeneSegmentAlphabet initialisation and access")

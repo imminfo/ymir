@@ -136,6 +136,11 @@ YMIR_TEST_START(test_model_param_vec_vj)
 
     YMIR_ASSERT(mvec[0] == 0)
 
+    YMIR_ASSERT(mvec.eventClassSize(VJ_VAR_JOI_GEN) == 9)
+    YMIR_ASSERT(mvec.eventClassSize(VJ_VAR_DEL) == 9)
+    YMIR_ASSERT(mvec.eventFamilySize(VJ_VAR_DEL, 1) == 2)
+    YMIR_ASSERT(mvec.eventFamilySize(VJ_VAR_DEL, 3) == 4)
+
     cout << mvec.mat_index(VJ_VAR_JOI_GEN, 1, 2) << endl;
     cout << mvec.event_index(VJ_VAR_JOI_GEN, 1, 1, 2) << endl;
     YMIR_ASSERT(mvec.mat_prob(VJ_VAR_JOI_GEN, 1, 2) == .025)

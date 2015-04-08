@@ -148,10 +148,11 @@ namespace ymir {
             }
 
             _event_family_row_numbers = vector<seq_len_t>();
-            _event_family_row_numbers.reserve(event_family_row_numbers.size());
-            _event_family_row_numbers.insert(_event_family_row_numbers.end(),
-                                            event_family_row_numbers.begin(),
-                                            event_family_row_numbers.end());
+            _event_family_row_numbers.reserve(event_family_row_numbers.size() + 1);
+            _event_family_row_numbers.push_back(0);
+            for (eventind_t i = 0; i < event_family_row_numbers.size(); ++i) {
+                _event_family_row_numbers.push_back(event_family_row_numbers[i]);
+            }
 
             _edges.reserve(lens_vec.size() + 4);
             _edges.push_back(0);

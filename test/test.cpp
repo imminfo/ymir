@@ -30,7 +30,7 @@
 
 #define YMIR_TEST_START(funname) vector<string> funname() { vector<string> _failed_cases;
 #define YMIR_ASSERT(expr) { if (!(expr)) { _failed_cases.push_back(#expr); } };
-#define YMIR_ASSERT2(expr1, expr2) { if ((expr1) != (expr2)) { std::stringstream ss; ss << #expr1 << " == " << #expr2 << " (result: " << expr1 << ", need: " << expr2 << ")";_failed_cases.push_back(ss.str()); } };
+#define YMIR_ASSERT2(expr1, expr2) { if ((expr1) != (expr2)) { std::stringstream ss; ss << #expr1 << " == " << #expr2 << "  (result: " << (expr1) << ", need: " << (expr2) << ")";_failed_cases.push_back(ss.str()); } };
 #define YMIR_TEST_END return _failed_cases; }
 
 #define TEST_DATA_FOLDER string("/Users/vdn/ymir/test/data/")
@@ -142,6 +142,11 @@ YMIR_TEST_START(test_model_param_vec_vj)
     YMIR_ASSERT2(mvec.eventClassSize(VJ_VAR_DEL), 9)
     YMIR_ASSERT2(mvec.eventFamilySize(VJ_VAR_DEL, 1), 2)
     YMIR_ASSERT2(mvec.eventFamilySize(VJ_VAR_DEL, 3), 4)
+    YMIR_ASSERT2(mvec.eventClassSize(VJ_JOI_DEL), 5)
+    YMIR_ASSERT2(mvec.eventFamilySize(VJ_JOI_DEL, 1), 2)
+    YMIR_ASSERT2(mvec.eventFamilySize(VJ_JOI_DEL, 2), 3)
+    YMIR_ASSERT2(mvec.eventClassSize(VJ_VAR_JOI_INS_LEN), 5)
+    YMIR_ASSERT2(mvec.eventFamilySize(VJ_VAR_JOI_INS_LEN, 1), 5)
     
     YMIR_ASSERT2(mvec.mat_prob(VJ_VAR_JOI_GEN, 1, 2), .025)
     YMIR_ASSERT2(mvec.event_prob(VJ_VAR_JOI_GEN, 1, 1, 2), .025)
@@ -172,12 +177,12 @@ YMIR_TEST_START(test_model_param_vec_vj)
     YMIR_ASSERT2(mvec.vec_prob(VJ_JOI_DEL, 2, 2), .7)
     YMIR_ASSERT2(mvec.event_prob(VJ_JOI_DEL, 2, 2), .7)
 
-    YMIR_ASSERT2(mvec.vec_prob(VJ_VAR_JOI_INS_LEN, 0) - .31, 0)
-    YMIR_ASSERT2(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 0) - .31, 0)
-    YMIR_ASSERT2(mvec.vec_prob(VJ_VAR_JOI_INS_LEN, 1) - .39, 0)
-    YMIR_ASSERT2(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 1), .7)
-    YMIR_ASSERT2(mvec.vec_prob(VJ_VAR_JOI_INS_LEN, 2) - .1, 0)
-    YMIR_ASSERT2(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 2), .7)
+    YMIR_ASSERT2(round(mvec.vec_prob(VJ_VAR_JOI_INS_LEN, 0) * 100) / 100, .31)
+    YMIR_ASSERT2(round(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 0) * 100) / 100, .31)
+    YMIR_ASSERT2(round(mvec.vec_prob(VJ_VAR_JOI_INS_LEN, 1) * 100) / 100, .39)
+    YMIR_ASSERT2(round(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 1) * 100) / 100, .39)
+    YMIR_ASSERT2(round(mvec.vec_prob(VJ_VAR_JOI_INS_LEN, 2) * 100) / 100, .1)
+    YMIR_ASSERT2(round(mvec.event_prob(VJ_VAR_JOI_INS_LEN, 1, 2) * 100) / 100, .1)
     YMIR_ASSERT2(mvec.max_VJ_ins_len(), 4)
 
     YMIR_ASSERT2(mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 1, 0)], .05)

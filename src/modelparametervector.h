@@ -143,6 +143,7 @@ namespace ymir {
 
             _event_classes = vector<eventind_t>();
             _event_classes.reserve(event_classes.size() + 1);
+            _event_classes.push_back(0);
             for (eventind_t i = 0; i < event_classes.size(); ++i) {
                 _event_classes.push_back(event_classes[i] + 1);
             }
@@ -198,7 +199,7 @@ namespace ymir {
         }
 
         eventind_t eventFamilySize(eventind_t event_class, eventind_t event_family) const {
-            return _edges[_event_classes[event_class] + 1] - _edges[_event_classes[event_class]];
+            return eventFamilySize(_event_classes[event_class] + event_family - 1);
         }
 
         eventind_t eventClassSize(eventind_t event_class) const {
@@ -224,24 +225,6 @@ namespace ymir {
         vector<prob_t>::const_iterator get_iterator(eventind_t i) const { return _vec.begin() + i; }
 
 
-        /**
-         *
-         * // vector of events
-         * param_vec(VDJ_VAR_GEN, 5) // 5th V segment
-         * vec_ind(VDJ_VAR_GEN, 5)
-         *
-         * // two different event classes with similar access
-         * // matrix of events
-         * param_vec(VJ_VAR_JOI_GEN, 3, 4)  // 3th V segment, 4th J segment
-         * mat_ind(VJ_VAR_JOI_GEN, 3, 4)
-         * // vector of vectors of events
-         * param_vec(VJ_VAR_DEL, 5, 15)  // 5th V segment, 15 deletions
-         * vec_ind(VJ_VAR_DEL, 5, 15)
-         * // also
-         * // matrix of events
-         * param_vec(VDJ_DIV_DEL, 2, 7, 8) // 2nd D segment, 7 D3' deletions, 8 D5' deletions
-         * mat_ind(VDJ_DIV_DEL, 2, 7, 8)
-         */
         // get indices from vector of events
         eventind_t event_index(EVENT_CLASS event_class, eventind_t event_family, eventind_t event_index) const {
             return _edges[_event_classes[event_class] + (event_family - 1)] + event_index;

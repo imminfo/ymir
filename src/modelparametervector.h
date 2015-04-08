@@ -143,7 +143,9 @@ namespace ymir {
 
             _event_classes = vector<eventind_t>();
             _event_classes.reserve(event_classes.size() + 1);
-            _event_classes.insert(_event_classes.end(), event_classes.begin(), event_classes.end());
+            for (eventind_t i = 0; i < event_classes.size(); ++i) {
+                _event_classes.push_back(event_classes[i] + 1);
+            }
 
             _event_family_row_numbers = vector<seq_len_t>();
             _event_family_row_numbers.reserve(event_family_row_numbers.size());

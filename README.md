@@ -1,43 +1,112 @@
-Ymir
---
+# Ymir
+Probabilistic models of immune receptors assembling
 
-description
+---
 
-overview
-- 1
-- 2
-- 3
+### Overview
 
+#### Features
 
-*Table of contents*
-- Quick start
-- - Compute assembly probabilities of human TCR-alpha data
-- - Perform statistical inference of parameters of generation model of human TCR-alpha
-- - Generate artificial human TCR-alpha repertoire
-- Command line arguments
-- Building Ymir
-- Model file description
-- Include Ymir library to your project
+#### Paper
 
+#### Details
+Undetailed dependencies. For more information on dependencies see `Installing and using Ymir` subsection.
 
-**Quick start**
-***Compute assembly probabilities of human TCR-alpha data***
+---
 
+## Installing and using Ymir
 
-### Perform statistical inference of parameters of generation model of human TCR-alpha
+You can use Ymir in two ways:
 
+- as a library in your project or 
 
-### Generate artificial human TCR-alpha repertoire
+- using pre-made scripts for the most common tasks - computation of generation probabilities,
+estimation of parameters of an assembling model from the experimental data or
+generation of pre-selected immune receptor sequences. For this tasks you need to compile
+some source code, but don't worry! It's very easy, just look at the next subsection. After compiling,
+take a look at the `Examples / ready-to-use scripts` section where pre-made scripts are explained in details.
 
+### Compiling Ymir
 
-## Command line arguments
+Dependencies:
 
+- Eigen
 
-## Building and testing Ymir
+- JsonCPP
 
+- MPFR (non-necessary due to license)
 
-## Model file description
+assembling / generation
 
+Targets: scripts, tests, benchmarking, lib
 
-## Include Ymir library to your project
+### Using Ymir as a library
 
+Ymir is a header only library
+
+For using only the core data structure MAAG and MAAGBuilder use:
+
+    #include <Ymir/Graph>
+
+For computing and generation from files:
+
+    #include <Ymir/Model>
+
+For statistical inference of parameters:
+
+    #include <Ymir/Inference>
+
+For super secret unimplemented things:
+    
+    #include <Ymir/Pattern>
+
+wow-wow, easy here. There are not implemented yet.
+
+---
+
+## Examples / ready-to-use scripts
+
+After compiling an executable files will appear in the `build` folder.
+
+### Compute generation probabilities of human TCR-alpha data
+
+* `mkdocs new [dir-name]` - Create a new project.
+* `mkdocs serve` - Start the live-reloading docs server.
+* `mkdocs build` - Build the documentation site.
+* `mkdocs help` - Print this help message.
+
+### Estimate human TCR-alpha generation model parameters using EM-algorithm
+
+### Generate artificial human TCR-alpha repertoire before selection
+
+---
+
+## Input file formats
+
+### Model files
+
+### Gene segments files
+
+### Cloneset files
+
+---
+
+## Testing
+
+---
+
+## Benchmarking
+
+---
+
+For full documentation visit [mkdocs.org](http://mkdocs.org).
+
+* `mkdocs new [dir-name]` - Create a new project.
+* `mkdocs serve` - Start the live-reloading docs server.
+* `mkdocs build` - Build the documentation site.
+* `mkdocs help` - Print this help message.
+
+    mkdocs.yml    # The configuration file.
+    docs/
+        index.md  # The documentation homepage.
+        ...       # Other markdown pages, images and other files.

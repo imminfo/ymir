@@ -103,7 +103,7 @@ namespace ymir {
          * \return Full assembling probability. Returns 0 if wrong recombination function is used.
          */
         ///@{
-        numeric fullProbability(eventind_t v_index, eventind_t j_index) const {
+        prob_t fullProbability(eventind_t v_index, eventind_t j_index) const {
             if (this->is_vj()) {
                 // P(Vi) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji) * P(Ji)
                 return (_chain[0][0](v_index, j_index) *  // P(Vi & Ji)
@@ -116,7 +116,7 @@ namespace ymir {
             }
         }
 
-        numeric fullProbability(eventind_t v_index, eventind_t d_index, eventind_t j_index) const {
+        prob_t fullProbability(eventind_t v_index, eventind_t d_index, eventind_t j_index) const {
             if (this->is_vdj()) {
                 // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
                 return (_chain[0][v_index] *      // P(Vi)
@@ -131,10 +131,10 @@ namespace ymir {
             }
         }
 
-        numeric fullProbability(MAAG_COMPUTE_PROB_ACTION action) const {
+        prob_t fullProbability(MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
             // choose the max full probability from all possible recombinations of V(D)J gene segment indices
             if (action == MAX_PROBABILITY) {
-                numeric max_prob = 0, cur_prob = 0;
+                prob_t max_prob = 0, cur_prob = 0;
                 if (this->is_vj()) {
                     for (eventind_t v_index = 0; v_index < this->nVar(); ++v_index) {
                         for (eventind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
@@ -156,7 +156,7 @@ namespace ymir {
             }
             // compute the sum of full probabilities of all possible recombinations of V(D)J gene segment indices
             else {
-                numeric sum_prob = 0;
+                prob_t sum_prob = 0;
                 if (this->is_vj()) {
                     for (eventind_t v_index = 0; v_index < this->nVar(); ++v_index) {
                         for (eventind_t j_index = 0; j_index < this->nJoi(); ++j_index) {

@@ -37,52 +37,6 @@ using namespace std;
 
 namespace ymir {
 
-    /**
-     * \enum MODEL_VECTOR_TYPE
-     */
-    enum MODEL_VECTOR_TYPE {
-        VJ_RECOMB,
-        VDJ_RECOMB
-    };
-
-
-    /**
-     * \enum EVENT_CLASS
-     */
-    enum EVENT_CLASS {
-        NULL_EVENT = 0,
-
-        VJ_VAR_JOI_GEN = 1,
-        VJ_VAR_DEL = 2,
-        VJ_JOI_DEL = 3,
-        VJ_VAR_JOI_INS_LEN = 4,
-        VJ_VAR_JOI_INS_NUC = 5,
-        VJ_VAR_JOI_INS_NUC_A_ROW = 5,
-        VJ_VAR_JOI_INS_NUC_C_ROW = 6,
-        VJ_VAR_JOI_INS_NUC_G_ROW = 7,
-        VJ_VAR_JOI_INS_NUC_T_ROW = 8,
-        VJ_HYPMUT = 9,
-
-        VDJ_VAR_GEN = 1,
-        VDJ_JOI_DIV_GEN = 2,
-        VDJ_VAR_DEL = 3,
-        VDJ_JOI_DEL = 4,
-        VDJ_DIV_DEL = 5,
-        VDJ_VAR_DIV_INS_LEN = 6,
-        VDJ_DIV_JOI_INS_LEN = 7,
-        VDJ_VAR_DIV_INS_NUC = 8,
-        VDJ_VAR_DIV_INS_NUC_A_ROW = 8,
-        VDJ_VAR_DIV_INS_NUC_C_ROW = 9,
-        VDJ_VAR_DIV_INS_NUC_G_ROW = 10,
-        VDJ_VAR_DIV_INS_NUC_T_ROW = 11,
-        VDJ_DIV_JOI_INS_NUC = 12,
-        VDJ_DIV_JOI_INS_NUC_A_ROW = 12,
-        VDJ_DIV_JOI_INS_NUC_C_ROW = 13,
-        VDJ_DIV_JOI_INS_NUC_G_ROW = 14,
-        VDJ_DIV_JOI_INS_NUC_T_ROW = 15,
-        VDJ_HYPMUT = 16
-    };
-
 
     /**
     * \class ModelParameterVector

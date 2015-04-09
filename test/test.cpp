@@ -43,7 +43,7 @@
 #include "parser.h"
 #include "multimatrixchain.h"
 #include "modelparametervector.h"
-#include "markovchain.h"
+#include "maagbuilder.h"
 //#include "statisticalinferencealgorithm.h"
 
 
@@ -748,7 +748,7 @@ YMIR_TEST_START(test_aa_aligner)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_mitcr)
+YMIR_TEST_START(test_mitcr_vj)
     RepertoireParser parser;
     YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
 
@@ -777,6 +777,11 @@ YMIR_TEST_START(test_mitcr)
     YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(0)].allele == "TRAJ8")
     YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(1)].allele == "TRAJ18")
     YMIR_ASSERT(cr[2].nJoi() == 2)
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_mitcr_vdj)
+    YMIR_ASSERT(false)
 YMIR_TEST_END
 
 
@@ -957,144 +962,205 @@ YMIR_TEST_START(test_mmc)
 YMIR_TEST_END
 
 
-//YMIR_TEST_START(test_maag_vj)
-//    vector<prob_t> v1;
-//    vector<eventind_t> v2;
-//
-//    // V-J
-//    v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
-//    v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
-//    v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
-//    v2.push_back(9);
-//
-//    // V del
-//    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
-//    v2.push_back(5);
-//
-//    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
-//    v2.push_back(4);
-//
-//    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
-//    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
-//    v2.push_back(7);
-//
-//    // J del
-//    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
-//    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
-//    v1.push_back(.01);
-//    v2.push_back(7);
-//
-//    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
-//    v1.push_back(.19); v1.push_back(.21);
-//    v2.push_back(5);
-//
-//    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
-//    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
-//    v2.push_back(7);
-//
-//    // VJ ins len
-//    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.1);
-//    v2.push_back(7);
-//
-//    // VJ ins nuc
-//    // prev A
-//    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
-//    v2.push_back(4);
-//
-//    // prev C
-//    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
-//    v2.push_back(4);
-//
-//    // prev G
-//    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
-//    v2.push_back(4);
-//
-//    // prev T
-//    v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
-//    v2.push_back(4);
-//
-//    ModelParameterVector mvec(v1, v2, 3);
-//
-//    vector<string> alvec1;
-//    vector<string> seqvec1;
-//    alvec1.push_back("Vseg1");
-//    alvec1.push_back("Vseg2");
-//    alvec1.push_back("Vseg3");
-//    seqvec1.push_back("CCCG");
-//    seqvec1.push_back("GGG");
-//    seqvec1.push_back("CCCGGG");
-//
-//    vector<string> alvec2;
-//    vector<string> seqvec2;
-//    alvec2.push_back("Jseg1");
-//    alvec2.push_back("Jseg2");
-//    alvec2.push_back("Jseg3");
-//    seqvec2.push_back("CCGTTT");
-//    seqvec2.push_back("ATTT");
-//    seqvec2.push_back("AGGTTT");
-//
-//    VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
-//
-//    MAAGBuilder maag_builder(mvec, genes);
-//
-//    ClonotypeBuilder cl_builder;
-//    // CCCG.AC.GGTTT
-//    // poses:
-//    // vs: 0-1-2-3-4-5
-//    // js: 7-8-9-10-11
-//    cl_builder.setSequence("CCCGACGGTTT")
-//            .setNucleotideSeq()
-//            .addValignment(1, 4)
-//            .addValignment(3, 5)
-//            .addJalignment(1, 8)
-//            .addJalignment(2, 9)
-//            .addJalignment(3, 7);
-//    Clonotype clonotype = cl_builder.buildClonotype();
-//
-//    MAAG maag = maag_builder.build(clonotype, true);
-//
-//    YMIR_ASSERT(maag.event_index(0, 0, 0, 0) == mvec.index_VJ_genes(1, 1))
-//    YMIR_ASSERT(maag.event_index(0, 0, 0, 1) == mvec.index_VJ_genes(1, 2))
-//    YMIR_ASSERT(maag.event_index(0, 0, 1, 0) == mvec.index_VJ_genes(3, 1))
-//    YMIR_ASSERT(maag.event_index(0, 0, 1, 2) == mvec.index_VJ_genes(3, 3))
-//
-//    YMIR_ASSERT(maag.event_index(1, 0, 0, 0) == mvec.index_V_del(1, 4))
-//    YMIR_ASSERT(maag.event_index(1, 0, 0, 1) == mvec.index_V_del(1, 3))
-//    YMIR_ASSERT(maag.event_index(1, 0, 0, 2) == mvec.index_V_del(1, 2))
-//    YMIR_ASSERT(maag.event_index(1, 0, 0, 3) == mvec.index_V_del(1, 1))
-//    YMIR_ASSERT(maag.event_index(1, 0, 0, 4) == mvec.index_V_del(1, 0))
-//    YMIR_ASSERT(maag.event_index(1, 0, 0, 5) == 0)
-//
-//    YMIR_ASSERT(maag.event_index(1, 1, 0, 0) == mvec.index_V_del(3, 6))
-//    YMIR_ASSERT(maag.event_index(1, 1, 0, 1) == mvec.index_V_del(3, 5))
-//    YMIR_ASSERT(maag.event_index(1, 1, 0, 2) == mvec.index_V_del(3, 4))
-//    YMIR_ASSERT(maag.event_index(1, 1, 0, 3) == mvec.index_V_del(3, 3))
-//    YMIR_ASSERT(maag.event_index(1, 1, 0, 4) == mvec.index_V_del(3, 2))
-//    YMIR_ASSERT(maag.event_index(1, 1, 0, 5) == mvec.index_V_del(3, 1))
-//
-//    YMIR_ASSERT(maag.event_index(2, 0, 0, 0) == mvec.index_VJ_ins_len(maag.position(6) - maag.position(0) - 1))
-//    YMIR_ASSERT(maag.event_index(2, 0, 0, 1) == 0)
-//
-//    YMIR_ASSERT(maag.event_index(3, 0, 0, 0) == 0)
-//    YMIR_ASSERT(maag.event_index(3, 0, 1, 0) == mvec.index_J_del(1, 2))
-//    YMIR_ASSERT(maag.event_index(3, 0, 2, 0) == mvec.index_J_del(1, 3))
-//    YMIR_ASSERT(maag.event_index(3, 0, 3, 0) == mvec.index_J_del(1, 4))
-//    YMIR_ASSERT(maag.event_index(3, 0, 4, 0) == mvec.index_J_del(1, 5))
-//    YMIR_ASSERT(maag.event_index(3, 0, 5, 0) == mvec.index_J_del(1, 6))
-//
-//    YMIR_ASSERT(maag.event_index(3, 2, 0, 0) == mvec.index_J_del(3, 1))
-//    YMIR_ASSERT(maag.event_index(3, 2, 1, 0) == mvec.index_J_del(3, 2))
-//    YMIR_ASSERT(maag.event_index(3, 2, 2, 0) == mvec.index_J_del(3, 3))
-//    YMIR_ASSERT(maag.event_index(3, 2, 3, 0) == mvec.index_J_del(3, 4))
-//    YMIR_ASSERT(maag.event_index(3, 2, 4, 0) == mvec.index_J_del(3, 5))
-//    YMIR_ASSERT(maag.event_index(3, 2, 5, 0) == mvec.index_J_del(3, 6))
-////
-////    YMIR_ASSERT(maag.event_index(4, 0, 0, 0) == mvec.index_J_gene(1))
-////    YMIR_ASSERT(maag.event_index(4, 1, 0, 0) == mvec.index_J_gene(2))
-////    YMIR_ASSERT(maag.event_index(4, 2, 0, 0) == mvec.index_J_gene(3))
-//YMIR_TEST_END
-//
-//
+YMIR_TEST_START(test_maag_vj)
+    vector<prob_t> v1;  // param vec
+    vector<eventind_t> v2;  // lens vec
+    vector<eventind_t> v3;  // event classes
+    vector<seq_len_t> v4;  // event family col numbers
+
+    // V-J
+    v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
+    v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
+    v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
+    v2.push_back(9);
+
+    v3.push_back(0);
+    v4.push_back(3);
+
+    // V del
+    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
+    v2.push_back(5);
+
+    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
+    v2.push_back(4);
+
+    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
+    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
+    v2.push_back(7);
+
+    v3.push_back(1);
+    v4.push_back(0);
+    v4.push_back(0);
+    v4.push_back(0);
+
+    // J del
+    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
+    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
+    v1.push_back(.01);
+    v2.push_back(7);
+    v4.push_back(0);
+
+    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
+    v1.push_back(.19); v1.push_back(.21);
+    v2.push_back(5);
+    v4.push_back(0);
+
+    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
+    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
+    v2.push_back(7);
+    v4.push_back(0);
+
+    v3.push_back(4);
+
+    // VJ ins len
+    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.1);
+    v2.push_back(7);
+    v4.push_back(0);
+
+    v3.push_back(7);
+
+    // VJ ins nuc
+    // prev A
+    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(8);
+
+    // prev C
+    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(9);
+
+    // prev G
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(10);
+
+    // prev T
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(11);
+
+    ModelParameterVector mvec(VJ_RECOMB, v1, v2, v3, v4);
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1");
+    alvec1.push_back("Vseg2");
+    alvec1.push_back("Vseg3");
+    seqvec1.push_back("CCCG");
+    seqvec1.push_back("GGG");
+    seqvec1.push_back("CCCGGG");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1");
+    alvec2.push_back("Jseg2");
+    alvec2.push_back("Jseg3");
+    seqvec2.push_back("CCGTTT");
+    seqvec2.push_back("ATTT");
+    seqvec2.push_back("AGGTTT");
+
+    VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
+
+    MAAGBuilder maag_builder(mvec, genes);
+
+    ClonotypeBuilder cl_builder;
+    // CCCG.AC.GGTTT
+    // poses:
+    // vs: 0-1-2-3-4-5
+    // js: 7-8-9-10-11
+    cl_builder.setSequence("CCCGACGGTTT")
+            .setNucleotideSeq()
+            .addValignment(1, 4)
+            .addValignment(3, 5)
+            .addJalignment(1, 8)
+            .addJalignment(2, 9)
+            .addJalignment(3, 7);
+    Clonotype clonotype = cl_builder.buildClonotype();
+
+    MAAG maag = maag_builder.build(clonotype, true);
+
+    YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
+    YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
+    YMIR_ASSERT2(maag.event_index(0, 0, 1, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 0))
+    YMIR_ASSERT2(maag.event_index(0, 0, 1, 2), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 2))
+
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 0), mvec.event_index(VJ_VAR_DEL, 0, 4));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 1), mvec.event_index(VJ_VAR_DEL, 0, 3));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 2), mvec.event_index(VJ_VAR_DEL, 0, 2));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 3), mvec.event_index(VJ_VAR_DEL, 0, 1));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 4), mvec.event_index(VJ_VAR_DEL, 0, 0));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 5), 0)
+
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 0), mvec.event_index(VJ_VAR_DEL, 2, 6))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 1), mvec.event_index(VJ_VAR_DEL, 2, 5))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 2), mvec.event_index(VJ_VAR_DEL, 2, 4))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 3), mvec.event_index(VJ_VAR_DEL, 2, 3))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec.event_index(VJ_VAR_DEL, 2, 2))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec.event_index(VJ_VAR_DEL, 2, 1))
+
+    YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
+    YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), 0)
+
+    YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
+    YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), mvec.event_index(VJ_JOI_DEL, 0, 2))
+    YMIR_ASSERT2(maag.event_index(3, 0, 2, 0), mvec.event_index(VJ_JOI_DEL, 0, 3))
+    YMIR_ASSERT2(maag.event_index(3, 0, 3, 0), mvec.event_index(VJ_JOI_DEL, 0, 4))
+    YMIR_ASSERT2(maag.event_index(3, 0, 4, 0), mvec.event_index(VJ_JOI_DEL, 0, 5))
+    YMIR_ASSERT2(maag.event_index(3, 0, 5, 0), mvec.event_index(VJ_JOI_DEL, 0, 6))
+
+    YMIR_ASSERT2(maag.event_index(3, 2, 0, 0), mvec.event_index(VJ_JOI_DEL, 2, 1))
+    YMIR_ASSERT2(maag.event_index(3, 2, 1, 0), mvec.event_index(VJ_JOI_DEL, 2, 2))
+    YMIR_ASSERT2(maag.event_index(3, 2, 2, 0), mvec.event_index(VJ_JOI_DEL, 2, 3))
+    YMIR_ASSERT2(maag.event_index(3, 2, 3, 0), mvec.event_index(VJ_JOI_DEL, 2, 4))
+    YMIR_ASSERT2(maag.event_index(3, 2, 4, 0), mvec.event_index(VJ_JOI_DEL, 2, 5))
+    YMIR_ASSERT2(maag.event_index(3, 2, 5, 0), mvec.event_index(VJ_JOI_DEL, 2, 6))
+
+    YMIR_ASSERT2(maag.event_probability(0, 0, 0, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 0))
+    YMIR_ASSERT2(maag.event_probability(0, 0, 0, 1), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 1))
+    YMIR_ASSERT2(maag.event_probability(0, 0, 1, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 0))
+    YMIR_ASSERT2(maag.event_probability(0, 0, 1, 2), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 2))
+
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 0), mvec.event_prob(VJ_VAR_DEL, 0, 4));
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 1), mvec.event_prob(VJ_VAR_DEL, 0, 3));
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 2), mvec.event_prob(VJ_VAR_DEL, 0, 2));
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 3), mvec.event_prob(VJ_VAR_DEL, 0, 1));
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 4), mvec.event_prob(VJ_VAR_DEL, 0, 0));
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 5), 0)
+
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 0), mvec.event_prob(VJ_VAR_DEL, 2, 6))
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 1), mvec.event_prob(VJ_VAR_DEL, 2, 5))
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 2), mvec.event_prob(VJ_VAR_DEL, 2, 4))
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 3), mvec.event_prob(VJ_VAR_DEL, 2, 3))
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 4), mvec.event_prob(VJ_VAR_DEL, 2, 2))
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 5), mvec.event_prob(VJ_VAR_DEL, 2, 1))
+
+    YMIR_ASSERT2(maag.event_probability(2, 0, 0, 1), 0)
+
+    YMIR_ASSERT2(maag.event_probability(3, 0, 0, 0), 0)
+    YMIR_ASSERT2(maag.event_probability(3, 0, 1, 0), mvec.event_prob(VJ_JOI_DEL, 0, 2))
+    YMIR_ASSERT2(maag.event_probability(3, 0, 2, 0), mvec.event_prob(VJ_JOI_DEL, 0, 3))
+    YMIR_ASSERT2(maag.event_probability(3, 0, 3, 0), mvec.event_prob(VJ_JOI_DEL, 0, 4))
+    YMIR_ASSERT2(maag.event_probability(3, 0, 4, 0), mvec.event_prob(VJ_JOI_DEL, 0, 5))
+    YMIR_ASSERT2(maag.event_probability(3, 0, 5, 0), mvec.event_prob(VJ_JOI_DEL, 0, 6))
+
+    YMIR_ASSERT2(maag.event_probability(3, 2, 0, 0), mvec.event_prob(VJ_JOI_DEL, 2, 1))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 1, 0), mvec.event_prob(VJ_JOI_DEL, 2, 2))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 2, 0), mvec.event_prob(VJ_JOI_DEL, 2, 3))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 3, 0), mvec.event_prob(VJ_JOI_DEL, 2, 4))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 4, 0), mvec.event_prob(VJ_JOI_DEL, 2, 5))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 5, 0), mvec.event_prob(VJ_JOI_DEL, 2, 6))
+YMIR_TEST_END
+
+
 //YMIR_TEST_START(test_maag_vdj)
 //    vector<prob_t> v1;
 //    vector<eventind_t> v2;
@@ -1435,7 +1501,8 @@ int main() {
     YMIR_TEST(test_aa_aligner(), "Naive amino acid sequence aligner")
 
     // Test for MiTCR parser.
-    YMIR_TEST(test_mitcr(), "MiTCR parser test w/ naive D alignment")
+    YMIR_TEST(test_mitcr_vj(), "MiTCR parser test for alpha chain")
+    YMIR_TEST(test_mitcr_vdj(), "MiTCR parser test for beta chain")
 
     // Tests for clonal repertoires and clonal repertoire views.
     YMIR_TEST(test_clorep(), "Cloneset creating / access")
@@ -1449,7 +1516,7 @@ int main() {
     YMIR_TEST(test_mmc(), "Multi-Matrix chain all interface")
 
 //    // Tests for MAAG / MAAG builder
-//    YMIR_TEST(test_maag_vj(), "MAAG VJ building and computing")
+    YMIR_TEST(test_maag_vj(), "MAAG VJ building and computing")
 //    YMIR_TEST(test_maag_vdj(), "MAAG VDJ building and computing")
 //    YMIR_TEST(test_maag_builder_replace(), "MAAG Builder replace event probabilities")
 //

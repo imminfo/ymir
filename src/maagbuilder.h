@@ -225,7 +225,7 @@ namespace ymir {
 
                 if (clonotype.is_vj()) {
                     // probability of choosing this V gene segment
-                    for (segindex_t j_index = 0; j_index < j_num; ++j_num) {
+                    for (segindex_t j_index = 0; j_index < j_num; ++j_index) {
                         probs(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
                                 = _param_vec->event_prob(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
                     }
@@ -246,8 +246,9 @@ namespace ymir {
                 if (full_build) {
                     if (clonotype.is_vj()) {
                         // probability of choosing this V gene segment
-                        for (segindex_t j_index = 0; j_index < j_num; ++j_num) {
-                            events(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index) = _param_vec->event_index(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
+                        for (segindex_t j_index = 0; j_index < j_num; ++j_index) {
+                            events(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
+                                    = _param_vec->event_index(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
                         }
                     } else {
                         events(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_index(VDJ_VAR_GEN, 0, v_gene - 1);

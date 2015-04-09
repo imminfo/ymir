@@ -1,0 +1,4 @@
+V genes	Sequences
+Vseg1	CCCG
+Vseg2	GGG
+Vseg3	CCCGGG

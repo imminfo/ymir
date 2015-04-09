@@ -1,0 +1,68 @@
+{
+  "name": "Test model for some immune receptors",
+  "comment": "Cool comment about this model, yep",
+  "recombination": "VDJ",
+  "hypermutations": false,
+  "segments": {
+    "variable": {
+      "file": "vsegments.txt",
+      "P.nuc.3'": 0,
+      "P.nuc.5'": 0
+    },
+    "joining": {
+      "file": "jsegments.txt",
+      "P.nuc.3'": 0,
+      "P.nuc.5'": 0
+    },
+    "diversity": {
+      "file": "dsegments.txt",
+      "P.nuc.3'": 0,
+      "P.nuc.5'": 0
+    }
+  },
+  "probtables": {
+    "v": {
+      "file": "p.v.txt",
+      "laplace": 0,
+      "type": "vector.list",
+      "skip.first.column": true
+    },
+    "j.d": {
+      "file": "p.jd.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "skip.first.column": true
+    },
+    "v.del": {
+      "file": "p.v.del.txt",
+      "laplace": 0,
+      "type": "vector.list",
+      "skip.first.column": true
+    },
+    "j.del": {
+      "file": "p.j.del.txt",
+      "laplace": 0,
+      "type": "vector.list",
+      "skip.first.column": true
+    },
+    "d.del": {
+      "file": "p.d.del.txt",
+      "laplace": 0,
+      "type": "matrix.list",
+      "skip.first.column": true,
+      "min.len": 3
+    },
+    "ins.len": {
+      "file": "p.ins.len.txt",
+      "laplace": 0,
+      "type": "vector.list",
+      "skip.first.column": true
+    },
+    "ins.nucl": {
+      "file": "p.ins.nucl.txt",
+      "laplace": 0,
+      "type": "matrix",
+      "skip.first.column": true
+    }
+  }
+}

@@ -67,6 +67,41 @@ namespace ymir {
         }
 
         bool read(const string& filepath) {
+            ifstream ifs;
+            ifs.open(filepath);
+
+            if (ifs.is_open()) {
+                stringstream line_stream;
+                string line, word;
+                bool read_header = true;
+                while (!ifs.eof()) {
+                    getline(ifs, line);
+                    if (line[0] != '\n') {
+                        line_stream.str(line);
+                        if (read_header) {
+                            while (!line_stream.eof()) {
+                                getline(line_stream, word, '\t');
+                                cout << word << endl;
+                                // add row
+                            }
+                            read_header = false;
+                        } else {
+                            getline(line_stream, word, '\t'); // skip row's name
+                            int i = 0;
+                            while (!line_stream.eof()) {
+                                getline(line_stream, word, '\t');
+                                // MPFR?!?!?! I don't know
+                                // add row
+                                cout << word << endl;
+                                ++i;
+                            }
+                        }
+                        line_stream.clear();
+                    }
+                }
+                return true;
+            }
+
             return false;
         }
 
@@ -129,8 +164,11 @@ namespace ymir {
     AbstractTDContainer* read_textdata(const string& filepath,
                                        const string& filetype,
                                        bool skip_first_column,
-                                       prob_t laplace) {
+                                       prob_t laplace,
+                                       string& err_message) {
         AbstractTDContainer* container;
+        bool ok;
+        err_message = "OK";
         if (filetype == "matrix") {
             container = new TDMatrix(skip_first_column, laplace);
         } else if (filetype == "vector.list") {
@@ -139,11 +177,15 @@ namespace ymir {
             container = new TDMatrixList(skip_first_column, laplace);
         } else {
             if (filetype == "") {
-                cerr << "No file type for [" << filepath << "]" << endl;
+                err_message = "ERROR: no file type for [" + filepath + "]";
             } else {
-                cerr << "Unregonised file type of [" << filepath << "]:\n\t" << filetype << endl;
+                err_message = "ERROR: unrecognised file type for [" + filepath + "]";
             }
-            container = nullptr;
+            return nullptr;
+        }
+        ok = container->read(filepath);
+        if (!ok) {
+            err_message  = "ERROR: problems in reading file [" + filepath + "]";
         }
         return container;
     }

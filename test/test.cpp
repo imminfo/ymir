@@ -1609,9 +1609,9 @@ int main() {
 
     // Tests for assembling statistical model (ASM) reading / writing files.
     YMIR_TEST(test_model_vj_file(), "VJ Model constructing from a file")
-    YMIR_TEST(test_model_vdj_file(), "VDJ Model constructing from a file")
-    YMIR_TEST(test_model_vj_maag(), "VJ Model creating MAAGs")
-    YMIR_TEST(test_model_vdj_maag(), "VDJ Model creating MAAGs")
+//    YMIR_TEST(test_model_vdj_file(), "VDJ Model constructing from a file")
+//    YMIR_TEST(test_model_vj_maag(), "VJ Model creating MAAGs")
+//    YMIR_TEST(test_model_vdj_maag(), "VDJ Model creating MAAGs")
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.
 

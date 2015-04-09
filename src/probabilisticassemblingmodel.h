@@ -235,7 +235,7 @@ namespace ymir {
                         _config.get("recombination", "VJ").asString() <<
                         "-recombination  |  " <<
                         (_config.get("hypermutations", false).asBool() ? "Hypermutations" : "No hypermutations") <<
-                        endl;
+                        endl << "\tFiles:"<< endl;
                 return true;
             }
             cerr << "Probabilistic assembling model error:" << endl << "\t config .json file not found at [" << jsonpath << "]" << endl;
@@ -281,55 +281,115 @@ namespace ymir {
         bool parseEventProbabilities() {
             Json::Value pt = _config.get("probtables", "no-prob");
             if (pt.size()) {
-                AbstractTDContainer *container;
-                string element = "";
+                vector<prob_t> event_probs;  // param vec
+                vector<eventind_t> event_lengths;  // lens vec
+                vector<eventind_t> event_classes;  // event classes
+                vector<seq_len_t> event_col_num;  // event family col numbers
+
+                AbstractTDContainer *container = nullptr;
+                string element = "", err_message = "";
+                vector<AbstractTDContainer*> containers;
+                containers.resize(10, nullptr);
+
+                // Parser tables with event probabilities
                 for (Json::ArrayIndex i = 0; i < pt.size(); ++i) {
-                    if (container) { delete container; }
-
                     element = pt.getMemberNames()[i];
-                    container = read_textdata(pt[element]["file"].asString(),
-                                  pt[element]["type"].asString(),
-                                  pt[element]["skip.first.column"].asBool(),
-                                  pt[element]["laplace"].asDouble());
+                    container = read_textdata(_model_path + pt[element]["file"].asString(),
+                                              pt[element]["type"].asString(),
+                                              pt[element]["skip.first.column"].asBool(),
+                                              pt[element]["laplace"].asDouble(),
+                                              err_message);
 
-                    if (container) {
-                        if (_vj_recomb) {
-                            if (element == "v.j") {
-
-                            } else if (element == "v.del") {
-
-                            } else if (element == "j.del") {
-
-                            } else if (element == "ins.len") {
-
-                            } else if (element == "ins.nucl") {
-
-                            } else {
-                                cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl;
-                            }
-                        } else {
-                            if (element == "v") {
-
-                            } else if (element == "j.d") {
-
-                            } else if (element == "v.del") {
-
-                            } else if (element == "j.del") {
-
-                            } else if (element == "d.del") {
-
-                            } else if (element == "ins.len") {
-
-                            } else if (element == "ins.nucl") {
-
-                            } else {
-                                cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl;
-                            }
+                    if (_vj_recomb) {
+                        if (element == "v.j") {
+                            if (container) { containers[VJ_VAR_JOI_GEN] = container; }
+                            cout << "\tV-J gene pair:\t" << err_message << endl;
                         }
+                        else if (element == "v.del") {
+                            if (container) { containers[VJ_VAR_DEL] = container; }
+                            cout << "\tV deletions num.:\t" << err_message << endl;;
+                        }
+                        else if (element == "j.del") {
+                            if (container) { containers[VJ_JOI_DEL] = container; }
+                            cout << "\tJ deletions num.:\t" << err_message << endl;;
+                        }
+                        else if (element == "ins.len") {
+                            if (container) { containers[VJ_VAR_JOI_INS_LEN] = container; }
+                            cout << "\tVJ insert. length:\t" << err_message << endl;;
+                        }
+                        else if (element == "ins.nucl") {
+                            if (container) { containers[VJ_VAR_JOI_INS_NUC] = container; }
+                            cout << "\tVJ insert. nucl-s:\t" << err_message << endl;;
+                        }
+                        else { cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl; }
+                    } else {
+                        if (element == "v") {
+                            if (container) { containers[VDJ_VAR_GEN] = container; }
+                            cout << "\tV-J genes:\t" << err_message << endl;
+                        }
+                        else if (element == "j.d") {
+                            if (container) { containers[VDJ_JOI_DIV_GEN] = container; }
+                            cout << "\tV-J genes:\t" << err_message << endl;
+                        }
+                        else if (element == "v.del") {
+                            if (container) { containers[VDJ_VAR_DEL] = container; }
+                            cout << "\tV-J genes:\t" << err_message << endl;
+                        }
+                        else if (element == "j.del") {
+                            if (container) { containers[VDJ_JOI_DEL] = container; }
+                            cout << "\tV-J genes:\t" << err_message << endl;
+                        }
+                        else if (element == "d.del") {
+                            if (container) { containers[VDJ_DIV_DEL] = container; }
+                            cout << "\tV-J genes:\t" << err_message << endl;
+                        }
+                        else if (element == "ins.len") {
+                            if (container) { containers[VDJ_VAR_DIV_INS_LEN] = container; }
+                            cout << "\tV-J genes:\t" << err_message << endl;
+
+                            if (container) { containers[VDJ_DIV_JOI_INS_LEN] = container; }
+                            cout << "\tV-J genes:\t" << err_message << endl;
+                        } else if (element == "ins.nucl") {
+                            if (container) { containers[VDJ_VAR_DIV_INS_NUC] = container; }
+                            cout << "\tV-J genes:\t" << err_message << endl;
+
+                            if (container) { containers[VDJ_DIV_JOI_INS_NUC] = container; }
+                            cout << "\tV-J genes:\t" << err_message << endl;
+                        } else { cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl; }
                     }
                 }
 
-                if (container) { delete container; }
+                // Made ModelParameterVector from input tables if all is ok.
+                if (_vj_recomb) {
+                    if (containers[VJ_VAR_JOI_GEN]
+                        && containers[VJ_VAR_DEL]
+                        && containers[VJ_JOI_DEL]
+                        && containers[VJ_VAR_JOI_INS_LEN]
+                        && containers[VJ_VAR_JOI_INS_NUC]) {
+
+                    } else {
+                        cerr << "Data for some of the events is missing." << endl;
+                    }
+                } else {
+                    if (containers[VDJ_VAR_GEN]
+                        && containers[VDJ_JOI_DIV_GEN]
+                        && containers[VDJ_VAR_DEL]
+                        && containers[VDJ_JOI_DEL]
+                        && containers[VDJ_DIV_DEL]
+                        && containers[VDJ_VAR_DIV_INS_LEN]
+                        && containers[VDJ_DIV_JOI_INS_LEN]
+                        && containers[VDJ_VAR_DIV_INS_NUC]
+                        && containers[VDJ_DIV_JOI_INS_NUC]) {
+
+                    } else {
+                        cerr << "Data for some of the events is missing." << endl;
+                    }
+                }
+
+                // Free all memory for containers.
+                for (size_t i = 0; i < containers.size(); ++i) {
+                    if (containers[i]) { delete containers[i]; }
+                }
 
             } else {
                 cerr << "No information about probability events in the model .json file found." << endl;

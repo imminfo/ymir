@@ -81,7 +81,7 @@ namespace ymir {
             _builder = nullptr;
             _generator = nullptr;
 
-            _status = this->parseModelConfig(folderpath + "/model.json")
+            _status = this->parseModelConfig(folderpath + "model.json")
                       && this->parseGeneSegments()
                       && this->parseEventProbabilities();
 
@@ -162,6 +162,12 @@ namespace ymir {
          * \return Const reference to the gene segments table.
          */
         const VDJRecombinationGenes& gene_segments() const { return *_genes; }
+
+
+        /**
+         * \brief Access to vector of probabilities.
+         */
+        const ModelParameterVector& event_probabilities() const { return *_param_vec; }
 
 
         /**
@@ -247,21 +253,34 @@ namespace ymir {
          * \brief Parse gene segment JSON files and tables.
          */
         bool parseGeneSegments() {
+
+            cout << "\tV gene seg.:\t";
             if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
-                cerr << "Probabilistic assembling model error:" << endl << "\t V(ariable) gene segments file not found" << endl;
+//                cerr << "Probabilistic assembling model error:" << endl << "\t V(ariable) gene segments file not found" << endl;
+                cout << "ERROR: no gene segments file in the model's .json." << endl;
                 return false;
+            } else {
+                cout << "OK" << endl;
             }
             string v_path = _model_path + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
 
-
+            cout << "\tJ gene seg.:\t";
             if (_config.get("segments", Json::Value("")).get("joining", Json::Value("")).size() == 0) {
-                cerr << "Probabilistic assembling model error:" << endl << "\t J(oining) gene segments file not found" << endl;
+//                cerr << "Probabilistic assembling model error:" << endl << "\t J(oining) gene segments file not found" << endl;
+                cout << "ERROR: no gene segments file in the model's .json." << endl;
                 return false;
+            } else {
+                cout << "OK" << endl;
             }
             string j_path = _model_path + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
 
-
             bool vok, jok, dok = true;
+//            if (_vj_recomb) {
+//
+//            } else {
+//
+//            }
+
             if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
                 _genes = new VDJRecombinationGenes("VJ.V", v_path, "VJ.J", j_path, &vok, &jok);
                 /* add P nucleotides */
@@ -301,30 +320,96 @@ namespace ymir {
                                               err_message);
 
                     if (_vj_recomb) {
+                        bool check = true;
                         if (element == "v.j") {
-                            if (container) { containers[VJ_VAR_JOI_GEN] = container; }
-                            cout << "\tV-J gene pair:\t" << err_message << endl;
+                            if (container) {
+                                check = true;
+
+                                containers[VJ_VAR_JOI_GEN] = container;
+
+                                for (size_t i = 0; i < container->column_names().size(); ++i) {
+                                    if (_genes->J()[container->column_names()[i]].index == 0) {
+                                        err_message = "ERROR: can't find " + (container->column_names()[i]) + " in gene segments.";
+                                        check = false;
+                                    }
+                                }
+
+                                for (size_t i = 0; i < container->row_names().size(); ++i) {
+                                    if (_genes->V()[container->row_names()[i]].index == 0) {
+                                        err_message = "ERROR: can't find " + (container->row_names()[i]) + " in gene segments.";
+                                        check = false;
+                                    }
+                                }
+
+                                if (!check) { delete containers[VJ_VAR_JOI_GEN]; containers[VJ_VAR_JOI_GEN] = nullptr; }
+                            }
+
+                            cout << "\tV-J gene pairs:\t" << err_message << endl;
                         }
                         else if (element == "v.del") {
-                            if (container) { containers[VJ_VAR_DEL] = container; }
-                            cout << "\tV deletions num.:\t" << err_message << endl;;
+                            check = true;
+
+                            if (container) {
+                                containers[VJ_VAR_DEL] = container;
+
+                                for (size_t i = 0; i < container->column_names().size(); ++i) {
+                                    if (_genes->V()[container->column_names()[i]].index == 0) {
+                                        err_message = "ERROR: can't find " + (container->column_names()[i]) + " in gene segments.";
+                                        check = false;
+                                    }
+                                }
+
+                                if (!check) { delete containers[VJ_VAR_DEL]; containers[VJ_VAR_DEL] = nullptr; }
+                            }
+
+                            cout << "\tV delet. num.:\t" << err_message << endl;;
                         }
                         else if (element == "j.del") {
-                            if (container) { containers[VJ_JOI_DEL] = container; }
-                            cout << "\tJ deletions num.:\t" << err_message << endl;;
+                            check = true;
+
+                            if (container) {
+                                containers[VJ_JOI_DEL] = container;
+
+                                for (size_t i = 0; i < container->column_names().size(); ++i) {
+                                    if (_genes->J()[container->column_names()[i]].index == 0) {
+                                        err_message = "ERROR: can't find " + (container->column_names()[i]) + " in gene segments.";
+                                        check = false;
+                                    }
+                                }
+
+                                if (!check) { delete containers[VJ_JOI_DEL]; containers[VJ_JOI_DEL] = nullptr; }
+                            }
+
+                            cout << "\tJ delet. num.:\t" << err_message << endl;;
                         }
                         else if (element == "ins.len") {
                             if (container) { containers[VJ_VAR_JOI_INS_LEN] = container; }
-                            cout << "\tVJ insert. length:\t" << err_message << endl;;
+
+                            cout << "\tVJ ins. len.:\t" << err_message << endl;;
                         }
                         else if (element == "ins.nucl") {
-                            if (container) { containers[VJ_VAR_JOI_INS_NUC] = container; }
-                            cout << "\tVJ insert. nucl-s:\t" << err_message << endl;;
+                            check = true;
+
+                            if (container) {
+                                containers[VJ_VAR_JOI_INS_NUC] = container;
+
+                                if (container->row_names().size() != 4 || container->column_names().size() != 4) {
+                                    check = false;
+                                    err_message = "ERROR: wrong number of columns and rows.";
+                                }
+
+                                if (!check) { delete containers[VJ_VAR_JOI_INS_NUC]; containers[VJ_VAR_JOI_INS_NUC] = nullptr; }
+                            }
+
+                            cout << "\tVJ ins. nuc.:\t" << err_message << endl;;
                         }
                         else { cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl; }
-                    } else {
+                    }
+                    else {
                         if (element == "v") {
-                            if (container) { containers[VDJ_VAR_GEN] = container; }
+                            if (container) {
+                                containers[VDJ_VAR_GEN] = container;
+                            }
                             cout << "\tV-J genes:\t" << err_message << endl;
                         }
                         else if (element == "j.d") {
@@ -360,6 +445,7 @@ namespace ymir {
                 }
 
                 // Made ModelParameterVector from input tables if all is ok.
+                bool is_ok = false;
                 if (_vj_recomb) {
                     if (containers[VJ_VAR_JOI_GEN]
                         && containers[VJ_VAR_DEL]
@@ -367,8 +453,7 @@ namespace ymir {
                         && containers[VJ_VAR_JOI_INS_LEN]
                         && containers[VJ_VAR_JOI_INS_NUC]) {
 
-                    } else {
-                        cerr << "Data for some of the events is missing." << endl;
+                        is_ok = true;
                     }
                 } else {
                     if (containers[VDJ_VAR_GEN]
@@ -381,8 +466,8 @@ namespace ymir {
                         && containers[VDJ_VAR_DIV_INS_NUC]
                         && containers[VDJ_DIV_JOI_INS_NUC]) {
 
-                    } else {
-                        cerr << "Data for some of the events is missing." << endl;
+
+                        is_ok = true;
                     }
                 }
 
@@ -390,6 +475,8 @@ namespace ymir {
                 for (size_t i = 0; i < containers.size(); ++i) {
                     if (containers[i]) { delete containers[i]; }
                 }
+
+                if (!is_ok) { return false; }
 
             } else {
                 cerr << "No information about probability events in the model .json file found." << endl;

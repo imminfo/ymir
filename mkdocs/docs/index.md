@@ -68,16 +68,22 @@ wow-wow, easy here. There are not implemented yet.
 
 After compiling an executable files will appear in the `build` folder.
 
-### Compute generation probabilities of human TCR-alpha data
+### Computation of generation probabilities
+
+#### Compute generation probabilities of human TCR-alpha data
 
 * `mkdocs new [dir-name]` - Create a new project.
 * `mkdocs serve` - Start the live-reloading docs server.
 * `mkdocs build` - Build the documentation site.
 * `mkdocs help` - Print this help message.
 
-### Estimate human TCR-alpha generation model parameters using EM-algorithm
+### Statistical inference of a model's parameters
 
-### Generate artificial human TCR-alpha repertoire before selection
+#### Estimate human TCR-alpha generation model parameters using EM-algorithm
+
+### Generation of pre-selection receptors
+
+#### Generate artificial human TCR-alpha repertoire before selection
 
 ---
 
@@ -85,9 +91,15 @@ After compiling an executable files will appear in the `build` folder.
 
 ### Model files
 
-### Gene segments files
+#### Main JSON file
+
+#### Gene segments files
+
+#### Event probability files
 
 ### Cloneset files
+
+#### Available parsers
 
 ---
 

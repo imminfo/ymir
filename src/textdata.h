@@ -13,15 +13,23 @@
 namespace ymir {
 
 
+    enum CONTAINER_TYPE {
+        VECTOR_LIST,
+        MATRIX,
+        MATRIX_LIST
+    };
+
+
     struct AbstractTDContainer {
     public:
 
-        AbstractTDContainer(bool skip_first_column, prob_t laplace) {
+        AbstractTDContainer(CONTAINER_TYPE ctype, bool skip_first_column, prob_t laplace) {
             _colnames.reserve(40);
             _rownames.reserve(40);
             _data.reserve(40);
             _laplace = laplace;
             _skip_first_column = skip_first_column;
+            _type = ctype;
         }
 
 
@@ -45,6 +53,8 @@ namespace ymir {
 
         const vector<prob_t>& data(size_t i) const { return _data[i]; }
 
+        CONTAINER_TYPE type() const { return _type; }
+
     protected:
 
         vector< vector<prob_t> > _data;
@@ -52,6 +62,7 @@ namespace ymir {
         vector<string> _rownames;
         prob_t _laplace;
         bool _skip_first_column;
+        CONTAINER_TYPE _type;
 
 
         AbstractTDContainer() {
@@ -71,7 +82,7 @@ namespace ymir {
     struct TDVectorList : public AbstractTDContainer {
     public:
 
-        TDVectorList(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(skip_first_column, laplace) { }
+        TDVectorList(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(VECTOR_LIST, skip_first_column, laplace) { }
 
 
         virtual ~TDVectorList() { }
@@ -159,7 +170,7 @@ namespace ymir {
     struct TDMatrix : public AbstractTDContainer  {
     public:
 
-        TDMatrix(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(skip_first_column, laplace)  { }
+        TDMatrix(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(MATRIX, skip_first_column, laplace)  { }
 
 
         virtual ~TDMatrix() { }
@@ -243,7 +254,7 @@ namespace ymir {
     public:
 
 
-        TDMatrixList(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(skip_first_column, laplace)  { }
+        TDMatrixList(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(MATRIX_LIST, skip_first_column, laplace)  { }
 
 
         virtual ~TDMatrixList() { }

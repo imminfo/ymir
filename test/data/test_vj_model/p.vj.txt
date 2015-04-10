@@ -1,4 +1,4 @@
-V/	Jseg1	Jseg3	Jseg2
+V-J	Jseg1	Jseg3	Jseg2
 Vseg3	.075	.565	.085
 Vseg1	.05	.035	.025
 Vseg2	.045	.065	.055

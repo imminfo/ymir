@@ -36,6 +36,12 @@ namespace ymir {
         virtual ~AbstractTDContainer() { }
 
 
+        prob_t laplace() const { return _laplace; }
+
+
+        segindex_t n_columns() const { return _colnames.size(); }
+
+
         void addRowName(const string& name) { _rownames.push_back(name); }
 
 

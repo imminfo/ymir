@@ -426,7 +426,15 @@ namespace ymir {
                         && containers[VJ_VAR_JOI_INS_LEN]
                         && containers[VJ_VAR_JOI_INS_NUC]) {
 
-//                        name_order = this->arrangeNames(containers)
+                        this->addGenes(containers[VJ_VAR_DEL],
+                                       _genes->V(),
+                                       _genes->J(),
+                                       event_probs,
+                                       event_lengths,
+                                       event_classes,
+                                       event_col_num,
+                                       laplace,
+                                       0);
 
                         this->addDels(containers[VJ_VAR_DEL],
                                      _genes->V(),
@@ -446,21 +454,21 @@ namespace ymir {
                                      laplace,
                                      containers[VJ_VAR_DEL]->n_columns());
 
-                        this->addInsLen(containers[VJ_VAR_JOI_INS_LEN],
-                                        event_probs,
-                                        event_lengths,
-                                        event_classes,
-                                        event_col_num,
-                                        laplace,
-                                        containers[VJ_JOI_DEL]->n_columns());
+                        this->addIns(containers[VJ_VAR_JOI_INS_LEN],
+                                     event_probs,
+                                     event_lengths,
+                                     event_classes,
+                                     event_col_num,
+                                     laplace,
+                                     containers[VJ_JOI_DEL]->n_columns());
 
-                        this->addInsNuc(containers[VJ_VAR_JOI_INS_NUC],
-                                        event_probs,
-                                        event_lengths,
-                                        event_classes,
-                                        event_col_num,
-                                        laplace,
-                                        1);
+                        this->addIns(containers[VJ_VAR_JOI_INS_NUC],
+                                     event_probs,
+                                     event_lengths,
+                                     event_classes,
+                                     event_col_num,
+                                     laplace,
+                                     1);
 
                         _param_vec = new ModelParameterVector(VJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace);
                         is_ok = true;
@@ -536,8 +544,7 @@ namespace ymir {
                       vector<eventind_t> &event_lengths,
                       vector<eventind_t> &event_classes,
                       vector<seq_len_t> &event_col_num,
-                      vector<prob_t> &laplace,
-                      segindex_t prev_class_size) const {
+                      vector<prob_t> &laplace) const {
             vector<segindex_t> name_order = this->arrangeNames(container->column_names(), gsa);
             vector<prob_t> prob_data;
             for (size_t i = 0; i < name_order.size(); ++i) {
@@ -551,7 +558,8 @@ namespace ymir {
                 event_col_num.push_back(0);
                 laplace.push_back(container->laplace());
             }
-            event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
+
+            event_classes.push_back(0);
         }
 
 
@@ -564,7 +572,8 @@ namespace ymir {
                       vector<seq_len_t> &event_col_num,
                       vector<prob_t> &laplace,
                       segindex_t prev_class_size) const {
-            vector<segindex_t> name_order = this->arrangeNames(container->column_names(), gsa);
+            vector<segindex_t> name_order_row = this->arrangeNames(container->column_names(), gsa_row);
+            vector<segindex_t> name_order_column = this->arrangeNames(container->column_names(), gsa_column);
             vector<prob_t> prob_data;
             for (size_t i = 0; i < name_order.size(); ++i) {
                 prob_data = container->data(name_order[i]);
@@ -577,7 +586,12 @@ namespace ymir {
                 event_col_num.push_back(0);
                 laplace.push_back(container->laplace());
             }
-            event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
+
+            if (prev_class_size) {
+                event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
+            } else {
+                event_classes.push_back(1);
+            }
         }
 
 
@@ -606,38 +620,23 @@ namespace ymir {
         }
 
 
-        void addInsLen(AbstractTDContainer *container,
-                                vector<prob_t> &event_probs,
-                                vector<eventind_t> &event_lengths,
-                                vector<eventind_t> &event_classes,
-                                vector<seq_len_t> &event_col_num,
-                                vector<prob_t> &laplace,
-                                segindex_t prev_class_size) const {
-            vector<prob_t> prob_data = container->data(0);
-            event_probs.insert(event_probs.end(),
-                               prob_data.begin(),
-                               prob_data.end());
-            event_lengths.push_back(prob_data.size());
-            event_col_num.push_back(0);
-            laplace.push_back(container->laplace());
-            event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
-        }
-
-
-        void addInsNuc(AbstractTDContainer *container,
-                       vector<prob_t> &event_probs,
-                       vector<eventind_t> &event_lengths,
-                       vector<eventind_t> &event_classes,
-                       vector<seq_len_t> &event_col_num,
-                       vector<prob_t> &laplace,
-                       segindex_t prev_class_size) const {
-            vector<prob_t> prob_data = container->data(0);
-            event_probs.insert(event_probs.end(),
-                               prob_data.begin(),
-                               prob_data.end());
-            event_lengths.push_back(prob_data.size());
-            event_col_num.push_back(0);
-            laplace.push_back(container->laplace());
+        void addIns(AbstractTDContainer *container,
+                    vector<prob_t> &event_probs,
+                    vector<eventind_t> &event_lengths,
+                    vector<eventind_t> &event_classes,
+                    vector<seq_len_t> &event_col_num,
+                    vector<prob_t> &laplace,
+                    segindex_t prev_class_size) const {
+            vector<prob_t> prob_data;
+            for (size_t i = 0; i < container->n_columns(); ++i) {
+                prob_data = container->data(i);
+                event_probs.insert(event_probs.end(),
+                                   prob_data.begin(),
+                                   prob_data.end());
+                event_lengths.push_back(prob_data.size());
+                event_col_num.push_back(0);
+                laplace.push_back(container->laplace());
+            }
             event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
         }
 

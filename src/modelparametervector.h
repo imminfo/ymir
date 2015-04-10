@@ -145,6 +145,16 @@ namespace ymir {
         }
 
 
+        bool operator==(const ModelParameterVector &other) const {
+            return (_vec == other._vec)
+                   && (_edges == other._edges)
+                   && (_event_classes == other._event_classes)
+                   && (_event_family_col_numbers == other._event_family_col_numbers)
+                   && (_laplace == other._laplace)
+                   && (_d_genes_min_len == other._d_genes_min_len);
+        }
+
+
         //============= VECTOR INDICES ACCESS =============//
 
 

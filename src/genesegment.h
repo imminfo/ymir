@@ -97,8 +97,15 @@ namespace ymir {
         const string& name() const { return this->_name; }
 
 
-        const GeneSegment& operator[] (segindex_t index) const { return this->_vec[index]; }
-        const GeneSegment& operator[] (const string& name) const { return this->_vec[this->_map.at(name)]; }
+        const GeneSegment& operator[] (segindex_t index) const {
+            if (index < _vec.size()) { return _vec[index]; }
+            return _vec[0];
+        }
+
+        const GeneSegment& operator[] (const string& name) const {
+            if (_map.find(name) != _map.end()) { return _vec[_map.at(name)]; }
+            return _vec[0];
+        }
 
 
         segindex_t size() const { return this->_vec.size(); }

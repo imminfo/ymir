@@ -1,14 +1,14 @@
-# Ymir
-Probabilistic models of immune receptors assembling
+# Algorithms in Ymir
 
 ---
 
-## Multi-Alignment Assembly Graph
+## MAAG: Multi-Alignment Assembly Graph
 
 ### MAAG for nucleotide sequences
 
 ### MAAG for amino acid sequences
 
+amino acid markov chain and tables
 
 ---
 

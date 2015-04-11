@@ -5,6 +5,7 @@ site_author: Vadim Nazarov
 copyright: Copyright © 2015, Vadim Nazarov.
 pages:
 - [index.md, Home]
+- [algorithms.md, Algorithms]
 - [api.md, C++ API]
 - [rpackage.md, R package]
 - [about.md, About]

@@ -148,9 +148,9 @@ namespace ymir {
         * \return True if found has been successfully processed, false otherwise.
         */
         bool parse(const string& filepath, Cloneset *rep, const VDJRecombinationGenes& gene_segments,
-                const AbstractAligner& aligner = NaiveNucleotideAligner(),
-                bool nuc_sequences = true,
-                AlignmentColumnOptions opts = AlignmentColumnOptions().setV(MAKE_IF_NOT_FOUND).setJ(MAKE_IF_NOT_FOUND).setD(MAKE_IF_NOT_FOUND)) {
+                   const AbstractAligner& aligner = NaiveNucleotideAligner(),
+                   bool nuc_sequences = true,
+                   AlignmentColumnOptions opts = AlignmentColumnOptions().setV(MAKE_IF_NOT_FOUND).setJ(MAKE_IF_NOT_FOUND).setD(MAKE_IF_NOT_FOUND)) {
 
             if (!_config_is_loaded) { return false; }
 

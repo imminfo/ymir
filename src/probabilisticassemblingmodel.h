@@ -485,6 +485,7 @@ namespace ymir {
                         && containers[VDJ_DIV_JOI_INS_NUC]) {
 
 
+
                         _param_vec = new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace);
                         is_ok = true;
                     }
@@ -574,9 +575,6 @@ namespace ymir {
             sorted_prob_data.resize(prob_data.size(), 0);
             for (size_t i = 0; i < name_order_row.size(); ++i) {
                 for (size_t j = 0; j < name_order_column.size(); ++j) {
-//                    cout << "row:" << (int) i << " column:" << (int) j << endl;
-//                    cout << container->row_names()[i] << ":" << container->column_names()[j] << endl;
-//                    cout << "correct row:" << (int) (name_order_row[i] - 1) << " correct column:" << (int) (name_order_column[j] - 1) << endl;
                     sorted_prob_data[(name_order_row[i] - 1) * container->n_columns() + (name_order_column[j] - 1)] = prob_data[i * container->n_columns() + j];
                 }
             }

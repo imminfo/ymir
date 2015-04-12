@@ -11,32 +11,102 @@
 
 int main() {
 
-    // GENERATE TABLE FILES FOR FURTHER VISUALISATION IN R
+//    Cloneset repertoire1K, repertoire10K, repertoire100K;
+//  With and without parallelisation
 
-    // Compute simple one-alignment VJ full probabilities.
-    // VJ
+    // Compute simple one-alignment full probabilities.
+    // 1 V ; 1 J
+    //    repertoire1K;
+//    repertoire10K;
+//    repertoire100K;
+    // 1000
+    // 10000
+    // 100000
 
-    // VDJ
+    // 1 V ; 2 Ds ; 1 J
+    //    repertoire1K;
+//    repertoire10K;
+//    repertoire100K;
+    // 1000
+    // 10000
+    // 100000
 
 
     // Compute simple one-alignment full probabilities with storing additional data like CDR3 sequences.
-    // VJ
+    // 1 V ; 1 J
+    // 1000
+    // 10000
+    // 100000
 
-    // VDJ
+    // 1 V ; 2 Ds ; 1 J
+    // 1000
+    // 10000
+    // 100000
 
 
     // Compute various multi-alignment full probabilities.
     // 2 Vs ; 1 Js
+    // 1000
+    // 10000
+    // 100000
 
     // 5 Vs ; 1 Js
+    // 1000
+    // 10000
+    // 100000
 
-    // 10 Vs ; 1 Js
+    // 5 Vs ; 5 Js
+    // 1000
+    // 10000
+    // 100000
 
     // 2 Vs ; 2 Ds ; 1 Js
+    // 1000
+    // 10000
+    // 100000
 
     // 5 Vs ; 2 Ds ; 1 Js
+    // 1000
+    // 10000
+    // 100000
 
-    // 10 Vs ; 2 Ds ; 1 Js
+    // 5 Vs ; 2 Ds ; 5 Js
+    // 1000
+    // 10000
+    // 100000
+
+
+    // Compute various multi-alignment full probabilities with full graph building.
+    // 2 Vs ; 1 Js
+    // 1000
+    // 10000
+    // 100000
+
+    // 5 Vs ; 1 Js
+    // 1000
+    // 10000
+    // 100000
+
+    // 5 Vs ; 5 Js
+    // 1000
+    // 10000
+    // 100000
+
+    // 2 Vs ; 2 Ds ; 1 Js
+    // 1000
+    // 10000
+    // 100000
+
+    // 5 Vs ; 2 Ds ; 1 Js
+    // 1000
+    // 10000
+    // 100000
+
+    // 5 Vs ; 2 Ds ; 5 Js
+    // 1000
+    // 10000
+    // 100000
+
 
 
     return 0;

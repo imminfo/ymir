@@ -1,0 +1,4 @@
+J-D segments	Dseg2	Dseg3	Dseg1
+Jseg2	.05	.07	.04
+Jseg3	.09	.61	.08
+Jseg1	.02	.03	.01

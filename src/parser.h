@@ -235,7 +235,8 @@ namespace ymir {
 
             ClonotypeBuilder clone_builder;
 
-            int glob_index = 0;
+            int glob_index = 0, bad_index = 0;
+
             while (!ifs.eof()) {
                 getline(ifs, line);
                 if (line.size() > 2) {
@@ -347,7 +348,7 @@ namespace ymir {
 
                         ++glob_index;
                         if (glob_index % 50000 == 0) {
-                            cout << get_parser_name() + ": parsed " << glob_index << " clones" << endl;
+                            cout << get_parser_name() + ": parsed " << glob_index << " lines" << endl;
                         }
 
                         vec.push_back(clone_builder.buildClonotype());
@@ -356,7 +357,15 @@ namespace ymir {
                 }
             }
 
-            cout << get_parser_name() + ": parsed " << glob_index << " clones. " << "Parsing is complete." << endl;
+            cout << get_parser_name() + ": parsed " <<
+                    glob_index <<
+                    " lines (" <<
+                    bad_index  <<
+                    " error clonotypes removed)." <<
+                    endl <<
+                    "Parsing is complete. Resulting cloneset size: " <<
+                    (glob_index - bad_index) <<
+                    endl;
 
             return true;
         }

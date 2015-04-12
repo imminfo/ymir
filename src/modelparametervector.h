@@ -120,18 +120,18 @@ namespace ymir {
 
             _laplace = vector<prob_t>();
             if (laplace_vec.size()) {
-                _laplace.reserve(laplace_vec.size());
+                _laplace.reserve(laplace_vec.size() + 1);
                 _laplace.push_back(0);
                 for (eventind_t i = 0; i < laplace_vec.size(); ++i) {
                     _laplace.push_back(laplace_vec[i]);
                 }
             } else {
                 // Laplace correction equal to zero if vector is not supplied.
-                _laplace.resize(_edges.size(), 0);
+                _laplace.resize(_edges.size() - 2, 0);
             }
 
+            _d_genes_min_len = vector<seq_len_t>();
             if (vec_type == VDJ_RECOMB) {
-                _d_genes_min_len = vector<seq_len_t>();
                 if (d_genes_min_len.size()) {
                     _d_genes_min_len = d_genes_min_len;
                 } else {
@@ -146,12 +146,23 @@ namespace ymir {
 
 
         bool operator==(const ModelParameterVector &other) const {
-            return (_vec == other._vec)
-                   && (_edges == other._edges)
-                   && (_event_classes == other._event_classes)
-                   && (_event_family_col_numbers == other._event_family_col_numbers)
-                   && (_laplace == other._laplace)
-                   && (_d_genes_min_len == other._d_genes_min_len);
+            if ((_vec.size() != other._vec.size())
+                || (_edges.size() != other._edges.size())
+                || (_event_classes.size() != other._event_classes.size())
+                || (_event_family_col_numbers.size() != other._event_family_col_numbers.size())
+                || (_laplace.size() != other._laplace.size())
+                || (_d_genes_min_len.size() != other._d_genes_min_len.size())) {
+                return false;
+            }
+
+            for (size_t i = 0; i < _vec.size(); ++i) { if (_vec[i] != other._vec[i]) { return false; } }
+            for (size_t i = 0; i < _edges.size(); ++i) { if (_edges[i] != other._edges[i]) { return false; } }
+            for (size_t i = 0; i < _event_classes.size(); ++i) { if (_event_classes[i] != other._event_classes[i]) { return false; } }
+            for (size_t i = 0; i < _event_family_col_numbers.size(); ++i) { if (_event_family_col_numbers[i] != other._event_family_col_numbers[i]) { return false; } }
+            for (size_t i = 0; i < _laplace.size(); ++i) { if (_laplace[i] != other._laplace[i]) { return false; } }
+            for (size_t i = 0; i < _d_genes_min_len.size(); ++i) { if (_d_genes_min_len[i] != other._d_genes_min_len[i]) { return false; } }
+
+            return true;
         }
 
 

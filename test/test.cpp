@@ -1571,7 +1571,7 @@ YMIR_TEST_START(test_model_vj_file)
     v3.push_back(4);
 
     // VJ ins len
-    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.1);
+    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
     v2.push_back(7);
     v4.push_back(0);
 
@@ -1593,14 +1593,14 @@ YMIR_TEST_START(test_model_vj_file)
     v3.push_back(9);
 
     // prev G
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
     v2.push_back(4);
     v4.push_back(0);
 
     v3.push_back(10);
 
     // prev T
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
+    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
     v2.push_back(4);
     v4.push_back(0);
 
@@ -1611,7 +1611,7 @@ YMIR_TEST_START(test_model_vj_file)
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
     YMIR_ASSERT(model.status())
 
-//    YMIR_ASSERT(mvec == model.event_probabilities())
+    YMIR_ASSERT(mvec == model.event_probabilities())
 
 
 YMIR_TEST_END

@@ -426,7 +426,7 @@ namespace ymir {
                         && containers[VJ_VAR_JOI_INS_LEN]
                         && containers[VJ_VAR_JOI_INS_NUC]) {
 
-                        this->addGenes(containers[VJ_VAR_DEL],
+                        this->addGenes(containers[VJ_VAR_JOI_GEN],
                                        _genes->V(),
                                        _genes->J(),
                                        event_probs,
@@ -485,7 +485,7 @@ namespace ymir {
                         && containers[VDJ_DIV_JOI_INS_NUC]) {
 
 
-                        _param_vec = new ModelParameterVector(VJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace);
+                        _param_vec = new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace);
                         is_ok = true;
                     }
                 }
@@ -508,11 +508,11 @@ namespace ymir {
             unordered_set<string> nameset;
 
             for (size_t i = 0; i < names.size(); ++i) {
-                nameset.insert(names[i]);
                 if (gsa[names[i]].index == 0) {
                     err_message = "ERROR: can't find " + names[i] + " in gene segments.";
                     return false;
                 }
+                nameset.insert(names[i]);
             }
 
             for (size_t i = 1; i < gsa.size(); ++i) {
@@ -528,7 +528,7 @@ namespace ymir {
 
         vector<segindex_t> arrangeNames(const vector<string> &names, const GeneSegmentAlphabet &gsa) const {
             vector<segindex_t> res;
-            res.resize(gsa.size(), 0);
+            res.resize(names.size(), 0);
 
             for (size_t i = 0; i < names.size(); ++i) { res[i] = gsa[names[i]].index; }
 
@@ -546,9 +546,7 @@ namespace ymir {
             vector<segindex_t> name_order = this->arrangeNames(container->column_names(), gsa);
             vector<prob_t> prob_data;
             for (size_t i = 0; i < name_order.size(); ++i) {
-                prob_data = container->data(name_order[i]);
-                // remove trailing zeros
-                prob_data.resize(gsa[name_order[i]].sequence.size() + 1);
+                prob_data = container->data(name_order[i] - 1);
                 event_probs.insert(event_probs.end(),
                                    prob_data.begin(),
                                    prob_data.end());
@@ -570,25 +568,29 @@ namespace ymir {
                       vector<seq_len_t> &event_col_num,
                       vector<prob_t> &laplace,
                       segindex_t prev_class_size) const {
-            vector<segindex_t> name_order_row = this->arrangeNames(container->column_names(), gsa_row);
+            vector<segindex_t> name_order_row = this->arrangeNames(container->row_names(), gsa_row);
             vector<segindex_t> name_order_column = this->arrangeNames(container->column_names(), gsa_column);
-            vector<prob_t> prob_data = container->data(0);
+            vector<prob_t> prob_data = container->data(0), sorted_prob_data;
+            sorted_prob_data.resize(prob_data.size(), 0);
             for (size_t i = 0; i < name_order_row.size(); ++i) {
                 for (size_t j = 0; j < name_order_column.size(); ++j) {
-                    prob_data.resize(gsa[name_order[i]].sequence.size() + 1);
-                    event_probs.insert(event_probs.end(),
-                                       prob_data.begin(),
-                                       prob_data.end());
-                    event_lengths.push_back(prob_data.size());
-                    event_col_num.push_back(0);
-                    laplace.push_back(container->laplace());
+//                    cout << "row:" << (int) i << " column:" << (int) j << endl;
+//                    cout << container->row_names()[i] << ":" << container->column_names()[j] << endl;
+//                    cout << "correct row:" << (int) (name_order_row[i] - 1) << " correct column:" << (int) (name_order_column[j] - 1) << endl;
+                    sorted_prob_data[(name_order_row[i] - 1) * container->n_columns() + (name_order_column[j] - 1)] = prob_data[i * container->n_columns() + j];
                 }
             }
+            event_probs.insert(event_probs.end(),
+                               sorted_prob_data.begin(),
+                               sorted_prob_data.end());
+            event_lengths.push_back(sorted_prob_data.size());
+            event_col_num.push_back(container->n_columns());
+            laplace.push_back(container->laplace());
 
             if (prev_class_size) {
                 event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
             } else {
-                event_classes.push_back(1);
+                event_classes.push_back(0);
             }
         }
 
@@ -601,20 +603,25 @@ namespace ymir {
                         vector<seq_len_t> &event_col_num,
                         vector<prob_t> &laplace,
                         segindex_t prev_class_size) const {
-        vector<segindex_t> name_order = this->arrangeNames(container->column_names(), gsa);
-        vector<prob_t> prob_data;
-        for (size_t i = 0; i < name_order.size(); ++i) {
-            prob_data = container->data(name_order[i]);
-            // remove trailing zeros
-            prob_data.resize(gsa[name_order[i]].sequence.size() + 1);
-            event_probs.insert(event_probs.end(),
-                               prob_data.begin(),
-                               prob_data.end());
-            event_lengths.push_back(prob_data.size());
-            event_col_num.push_back(0);
-            laplace.push_back(container->laplace());
-        }
-        event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
+            vector<segindex_t> name_order = this->arrangeNames(container->column_names(), gsa);
+            vector<prob_t> prob_data;
+            for (size_t i = 0; i < name_order.size(); ++i) {
+                // find correct segment for i-th position
+                size_t j = 0;
+                for (; i+1 != name_order[j] ; ++j) {}
+                prob_data = container->data(j);
+                // remove trailing zeros
+                if (prob_data.size() > gsa[name_order[j]].sequence.size() + 1) {
+                    prob_data.resize(gsa[name_order[j]].sequence.size() + 1);
+                }
+                event_probs.insert(event_probs.end(),
+                                   prob_data.begin(),
+                                   prob_data.end());
+                event_lengths.push_back(prob_data.size());
+                event_col_num.push_back(0);
+                laplace.push_back(container->laplace());
+            }
+            event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
         }
 
 
@@ -634,8 +641,8 @@ namespace ymir {
                 event_lengths.push_back(prob_data.size());
                 event_col_num.push_back(0);
                 laplace.push_back(container->laplace());
+                event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
             }
-            event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
         }
 
 

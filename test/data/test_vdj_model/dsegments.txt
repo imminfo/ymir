@@ -1,4 +1,4 @@
-J genes	Sequences
-Jseg1	CCGTTT
-Jseg2	ATTT
-Jseg3	AGGTTT
+D genes	Sequences
+Dseg1	GTTT
+Dseg2	ACCGGT
+Dseg3	CCCGGAC

@@ -24,14 +24,12 @@
     "v": {
       "file": "p.v.txt",
       "laplace": 0,
-      "type": "vector.list",
-      "skip.first.column": true
+      "type": "vector"
     },
     "j.d": {
       "file": "p.jd.txt",
       "laplace": 0,
-      "type": "matrix",
-      "skip.first.column": true
+      "type": "matrix"
     },
     "v.del": {
       "file": "p.v.del.txt",

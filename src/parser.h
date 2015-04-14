@@ -147,10 +147,12 @@ namespace ymir {
         *
         * \return True if found has been successfully processed, false otherwise.
         */
-        bool parse(const string& filepath, Cloneset *rep, const VDJRecombinationGenes& gene_segments,
+        bool parse(const string& filepath,
+                   Cloneset *rep,
+                   const VDJRecombinationGenes& gene_segments,
+                   AlignmentColumnOptions opts = AlignmentColumnOptions().setV(MAKE_IF_NOT_FOUND).setJ(MAKE_IF_NOT_FOUND).setD(MAKE_IF_NOT_FOUND),
                    const AbstractAligner& aligner = NaiveNucleotideAligner(),
-                   bool nuc_sequences = true,
-                   AlignmentColumnOptions opts = AlignmentColumnOptions().setV(MAKE_IF_NOT_FOUND).setJ(MAKE_IF_NOT_FOUND).setD(MAKE_IF_NOT_FOUND)) {
+                   bool nuc_sequences = true) {
 
             if (!_config_is_loaded) { return false; }
 
@@ -161,6 +163,7 @@ namespace ymir {
             bool res = false;
             if (ifs.is_open()) {
                 res = this->parseRepertoire(ifs, clonevec, gene_segments, aligner, nuc_sequences, opts);
+                cout << "Repertoire parser " + get_parser_name() + ":" << endl << "\tparsing input file [" << filepath << "]" << endl;
                 if (res) { rep->swap(clonevec); }
             } else {
                 cerr << "Repertoire parser " + get_parser_name() + " error:" << endl << "\tinput file [" << filepath << "] not found" << endl;
@@ -178,11 +181,12 @@ namespace ymir {
         bool _config_is_loaded;
 
 
-        virtual bool parseRepertoire(ifstream& ifs, vector<Clonotype>& vec,
-                const VDJRecombinationGenes& gene_segments,
-                const AbstractAligner& aligner,
-                bool nuc_sequences,
-                AlignmentColumnOptions opts) {
+        virtual bool parseRepertoire(ifstream& ifs,
+                                     vector<Clonotype>& vec,
+                                     const VDJRecombinationGenes& gene_segments,
+                                     const AbstractAligner& aligner,
+                                     bool nuc_sequences,
+                                     AlignmentColumnOptions opts) {
 
             unordered_map<string, int> columns_id;
 
@@ -224,7 +228,7 @@ namespace ymir {
             bool do_align_V = false, do_align_J = false, do_align_D = false;
 
             stringstream line_stream, word_stream;
-            string line, word;
+            string line, word, sequence;
             int skip_lines = _config.get("skip.lines", 0).asInt();
             bool header = true;
 
@@ -313,11 +317,13 @@ namespace ymir {
                                 if (nuc_sequences) {
                                     clone_builder.setSequence(word);
                                     clone_builder.setNucleotideSeq();
+                                    sequence = word;
                                 }
                             } else if (index == col_aa_seq_id) {
                                 if (!nuc_sequences) {
                                     clone_builder.setSequence(word);
                                     clone_builder.setAminoAcidSeq();
+                                    sequence = word;
                                 }
                             } else if (index == col_v_seg_id) {
                                 parseWordSegment(word, al_sep, vseg, gene_segments.V());
@@ -329,21 +335,32 @@ namespace ymir {
                                 parseWordAlignment(word, al_sep, jseg, gene_segments.J(), clone_builder, based1, 'J');
                             } else if (index == col_d_seg_id) {
                                 // NOT IMPLEMENTED YET
-                                if (do_align_D) {
-
-                                } else {
-
+                                if (!do_align_D) {
+                                    // error if VDJ recombination, no D alignment and D genes column is bad
                                 }
                             } else if (index == col_d_als_id) {
-                                // NOT IMPLEMENTED YET
-                                if (do_align_D) {
-
-                                } else {
-
+                                if (!do_align_D) {
+                                    // error if VDJ recombination and D alignment columns is bad
                                 }
                             }
 
                             ++index;
+                        }
+
+                        if (do_align_V) {}
+
+                        if (do_align_J) {}
+
+                        if (do_align_D) {
+                            for (segindex_t seg_i = 0; seg_i < gene_segments.D().size() - 1; ++seg_i) {
+                                AbstractAligner::LocalAlignmentIndices indices =
+                                        aligner.alignLocal(gene_segments.D()[seg_i + 1].sequence,
+                                                           sequence,
+                                                           3);
+                                for (size_t align_i = 0; align_i < indices.size(); ++align_i) {
+                                    clone_builder.addDalignment(seg_i + 1, indices[align_i]);
+                                }
+                            }
                         }
 
                         ++glob_index;

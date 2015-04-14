@@ -105,10 +105,10 @@ namespace ymir {
                 string line, word;
                 vector<prob_t> word_vec;
                 int line_num = 1;
-                bool skip_col_num_check = true;
+                bool skip_col_num_check = true, empty_line = false;
                 while (!ifs.eof()) {
                     getline(ifs, line);
-                    if (line[0] != '\n') {
+                    if (line[0] != '\n' && line[0] != 0) {
                         word_vec.clear();
                         line_stream.str(line);
                         int i = !_skip_first_column;
@@ -130,26 +130,32 @@ namespace ymir {
 
                         }
                         line_stream.clear();
+                    } else {
+                        empty_line = true;
                     }
 
-                    if (!skip_col_num_check) {
-                        if (word_vec.size() == _colnames.size()) {
-                            for (size_t i = 0; i < word_vec.size(); ++i) {
-                                _data[i].push_back(word_vec[i]);
+                    if (!empty_line) {
+                        if (!skip_col_num_check) {
+                            if (word_vec.size() == _colnames.size()) {
+                                for (size_t i = 0; i < word_vec.size(); ++i) {
+                                    _data[i].push_back(word_vec[i]);
+                                }
+                            } else {
+                                stringstream ss;
+                                ss << "ERROR: number of elements doesn't match the number of columns in the line " <<
+                                (int) line_num <<
+                                " (expected: " <<
+                                (int) _colnames.size() <<
+                                ", got: " <<
+                                (int) word_vec.size() << ")";
+                                err_message = ss.str();
+                                return false;
                             }
                         } else {
-                            stringstream ss;
-                            ss << "ERROR: number of elements doesn't match the number of columns in the line " <<
-                            (int) line_num <<
-                            " (expected: " <<
-                            (int) _colnames.size() <<
-                            ", got: " <<
-                            (int) word_vec.size() << ")";
-                            err_message = ss.str();
-                            return false;
+                            skip_col_num_check = false;
                         }
                     } else {
-                        skip_col_num_check = false;
+                        empty_line = false;
                     }
 
                     ++line_num;
@@ -192,10 +198,10 @@ namespace ymir {
                 string line, word;
                 vector<prob_t> word_vec;
                 int line_num = 1;
-                bool skip_col_num_check = true;
+                bool skip_col_num_check = true, empty_line = false;
                 while (!ifs.eof()) {
                     getline(ifs, line);
-                    if (line[0] != '\n') {
+                    if (line[0] != '\n' && line[0] != 0) {
                         word_vec.clear();
                         line_stream.str(line);
                         int i = !_skip_first_column;
@@ -222,26 +228,32 @@ namespace ymir {
 
                         }
                         line_stream.clear();
+                    } else {
+                        empty_line = true;
                     }
 
-                    if (!skip_col_num_check) {
-                        if (word_vec.size() == _colnames.size()) {
-                            for (size_t i = 0; i < word_vec.size(); ++i) {
-                                _data[i].push_back(word_vec[i]);
+                    if (!empty_line) {
+                        if (!skip_col_num_check) {
+                            if (word_vec.size() == _colnames.size()) {
+                                for (size_t i = 0; i < word_vec.size(); ++i) {
+                                    _data[i].push_back(word_vec[i]);
+                                }
+                            } else {
+                                stringstream ss;
+                                ss << "ERROR: number of elements doesn't match the number of columns in the line " <<
+                                (int) line_num <<
+                                " (expected: " <<
+                                (int) _colnames.size() <<
+                                ", got: " <<
+                                (int) word_vec.size() << ")";
+                                err_message = ss.str();
+                                return false;
                             }
                         } else {
-                            stringstream ss;
-                            ss << "ERROR: number of elements doesn't match the number of columns in the line " <<
-                            (int) line_num <<
-                            " (expected: " <<
-                            (int) _colnames.size() <<
-                            ", got: " <<
-                            (int) word_vec.size() << ")";
-                            err_message = ss.str();
-                            return false;
+                            skip_col_num_check = false;
                         }
                     } else {
-                        skip_col_num_check = false;
+                        empty_line = false;
                     }
 
                     ++line_num;
@@ -281,10 +293,10 @@ namespace ymir {
                 string line, word;
                 vector<prob_t> word_vec;
                 int line_num = 1;
-                bool skip_col_num_check = true;
+                bool skip_col_num_check = true, empty_line = false;
                 while (!ifs.eof()) {
                     getline(ifs, line);
-                    if (line[0] != '\n') {
+                    if (line[0] != '\n' && line[0] != 0) {
                         word_vec.clear();
                         line_stream.str(line);
                         int i = !_skip_first_column;
@@ -307,24 +319,30 @@ namespace ymir {
 
                         }
                         line_stream.clear();
+                    } else {
+                        empty_line = true;
                     }
 
-                    if (!skip_col_num_check) {
-                        if (word_vec.size() == _colnames.size()) {
-                            _data[0].insert(_data[0].end(), word_vec.begin(), word_vec.end());
+                    if (!empty_line) {
+                        if (!skip_col_num_check) {
+                            if (word_vec.size() == _colnames.size()) {
+                                _data[0].insert(_data[0].end(), word_vec.begin(), word_vec.end());
+                            } else {
+                                stringstream ss;
+                                ss << "ERROR: number of elements doesn't match the number of columns in the line " <<
+                                (int) line_num <<
+                                " (expected: " <<
+                                (int) _colnames.size() <<
+                                ", got: " <<
+                                (int) word_vec.size() << ")";
+                                err_message = ss.str();
+                                return false;
+                            }
                         } else {
-                            stringstream ss;
-                            ss << "ERROR: number of elements doesn't match the number of columns in the line " <<
-                            (int) line_num <<
-                            " (expected: " <<
-                            (int) _colnames.size() <<
-                            ", got: " <<
-                            (int) word_vec.size() << ")";
-                            err_message = ss.str();
-                            return false;
+                            skip_col_num_check = false;
                         }
                     } else {
-                        skip_col_num_check = false;
+                        empty_line = false;
                     }
 
                     ++line_num;
@@ -370,10 +388,10 @@ namespace ymir {
                 string line, word;
                 vector<prob_t> word_vec;
                 int line_num = 1, matrix_num = 0;
-                bool skip_col_num_check = true, in_matrix = true;
+                bool skip_col_num_check = true, in_matrix = true, empty_line = false;
                 while (!ifs.eof()) {
                     getline(ifs, line);
-                    if (line[0] != '\n') {
+                    if (line[0] != '\n' && line[0] != 0) {
                         word_vec.clear();
                         line_stream.str(line);
                         int i = !_skip_first_column;
@@ -406,25 +424,30 @@ namespace ymir {
                             }
                             line_stream.clear();
                         }
-
+                    } else {
+                        empty_line = true;
                     }
 
-                    if (!skip_col_num_check) {
-                        if (word_vec.size() == _colnames.size()) {
-                            _data[matrix_num].insert(_data[matrix_num].end(), word_vec.begin(), word_vec.end());
+                    if (!empty_line) {
+                        if (!skip_col_num_check) {
+                            if (word_vec.size() == _colnames.size()) {
+                                _data[matrix_num].insert(_data[matrix_num].end(), word_vec.begin(), word_vec.end());
+                            } else {
+                                stringstream ss;
+                                ss << "ERROR: number of elements doesn't match the number of columns in the line " <<
+                                (int) line_num <<
+                                " (expected: " <<
+                                (int) _colnames.size() <<
+                                ", got: " <<
+                                (int) word_vec.size() << ")";
+                                err_message = ss.str();
+                                return false;
+                            }
                         } else {
-                            stringstream ss;
-                            ss << "ERROR: number of elements doesn't match the number of columns in the line " <<
-                            (int) line_num <<
-                            " (expected: " <<
-                            (int) _colnames.size() <<
-                            ", got: " <<
-                            (int) word_vec.size() << ")";
-                            err_message = ss.str();
-                            return false;
+                            skip_col_num_check = false;
                         }
                     } else {
-                        skip_col_num_check = false;
+                        empty_line = false;
                     }
 
                     ++line_num;

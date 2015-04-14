@@ -162,8 +162,8 @@ namespace ymir {
             ifs.open(filepath);
             bool res = false;
             if (ifs.is_open()) {
-                res = this->parseRepertoire(ifs, clonevec, gene_segments, aligner, nuc_sequences, opts);
                 cout << "Repertoire parser " + get_parser_name() + ":" << endl << "\tparsing input file [" << filepath << "]" << endl;
+                res = this->parseRepertoire(ifs, clonevec, gene_segments, aligner, nuc_sequences, opts);
                 if (res) { rep->swap(clonevec); }
             } else {
                 cerr << "Repertoire parser " + get_parser_name() + " error:" << endl << "\tinput file [" << filepath << "] not found" << endl;

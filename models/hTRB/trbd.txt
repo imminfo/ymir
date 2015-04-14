@@ -1,0 +1,3 @@
+D.alleles	Nucleotide.sequence
+TRBD1	GGGACAGGGGGC
+TRBD2	GGGACTAGCGGGGGGG

@@ -14,6 +14,7 @@ namespace ymir {
 
 
     enum CONTAINER_TYPE {
+        VECTOR,
         VECTOR_LIST,
         MATRIX,
         MATRIX_LIST
@@ -83,7 +84,94 @@ namespace ymir {
 
 
     /**
-     * \brief List of vectors for deletions, insertions and gene segments.
+     * \brief Vector of gene segments.
+     */
+    struct TDVector : public AbstractTDContainer {
+    public:
+
+        TDVector(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(VECTOR, skip_first_column, laplace) { }
+
+
+        virtual ~TDVector() { }
+
+
+        bool read(const string& filepath, string &err_message) {
+            ifstream ifs;
+
+            ifs.open(filepath);
+
+            if (ifs.is_open()) {
+                stringstream line_stream;
+                string line, word;
+                vector<prob_t> word_vec;
+                int line_num = 1;
+                bool skip_col_num_check = true;
+                while (!ifs.eof()) {
+                    getline(ifs, line);
+                    if (line[0] != '\n') {
+                        word_vec.clear();
+                        line_stream.str(line);
+                        int i = !_skip_first_column;
+
+                        if (skip_col_num_check) {
+                            getline(line_stream, word, '\t');
+                            this->addColumnName("Probability");
+                            _data.push_back(vector<prob_t>());
+                            _data[0].reserve(60);
+                        } else {
+                            while (!line_stream.eof()) {
+                                getline(line_stream, word, '\t');
+                                // MPFR?!?!?! I don't know
+                                // add row
+                                if (i) { word_vec.push_back(stod(word)); }
+                                else { this->addRowName(word); }
+                                ++i;
+                            }
+
+                        }
+                        line_stream.clear();
+                    }
+
+                    if (!skip_col_num_check) {
+                        if (word_vec.size() == _colnames.size()) {
+                            for (size_t i = 0; i < word_vec.size(); ++i) {
+                                _data[i].push_back(word_vec[i]);
+                            }
+                        } else {
+                            stringstream ss;
+                            ss << "ERROR: number of elements doesn't match the number of columns in the line " <<
+                            (int) line_num <<
+                            " (expected: " <<
+                            (int) _colnames.size() <<
+                            ", got: " <<
+                            (int) word_vec.size() << ")";
+                            err_message = ss.str();
+                            return false;
+                        }
+                    } else {
+                        skip_col_num_check = false;
+                    }
+
+                    ++line_num;
+                }
+                ifs.close();
+                return true;
+            }
+
+            err_message = "ERROR: can't open file [" + filepath + "]";
+            return false;
+        }
+
+    protected:
+
+        TDVector() : AbstractTDContainer() {}
+
+    };
+
+
+
+    /**
+     * \brief List of vectors for deletions and insertions.
      */
     struct TDVectorList : public AbstractTDContainer {
     public:
@@ -256,6 +344,11 @@ namespace ymir {
     };
 
 
+    /**
+     * row names - segments
+     * col names - no col names
+     * columns - number of columns in each matrices
+     */
     struct TDMatrixList : public AbstractTDContainer  {
     public:
 
@@ -267,6 +360,80 @@ namespace ymir {
 
 
         bool read(const string& filepath, string &err_message) {
+            ifstream ifs;
+
+            ifs.open(filepath);
+
+            if (ifs.is_open()) {
+                _data.push_back(vector<prob_t>());
+                stringstream line_stream;
+                string line, word;
+                vector<prob_t> word_vec;
+                int line_num = 1, matrix_num = 0;
+                bool skip_col_num_check = true, in_matrix = true;
+                while (!ifs.eof()) {
+                    getline(ifs, line);
+                    if (line[0] != '\n') {
+                        word_vec.clear();
+                        line_stream.str(line);
+                        int i = !_skip_first_column;
+
+                        if (!in_matrix) {
+                            matrix_num++;
+                            in_matrix = true;
+                        } else {
+                            if (skip_col_num_check) {
+                                while (!line_stream.eof()) {
+                                    getline(line_stream, word, '\t');
+                                    if (i) { this->addColumnName(word); }
+                                    ++i;
+                                }
+                            } else {
+                                while (!line_stream.eof()) {
+                                    getline(line_stream, word, '\t');
+                                    // MPFR?!?!?! I don't know
+                                    // add row
+                                    if (word == "") {
+                                        cout << "wow wow!!" << endl;
+                                    } else {
+                                        cout << word << endl;
+                                    }
+                                    if (i) { word_vec.push_back(stod(word)); }
+                                    else { this->addRowName(word); }
+                                    ++i;
+                                }
+
+                            }
+                            line_stream.clear();
+                        }
+
+                    }
+
+                    if (!skip_col_num_check) {
+                        if (word_vec.size() == _colnames.size()) {
+                            _data[matrix_num].insert(_data[matrix_num].end(), word_vec.begin(), word_vec.end());
+                        } else {
+                            stringstream ss;
+                            ss << "ERROR: number of elements doesn't match the number of columns in the line " <<
+                            (int) line_num <<
+                            " (expected: " <<
+                            (int) _colnames.size() <<
+                            ", got: " <<
+                            (int) word_vec.size() << ")";
+                            err_message = ss.str();
+                            return false;
+                        }
+                    } else {
+                        skip_col_num_check = false;
+                    }
+
+                    ++line_num;
+                }
+                ifs.close();
+                return true;
+            }
+
+            err_message = "ERROR: can't open file [" + filepath + "]";
             return false;
         }
 
@@ -295,6 +462,8 @@ namespace ymir {
             container = new TDVectorList(skip_first_column, laplace);
         } else if (filetype == "matrix.list") {
             container = new TDMatrixList(skip_first_column, laplace);
+        } else if (filetype == "vector") {
+            container = new TDVector(skip_first_column, laplace);
         } else {
             if (filetype == "") {
                 err_message = "ERROR: no file type for [" + filepath + "]";

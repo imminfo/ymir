@@ -2,7 +2,7 @@
   "name": "MiTCR (with dots)",
   "comment": "Parser for MiTCR repertoire files in which spaces in column names are replaced with dots",
   "sep": "\t",
-  "1-based": true,
+  "1-based": false,
   "skip.lines": 0,
   "nuc.seq": "CDR3.nucleotide.sequence",
   "aa.seq": "CDR3.amino.acid.sequence",

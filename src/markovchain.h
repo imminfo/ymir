@@ -84,9 +84,9 @@ namespace ymir {
         }
 
 
-        prob_t nucProbability(string::iterator start, seq_len_t sequence_len) const {
+        prob_t nucProbability(string::const_iterator start, seq_len_t sequence_len) const {
             prob_t res = 1;
-            string::iterator next = start + 1;
+            string::const_iterator next = start + 1;
             for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
                 res *= (*this)(nuc_hash(*start), nuc_hash(*next));
             }

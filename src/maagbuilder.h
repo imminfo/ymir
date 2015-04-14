@@ -77,7 +77,7 @@ namespace ymir {
          * ???? \param aminoacid If true than build MAAGs from the aminoacid sequences.
          */
         ///@{
-        MAAG build(/*const*/ Clonotype &clonotype, bool full_build = false) const {
+        MAAG build(const Clonotype &clonotype, bool full_build = false) const {
             ProbMMC probs;
             EventIndMMC events;
             vector<seq_len_t> seq_poses;
@@ -113,7 +113,12 @@ namespace ymir {
         }
 
         MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) {
-            // in parallel ???
+            MAAGRepertoire res;
+            res.reserve(cloneset.size());
+            for (size_t i = 0; i < cloneset.size(); ++i) {
+                res[i] = build(cloneset[i], full_build);
+            }
+            return res;
         }
         ///@}
 
@@ -181,10 +186,10 @@ namespace ymir {
         * \param full_build Boolean if build should be full.
         */
         void buildVariable(const Clonotype &clonotype,
-                ProbMMC &probs,
-                EventIndMMC &events,
-                vector<seq_len_t> &seq_poses,
-                bool full_build) const
+                           ProbMMC &probs,
+                           EventIndMMC &events,
+                           vector<seq_len_t> &seq_poses,
+                           bool full_build) const
         {
             // find max V alignment
             seq_len_t len = 0;
@@ -280,10 +285,10 @@ namespace ymir {
         * \param full_build Boolean if build should be full.
         */
         void buildJoining(const Clonotype &clonotype,
-                ProbMMC &probs,
-                EventIndMMC &events,
-                vector<seq_len_t> &seq_poses,
-                bool full_build) const
+                          ProbMMC &probs,
+                          EventIndMMC &events,
+                          vector<seq_len_t> &seq_poses,
+                          bool full_build) const
         {
             int J_index_dels = JOINING_DELETIONS_VJ_MATRIX_INDEX,
                     J_index_genes = JOINING_GENES_VDJ_MATRIX_INDEX;
@@ -445,11 +450,11 @@ namespace ymir {
         * \param seq_poses Vector of positions.
         * \param full_build Boolean if build should be full.
         */
-        void buildVJinsertions(/*const*/ Clonotype &clonotype,
-                                         ProbMMC &probs,
-                                         EventIndMMC &events,
-                                         vector<seq_len_t> &seq_poses,
-                                         bool full_build) const
+        void buildVJinsertions(const Clonotype &clonotype,
+                               ProbMMC &probs,
+                               EventIndMMC &events,
+                               vector<seq_len_t> &seq_poses,
+                               bool full_build) const
         {
             MarkovChain mc(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
 
@@ -487,7 +492,7 @@ namespace ymir {
         * \param seq_poses Vector of positions.
         * \param full_build Boolean if build should be full.
         */
-        void buildVDinsertions(Clonotype &clonotype,
+        void buildVDinsertions(const Clonotype &clonotype,
                                ProbMMC &probs,
                                EventIndMMC &events,
                                vector<seq_len_t> &seq_poses,
@@ -529,7 +534,7 @@ namespace ymir {
         * \param seq_poses Vector of positions.
         * \param full_build Boolean if build should be full.
         */
-        void buildDJinsertions(Clonotype &clonotype,
+        void buildDJinsertions(const Clonotype &clonotype,
                                ProbMMC &probs,
                                EventIndMMC &events,
                                vector<seq_len_t> &seq_poses,
@@ -581,7 +586,7 @@ namespace ymir {
          * \param right_vertices_end Ending index in seq_poses for the vertices in the right matrix.
          * \param mc MarkovChain that use for generation of N nucleotides.
         */
-        void buildInsertions(Clonotype &clonotype,
+        void buildInsertions(const Clonotype &clonotype,
                              ProbMMC &probs,
                              EventIndMMC &events,
                              vector<seq_len_t> &seq_poses,

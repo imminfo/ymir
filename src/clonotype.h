@@ -101,7 +101,8 @@ namespace ymir {
 
         const string& sequence() const { return seq; }
 
-        string::iterator seq_iterator(seq_len_t pos) { return seq.begin() + pos; }
+
+        string::const_iterator seq_iterator(seq_len_t pos) const { return seq.cbegin() + pos; }
 
 
         bool is_nucleotide() const { return nucleotide; }

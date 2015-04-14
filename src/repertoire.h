@@ -48,6 +48,69 @@ namespace ymir {
      => (Model::Builder) => [GraphRepertoire]
     */
 
+//    class ClonesetView {
+//
+//    public:
+//
+//
+//        ClonesetView(shared_ptr<vector<Clonotype>> pvec, const vector<size_t>& shifts) :
+//                _source(pvec), _shifts(shifts) {}
+//
+//
+//        ClonesetView(const ClonesetView& other) : _source(other._source), _shifts(other._shifts) {}
+//
+//
+//        virtual ~ClonesetView() { }
+//
+//
+//
+//        virtual const Clonotype& operator[] (size_t index) const {
+//            return _source->at(_shifts[index]);
+//        }
+//
+//
+//        size_t size() const { return _shifts.size(); }
+//
+//
+//        ClonesetView coding() { }
+//
+//
+//        ClonesetView noncoding(bool out_of_frames_only = false) { }
+//
+//
+//        ClonesetView head() {};
+//        ClonesetView [](vector of indices) {};
+//        ClonesetView slice() {};
+//
+//
+//    protected:
+//
+//        shared_ptr<vector<Clonotype>> _source;
+//        vector<size_t> _shifts;
+//
+//
+//        ClonesetView() {}
+//
+//    };
+//
+//
+//    class Cloneset : public ClonesetView {
+//
+//    public:
+//
+//
+//        Cloneset() { }
+//
+//
+//        virtual ~Cloneset() { }
+//
+//
+//
+//    protected:
+//
+//
+//    };
+
 
     /**
     * \class AbstractRepertoireView
@@ -230,7 +293,7 @@ namespace ymir {
     typedef AbstractRepertoire<Clonotype> Cloneset;
 
 
-    typedef AbstractRepertoire<MAAG> MAAGRepertoire;
+    typedef vector<MAAG> MAAGRepertoire;
 
 }
 

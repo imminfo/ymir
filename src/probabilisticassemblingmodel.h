@@ -73,7 +73,9 @@ namespace ymir {
         /**
         *
         */
-        ProbabilisticAssemblingModel(const string& folderpath) : _model_path(folderpath + "/") {
+        ProbabilisticAssemblingModel(const string& folderpath) {
+            _model_path = folderpath + "/";
+
             _vj_recomb = false;
             _status = false;
 
@@ -83,7 +85,7 @@ namespace ymir {
             _builder = nullptr;
             _generator = nullptr;
 
-            _status = this->parseModelConfig(folderpath + "model.json")
+            _status = this->parseModelConfig(_model_path + "model.json")
                       && this->parseGeneSegments()
                       && this->parseEventProbabilities();
 
@@ -140,7 +142,7 @@ namespace ymir {
         MAAGRepertoire buildGraphs(const ClonesetView& repertoire,
                                    bool full_build = true,
                                    bool aminoacid = false) const {
-            _builder->build(repertoire);
+            return _builder->build(repertoire, full_build);
         }
 
 

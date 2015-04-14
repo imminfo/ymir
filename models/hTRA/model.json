@@ -45,9 +45,6 @@
       "laplace": 0,
       "type": "vector.list",
       "skip.first.column": true
-    },
-    "random.element": {
-      "file": "nofile"
     }
   }
 }

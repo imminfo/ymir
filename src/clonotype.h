@@ -45,8 +45,12 @@ namespace ymir {
     */
     struct Clonotype {
 
-        Clonotype(const string& sequence, bool nucleotide, segindex_t *segments,
-                seq_len_t *alignments, seq_len_t *n_D_alignments = nullptr) : seq(sequence), nucleotide(nucleotide) {
+        Clonotype(const string& sequence,
+                  bool nucleotide,
+                  segindex_t *segments,
+                  seq_len_t *alignments,
+                  seq_len_t *n_D_alignments = nullptr)
+                : seq(sequence), nucleotide(nucleotide) {
 
             this->segments = segments;
             this->alignments = alignments;
@@ -70,11 +74,12 @@ namespace ymir {
             if (segments[2]) {
                 n_D_alignments = new seq_len_t[segments[2]];
                 for  (int i = 0; i < segments[2]; ++i) {
-                    n_D_alignments[i] += other.n_D_alignments[i];
+                    n_D_alignments[i] = other.n_D_alignments[i];
                 }
                 for  (int i = 0; i < segments[2]; ++i) {
                     sum_align += n_D_alignments[i] * 4;
                 }
+
             } else {
                 n_D_alignments = nullptr;
             }
@@ -228,6 +233,7 @@ namespace ymir {
                 for (int i = 0; i < _n_Dalign.size(); ++i) {
                     n_D_alignments[i] = _n_Dalign[i];
                 }
+
             } else {
                 n_D_alignments = nullptr;
             }
@@ -282,8 +288,7 @@ namespace ymir {
             return *this;
         }
         ClonotypeBuilder& addDalignment(segindex_t dseg, const d_alignment_t& dalignment) {
-            addDalignment(dseg, dalignment.Dstart, dalignment.Dend, dalignment.seqstart, dalignment.seqend);
-            return *this;
+            return addDalignment(dseg, dalignment.Dstart, dalignment.Dend, dalignment.seqstart, dalignment.seqend);
         }
         ///@}
 
@@ -310,6 +315,7 @@ namespace ymir {
             _Dseg.reserve(CLONOTYPEBUILDER_DSEG_DEFAULT_RESERVE_SIZE);
             _Dalign.clear();
             _Dalign.reserve(CLONOTYPEBUILDER_DSEG_DEFAULT_RESERVE_SIZE * 4);
+
             _n_Dalign.clear();
         }
 

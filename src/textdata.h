@@ -31,6 +31,7 @@ namespace ymir {
             _laplace = laplace;
             _skip_first_column = skip_first_column;
             _type = ctype;
+            _file_exists = false;
         }
 
 
@@ -62,13 +63,15 @@ namespace ymir {
 
         CONTAINER_TYPE type() const { return _type; }
 
+        bool file_exists() const { return _file_exists; }
+
     protected:
 
         vector< vector<prob_t> > _data;
         vector<string> _colnames;
         vector<string> _rownames;
         prob_t _laplace;
-        bool _skip_first_column;
+        bool _skip_first_column, _file_exists;
         CONTAINER_TYPE _type;
 
 
@@ -161,9 +164,11 @@ namespace ymir {
                     ++line_num;
                 }
                 ifs.close();
+                _file_exists = true;
                 return true;
             }
 
+            _file_exists = false;
             err_message = "ERROR: can't open file [" + filepath + "]";
             return false;
         }
@@ -259,9 +264,11 @@ namespace ymir {
                     ++line_num;
                 }
                 ifs.close();
+                _file_exists = true;
                 return true;
             }
 
+            _file_exists = false;
             err_message = "ERROR: can't open file [" + filepath + "]";
             return false;
         }
@@ -348,9 +355,11 @@ namespace ymir {
                     ++line_num;
                 }
                 ifs.close();
+                _file_exists = true;
                 return true;
             }
 
+            _file_exists = false;
             err_message = "ERROR: can't open file [" + filepath + "]";
             return false;
         }
@@ -453,9 +462,11 @@ namespace ymir {
                     ++line_num;
                 }
                 ifs.close();
+                _file_exists = true;
                 return true;
             }
 
+            _file_exists = false;
             err_message = "ERROR: can't open file [" + filepath + "]";
             return false;
         }

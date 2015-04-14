@@ -190,6 +190,10 @@ namespace ymir {
             return (*(this->_vec))[index];
         }
 
+        const T& operator[] (size_t index) const {
+            return (*(this->_vec))[index];
+        }
+
 
         AbstractRepertoireView<T> operator[] (const vector<size_t>& indices) {
             return AbstractRepertoireView<T>(this->_vec, indices);

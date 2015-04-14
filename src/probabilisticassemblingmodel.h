@@ -123,10 +123,10 @@ namespace ymir {
          *
          * \return Vector of full assembling probabilities.
          */
-        vector<prob_t> computeFullProbabilities(const ClonesetView& repertoire,
-                                                 bool aminoacid = false,
-                                                 MAAG_COMPUTE_PROB_ACTION action = MAX_PROBABILITY) const {
-//            return this->_builder->buildAndCompute(???);
+        vector<prob_t> computeFullProbabilities(const Cloneset& repertoire,
+                                                bool aminoacid = false,
+                                                MAAG_COMPUTE_PROB_ACTION action = MAX_PROBABILITY) const {
+            return this->_builder->buildAndCompute(repertoire, aminoacid, action);
         }
 
 
@@ -139,7 +139,7 @@ namespace ymir {
          *
          * \return Set of MAAGs.
          */
-        MAAGRepertoire buildGraphs(const ClonesetView& repertoire,
+        MAAGRepertoire buildGraphs(const Cloneset& repertoire,
                                    bool full_build = true,
                                    bool aminoacid = false) const {
             return _builder->build(repertoire, full_build);
@@ -318,6 +318,7 @@ namespace ymir {
                         bool check = true;
                         if (element == "v.j") {
                             if (container
+                                && container->file_exists()
                                 && this->findGenes(container->column_names(), _genes->J(), err_message)
                                 && this->findGenes(container->row_names(), _genes->V(), err_message)) {
                                     containers[VJ_VAR_JOI_GEN] = container;
@@ -327,6 +328,7 @@ namespace ymir {
                         }
                         else if (element == "v.del") {
                             if (container
+                                && container->file_exists()
                                 && this->findGenes(container->column_names(), _genes->V(), err_message)) {
                                     containers[VJ_VAR_DEL] = container;
                                 }
@@ -335,6 +337,7 @@ namespace ymir {
                         }
                         else if (element == "j.del") {
                             if (container
+                                && container->file_exists()
                                 && this->findGenes(container->column_names(), _genes->J(), err_message)) {
                                     containers[VJ_JOI_DEL] = container;
                             }
@@ -342,9 +345,11 @@ namespace ymir {
                             cout << "\tJ delet. num.:   " << err_message << endl;
                         }
                         else if (element == "ins.len") {
-                            if (container) {
+                            if (container && container->file_exists()) {
                                 if (container->n_columns() != 1) {
-                                    err_message = "ERROR: wrong number of columns.";
+                                    stringstream ss;
+                                    ss << "ERROR: wrong number of columns (expected: 1, got: " << (int) container->n_columns() << ")";
+                                    err_message = ss.str();
                                 } else {
                                     containers[VJ_VAR_JOI_INS_LEN] = container;
                                 }
@@ -353,9 +358,11 @@ namespace ymir {
                             cout << "\tVJ ins. len.:    " << err_message << endl;
                         }
                         else if (element == "ins.nucl") {
-                            if (container) {
+                            if (container && container->file_exists()) {
                                 if (container->row_names().size() != 4 || container->column_names().size() != 4) {
-                                    err_message = "ERROR: wrong number of columns and rows.";
+                                    stringstream ss;
+                                    ss << "ERROR: wrong number of columns and rows (expected: 4 X 4, got: " << (int) container->row_names().size() << "X" << (int) container->column_names().size() << ")";
+                                    err_message = ss.str();
                                 } else {
                                     containers[VJ_VAR_JOI_INS_NUC] = container;
                                 }
@@ -367,11 +374,12 @@ namespace ymir {
                     }
                     else {
                         if (element == "v") {
-                            if (container) { containers[VDJ_VAR_GEN] = container; }
+                            if (container && container->file_exists()) { containers[VDJ_VAR_GEN] = container; }
                             cout << "\tV genes prob.:   " << err_message << endl;
                         }
                         else if (element == "j.d") {
                             if (container
+                                && container->file_exists()
                                 && this->findGenes(container->column_names(), _genes->D(), err_message)
                                 && this->findGenes(container->row_names(), _genes->J(), err_message)) {
                                     containers[VDJ_JOI_DIV_GEN] = container;
@@ -381,6 +389,7 @@ namespace ymir {
                         }
                         else if (element == "v.del") {
                             if (container
+                                && container->file_exists()
                                 && this->findGenes(container->column_names(), _genes->V(), err_message)) {
                                     containers[VDJ_VAR_DEL] = container;
                             }
@@ -389,6 +398,7 @@ namespace ymir {
                         }
                         else if (element == "j.del") {
                             if (container
+                                && container->file_exists()
                                 && this->findGenes(container->column_names(), _genes->J(), err_message)) {
                                     containers[VDJ_JOI_DEL] = container;
                             }
@@ -396,14 +406,16 @@ namespace ymir {
                             cout << "\tJ delet. num.:   " << err_message << endl;
                         }
                         else if (element == "d.del") {
-                            if (container) { containers[VDJ_DIV_DEL] = container; }
+                            if (container && container->file_exists()) { containers[VDJ_DIV_DEL] = container; }
 
                             cout << "\tD delet. num.:   " << err_message << endl;
                         }
                         else if (element == "ins.len") {
-                            if (container) {
+                            if (container && container->file_exists()) {
                                 if (container->n_columns() != 2) {
-                                    err_message = "ERROR: wrong number of columns.";
+                                    stringstream ss;
+                                    ss << "ERROR: wrong number of columns (expected: 2, got: " << (int) container->n_columns() << ")";
+                                    err_message = ss.str();
                                 } else {
                                     containers[VDJ_VAR_DIV_INS_LEN] = container;
                                 }
@@ -412,9 +424,11 @@ namespace ymir {
                             cout << "\tVD/DJ ins. len.: " << err_message << endl;;
                         }
                         else if (element == "ins.nucl") {
-                            if (container) {
+                            if (container && container->file_exists()) {
                                 if (container->row_names().size() != 4 || container->column_names().size() != 8) {
-                                    err_message = "ERROR: wrong number of columns and rows.";
+                                    stringstream ss;
+                                    ss << "ERROR: wrong number of columns and rows (expected: 4 X 8, got: " << (int) container->row_names().size() << "X" << (int) container->column_names().size() << ")";
+                                    err_message = ss.str();
                                 } else {
                                     containers[VDJ_VAR_DIV_INS_NUC] = container;
                                 }

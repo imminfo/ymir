@@ -112,22 +112,35 @@ namespace ymir {
             }
         }
 
-        MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) {
+        MAAGRepertoire build(const Cloneset &cloneset, bool full_build = false) {
             MAAGRepertoire res;
             res.reserve(cloneset.size());
             for (size_t i = 0; i < cloneset.size(); ++i) {
-                res[i] = build(cloneset[i], full_build);
+                res.push_back(build(cloneset[i], full_build));
+                if ((i+1) % 50000 == 0) {
+                    cout << "Built " << (int) i << " graphs." << endl;
+                }
             }
             return res;
         }
         ///@}
 
 
-        /*
-        numeric buildAndCompute(Clonotype &clonotype, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {}
+        prob_t buildAndCompute(const Clonotype &clonotype, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
+            return build(clonotype, false).fullProbability(action);
+        }
 
-        vector<numeric> buildAndCompute(ClonesetView &cloneset, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {}
-        */
+        vector<prob_t> buildAndCompute(const Cloneset &cloneset, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
+            vector<prob_t> res;
+            res.reserve(cloneset.size());
+            for (size_t i = 0; i < cloneset.size(); ++i) {
+                res.push_back(buildAndCompute(cloneset[i], aminoacid, action));
+                if ((i+1) % 50000 == 0) {
+                    cout << "Computed " << (int) (i+1) << " assembling probabilities." << endl;
+                }
+            }
+            return res;
+        }
 
 
         /**
@@ -608,9 +621,19 @@ namespace ymir {
                     insertion_len = seq_poses[right_vertex_i] - seq_poses[left_vertex_i] - 1;
                     good_insertion = (insertion_len >= 0) && (insertion_len <= max_size);
                     if (good_insertion) {
-                        probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
-                                = mc.nucProbability(clonotype.seq_iterator(seq_poses[left_vertex_i]), insertion_len)
-                                  * (*_param_vec)[null_insertion + insertion_len];
+                        if (seq_poses[left_vertex_i] == 0) {
+                            // seq_iterator(0) and multiplication by .25 here because we don't know the last nucleotide
+                            // of the aligned gene segment. And, honestly, it doesn't even matter and won't dramatically affect the result.
+                            probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
+                                    = mc.nucProbability(clonotype.seq_iterator(0), insertion_len)
+                                      * .25
+                                      * (*_param_vec)[null_insertion + insertion_len];
+                        } else {
+                            probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
+                                    = mc.nucProbability(clonotype.seq_iterator(seq_poses[left_vertex_i] - 1), insertion_len)
+                                      * (*_param_vec)[null_insertion + insertion_len];
+                        }
+
                         if (full_build) {
                             events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
                                     = null_insertion + insertion_len;

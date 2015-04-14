@@ -256,40 +256,36 @@ namespace ymir {
          */
         bool parseGeneSegments() {
 
-            cout << "\tV gene seg.:\t";
+            cout << "\tV gene seg.:     ";
             if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
-//                cerr << "Probabilistic assembling model error:" << endl << "\t V(ariable) gene segments file not found" << endl;
                 cout << "ERROR: no gene segments file in the model's .json." << endl;
                 return false;
-            } else {
-                cout << "OK" << endl;
-            }
+            } else { cout << "OK" << endl; }
             string v_path = _model_path + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
 
-            cout << "\tJ gene seg.:\t";
+            cout << "\tJ gene seg.:     ";
             if (_config.get("segments", Json::Value("")).get("joining", Json::Value("")).size() == 0) {
-//                cerr << "Probabilistic assembling model error:" << endl << "\t J(oining) gene segments file not found" << endl;
                 cout << "ERROR: no gene segments file in the model's .json." << endl;
                 return false;
-            } else {
-                cout << "OK" << endl;
-            }
+            } else { cout << "OK" << endl; }
             string j_path = _model_path + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
 
             bool vok, jok, dok = true;
-//            if (_vj_recomb) {
-//
-//            } else {
-//
-//            }
 
-            if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
+            if (_vj_recomb) {
                 _genes = new VDJRecombinationGenes("VJ.V", v_path, "VJ.J", j_path, &vok, &jok);
                 /* add P nucleotides */
             } else {
-                string d_path = _model_path + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
-                _genes = new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok);
-                /* add P nucleotides */
+                cout << "\tD gene seg.:     ";
+                if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
+                    cout << "ERROR: no gene segments file in the model's .json." << endl;
+                    return false;
+                } else {
+                    string d_path = _model_path + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
+                    _genes = new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok);
+                    /* add P nucleotides */
+                    cout << "OK" << endl;
+                }
             }
 
             return vok && jok && dok;
@@ -312,101 +308,119 @@ namespace ymir {
                     element = pt.getMemberNames()[i];
                     container = read_textdata(_model_path + pt[element]["file"].asString(),
                                               pt[element]["type"].asString(),
-                                              pt[element]["skip.first.column"].asBool(),
+                                              pt[element].get("skip.first.column", true).asBool(),
                                               pt[element]["laplace"].asDouble(),
                                               err_message);
 
                     if (_vj_recomb) {
                         bool check = true;
                         if (element == "v.j") {
-                            if (container) {
-                                containers[VJ_VAR_JOI_GEN] = container;
-                                if (!(this->findGenes(container->column_names(), _genes->J(), err_message)
-                                      && this->findGenes(container->row_names(), _genes->V(), err_message))) {
-                                    delete containers[VJ_VAR_JOI_GEN];
-                                    containers[VJ_VAR_JOI_GEN] = nullptr;
-                                }
+                            if (container
+                                && this->findGenes(container->column_names(), _genes->J(), err_message)
+                                && this->findGenes(container->row_names(), _genes->V(), err_message)) {
+                                    containers[VJ_VAR_JOI_GEN] = container;
                             }
 
-                            cout << "\tV-J gene pairs:\t" << err_message << endl;
+                            cout << "\tV-J gene pairs:  " << err_message << endl;
                         }
                         else if (element == "v.del") {
-                            if (container) {
-                                containers[VJ_VAR_DEL] = container;
-                                if (!this->findGenes(container->column_names(), _genes->V(), err_message)) {
-                                    delete containers[VJ_VAR_DEL];
-                                    containers[VJ_VAR_DEL] = nullptr;
+                            if (container
+                                && this->findGenes(container->column_names(), _genes->V(), err_message)) {
+                                    containers[VJ_VAR_DEL] = container;
                                 }
-                            }
 
-                            cout << "\tV delet. num.:\t" << err_message << endl;;
+                            cout << "\tV delet. num.:   " << err_message << endl;
                         }
                         else if (element == "j.del") {
+                            if (container
+                                && this->findGenes(container->column_names(), _genes->J(), err_message)) {
+                                    containers[VJ_JOI_DEL] = container;
+                            }
+
+                            cout << "\tJ delet. num.:   " << err_message << endl;
+                        }
+                        else if (element == "ins.len") {
                             if (container) {
-                                containers[VJ_JOI_DEL] = container;
-                                if (!this->findGenes(container->column_names(), _genes->J(), err_message)) {
-                                    delete containers[VJ_JOI_DEL];
-                                    containers[VJ_JOI_DEL] = nullptr;
+                                if (container->n_columns() != 1) {
+                                    err_message = "ERROR: wrong number of columns.";
+                                } else {
+                                    containers[VJ_VAR_JOI_INS_LEN] = container;
                                 }
                             }
 
-                            cout << "\tJ delet. num.:\t" << err_message << endl;;
-                        }
-                        else if (element == "ins.len") {
-                            if (container) { containers[VJ_VAR_JOI_INS_LEN] = container; }
-
-                            cout << "\tVJ ins. len.:\t" << err_message << endl;;
+                            cout << "\tVJ ins. len.:    " << err_message << endl;
                         }
                         else if (element == "ins.nucl") {
                             if (container) {
-                                containers[VJ_VAR_JOI_INS_NUC] = container;
-
                                 if (container->row_names().size() != 4 || container->column_names().size() != 4) {
                                     err_message = "ERROR: wrong number of columns and rows.";
-                                    delete containers[VJ_VAR_JOI_INS_NUC]; containers[VJ_VAR_JOI_INS_NUC] = nullptr;
+                                } else {
+                                    containers[VJ_VAR_JOI_INS_NUC] = container;
                                 }
                             }
 
-                            cout << "\tVJ ins. nuc.:\t" << err_message << endl;;
+                            cout << "\tVJ ins. nuc.:    " << err_message << endl;
                         }
                         else { cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl; }
                     }
                     else {
                         if (element == "v") {
-                            if (container) {
-                                containers[VDJ_VAR_GEN] = container;
-                            }
-                            cout << "\tV-J genes:\t" << err_message << endl;
+                            if (container) { containers[VDJ_VAR_GEN] = container; }
+                            cout << "\tV genes prob.:   " << err_message << endl;
                         }
                         else if (element == "j.d") {
-                            if (container) { containers[VDJ_JOI_DIV_GEN] = container; }
-                            cout << "\tV-J genes:\t" << err_message << endl;
+                            if (container
+                                && this->findGenes(container->column_names(), _genes->D(), err_message)
+                                && this->findGenes(container->row_names(), _genes->J(), err_message)) {
+                                    containers[VDJ_JOI_DIV_GEN] = container;
+                            }
+
+                            cout << "\tJ-D gene pairs:  " << err_message << endl;
                         }
                         else if (element == "v.del") {
-                            if (container) { containers[VDJ_VAR_DEL] = container; }
-                            cout << "\tV-J genes:\t" << err_message << endl;
+                            if (container
+                                && this->findGenes(container->column_names(), _genes->V(), err_message)) {
+                                    containers[VDJ_VAR_DEL] = container;
+                            }
+
+                            cout << "\tV delet. num.:   " << err_message << endl;;
                         }
                         else if (element == "j.del") {
-                            if (container) { containers[VDJ_JOI_DEL] = container; }
-                            cout << "\tV-J genes:\t" << err_message << endl;
+                            if (container
+                                && this->findGenes(container->column_names(), _genes->J(), err_message)) {
+                                    containers[VDJ_JOI_DEL] = container;
+                            }
+
+                            cout << "\tJ delet. num.:   " << err_message << endl;
                         }
                         else if (element == "d.del") {
                             if (container) { containers[VDJ_DIV_DEL] = container; }
-                            cout << "\tV-J genes:\t" << err_message << endl;
+
+                            cout << "\tD delet. num.:   " << err_message << endl;
                         }
                         else if (element == "ins.len") {
-                            if (container) { containers[VDJ_VAR_DIV_INS_LEN] = container; }
-                            cout << "\tV-J genes:\t" << err_message << endl;
+                            if (container) {
+                                if (container->n_columns() != 2) {
+                                    err_message = "ERROR: wrong number of columns.";
+                                } else {
+                                    containers[VDJ_VAR_DIV_INS_LEN] = container;
+                                }
+                            }
 
-                            if (container) { containers[VDJ_DIV_JOI_INS_LEN] = container; }
-                            cout << "\tV-J genes:\t" << err_message << endl;
-                        } else if (element == "ins.nucl") {
-                            if (container) { containers[VDJ_VAR_DIV_INS_NUC] = container; }
-                            cout << "\tV-J genes:\t" << err_message << endl;
+                            cout << "\tVD/DJ ins. len.: " << err_message << endl;;
+                        }
+                        else if (element == "ins.nucl") {
+                            if (container) {
+                                if (container->row_names().size() != 4 || container->column_names().size() != 8) {
+                                    err_message = "ERROR: wrong number of columns and rows.";
+                                } else {
+                                    containers[VDJ_VAR_DIV_INS_NUC] = container;
+                                }
+                            }
 
-                            if (container) { containers[VDJ_DIV_JOI_INS_NUC] = container; }
-                            cout << "\tV-J genes:\t" << err_message << endl;
-                        } else { cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl; }
+                            cout << "\tVD/DJ ins. nuc.: " << err_message << endl;
+                        }
+                        else { cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl; }
                     }
                 }
 
@@ -480,11 +494,68 @@ namespace ymir {
                         && containers[VDJ_JOI_DEL]
                         && containers[VDJ_DIV_DEL]
                         && containers[VDJ_VAR_DIV_INS_LEN]
-                        && containers[VDJ_DIV_JOI_INS_LEN]
-                        && containers[VDJ_VAR_DIV_INS_NUC]
-                        && containers[VDJ_DIV_JOI_INS_NUC]) {
+                        && containers[VDJ_VAR_DIV_INS_NUC]) {
 
+                        this->addGenes(containers[VDJ_VAR_GEN],
+                                       _genes->V(),
+                                       event_probs,
+                                       event_lengths,
+                                       event_classes,
+                                       event_col_num,
+                                       laplace);
 
+                        this->addGenes(containers[VDJ_JOI_DIV_GEN],
+                                       _genes->J(),
+                                       _genes->D(),
+                                       event_probs,
+                                       event_lengths,
+                                       event_classes,
+                                       event_col_num,
+                                       laplace,
+                                       1);
+
+                        this->addDels(containers[VDJ_VAR_DEL],
+                                      _genes->V(),
+                                      event_probs,
+                                      event_lengths,
+                                      event_classes,
+                                      event_col_num,
+                                      laplace,
+                                      1);
+
+                        this->addDels(containers[VDJ_JOI_DEL],
+                                      _genes->J(),
+                                      event_probs,
+                                      event_lengths,
+                                      event_classes,
+                                      event_col_num,
+                                      laplace,
+                                      containers[VDJ_VAR_DEL]->n_columns());
+
+                        this->addDels(containers[VDJ_DIV_DEL],
+                                      _genes->D(),
+                                      event_probs,
+                                      event_lengths,
+                                      event_classes,
+                                      event_col_num,
+                                      laplace,
+                                      containers[VDJ_JOI_DEL]->n_columns());
+
+                        this->addIns(containers[VDJ_VAR_DIV_INS_LEN],
+                                     event_probs,
+                                     event_lengths,
+                                     event_classes,
+                                     event_col_num,
+                                     laplace,
+                                     containers[VDJ_DIV_DEL]->n_columns());
+
+                        this->addIns(containers[VDJ_VAR_DIV_INS_NUC],
+                                     event_probs,
+                                     event_lengths,
+                                     event_classes,
+                                     event_col_num,
+                                     laplace,
+                                     2);
 
                         _param_vec = new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace);
                         is_ok = true;
@@ -544,17 +615,18 @@ namespace ymir {
                       vector<eventind_t> &event_classes,
                       vector<seq_len_t> &event_col_num,
                       vector<prob_t> &laplace) const {
-            vector<segindex_t> name_order = this->arrangeNames(container->column_names(), gsa);
+            vector<segindex_t> name_order = this->arrangeNames(container->row_names(), gsa);
             vector<prob_t> prob_data;
+            prob_data.resize(container->data(0).size(), 0);
             for (size_t i = 0; i < name_order.size(); ++i) {
-                prob_data = container->data(name_order[i] - 1);
-                event_probs.insert(event_probs.end(),
-                                   prob_data.begin(),
-                                   prob_data.end());
-                event_lengths.push_back(prob_data.size());
-                event_col_num.push_back(0);
-                laplace.push_back(container->laplace());
+                prob_data[i] = container->data(0)[name_order[i] - 1];
             }
+            event_probs.insert(event_probs.end(),
+                               prob_data.begin(),
+                               prob_data.end());
+            event_lengths.push_back(prob_data.size());
+            event_col_num.push_back(0);
+            laplace.push_back(container->laplace());
 
             event_classes.push_back(0);
         }
@@ -594,13 +666,43 @@ namespace ymir {
 
 
         void addDels(AbstractTDContainer *container,
-                        const GeneSegmentAlphabet &gsa,
-                        vector<prob_t> &event_probs,
-                        vector<eventind_t> &event_lengths,
-                        vector<eventind_t> &event_classes,
-                        vector<seq_len_t> &event_col_num,
-                        vector<prob_t> &laplace,
-                        segindex_t prev_class_size) const {
+                     const GeneSegmentAlphabet &gsa,
+                     vector<prob_t> &event_probs,
+                     vector<eventind_t> &event_lengths,
+                     vector<eventind_t> &event_classes,
+                     vector<seq_len_t> &event_col_num,
+                     vector<prob_t> &laplace,
+                     segindex_t prev_class_size) const {
+            vector<segindex_t> name_order = this->arrangeNames(container->column_names(), gsa);
+            vector<prob_t> prob_data;
+            for (size_t i = 0; i < name_order.size(); ++i) {
+                // find correct segment for i-th position
+                size_t j = 0;
+                for (; i+1 != name_order[j] ; ++j) {}
+                prob_data = container->data(j);
+                // remove trailing zeros
+                if (prob_data.size() > gsa[name_order[j]].sequence.size() + 1) {
+                    prob_data.resize(gsa[name_order[j]].sequence.size() + 1);
+                }
+                event_probs.insert(event_probs.end(),
+                                   prob_data.begin(),
+                                   prob_data.end());
+                event_lengths.push_back(prob_data.size());
+                event_col_num.push_back(0);
+                laplace.push_back(container->laplace());
+            }
+            event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
+        }
+
+
+        void addDels2D(AbstractTDContainer *container,
+                       const GeneSegmentAlphabet &gsa,
+                       vector<prob_t> &event_probs,
+                       vector<eventind_t> &event_lengths,
+                       vector<eventind_t> &event_classes,
+                       vector<seq_len_t> &event_col_num,
+                       vector<prob_t> &laplace,
+                       segindex_t prev_class_size) const {
             vector<segindex_t> name_order = this->arrangeNames(container->column_names(), gsa);
             vector<prob_t> prob_data;
             for (size_t i = 0; i < name_order.size(); ++i) {

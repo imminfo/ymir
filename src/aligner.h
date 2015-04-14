@@ -139,72 +139,56 @@ namespace ymir {
             seq_len_t p_start, t_start;
 
             for (seq_len_t pattern_i = 1; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
-                int text_i = 0;
-                cout << endl << "SUBSTRINGS::" << endl;
                 open_match = false;
-                min_subsize = min(p_size - pattern_i, t_size - text_i);
-                cout << pattern.substr(pattern_i, min_subsize) << endl;
-                cout << text.substr(text_i, min_subsize) << endl;
+                min_subsize = min(p_size - pattern_i, (int) t_size);
                 for (seq_len_t i = 0; i < min_subsize; ++i) {
-                    cout << (pattern_i + i) << ":" << (text_i + i) << endl;
-                    cout << pattern[pattern_i + i] << "?=" << text[text_i + i] << endl;
-                    if (pattern[pattern_i + i] == text[text_i + i]) {
+                    if (pattern[pattern_i + i] == text[i]) {
                         if (!open_match) {
                             p_start = pattern_i + i;
-                            t_start = text_i + i;
+                            t_start = i;
                             open_match = true;
                         }
                     } else if (open_match) {
                         if ((pattern_i + i - p_start) >= match_min_len) {
-                            cout << "DALIGNMENT cycle:" << p_start << ":" << (pattern_i + i - 1) << ":" << t_start << ":" << (text_i  + i - 1) << endl;
                             vec.push_back(p_start);
                             vec.push_back(pattern_i + i - 1);
                             vec.push_back(t_start);
-                            vec.push_back(text_i + i - 1);
+                            vec.push_back(i - 1);
                         }
                         open_match = false;
                     }
                 }
                 if (open_match && (pattern_i + min_subsize - p_start) >= match_min_len) {
-                    cout << "DALIGNMENT post:" << p_start << ":" << (pattern_i + min_subsize - 1) << ":" << t_start << ":" << (text_i + min_subsize - 1) << endl;
                     vec.push_back(p_start);
                     vec.push_back(pattern_i + min_subsize - 1);
                     vec.push_back(t_start);
-                    vec.push_back(text_i + min_subsize - 1);
+                    vec.push_back(min_subsize - 1);
                 }
             }
 
             for (seq_len_t text_i = 0; text_i < t_size - match_min_len + 1; ++text_i) {
-                int pattern_i = 0;
-                cout << endl << "SUBSTRINGS::" << endl;
                 open_match = false;
-                min_subsize = min(p_size - pattern_i, t_size - text_i);
-                cout << pattern.substr(pattern_i, min_subsize) << endl;
-                cout << text.substr(text_i, min_subsize) << endl;
+                min_subsize = min((int) p_size, t_size - text_i);
                 for (seq_len_t i = 0; i < min_subsize; ++i) {
-                    cout << (pattern_i + i) << ":" << (text_i + i) << endl;
-                    cout << pattern[pattern_i + i] << "?=" << text[text_i + i] << endl;
-                    if (pattern[pattern_i + i] == text[text_i + i]) {
+                    if (pattern[i] == text[text_i + i]) {
                         if (!open_match) {
-                            p_start = pattern_i + i;
+                            p_start = i;
                             t_start = text_i + i;
                             open_match = true;
                         }
                     } else if (open_match) {
-                        if ((pattern_i + i - p_start) >= match_min_len) {
-                            cout << "DALIGNMENT cycle:" << p_start << ":" << (pattern_i + i - 1) << ":" << t_start << ":" << (text_i  + i - 1) << endl;
+                        if ((i - p_start) >= match_min_len) {
                             vec.push_back(p_start);
-                            vec.push_back(pattern_i + i - 1);
+                            vec.push_back(i - 1);
                             vec.push_back(t_start);
                             vec.push_back(text_i + i - 1);
                         }
                         open_match = false;
                     }
                 }
-                if (open_match && (pattern_i + min_subsize - p_start) >= match_min_len) {
-                    cout << "DALIGNMENT post:" << p_start << ":" << (pattern_i + min_subsize - 1) << ":" << t_start << ":" << (text_i + min_subsize - 1) << endl;
+                if (open_match && (min_subsize - p_start) >= match_min_len) {
                     vec.push_back(p_start);
-                    vec.push_back(pattern_i + min_subsize - 1);
+                    vec.push_back(min_subsize - 1);
                     vec.push_back(t_start);
                     vec.push_back(text_i + min_subsize - 1);
                 }

@@ -726,21 +726,21 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_nuc_aligner)
     NaiveNucleotideAligner nna;
-    YMIR_ASSERT(nna.align5end("ACGT", "ACGTT") == 4)
-    YMIR_ASSERT(nna.align5end("ACGT", "ACGT") == 4)
-    YMIR_ASSERT(nna.align5end("ACGT", "ACG") == 3)
-    YMIR_ASSERT(nna.align5end("ACGT", "TTT") == 0)
+    YMIR_ASSERT2(nna.align5end("ACGT", "ACGTT"), 4)
+    YMIR_ASSERT2(nna.align5end("ACGT", "ACGT"), 4)
+    YMIR_ASSERT2(nna.align5end("ACGT", "ACG"), 3)
+    YMIR_ASSERT2(nna.align5end("ACGT", "TTT"), 0)
 
-    YMIR_ASSERT(nna.align3end("ACGT", "CGT") == 3)
-    YMIR_ASSERT(nna.align3end("ACGT", "TACGT") == 4)
-    YMIR_ASSERT(nna.align3end("ACGT", "TTCGT") == 3)
-    YMIR_ASSERT(nna.align3end("ACGG", "TTTTT") == 0)
+    YMIR_ASSERT2(nna.align3end("ACGT", "CGT"), 3)
+    YMIR_ASSERT2(nna.align3end("ACGT", "TACGT"), 4)
+    YMIR_ASSERT2(nna.align3end("ACGT", "TTCGT"), 3)
+    YMIR_ASSERT2(nna.align3end("ACGG", "TTTTT"), 0)
 
 
-    YMIR_ASSERT(nna.alignLocal("AA", "TTAATAA", 3).size() == 0)
-    YMIR_ASSERT(nna.alignLocal("AA", "TTAATAA", 2).size() == 2)
-    YMIR_ASSERT(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2).size() == 3)
-    YMIR_ASSERT(nna.alignLocal("ACT", "ACTGACGACGGTATCTAC", 2).size() == 5)
+    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 3).size(), 0)
+    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2).size(), 2)
+    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2).size(), 3)
+    YMIR_ASSERT2(nna.alignLocal("ACT", "ACTGACGACGGTATCTAC", 2).size(), 5)
 YMIR_TEST_END
 
 
@@ -760,7 +760,13 @@ YMIR_TEST_START(test_mitcr_vj)
     YMIR_ASSERT(J_err)
 
     Cloneset cr;
-    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha.txt", &cr, vdj_genes))
+    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha.txt",
+                             &cr,
+                             vdj_genes,
+                             RepertoireParser::AlignmentColumnOptions()
+                                     .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
+                                     .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
+                                     .setD(RepertoireParser::SKIP)))
 
     YMIR_ASSERT(cr.size() == 30)
     YMIR_ASSERT(cr[0].sequence() == "TGTGCAGCAAGTACCCCCTTAAGCTGGTGGTACTAGCTATGGAAAGCTGACATTT")
@@ -781,8 +787,55 @@ YMIR_TEST_START(test_mitcr_vj)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_mitcr_vdj)
-    YMIR_ASSERT(false)
+YMIR_TEST_START(test_mitcr_vdj_with_d_alignment)
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1");
+    alvec1.push_back("Vseg2");
+    alvec1.push_back("Vseg3");
+    seqvec1.push_back("CCCG");
+    seqvec1.push_back("GGG");
+    seqvec1.push_back("CCCGGG");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1");
+    alvec2.push_back("Jseg2");
+    alvec2.push_back("Jseg3");
+    seqvec2.push_back("CCGTTT");
+    seqvec2.push_back("ATTT");
+    seqvec2.push_back("AGGTTT");
+
+    vector<string> alvec3;
+    vector<string> seqvec3;
+    alvec3.push_back("Dseg1");
+    alvec3.push_back("Dseg2");
+    alvec3.push_back("Dseg3");
+    seqvec3.push_back("GTTT");
+    seqvec3.push_back("ACCGGT");
+    seqvec3.push_back("CCCGGAC");
+
+    VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
+
+    RepertoireParser parser;
+    YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
+
+    Cloneset cr;
+    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.beta.txt",
+                             &cr,
+                             genes,
+                             RepertoireParser::AlignmentColumnOptions()
+                                     .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
+                                     .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
+                                     .setD(RepertoireParser::OVERWRITE)))
+
+    YMIR_ASSERT2(cr.size(), 1)
+    YMIR_ASSERT2( (int) cr[0].nDiv(), 3)
+    YMIR_ASSERT2( (int) cr[0].nDalignments(0), 1)
+    YMIR_ASSERT2( (int) cr[0].nDalignments(1), 2)
+    YMIR_ASSERT2( (int) cr[0].nDalignments(2), 3)
+
 YMIR_TEST_END
 
 
@@ -1613,21 +1666,285 @@ YMIR_TEST_START(test_model_vj_file)
 
     YMIR_ASSERT(mvec == model.event_probabilities())
 
-
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_model_vdj_file)
+
+    vector<prob_t> v1;  // param vec
+    vector<eventind_t> v2;  // lens vec
+    vector<eventind_t> v3;  // event classes
+    vector<seq_len_t> v4;  // event family col numbers
+
+    // V
+    v1.push_back(.5); v1.push_back(.25); v1.push_back(.25);
+    v2.push_back(3);
+
+    v3.push_back(0);
+    v4.push_back(0);
+
+    // J-D
+    // J-D (3 Js - 3 Ds)
+    v1.push_back(.01); v1.push_back(.02); v1.push_back(.03);
+    v1.push_back(.04); v1.push_back(.05); v1.push_back(.07);
+    v1.push_back(.08); v1.push_back(.09); v1.push_back(.61);
+
+    v2.push_back(9);
+
+    v3.push_back(1);
+    v4.push_back(3);
+
+    // V del
+    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
+    v2.push_back(5);
+
+    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
+    v2.push_back(4);
+
+    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
+    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
+    v2.push_back(7);
+
+    v3.push_back(2);
+    v4.push_back(0);
+    v4.push_back(0);
+    v4.push_back(0);
+
+    // J del
+    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
+    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
+    v1.push_back(.01);
+    v2.push_back(7);
+
+    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
+    v1.push_back(.19); v1.push_back(.21);
+    v2.push_back(5);
+
+    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
+    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
+    v2.push_back(7);
+
+    v3.push_back(5);
+    v4.push_back(0);
+    v4.push_back(0);
+    v4.push_back(0);
+
+    // D1 dels
+    v1.push_back(.17); // first row
+    v1.push_back(.27);
+    v1.push_back(.37); // second row
+    v1.push_back(.19);
+
+    v2.push_back(4);
+    v4.push_back(2);
+
+    // D2 dels
+    // 3 rows 2 columns
+    v1.push_back(.11); v1.push_back(.12);
+    v1.push_back(.13); v1.push_back(.14);
+    v1.push_back(.15); v1.push_back(.35);
+
+    v2.push_back(6);
+    v4.push_back(2);
+
+    // D3 dels
+    v1.push_back(.11); // first row
+    v1.push_back(.22);
+    v1.push_back(.33); // second row
+    v1.push_back(.34);
+
+    v2.push_back(4);
+    v4.push_back(2);
+
+    v3.push_back(8);
+
+    // VD ins len
+    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
+    v2.push_back(7);
+
+    v3.push_back(11);
+    v4.push_back(0);
+
+    // DJ ins len
+    v1.push_back(.1); v1.push_back(.24); v1.push_back(.25); v1.push_back(.05); v1.push_back(.01); v1.push_back(.15); v1.push_back(.2);
+    v2.push_back(7);
+
+    v3.push_back(12);
+    v4.push_back(0);
+
+    // VD ins nuc
+    // prev A
+    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+    v2.push_back(4);
+
+    v3.push_back(13);
+    v4.push_back(0);
+
+    // prev C
+    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
+    v2.push_back(4);
+
+    v3.push_back(14);
+    v4.push_back(0);
+
+    // prev G
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
+    v2.push_back(4);
+
+    v3.push_back(15);
+    v4.push_back(0);
+
+    // prev T
+    v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.5);
+    v2.push_back(4);
+
+    v3.push_back(16);
+    v4.push_back(0);
+
+    // DJ ins nuc
+    // prev A
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
+    v2.push_back(4);
+
+    v3.push_back(17);
+    v4.push_back(0);
+
+    // prev C
+    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
+    v2.push_back(4);
+
+    v3.push_back(18);
+    v4.push_back(0);
+
+    // prev G
+    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+    v2.push_back(4);
+
+    v3.push_back(19);
+    v4.push_back(0);
+
+    // prev T
+    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
+    v2.push_back(4);
+
+    v3.push_back(20);
+    v4.push_back(0);
+
+    ModelParameterVector mvec(VDJ_RECOMB, v1, v2, v3, v3);
+
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vdj_model/");
     YMIR_ASSERT(model.status())
+
+//    YMIR_ASSERT(mvec == model.event_probabilities())
 
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_model_vj_maag)
-    ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
-    YMIR_ASSERT(model.status())
 
+    vector<prob_t> v1;  // param vec
+    vector<eventind_t> v2;  // lens vec
+    vector<eventind_t> v3;  // event classes
+    vector<seq_len_t> v4;  // event family col numbers
+
+    // V-J
+    v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
+    v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
+    v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
+    v2.push_back(9);
+
+    v3.push_back(0);
+    v4.push_back(3);
+
+    // V del
+    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
+    v2.push_back(5);
+
+    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
+    v2.push_back(4);
+
+    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
+    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
+    v2.push_back(7);
+
+    v3.push_back(1);
+    v4.push_back(0);
+    v4.push_back(0);
+    v4.push_back(0);
+
+    // J del
+    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
+    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
+    v1.push_back(.01);
+    v2.push_back(7);
+    v4.push_back(0);
+
+    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
+    v1.push_back(.19); v1.push_back(.21);
+    v2.push_back(5);
+    v4.push_back(0);
+
+    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
+    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
+    v2.push_back(7);
+    v4.push_back(0);
+
+    v3.push_back(4);
+
+    // VJ ins len
+    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
+    v2.push_back(7);
+    v4.push_back(0);
+
+    v3.push_back(7);
+
+    // VJ ins nuc
+    // prev A
+    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(8);
+
+    // prev C
+    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(9);
+
+    // prev G
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(10);
+
+    // prev T
+    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(11);
+
+//    ModelParameterVector mvec(VJ_RECOMB, v1, v2, v3, v4);
+//
+//    ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
+//    YMIR_ASSERT(model.status())
+//
+//    RepertoireParser parser;
+//    YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
+//
+//    bool V_err, J_err;
+//    VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
+//                                    "Jgene", TEST_DATA_FOLDER + "jgene.real.txt",
+//                                    &V_err, &J_err);
+//    YMIR_ASSERT(V_err)
+//    YMIR_ASSERT(J_err)
+//
+//    Cloneset cloneset;
+//    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha2.txt", &cloneset, vdj_genes))
+//
 //    MAAG maag = model.buildGraphs(cloneset, true, false)[1];
 //
 //    YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
@@ -1755,7 +2072,8 @@ int main() {
 
     // Test for MiTCR parser.
     YMIR_TEST(test_mitcr_vj(), "MiTCR parser test for alpha chain")
-    YMIR_TEST(test_mitcr_vdj(), "MiTCR parser test for beta chain")
+    YMIR_TEST(test_mitcr_vdj_with_d_alignment(), "MiTCR parser test for beta chain with D alignment")
+//    YMIR_TEST(test_mitcr_vdj_wo_d_alignment(), "MiTCR parser test for beta chain without D alignment")
 
     // Tests for clonal repertoires and clonal repertoire views.
     YMIR_TEST(test_clorep(), "Cloneset creating / access")
@@ -1775,7 +2093,7 @@ int main() {
 
     // Tests for assembling statistical model (ASM) reading / writing files.
     YMIR_TEST(test_model_vj_file(), "VJ Model constructing from a file")
-//    YMIR_TEST(test_model_vdj_file(), "VDJ Model constructing from a file")
+    YMIR_TEST(test_model_vdj_file(), "VDJ Model constructing from a file")
 //    YMIR_TEST(test_model_vj_maag(), "VJ Model creating MAAGs")
 //    YMIR_TEST(test_model_vdj_maag(), "VDJ Model creating MAAGs")
 

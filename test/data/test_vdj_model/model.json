@@ -59,7 +59,7 @@
     "ins.nucl": {
       "file": "p.ins.nucl.txt",
       "laplace": 0,
-      "type": "matrix",
+      "type": "vector.list",
       "skip.first.column": true
     }
   }

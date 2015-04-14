@@ -5,12 +5,12 @@
   "hypermutations": false,
   "segments": {
     "variable": {
-      "file": "vsegments.txt",
+      "file": "trav.txt",
       "P.nuc.3'": 0,
       "P.nuc.5'": 0
     },
     "joining": {
-      "file": "jsegments.txt",
+      "file": "traj.txt",
       "P.nuc.3'": 0,
       "P.nuc.5'": 0
     }
@@ -25,29 +25,29 @@
     "v.del": {
       "file": "p.v.del.txt",
       "laplace": 0,
-      "type": "matrix",
-      "seg.depend": true,
+      "type": "vector.list",
       "skip.first.column": true
     },
     "j.del": {
       "file": "p.j.del.txt",
       "laplace": 0,
-      "type": "matrix",
-      "seg.depend": true,
+      "type": "vector.list",
       "skip.first.column": true
     },
     "ins.len": {
       "file": "p.ins.len.txt",
       "laplace": 0,
-      "type": "matrix",
-      "seg.depend": false,
+      "type": "vector.list",
       "skip.first.column": true
     },
     "ins.nucl": {
       "file": "p.ins.nucl.txt",
       "laplace": 0,
-      "type": "matrix",
+      "type": "vector.list",
       "skip.first.column": true
+    },
+    "random.element": {
+      "file": "nofile"
     }
   }
 }

@@ -5,26 +5,26 @@
   "hypermutations": false,
   "segments": {
     "variable": {
-      "file": "vsegments.txt",
+      "file": "trbv.txt",
       "P.nuc.3'": 0,
       "P.nuc.5'": 0
     },
     "joining": {
-      "file": "jsegments.txt",
+      "file": "trbj.txt",
       "P.nuc.3'": 0,
       "P.nuc.5'": 0
     },
     "diversity": {
-      "file": "dsegments.txt",
+      "file": "trbd.txt",
       "P.nuc.3'": 0,
       "P.nuc.5'": 0
     }
   },
   "probtables": {
     "v": {
-      "file": "p.vj.txt",
+      "file": "p.v.txt",
       "laplace": 0,
-      "type": "matrix"
+      "type": "vector"
     },
     "j.d": {
       "file": "p.jd.txt",
@@ -34,32 +34,33 @@
     "v.del": {
       "file": "p.v.del.txt",
       "laplace": 0,
-      "type": "matrix",
-      "segdepend": true
+      "type": "vector.list",
+      "skip.first.column": true
     },
     "j.del": {
       "file": "p.j.del.txt",
       "laplace": 0,
-      "type": "matrix",
-      "segdepend": true
+      "type": "vector.list",
+      "skip.first.column": true
     },
     "d.del": {
       "file": "p.d.del.txt",
       "laplace": 0,
       "type": "matrix.list",
-      "segdepend": true,
+      "skip.first.column": true,
       "min.len": 3
     },
     "ins.len": {
       "file": "p.ins.len.txt",
       "laplace": 0,
-      "type": "matrix",
-      "segdepend": false
+      "type": "vector.list",
+      "skip.first.column": true
     },
     "ins.nucl": {
       "file": "p.ins.nucl.txt",
       "laplace": 0,
-      "type": "matrix"
+      "type": "vector.list",
+      "skip.first.column": true
     }
   }
 }

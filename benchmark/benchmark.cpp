@@ -7,6 +7,10 @@
 
 #define BENCH_DATA_FOLDER string("/Users/vdn/ymir/benchmark/data/")
 
+
+#include <chrono>
+#include <ctime>
+
 #include "parser.h"
 #include "statisticalinferencealgorithm.h"
 
@@ -14,6 +18,8 @@ using namespace ymir;
 
 
 int main() {
+    std::chrono::system_clock::time_point tp1, tp2;
+
 
     RepertoireParser parser;
     parser.loadConfig(BENCH_DATA_FOLDER + "../../parsers/mitcrdots.json");
@@ -26,6 +32,7 @@ int main() {
                                    "Jgene",
                                    BENCH_DATA_FOLDER + "traj.txt");
 
+    tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vj;
     parser.parse(BENCH_DATA_FOLDER + "mitcr.alpha.500k.txt",
                  &cloneset_vj,
@@ -34,6 +41,8 @@ int main() {
                          .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
                          .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
                          .setD(RepertoireParser::SKIP));
+    tp2 = std::chrono::system_clock::now();
+    cout << "Parsing VJ, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
 
     //
     // TCR beta chain repertoire - VDJ recombination
@@ -45,6 +54,7 @@ int main() {
                                     "Dgene",
                                     BENCH_DATA_FOLDER + "trbd.txt");
 
+    tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vdj;
     parser.parse(BENCH_DATA_FOLDER + "mitcr.beta.500k.txt",
                  &cloneset_vdj,
@@ -53,13 +63,41 @@ int main() {
                          .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
                          .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
                          .setD(RepertoireParser::OVERWRITE));
+    tp2 = std::chrono::system_clock::now();
+    cout << "Parsing VDJ, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
 
-
+    //
+    // VJ MAAG
+    //
     ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA");
 
-//    vj_model.buildGraphs(cloneset_vj, true);
+    tp1 = std::chrono::system_clock::now();
+    vj_model.buildGraphs(cloneset_vj, true);
+    tp2 = std::chrono::system_clock::now();
+    cout << "VJ MAAG with metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
 
-//    Cloneset repertoire20K, repertoire200K, repertoire500K;
+    tp1 = std::chrono::system_clock::now();
+    vj_model.computeFullProbabilities(cloneset_vj);
+    tp2 = std::chrono::system_clock::now();
+    cout << "VJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
+
+    //
+    // VDJ MAAG
+    //
+    ProbabilisticAssemblingModel vdj_model(BENCH_DATA_FOLDER + "../../models/hTRB");
+
+    tp1 = std::chrono::system_clock::now();
+    vdj_model.buildGraphs(cloneset_vdj, true);
+    tp2 = std::chrono::system_clock::now();
+    cout << "VDJ MAAG with metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
+
+    tp1 = std::chrono::system_clock::now();
+    vdj_model.computeFullProbabilities(cloneset_vdj);
+    tp2 = std::chrono::system_clock::now();
+    cout << "VDJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
+
+
+//    Cloneset repertoire50K, repertoire200K, repertoire500K;
 //  With and without parallelisation
 
     // Compute simple one-alignment full probabilities.

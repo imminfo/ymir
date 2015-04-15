@@ -26,11 +26,19 @@
 
 
 #include <unordered_map>
+#include <iostream>
 #include "tuple"
 
 #include "Eigen/Dense"
 
 #include "tools.h"
+
+//#define MPFR
+#include "gmp.h"
+#include "mpfr.h"
+//#include <Eigen/unsupported/Eigen/MPRealSupport>
+//using namespace mpfr;
+using namespace Eigen;
 
 
 namespace ymir {
@@ -39,15 +47,15 @@ namespace ymir {
     *
     * \brief Type of assembly scenario probabilities.
     */
-//    #define MPFR
+
     #ifdef MPFR
-    #include "Eigen/mpreal.h"
+
     /**
     * \typedef prob_t
     *
     * \brief Type of stored probabilities of different events.
     */
-    typedef mpfr::mpreal prob_t;
+    typedef mpreal prob_t;
     #else
     /**
     * \typedef prob_t

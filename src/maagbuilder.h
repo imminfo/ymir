@@ -118,7 +118,7 @@ namespace ymir {
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 res.push_back(build(cloneset[i], full_build));
                 if ((i+1) % 50000 == 0) {
-                    cout << "Built " << (int) i << " graphs." << endl;
+                    cout << "Built " << (int) (i+1) << " graphs." << endl;
                 }
             }
             return res;

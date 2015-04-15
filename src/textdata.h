@@ -65,6 +65,10 @@ namespace ymir {
 
         bool file_exists() const { return _file_exists; }
 
+        void addMetadata(seq_len_t data) { _metadata.push_back(data); }
+
+        seq_len_t metadata(size_t i) const { return _metadata[i]; }
+
     protected:
 
         vector< vector<prob_t> > _data;
@@ -73,6 +77,7 @@ namespace ymir {
         prob_t _laplace;
         bool _skip_first_column, _file_exists;
         CONTAINER_TYPE _type;
+        vector<seq_len_t> _metadata;
 
 
         AbstractTDContainer() {
@@ -392,12 +397,12 @@ namespace ymir {
             ifs.open(filepath);
 
             if (ifs.is_open()) {
-                _data.push_back(vector<prob_t>());
                 stringstream line_stream;
                 string line, word;
                 vector<prob_t> word_vec;
                 int line_num = 1, matrix_num = 0;
                 bool skip_col_num_check = true, in_matrix = true, empty_line = false;
+                _data.push_back(vector<prob_t>());
                 while (!ifs.eof()) {
                     getline(ifs, line);
                     if (line[0] != '\n' && line[0] != 0) {
@@ -405,41 +410,35 @@ namespace ymir {
                         line_stream.str(line);
                         int i = !_skip_first_column;
 
-                        if (!in_matrix) {
-                            matrix_num++;
-                            in_matrix = true;
-                        } else {
-                            if (skip_col_num_check) {
-                                while (!line_stream.eof()) {
-                                    getline(line_stream, word, '\t');
-                                    if (i) { this->addColumnName(word); }
-                                    ++i;
-                                }
-                            } else {
-                                while (!line_stream.eof()) {
-                                    getline(line_stream, word, '\t');
-                                    // MPFR?!?!?! I don't know
-                                    // add row
-                                    if (word == "") {
-                                        cout << "wow wow!!" << endl;
-                                    } else {
-                                        cout << word << endl;
-                                    }
-                                    if (i) { word_vec.push_back(stod(word)); }
-                                    else { this->addRowName(word); }
-                                    ++i;
-                                }
-
+                        if (skip_col_num_check) {
+                            while (!line_stream.eof()) {
+                                getline(line_stream, word, '\t');
+                                if (i) { this->addColumnName(word); }
+                                else { this->addRowName(word); }
+                                ++i;
                             }
-                            line_stream.clear();
+                            _metadata.push_back(i - 1);
+                        } else {
+                            while (!line_stream.eof()) {
+                                getline(line_stream, word, '\t');
+                                // MPFR?!?!?! I don't know
+                                // add row
+                                if (i) { word_vec.push_back(stod(word)); }
+                                ++i;
+                            }
+
                         }
+                        line_stream.clear();
                     } else {
+                        matrix_num++;
+                        _data.push_back(vector<prob_t>());
                         empty_line = true;
+                        skip_col_num_check = true;
                     }
 
                     if (!empty_line) {
                         if (!skip_col_num_check) {
-                            if (word_vec.size() == _colnames.size()) {
+                            if (word_vec.size() == _metadata[matrix_num]) {
                                 _data[matrix_num].insert(_data[matrix_num].end(), word_vec.begin(), word_vec.end());
                             } else {
                                 stringstream ss;

@@ -20,7 +20,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define NCURSES_TERM_H_incl 1
 
 #define YMIR_TEST(res, s) {all_tests += 1; if (res.size() == 0) {tests_passed += 1;} \
                             else { \
@@ -1730,21 +1730,21 @@ YMIR_TEST_START(test_model_vdj_file)
     v4.push_back(0);
 
     // D1 dels
-    v1.push_back(.17); // first row
-    v1.push_back(.27);
-    v1.push_back(.37); // second row
-    v1.push_back(.19);
-
-    v2.push_back(4);
-    v4.push_back(2);
-
-    // D2 dels
     // 3 rows 2 columns
     v1.push_back(.11); v1.push_back(.12);
     v1.push_back(.13); v1.push_back(.14);
     v1.push_back(.15); v1.push_back(.35);
 
     v2.push_back(6);
+    v4.push_back(2);
+
+    // D2 dels
+    v1.push_back(.17); // first row
+    v1.push_back(.27);
+    v1.push_back(.37); // second row
+    v1.push_back(.19);
+
+    v2.push_back(4);
     v4.push_back(2);
 
     // D3 dels
@@ -1795,7 +1795,7 @@ YMIR_TEST_START(test_model_vdj_file)
     v4.push_back(0);
 
     // prev T
-    v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.5);
+    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
     v2.push_back(4);
 
     v3.push_back(16);
@@ -1830,12 +1830,12 @@ YMIR_TEST_START(test_model_vdj_file)
     v3.push_back(20);
     v4.push_back(0);
 
-    ModelParameterVector mvec(VDJ_RECOMB, v1, v2, v3, v3);
+    ModelParameterVector mvec(VDJ_RECOMB, v1, v2, v3, v4);
 
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vdj_model/");
     YMIR_ASSERT(model.status())
 
-//    YMIR_ASSERT(mvec == model.event_probabilities())
+    YMIR_ASSERT(mvec == model.event_probabilities())
 
 YMIR_TEST_END
 
@@ -2037,6 +2037,9 @@ struct TestInfo {
 
 
 int main() {
+
+//    mpreal::set_default_prec(200);
+
     //
     // MEGA TO-DO: make good tests with some unit-testing framework (CTest)
     //

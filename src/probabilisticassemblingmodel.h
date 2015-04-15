@@ -548,14 +548,14 @@ namespace ymir {
                                       laplace,
                                       containers[VDJ_VAR_DEL]->n_columns());
 
-                        this->addDels(containers[VDJ_DIV_DEL],
-                                      _genes->D(),
-                                      event_probs,
-                                      event_lengths,
-                                      event_classes,
-                                      event_col_num,
-                                      laplace,
-                                      containers[VDJ_JOI_DEL]->n_columns());
+                        this->addDels2D(containers[VDJ_DIV_DEL],
+                                        _genes->D(),
+                                        event_probs,
+                                        event_lengths,
+                                        event_classes,
+                                        event_col_num,
+                                        laplace,
+                                        containers[VDJ_JOI_DEL]->n_columns());
 
                         this->addIns(containers[VDJ_VAR_DIV_INS_LEN],
                                      event_probs,
@@ -563,7 +563,7 @@ namespace ymir {
                                      event_classes,
                                      event_col_num,
                                      laplace,
-                                     containers[VDJ_DIV_DEL]->n_columns());
+                                     containers[VDJ_DIV_DEL]->row_names().size());
 
                         this->addIns(containers[VDJ_VAR_DIV_INS_NUC],
                                      event_probs,
@@ -571,7 +571,7 @@ namespace ymir {
                                      event_classes,
                                      event_col_num,
                                      laplace,
-                                     2);
+                                     1);
 
                         _param_vec = new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace);
                         is_ok = true;
@@ -635,7 +635,7 @@ namespace ymir {
             vector<prob_t> prob_data;
             prob_data.resize(container->data(0).size(), 0);
             for (size_t i = 0; i < name_order.size(); ++i) {
-                prob_data[i] = container->data(0)[name_order[i] - 1];
+                prob_data[name_order[i] - 1] = container->data(0)[i];
             }
             event_probs.insert(event_probs.end(),
                                prob_data.begin(),
@@ -719,22 +719,23 @@ namespace ymir {
                        vector<seq_len_t> &event_col_num,
                        vector<prob_t> &laplace,
                        segindex_t prev_class_size) const {
-            vector<segindex_t> name_order = this->arrangeNames(container->column_names(), gsa);
+            vector<segindex_t> name_order = this->arrangeNames(container->row_names(), gsa);
             vector<prob_t> prob_data;
             for (size_t i = 0; i < name_order.size(); ++i) {
                 // find correct segment for i-th position
                 size_t j = 0;
                 for (; i+1 != name_order[j] ; ++j) {}
                 prob_data = container->data(j);
-                // remove trailing zeros
-                if (prob_data.size() > gsa[name_order[j]].sequence.size() + 1) {
-                    prob_data.resize(gsa[name_order[j]].sequence.size() + 1);
-                }
+
+//                if (prob_data.size() > gsa[name_order[j]].sequence.size() + 1) {
+//                    prob_data.resize(gsa[name_order[j]].sequence.size() + 1);
+//                }
+
                 event_probs.insert(event_probs.end(),
                                    prob_data.begin(),
                                    prob_data.end());
                 event_lengths.push_back(prob_data.size());
-                event_col_num.push_back(0);
+                event_col_num.push_back(container->metadata(j));
                 laplace.push_back(container->laplace());
             }
             event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
@@ -758,6 +759,7 @@ namespace ymir {
                 event_col_num.push_back(0);
                 laplace.push_back(container->laplace());
                 event_classes.push_back(event_classes[event_classes.size() - 1] + prev_class_size);
+                prev_class_size = 1;
             }
         }
 

@@ -907,11 +907,11 @@ YMIR_TEST_START(test_markovchain_nuc)
     string s = "ACGT";
 
     // .7 * .3 * .2 = .042
-    YMIR_ASSERT(mc.nucProbability("") == 0);
+    YMIR_ASSERT(mc.nucProbability("") == 1);
     YMIR_ASSERT(mc.nucProbability(s) == .042);
     YMIR_ASSERT(mc.nucProbability(s.begin(), 4) == .042);
     YMIR_ASSERT(mc.nucProbability(s.begin() + 1, 3) == .06);
-    YMIR_ASSERT(mc.nucProbability(s.begin(), 0) == 0);
+    YMIR_ASSERT(mc.nucProbability(s.begin(), 0) == 1);
 
     mc.updateProbabilities(vec.begin());
 

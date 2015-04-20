@@ -233,6 +233,8 @@ namespace ymir {
         bool is_vdj() const { return _chain.size() == VDJ_CHAIN_SIZE; }
         ///@}
 
+        RECOMBINATION recombination() const { return _chain.size() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB ; }
+
     protected:
 
         EventIndMMC *_events;  /** Matrix of indices of events for each edge. */
@@ -240,6 +242,7 @@ namespace ymir {
         seq_len_t *_seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
         seq_len_t _n_poses;
         string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
+
 
 
         /**

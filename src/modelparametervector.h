@@ -82,7 +82,7 @@ namespace ymir {
          * length as lens_vec.
          * \param laplace_vec Vector of pseudo counts for each event family.
          */
-        ModelParameterVector(MODEL_VECTOR_TYPE vec_type,
+        ModelParameterVector(RECOMBINATION vec_type,
                              const vector<prob_t>& param_vec,
                              const vector<eventind_t>& lens_vec,
                              const vector<eventind_t>& event_classes,

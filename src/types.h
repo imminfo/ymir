@@ -140,7 +140,7 @@ namespace ymir {
     /**
      * \enum MODEL_VECTOR_TYPE
      */
-    enum MODEL_VECTOR_TYPE {
+    enum RECOMBINATION {
         VJ_RECOMB,
         VDJ_RECOMB
     };

@@ -56,9 +56,9 @@ namespace ymir {
     }
 
 
-//    string translate(const string& nuc_seq) {
-//
-//    }
+    string translate(const string& nuc_seq) {
+
+    }
 
 }
 

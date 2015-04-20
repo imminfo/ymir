@@ -1,31 +1,25 @@
 //
-// Created by Vadim N. on 15/04/2015.
+// Created by Vadim N. on 20/04/2015.
 //
 
-#ifndef YMIR_MAAGEVENTEXTRACTOR_H
-#define YMIR_MAAGEVENTEXTRACTOR_H
-
+#ifndef YMIR_MAAGFORWARDBACKWARDALGORITHM_H
+#define YMIR_MAAGFORWARDBACKWARDALGORITHM_H
 
 #include "maag.h"
 
-
 namespace ymir {
 
-    /**
-     * \class MAAGEventExtractor
-     *
-     * \brief Class for extracting normalised value of event probabilities.
-     */
-    class MAAGEventExtractor : protected MAAG {
+
+    class MAAGForwardBackwardAlgorithm : protected MAAG {
     public:
 
 
-        MAAGEventExtractor(const MAAG &maag) {
+        MAAGForwardBackwardAlgorithm(const MAAG &maag) {
             init(maag);
         }
 
 
-        virtual ~MAAGEventExtractor() { }
+        virtual ~MAAGForwardBackwardAlgorithm() { }
 
 
         bool init(const MAAG &maag) {
@@ -89,10 +83,10 @@ namespace ymir {
         size_t _node_i, _mat_i, _row, _column;
 
 
-        MAAGEventExtractor() { }
+        MAAGForwardBackwardAlgorithm() { }
 
     };
 
 }
 
-#endif //YMIR_MAAGEVENTEXTRACTOR_H
+#endif //YMIR_MAAGFORWARDBACKWARDALGORITHM_H

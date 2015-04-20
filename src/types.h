@@ -114,7 +114,11 @@ namespace ymir {
         bool operator!=(const d_alignment_t& other) {
             return !((*this) == other);
         }
+
     };
+
+
+    typedef pair<eventind_t, prob_t> event_pair_t;
 
 
     /**

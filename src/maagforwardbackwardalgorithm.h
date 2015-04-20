@@ -29,8 +29,10 @@ namespace ymir {
             _row = 0;
             _column = 0;
             if (maag && maag->_events) {
+                _chain = maag._chain;
                 _events = maag._events;
                 _status = true;
+                _recomb = maag.recombination();
             }
             return _status;
         }
@@ -38,36 +40,7 @@ namespace ymir {
 
         event_pair_t next() {
             if (_status && _node_i < _events->chainSize()) {
-                // node indices
-                if (_mat_i >= _events->nodeSize()) {
-                    ++_node_i;
-                    _mat_i = 0;
-                    _row = 0;
-                    _column = 0;
-                    return next();
-                } else {
 
-                }
-
-                // matrix indices
-                if (_row >= _events->matrix(_node_i, _mat_i).rows()) {
-                    ++_mat_i;
-                    _row = 0;
-                    _column = 0;
-                    return next();
-                } else {
-
-                }
-
-                // column indices
-                if (_column >= _events->matrix(_node_i, _mat_i).cols()) {
-                    ++_row;
-                    _column = 0;
-                    return next();
-                } else {
-
-                    ++_column;
-                }
             }
 
             _status = false;
@@ -80,7 +53,45 @@ namespace ymir {
     protected:
 
         bool _status;
+        RECOMBINATION _recomb;
         size_t _node_i, _mat_i, _row, _column;
+        // _memo;
+
+
+        prob_t forward(node_ind_t node_i,
+                       dim_t row_i,
+                       dim_t column_i,
+                       const vector<matrix_ind_t> &matrix_indices) {
+            // find previous nodes, compute forward probabilities for them, sum them up and return the sum
+            prob_t res = 1;
+            node_ind_t prev_node_i = node_i - 1;
+            if (prev_node_i > 0) {
+                for (dim_t next_row_i = 0; next_row_i < nodeRows(prev_node_i); ++next_row_i) {
+                    res += (*this)(node_i, matrix_indices[node_i], row_i, column_i) * forward(prev_node_i, matrix_indices[prev_node_i], next_row_i, row_i);
+                }
+            } else {
+                res = (*this)(node_i, matrix_i, row_i, column_i);
+            }
+            return res;
+        }
+
+
+        prob_t backward(node_ind_t node_i,
+                        dim_t row_i,
+                        dim_t column_i,
+                        const vector<matrix_ind_t> &matrix_indices) {
+            // find next nodes, compute backward probabilities for them, sum them up and return the sum
+            prob_t res = 1;
+            node_ind_t next_node_i = node_i + 1;
+            if (next_node_i < _chain.size() - 1) {
+                for (dim_t next_column_i = 0; next_column_i < nodeColumns(next_node_i); ++next_column_i) {
+                    res += (*this)(node_i, matrix_indices[node_i], row_i, column_i) * backward(next_node_i, matrix_indices[next_node_i], column_i, next_column_i);
+                }
+            } else {
+                res = (*this)(node_i, matrix_i, row_i, column_i);
+            }
+            return res;
+        }
 
 
         MAAGForwardBackwardAlgorithm() { }

@@ -38,7 +38,7 @@
 #include "mpfr.h"
 //#include <Eigen/unsupported/Eigen/MPRealSupport>
 //using namespace mpfr;
-using namespace Eigen;
+//using namespace Eigen;
 
 
 namespace ymir {
@@ -118,7 +118,7 @@ namespace ymir {
     };
 
 
-    typedef pair<eventind_t, prob_t> event_pair_t;
+    typedef std::pair<eventind_t, prob_t> event_pair_t;
 
 
     /**

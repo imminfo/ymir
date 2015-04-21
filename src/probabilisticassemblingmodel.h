@@ -154,9 +154,9 @@ namespace ymir {
          *
          * \return Artificial repertoire.
          */
-        Cloneset generateSequences(size_t count = 1, bool merge = false) const {
+        Cloneset generateSequences(size_t count = 1) const {
             // generate sequences
-//            return _generator->generate(count);
+            return _generator->generate(count);
         }
 
 
@@ -778,7 +778,7 @@ namespace ymir {
          */
         void make_assembler() {
             if (_generator) { delete _generator; }
-            /*_generator = new ClonotypeAssembler(*_param_vec, *_genes);*/
+            _generator = new ClonotypeAssembler(*_param_vec, *_genes);
         }
 
     };

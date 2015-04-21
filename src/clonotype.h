@@ -30,9 +30,6 @@
 #include "vector"
 
 
-using namespace std;
-
-
 namespace ymir {
 
     #define CLONOTYPEBUILDER_VSEG_DEFAULT_RESERVE_SIZE 3
@@ -321,9 +318,9 @@ namespace ymir {
 
     protected:
 
-        vector<segindex_t> _Vseg, _Jseg, _Dseg; // gene segment aligned
-        vector<seq_len_t> _Valign, _Jalign, _Dalign; // alignments for each gene segment
-        vector<segindex_t> _n_Dalign; // number of D alignments
+        std::vector<segindex_t> _Vseg, _Jseg, _Dseg; // gene segment aligned
+        std::vector<seq_len_t> _Valign, _Jalign, _Dalign; // alignments for each gene segment
+        std::vector<segindex_t> _n_Dalign; // number of D alignments
 
     };
 

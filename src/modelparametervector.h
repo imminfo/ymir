@@ -166,6 +166,9 @@ namespace ymir {
         }
 
 
+        RECOMBINATION recombination() const { return _recomb; }
+
+
         //============= VECTOR INDICES ACCESS =============//
 
 
@@ -324,6 +327,7 @@ namespace ymir {
         vector<seq_len_t> _event_family_col_numbers;  /** Vector of the number of rows of each event family. */
         vector<prob_t> _laplace;
         vector<seq_len_t> _d_genes_min_len;
+        RECOMBINATION _recomb;
 
 
         /**

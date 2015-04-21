@@ -30,9 +30,6 @@
 #include "types.h"
 
 
-using namespace std;
-
-
 namespace ymir {
 
 //    event_matrix_t read_matrix(const string& filepath) {
@@ -40,7 +37,7 @@ namespace ymir {
 //    }
 
 
-    void write_matrix(const string& filepath) {
+    void write_matrix(const std::string &filepath) {
 
     }
 
@@ -56,7 +53,7 @@ namespace ymir {
     }
 
 
-    string translate(const string& nuc_seq) {
+    std::string translate(const std::string &nuc_seq) {
 
     }
 

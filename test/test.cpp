@@ -2028,6 +2028,16 @@ YMIR_TEST_START(test_model_vdj_maag)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_maag_forward)
+    YMIR_ASSERT(false)
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_maag_backward)
+    YMIR_ASSERT(false)
+YMIR_TEST_END
+
+
 struct TestInfo {
     string test_name;
     vector<string> failed_cases;
@@ -2099,6 +2109,10 @@ int main() {
     YMIR_TEST(test_model_vdj_file(), "VDJ Model constructing from a file")
 //    YMIR_TEST(test_model_vj_maag(), "VJ Model creating MAAGs")
 //    YMIR_TEST(test_model_vdj_maag(), "VDJ Model creating MAAGs")
+
+    // Tests for forward-backward algorithms
+    YMIR_TEST(test_maag_forward(), "MAAG forward algorithm")
+    YMIR_TEST(test_maag_backward(), "MAAG backward algorithm")
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.
 

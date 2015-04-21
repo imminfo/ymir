@@ -65,13 +65,24 @@ namespace ymir {
             // find previous nodes, compute forward probabilities for them, sum them up and return the sum
             prob_t res = 1;
             node_ind_t prev_node_i = node_i - 1;
-            if (prev_node_i > 0) {
+            if (prev_node_i > 0 && node_i < _chain.size() - 1) {
                 for (dim_t next_row_i = 0; next_row_i < nodeRows(prev_node_i); ++next_row_i) {
                     res += (*this)(node_i, matrix_indices[node_i], row_i, column_i) * forward(prev_node_i, matrix_indices[prev_node_i], next_row_i, row_i);
                 }
+            } else if (prev_node == 0) {
+                if (_recomb == VJ_RECOMB) {
+                    res = _chain[0](matrix_indices[0], matrix_indices[VJ_CHAIN_SIZE - 1]);
+                } else {
+                    res = _chain[0][matrix_indices[0]](0, 0);
+                }
             } else {
-                res = (*this)(node_i, matrix_i, row_i, column_i);
+                if (_recomb == VJ_RECOMB) {
+                    res = 1;
+                } else {
+                    res = _chain[0](matrix_indices[VDJ_DIV_DEL], matrix_indices[VDJ_CHAIN_SIZE - 1]);
+                }
             }
+//            res = (*this)(node_i, matrix_i, row_i, column_i);
             return res;
         }
 

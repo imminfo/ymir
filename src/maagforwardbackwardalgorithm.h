@@ -47,7 +47,8 @@ namespace ymir {
         RECOMBINATION _recomb;
         size_t _node_i, _mat_i, _row, _column;
         ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspond. */
-        ProbMMC *_fb_acc;  /** Accumulator MMC for storing forward and backward probabilities */
+        ProbMMC *_fb_acc;  /** Accumulator MMC for storing forward and backward probabilities. */
+        prob_t _full_prob;  /** Full generation probability of the input MAAG. */
 
 
         bool init_and_process(const MAAG &maag) {
@@ -57,6 +58,7 @@ namespace ymir {
             _mat_i = 0;
             _row = 0;
             _column = 0;
+            _full_prob = 0;
             if (maag && maag->_events) {
                 _chain = maag._chain;
                 _events = maag._events;
@@ -180,6 +182,14 @@ namespace ymir {
                 this->forward_vj(maag, j_ind);
                 this->backward_vj(maag, j_ind);
                 // add fi * bi for this J to the accumulator
+                for (node_ind_t node_i = 0; node_i < _forward_acc->chainSize(); ++node_i) {
+                    for (dim_t row_i = 0; row_i < _forward_acc->matrix(node_i, 0).rows(); ++row_i) {
+                        for (dim_t col_i = 0; col_i < _forward_acc->matrix(node_i, 0).cols(); ++col_i) {
+                            _fb_acc->matrix(node_i, 0)(row_i, col_i) +=
+                                    _forward_acc->matrix(node_i, 0)(row_i, col_i) * _backward_acc->matrix(node_i, 0)(row_i, col_i);
+                        }
+                    }
+                }
             }
         }
 
@@ -215,7 +225,7 @@ namespace ymir {
         }
 
 
-        void forward_backward_vdj() {
+        void forward_backward_vdj(const MAAG &maag) {
 
         }
 

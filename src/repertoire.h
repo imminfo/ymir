@@ -174,6 +174,9 @@ namespace ymir {
         }
 
 
+        AbstractRepertoire(const AbstractRepertoire<T>& other) {}
+
+
         virtual ~AbstractRepertoire() {}
 
 
@@ -254,9 +257,6 @@ namespace ymir {
     protected:
 
         shared_ptr<vector<T>> _vec;
-
-
-        AbstractRepertoire(const AbstractRepertoire<T>& other) {}
 
     };
 

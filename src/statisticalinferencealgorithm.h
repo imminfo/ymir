@@ -71,10 +71,6 @@ namespace ymir {
                 ProbabilisticAssemblingModel & model,
                 const AlgorithmParameters& algo_param = AlgorithmParameters()) const =0;
 
-
-        // function for aggregating P list(s) / ModelParameterVector from assembly scenario matrices
-
-        // function for check if all sequences in clonal repertoire is nucleotide
     };
 
 
@@ -90,6 +86,12 @@ namespace ymir {
         virtual bool statisticalInference(const ClonesetView& repertoire,
                 ProbabilisticAssemblingModel & model,
                 const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10)) const {
+
+        }
+
+
+        // function for aggregating P list(s) / ModelParameterVector from assembly scenario matrices
+        void aggregate() {
 
         }
     };

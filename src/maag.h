@@ -221,9 +221,32 @@ namespace ymir {
         seq_len_t position(seq_len_t i) const { return _seq_poses[i]; }
 
 
-        void serialize(const string& filepath) const {
+        /**
+         * \brief Save the graph to the harddrive and load a previously saved graph.
+         *
+         * \param filepath Path to the file with a saved graph for loading and new file for saving.
+         * \param stream An output / input stream, from that read the graph or save the graph.
+         */
+        ///@{
+        bool save(const string &filepath) const {
+            ofstream ofs(filepath);
+            this->save(ofs);
+        }
+
+        bool save(ostream &stream) const {
 
         }
+
+        bool load(const string &filepath) {
+            ifstream ifs(filepath);
+            this->load(ifs);
+        }
+
+        bool load(istream &stream) {
+
+        }
+        ///@}
+
 
         /**
          * \brief Get is this MAAG was built from clonotype either with VJ or with VDJ recombination.

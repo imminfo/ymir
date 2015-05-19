@@ -54,8 +54,13 @@ namespace ymir {
 
 
     std::string translate(const std::string &nuc_seq) {
-
+        return "nothing";
     }
+
+
+//    uint sample(uint vec_size, prob_t *probs) {
+//
+//    }
 
 }
 

@@ -48,6 +48,9 @@ namespace ymir {
                 for (size_t clonotype_i = 0; clonotype_i < count; ++clonotype_i) {
                     sequence = "";
 
+                    //
+                    // GENERATION IS HERE
+                    //
 
                     vec.push_back(builder.buildClonotype());
                     if ((clonotype_i + 1) % 50000 == 0) {
@@ -62,6 +65,9 @@ namespace ymir {
                 for (size_t clonotype_i = 0; clonotype_i < count; ++clonotype_i) {
                     sequence = "";
 
+                    //
+                    // GENERATION IS HERE
+                    //
 
                     vec.push_back(builder.buildClonotype());
                     if ((clonotype_i + 1) % 50000 == 0) {

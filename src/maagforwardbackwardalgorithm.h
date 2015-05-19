@@ -125,51 +125,88 @@ namespace ymir {
 
         // make a matrix chain with forward probabilities for VJ receptors
         void forward_vj(const MAAG &maag, eventind_t j_ind) {
-            // and compute probabilities for every J
             prob_t temp_prob = 0;
             this->fillZero(_forward_acc);
 
             // VJ probabilities for the fixed J
-            for (dim_t row_i = 0; row_i < _forward_acc->nodeRows(VJ_VAR_JOI_GEN_I); ++row_i) {
+            for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_VAR_JOI_GEN_I); ++row_i) {
                 _forward_acc->matrix(VJ_VAR_JOI_GEN_I, 0)(row_i, 0) = maag.matrix(VJ_VAR_JOI_GEN_I, 0)(row_i, j_ind);
             }
 
             // V deletions
             for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
-                for (dim_t col_i = 0; col_i < _forward_acc->nodeColumns(VJ_VAR_DEL_I); ++col_i) {
+                for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
                     _forward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) =
-                            maag.matrix(VJ_VAR_JOI_GEN_I, 0)(v_ind, j_ind) * maag.matrix(VJ_VAR_DEL_I, v_ind)(0, col_i);
+                            _forward_acc->matrix(VJ_VAR_JOI_GEN_I, 0)(v_ind, 0) * maag.matrix(VJ_VAR_DEL_I, v_ind)(0, col_i);
                 }
             }
 
             // VD insertions
-            for (dim_t row_i = 0; row_i < _forward_acc->nodeRows(VJ_VAR_JOI_INS_I); ++row_i) {
+            for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_VAR_JOI_INS_I); ++row_i) {
                 // sum of fi for V del
                 for (dim_t v_i = 0; v_i < maag.nodeSize(VJ_VAR_DEL_I); ++v_i) {
-                    _forward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_i, 0) += maag.matrix(VJ_VAR_DEL_I, v_i)(0, row_i);
+                    _forward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_i, 0) += _forward_acc->matrix(VJ_VAR_DEL_I, v_i)(0, row_i);
                 }
                 _forward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_i, 0) *= maag.matrix(VJ_VAR_JOI_INS_I, 0)(row_i, 0);
 
                 // for this row in VJ insertions fill with equal values
                 // because this rows related to a specific number of deletions for each V gene
-                for (dim_t col_i = 1; col_i < _forward_acc->nodeColumns(VJ_VAR_JOI_INS_I); ++col_i) {
+                for (dim_t col_i = 1; col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++col_i) {
                     _forward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_i, col_i) = _forward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_i, 0);
                 }
             }
 
             // J deletions
-            for (dim_t row_i = 0; row_i < _forward_acc->nodeRows(VJ_JOI_DEL_I); ++row_i) {
+            for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_JOI_DEL_I); ++row_i) {
                 for (dim_t row_vj_i = 0; row_vj_i < maag.nodeSize(VJ_VAR_DEL_I); ++row_vj_i) {
-                    _forward_acc->matrix(VJ_JOI_DEL_I, 0)(row_i, 0) += maag.matrix(VJ_VAR_JOI_INS_I, 0)(row_vj_i, row_i)
+                    _forward_acc->matrix(VJ_JOI_DEL_I, 0)(row_i, 0) += _forward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_vj_i, row_i);
                 }
                 _forward_acc->matrix(VJ_JOI_DEL_I, 0)(row_i, 0) *= maag.matrix(VJ_JOI_DEL_I, j_ind)(row_i, 0);
+            }
+
+
+            // update the full generation probability
+            for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_JOI_DEL_I); ++row_i) {
+                _full_prob += _forward_acc->matrix(VJ_JOI_DEL_I, 0)(row_i, 0);
             }
         }
 
 
         // make a matrix chain with backward probabilities for VJ receptors
         void backward_vj(const MAAG &maag, eventind_t j_ind) {
-            // compute probabilities for every J
+            prob_t temp_prob = 0;
+            this->fillZero(_backward_acc);
+
+            // J deletions
+            for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_JOI_DEL_I); ++row_i) {
+                _backward_acc->matrix(VJ_JOI_DEL_I, 0)(row_i, 0) = 1;
+            }
+
+            // VJ insertions
+            for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++col_i) {
+                for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_VAR_JOI_INS_I); ++row_i) {
+                    _backward_acc->matrix(VJ_VAR_JOI_INS_I)(row_i, col_i) += maag.matrix(VJ_JOI_DEL_I, j_ind)(col_i, 0);
+                }
+            }
+
+            // V deletions
+            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+                for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
+                    for (dim_t ins_col_i = 0; ins_col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++ins_col_i) {
+                        _backward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) +=
+                                maag.matrix(VJ_VAR_JOI_INS_I, 0)(col_i, ins_col_i) * _backward_acc(VJ_VAR_JOI_INS_I, 0)(col_i, ins_col_i);
+                    }
+                }
+            }
+
+            // V-J genes
+            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+                for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
+                    _backward_acc->matrix(VJ_VAR_JOI_GEN_I, 0)(v_ind, 0) +=
+                            _backward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) * maag.matrix(VJ_VAR_DEL_I, v_ind)(0, col_i);
+                }
+            }
+
         }
 
 

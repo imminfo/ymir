@@ -20,7 +20,7 @@ namespace ymir {
 
 
         virtual ~MAAGForwardBackwardAlgorithm() {
-            if (_temp_mmc) { delete _temp_mmc; }
+            if (_forward_acc) { delete _forward_acc; }
             if (_forward_acc) { delete _forward_acc; }
             if (_backward_acc) { delete _backward_acc; }
         }
@@ -46,8 +46,8 @@ namespace ymir {
         bool _processed;
         RECOMBINATION _recomb;
         size_t _node_i, _mat_i, _row, _column;
-        ProbMMC *_temp_mmc;  /** Temporary MMC for storing temporary results for forward and backward probabilities */
-        ProbMMC *_forward_acc, *_backward_acc;  /** Accumulator MMC for forward and backward probabilities */
+        ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspond. */
+        ProbMMC *_fb_acc;  /** Accumulator MMC for storing forward and backward probabilities */
 
 
         bool init_and_process(const MAAG &maag) {
@@ -63,14 +63,9 @@ namespace ymir {
                 _status = true;
                 _recomb = maag.recombination();
                 if (_recomb == VJ_RECOMB) {
-                    this->init_vj(maag);
-                    // Should I make it lazy?
-                    this->forward_vj(maag);
-                    this->backward_vj(maag);
+                    this->forward_backward_vj(maag);
                 } else if (_recomb == VDJ_RECOMB) {
-                    this->init_vdj(maag);
-                    this->forward_vdj(maag);
-                    this->backward_vdj(maag);
+                    this->forward_backward_vdj(maag);
                 } else {
                     cerr << "Forward-backward algorithm error: unknown recombination type." << endl;
                     _status = false;
@@ -113,56 +108,79 @@ namespace ymir {
             this->initMMC(maag);
 
             // Initialise the temporary MMC for computing forward-backward probabilities.
-            _temp_mmc = new ProbMMC();
-            _temp_mmc->resize(maag.chainSize());
+            _forward_acc = new ProbMMC();
+            _forward_acc->resize(maag.chainSize());
             // VJ probabilities (for fixed J in future)
-            _temp_mmc->initNode(0, 1, maag.nodeRows(0), 1);
+            _forward_acc->initNode(VJ_VAR_JOI_GEN_I, 1, maag.nodeRows(VJ_VAR_JOI_GEN_I), 1);
             // V deletions
-            _temp_mmc->initNode(1, maag.nodeSize(1), maag.nodeRows(1), maag.nodeColumns(1));
+            _forward_acc->initNode(VJ_VAR_DEL_I, maag.nodeSize(VJ_VAR_DEL_I), maag.nodeRows(VJ_VAR_DEL_I), maag.nodeColumns(VJ_VAR_DEL_I));
             // VJ insertions
-            _temp_mmc->initNode(2, 1, maag.nodeRows(2), maag.nodeColumns(2));
+            _forward_acc->initNode(VJ_VAR_JOI_INS_I, 1, maag.nodeRows(VJ_VAR_JOI_INS_I), maag.nodeColumns(VJ_VAR_JOI_INS_I));
             // J deletions (for fixed J in future)
-            _temp_mmc->initNode(3, 1, maag.nodeRows(3), 1);
+            _forward_acc->initNode(VJ_JOI_DEL_I, 1, maag.nodeRows(VJ_JOI_DEL_I), 1);
         }
 
 
         // make a matrix chain with forward probabilities for VJ receptors
-        prob_t forward_vj(const MAAG &maag) {
+        void forward_vj(const MAAG &maag, eventind_t j_ind) {
             // and compute probabilities for every J
             prob_t temp_prob = 0;
-            for (eventind_t j_ind = 0; j_ind < maag.nJoi(); ++j_ind) {
-                this->fillZero(_temp_mmc);
+            this->fillZero(_forward_acc);
 
-                // VJ probabilities for the fixed J
-                for (dim_t row_i = 0; row_i < _temp_mmc->nodeRows(0); ++row_i) {
-                    _temp_mmc->matrix(0, 0)(row_i, 0) = maag.matrix(0, 0)(row_i, j_ind);
+            // VJ probabilities for the fixed J
+            for (dim_t row_i = 0; row_i < _forward_acc->nodeRows(VJ_VAR_JOI_GEN_I); ++row_i) {
+                _forward_acc->matrix(VJ_VAR_JOI_GEN_I, 0)(row_i, 0) = maag.matrix(VJ_VAR_JOI_GEN_I, 0)(row_i, j_ind);
+            }
+
+            // V deletions
+            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+                for (dim_t col_i = 0; col_i < _forward_acc->nodeColumns(VJ_VAR_DEL_I); ++col_i) {
+                    _forward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) =
+                            maag.matrix(VJ_VAR_JOI_GEN_I, 0)(v_ind, j_ind) * maag.matrix(VJ_VAR_DEL_I, v_ind)(0, col_i);
                 }
+            }
 
-                // V deletions
-                for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
-                    for (dim_t col_i = 0; col_i < _temp_mmc->nodeColumns(1); ++col_i) {
-                        _temp_mmc->matrix(1, v_ind)(0, col_i) = maag.matrix(0, 0)(v_ind, j_ind) * maag.matrix(0, v_ind)(0, col_i);
-                    }
+            // VD insertions
+            for (dim_t row_i = 0; row_i < _forward_acc->nodeRows(VJ_VAR_JOI_INS_I); ++row_i) {
+                // sum of fi for V del
+                for (dim_t v_i = 0; v_i < maag.nodeSize(VJ_VAR_DEL_I); ++v_i) {
+                    _forward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_i, 0) += maag.matrix(VJ_VAR_DEL_I, v_i)(0, row_i);
                 }
+                _forward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_i, 0) *= maag.matrix(VJ_VAR_JOI_INS_I, 0)(row_i, 0);
 
-                // VD insertions
-                for (dim_t row_i = 0; row_i < _temp_mmc->nodeRows(2); ++row_i) {
-                    for (dim_t col_i = 0; col_i < _temp_mmc->nodeColumns(2); ++col_i) {
-                        // sum of fi for V del
-                        for (dim_t prev_v_col_i = 0;)
-                        _temp_mmc->matrix(2, 0)(row_i, col_i) = ;
-                    }
+                // for this row in VJ insertions fill with equal values
+                // because this rows related to a specific number of deletions for each V gene
+                for (dim_t col_i = 1; col_i < _forward_acc->nodeColumns(VJ_VAR_JOI_INS_I); ++col_i) {
+                    _forward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_i, col_i) = _forward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_i, 0);
                 }
+            }
 
-                // J deletions
-
+            // J deletions
+            for (dim_t row_i = 0; row_i < _forward_acc->nodeRows(VJ_JOI_DEL_I); ++row_i) {
+                for (dim_t row_vj_i = 0; row_vj_i < maag.nodeSize(VJ_VAR_DEL_I); ++row_vj_i) {
+                    _forward_acc->matrix(VJ_JOI_DEL_I, 0)(row_i, 0) += maag.matrix(VJ_VAR_JOI_INS_I, 0)(row_vj_i, row_i)
+                }
+                _forward_acc->matrix(VJ_JOI_DEL_I, 0)(row_i, 0) *= maag.matrix(VJ_JOI_DEL_I, j_ind)(row_i, 0);
             }
         }
 
 
         // make a matrix chain with backward probabilities for VJ receptors
-        prob_t backward_vj(const MAAG &maag) {
+        void backward_vj(const MAAG &maag, eventind_t j_ind) {
             // compute probabilities for every J
+        }
+
+
+        // compute all forward-backward probabilities
+        void forward_backward_vj(const MAAG &maag) {
+            this->init_vj(maag);
+
+            for (eventind_t j_ind = 0; j_ind <- maag.nJoi(); ++j_ind) {
+                // compute forward and backward probabilities for a specific J gene
+                this->forward_vj(maag, j_ind);
+                this->backward_vj(maag, j_ind);
+                // add fi * bi for this J to the accumulator
+            }
         }
 
 
@@ -174,12 +192,12 @@ namespace ymir {
         void init_vdj(const MAAG &maag) {
             this->initMMC(maag);
 
-            _temp_mmc = new ProbMMC();
+            _forward_acc = new ProbMMC();
         }
 
 
         // make a matrix chain with forward probabilities for VDJ receptors
-        prob_t forward_vdj(const MAAG &maag) {
+        void forward_vdj(const MAAG &maag) {
             // forward probabilities for (V prob -> V del -> VD ins) are fixed
             // for all pairs of J-D.
 
@@ -190,10 +208,15 @@ namespace ymir {
 
 
         // make a matrix chain with backward probabilities for VDJ receptors
-        prob_t backward_vdj(const MAAG &maag) {
+        void backward_vdj(const MAAG &maag) {
             // compute probabilities for every J
 
             // compute probabilities for every D
+        }
+
+
+        void forward_backward_vdj() {
+
         }
 
 

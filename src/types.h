@@ -161,7 +161,7 @@ namespace ymir {
         VJ_VAR_JOI_INS_NUC_C_ROW = 6,
         VJ_VAR_JOI_INS_NUC_G_ROW = 7,
         VJ_VAR_JOI_INS_NUC_T_ROW = 8,
-        VJ_HYPMUT = 9,
+        VJ_HYPMUT = 9,  // <- REMOVE THAT!!
 
         VDJ_VAR_GEN = 1,
         VDJ_JOI_DIV_GEN = 2,
@@ -180,7 +180,23 @@ namespace ymir {
         VDJ_DIV_JOI_INS_NUC_C_ROW = 13,
         VDJ_DIV_JOI_INS_NUC_G_ROW = 14,
         VDJ_DIV_JOI_INS_NUC_T_ROW = 15,
-        VDJ_HYPMUT = 16
+        VDJ_HYPMUT = 16 // <- REMOVE THAT!!
+    };
+
+
+    enum MAAG_NODE_EVENT_INDEX {
+        VJ_VAR_JOI_GEN_I = 0,
+        VJ_VAR_DEL_I = 1,
+        VJ_VAR_JOI_INS_I = 2,
+        VJ_JOI_DEL_I = 3,
+
+        VDJ_VAR_GEN_I = 0,
+        VDJ_VAR_DEL_I = 1,
+        VDJ_VAR_DIV_INS_LEN_I = 2,
+        VDJ_DIV_DEL_I = 3,
+        VDJ_DIV_JOI_INS_LEN_I = 4,
+        VDJ_JOI_DEL_I = 5,
+        VDJ_JOI_DIV_GEN_I = 6
     };
 }
 

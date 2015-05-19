@@ -43,17 +43,14 @@ namespace ymir {
     protected:
 
         bool _status;
-        bool _processed;
-        RECOMBINATION _recomb;
-        size_t _node_i, _mat_i, _row, _column;
         ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspond. */
         ProbMMC *_fb_acc;  /** Accumulator MMC for storing forward and backward probabilities. */
         prob_t _full_prob;  /** Full generation probability of the input MAAG. */
+        size_t _node_i, _mat_i, _row, _column;
 
 
         bool init_and_process(const MAAG &maag) {
             _status = false;
-            _processed = false;
             _node_i = 0;
             _mat_i = 0;
             _row = 0;
@@ -63,13 +60,12 @@ namespace ymir {
                 _chain = maag._chain;
                 _events = maag._events;
                 _status = true;
-                _recomb = maag.recombination();
-                if (_recomb == VJ_RECOMB) {
+                if (maag.recombination() == VJ_RECOMB) {
                     this->forward_backward_vj(maag);
-                } else if (_recomb == VDJ_RECOMB) {
+                } else if (maag.recombination() == VDJ_RECOMB) {
                     this->forward_backward_vdj(maag);
                 } else {
-                    cerr << "Forward-backward algorithm error: unknown recombination type." << endl;
+                    cerr << "MAAG forward-backward algorithm error: unknown recombination type." << endl;
                     _status = false;
                 }
             }

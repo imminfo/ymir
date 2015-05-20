@@ -53,6 +53,8 @@ namespace ymir {
             return _status;
         }
 
+        prob_t fullProbability() const { return _full_prob; }
+
     protected:
 
         bool _status;
@@ -115,7 +117,7 @@ namespace ymir {
             // V deletions
             for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
-                    cout << _forward_acc->matrix(VJ_VAR_JOI_GEN_I, 0)(v_ind, 0) << endl;
+                    cout << "!" << _forward_acc->matrix(VJ_VAR_JOI_GEN_I, 0)(v_ind, 0) << endl;
                     _forward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) =
                             _forward_acc->matrix(VJ_VAR_JOI_GEN_I, 0)(v_ind, 0) * maag.matrix(VJ_VAR_DEL_I, v_ind)(0, col_i);
                 }
@@ -219,7 +221,7 @@ namespace ymir {
                 _fb_acc->initNode(i, maag.nodeSize(i), maag.nodeRows(i), maag.nodeColumns(i));
             }
 
-            for (eventind_t j_ind = 0; j_ind <- maag.nJoi(); ++j_ind) {
+            for (eventind_t j_ind = 0; j_ind < maag.nJoi(); ++j_ind) {
                 // compute forward and backward probabilities for a specific J gene
                 this->forward_vj(maag, j_ind);
                 this->backward_vj(maag, j_ind);

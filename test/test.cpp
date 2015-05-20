@@ -1690,7 +1690,9 @@ YMIR_TEST_START(test_maag_forward)
     YMIR_ASSERT2(algo.status(), true)
 
     // test for the full generaton probability
-    // YMIR_ASSERT2(fullProbability - maagfb.full_prob, 0)
+    cout << "algo:" << algo.fullProbability() << endl;
+    cout << "maag:" << maag.fullProbability() << endl;
+     YMIR_ASSERT2(algo.fullProbability() - maag.fullProbability(), 0)
 YMIR_TEST_END
 
 

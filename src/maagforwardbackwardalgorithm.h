@@ -46,7 +46,7 @@ namespace ymir {
 
         bool status() const { return _status; }
 
-        
+
         prob_t fullProbability() const { return _full_prob; }
 
     protected:

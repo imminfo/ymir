@@ -1645,6 +1645,50 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_maag_forward)
     YMIR_ASSERT(false)
+
+    ModelParameterVector mvec = make_test_events_vj();
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1");
+    alvec1.push_back("Vseg2");
+    alvec1.push_back("Vseg3");
+    seqvec1.push_back("CCCG");
+    seqvec1.push_back("GGG");
+    seqvec1.push_back("CCCGGG");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1");
+    alvec2.push_back("Jseg2");
+    alvec2.push_back("Jseg3");
+    seqvec2.push_back("CCGTTT");
+    seqvec2.push_back("ATTT");
+    seqvec2.push_back("AGGTTT");
+
+    VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
+
+    MAAGBuilder maag_builder(mvec, genes);
+
+    ClonotypeBuilder cl_builder;
+    // CCCG.AC.GGTTT
+    // poses:
+    // vs: 0-1-2-3-4-5
+    // js: 7-8-9-10-11
+    cl_builder.setSequence("CCCGACGGTTT")
+            .setNucleotideSeq()
+            .addValignment(1, 4)
+            .addValignment(3, 5)
+            .addJalignment(1, 8)
+            .addJalignment(2, 9)
+            .addJalignment(3, 7);
+    Clonotype clonotype = cl_builder.buildClonotype();
+
+    MAAG maag = maag_builder.build(clonotype, true);
+
+
+    MAAGForwardBackwardAlgorithm algo(maag);
+
     // test for the full generaton probability
     // YMIR_ASSERT2(fullProbability - maagfb.full_prob, 0)
 YMIR_TEST_END

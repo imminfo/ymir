@@ -43,12 +43,15 @@ namespace ymir {
     * all possible generation scenarios of a nucleotide or amino acid sequence of an immune receptor.
     */
     class MAAG : protected ProbMMC {
+
+        friend class MAAGForwardBackwardAlgorithm;  // ):
+
     public:
 
         /**
          *
          */
-        MAAG(const MAAG &other) {
+        MAAG(const MAAG &other) : ProbMMC(other) {
             if (other._events) {
                 _events = new EventIndMMC(*other._events);
             }
@@ -230,20 +233,20 @@ namespace ymir {
         ///@{
         bool save(const string &filepath) const {
             ofstream ofs(filepath);
-            this->save(ofs);
+            return this->save(ofs);
         }
 
         bool save(ostream &stream) const {
-
+            return false;
         }
 
         bool load(const string &filepath) {
             ifstream ifs(filepath);
-            this->load(ifs);
+            return this->load(ifs);
         }
 
         bool load(istream &stream) {
-
+            return false;
         }
         ///@}
 

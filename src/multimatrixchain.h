@@ -73,6 +73,8 @@ namespace ymir {
     template <typename _Scalar>
     class MultiMatrixChain {
 
+        friend class MAAGForwardBackwardAlgorithm;  // ):
+
     public:
 
         /**

@@ -10,7 +10,13 @@
 namespace ymir {
 
 
-    class MAAGForwardBackwardAlgorithm : protected MAAG {
+    class MAAGForwardBackwardAlgorithm {
+
+    protected:
+
+        typedef ProbMMC::dim_t dim_t;
+        typedef ProbMMC::node_ind_t node_ind_t;
+
     public:
 
 
@@ -56,9 +62,9 @@ namespace ymir {
             _row = 0;
             _column = 0;
             _full_prob = 0;
-            if (maag && maag->_events) {
-                _chain = maag._chain;
-                _events = maag._events;
+            if (maag._events) {
+//                _chain = maag._chain;
+//                _events = maag._events;
                 _status = true;
                 if (maag.recombination() == VJ_RECOMB) {
                     this->forward_backward_vj(maag);
@@ -181,7 +187,7 @@ namespace ymir {
             // VJ insertions
             for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++col_i) {
                 for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_VAR_JOI_INS_I); ++row_i) {
-                    _backward_acc->matrix(VJ_VAR_JOI_INS_I)(row_i, col_i) += maag.matrix(VJ_JOI_DEL_I, j_ind)(col_i, 0);
+                    _backward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(row_i, col_i) += maag.matrix(VJ_JOI_DEL_I, j_ind)(col_i, 0);
                 }
             }
 
@@ -190,7 +196,7 @@ namespace ymir {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
                     for (dim_t ins_col_i = 0; ins_col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++ins_col_i) {
                         _backward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) +=
-                                maag.matrix(VJ_VAR_JOI_INS_I, 0)(col_i, ins_col_i) * _backward_acc(VJ_VAR_JOI_INS_I, 0)(col_i, ins_col_i);
+                                maag.matrix(VJ_VAR_JOI_INS_I, 0)(col_i, ins_col_i) * _backward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(col_i, ins_col_i);
                     }
                 }
             }

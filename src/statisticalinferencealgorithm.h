@@ -26,6 +26,7 @@
 
 
 #include "probabilisticassemblingmodel.h"
+#include "maagforwardbackwardalgorithm.h"
 
 #include "unordered_map"
 

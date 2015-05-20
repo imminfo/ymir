@@ -1,5 +1,5 @@
 /*
- * Ymir <imminfo.github.io/Ymir>
+ * Ymir <imminfo.github.io/ymir>
  *
  * This file is part of Ymir, a fast C++ tool for computation of assembling
  * probabilities, statistical inference of assembling statistical model
@@ -46,6 +46,260 @@
 
 using namespace std;
 using namespace ymir;
+
+
+ModelParameterVector make_test_events_vj() {
+    vector<prob_t> v1;  // param vec
+    vector<eventind_t> v2;  // lens vec
+    vector<eventind_t> v3;  // event classes
+    vector<seq_len_t> v4;  // event family col numbers
+
+    // V-J
+    v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
+    v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
+    v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
+    v2.push_back(9);
+
+    v3.push_back(0);
+    v4.push_back(3);
+
+    // V del
+    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
+    v2.push_back(5);
+
+    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
+    v2.push_back(4);
+
+    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
+    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
+    v2.push_back(7);
+
+    v3.push_back(1);
+    v4.push_back(0);
+    v4.push_back(0);
+    v4.push_back(0);
+
+    // J del
+    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
+    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
+    v1.push_back(.01);
+    v2.push_back(7);
+    v4.push_back(0);
+
+    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
+    v1.push_back(.19); v1.push_back(.21);
+    v2.push_back(5);
+    v4.push_back(0);
+
+    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
+    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
+    v2.push_back(7);
+    v4.push_back(0);
+
+    v3.push_back(4);
+
+    // VJ ins len
+    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
+    v2.push_back(7);
+    v4.push_back(0);
+
+    v3.push_back(7);
+
+    // VJ ins nuc
+    // prev A
+    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(8);
+
+    // prev C
+    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(9);
+
+    // prev G
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(10);
+
+    // prev T
+    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
+    v2.push_back(4);
+    v4.push_back(0);
+
+    v3.push_back(11);
+
+    return ModelParameterVector(VJ_RECOMB, v1, v2, v3, v4);
+}
+
+
+ModelParameterVector make_test_events_vdj() {
+    vector<prob_t> v1;  // param vec
+    vector<eventind_t> v2;  // lens vec
+    vector<eventind_t> v3;  // event classes
+    vector<seq_len_t> v4;  // event family col numbers
+
+    // V
+    v1.push_back(.5); v1.push_back(.25); v1.push_back(.25);
+    v2.push_back(3);
+
+    v3.push_back(0);
+    v4.push_back(0);
+
+    // J-D
+    // J-D (3 Js - 3 Ds)
+    v1.push_back(.01); v1.push_back(.02); v1.push_back(.03);
+    v1.push_back(.04); v1.push_back(.05); v1.push_back(.07);
+    v1.push_back(.08); v1.push_back(.09); v1.push_back(.61);
+
+    v2.push_back(9);
+
+    v3.push_back(1);
+    v4.push_back(3);
+
+    // V del
+    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
+    v2.push_back(5);
+
+    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
+    v2.push_back(4);
+
+    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
+    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
+    v2.push_back(7);
+
+    v3.push_back(2);
+    v4.push_back(0);
+    v4.push_back(0);
+    v4.push_back(0);
+
+    // J del
+    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
+    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
+    v1.push_back(.01);
+    v2.push_back(7);
+
+    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
+    v1.push_back(.19); v1.push_back(.21);
+    v2.push_back(5);
+
+    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
+    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
+    v2.push_back(7);
+
+    v3.push_back(5);
+    v4.push_back(0);
+    v4.push_back(0);
+    v4.push_back(0);
+
+    // D1 dels
+    v1.push_back(.17); // first row
+    v1.push_back(.27);
+    v1.push_back(.37); // second row
+    v1.push_back(.19);
+
+    v2.push_back(4);
+    v4.push_back(2);
+
+    // D2 dels
+    // 3 rows 2 columns
+    v1.push_back(.11); v1.push_back(.12);
+    v1.push_back(.13); v1.push_back(.14);
+    v1.push_back(.15); v1.push_back(.35);
+
+    v2.push_back(6);
+    v4.push_back(2);
+
+    // D3 dels
+    v1.push_back(.11); // first row
+    v1.push_back(.22);
+    v1.push_back(.33); // second row
+    v1.push_back(.34);
+
+    v2.push_back(4);
+    v4.push_back(2);
+
+    v3.push_back(8);
+
+    // VD ins len
+    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
+    v2.push_back(7);
+
+    v3.push_back(11);
+    v4.push_back(0);
+
+    // DJ ins len
+    v1.push_back(.1); v1.push_back(.24); v1.push_back(.25); v1.push_back(.05); v1.push_back(.01); v1.push_back(.15); v1.push_back(.2);
+    v2.push_back(7);
+
+    v3.push_back(12);
+    v4.push_back(0);
+
+    // VD ins nuc
+    // prev A
+    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+    v2.push_back(4);
+
+    v3.push_back(13);
+    v4.push_back(0);
+
+    // prev C
+    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
+    v2.push_back(4);
+
+    v3.push_back(14);
+    v4.push_back(0);
+
+    // prev G
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
+    v2.push_back(4);
+
+    v3.push_back(15);
+    v4.push_back(0);
+
+    // prev T
+    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
+    v2.push_back(4);
+
+    v3.push_back(16);
+    v4.push_back(0);
+
+    // DJ ins nuc
+    // prev A
+    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
+    v2.push_back(4);
+
+    v3.push_back(17);
+    v4.push_back(0);
+
+    // prev C
+    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
+    v2.push_back(4);
+
+    v3.push_back(18);
+    v4.push_back(0);
+
+    // prev G
+    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+    v2.push_back(4);
+
+    v3.push_back(19);
+    v4.push_back(0);
+
+    // prev T
+    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
+    v2.push_back(4);
+
+    v3.push_back(20);
+    v4.push_back(0);
+
+    return ModelParameterVector(VDJ_RECOMB, v1, v2, v3, v4);
+}
 
 
 YMIR_TEST_START(test_basic)
@@ -133,27 +387,6 @@ YMIR_TEST_START(test_model_param_vec_vj)
     ModelParameterVector mvec(VJ_RECOMB, v1, v2, v3, v4);
 
     YMIR_ASSERT(mvec[0] == 0)
-
-//    YMIR_ASSERT(mvec.prob_VJ_genes(1, 2) == .025)
-//    YMIR_ASSERT(mvec.prob_VJ_genes(3, 1) == .075)
-//
-//    YMIR_ASSERT(mvec.prob_V_del(1, 0) == .75)
-//    YMIR_ASSERT(mvec.prob_V_del(1, 1) == .25)
-//    YMIR_ASSERT(mvec.prob_V_del(2, 0) == .4)
-//    YMIR_ASSERT(mvec.prob_V_del(2, 1) == .5)
-//    YMIR_ASSERT(mvec.prob_V_del(2, 2) == .1)
-//    YMIR_ASSERT(mvec.prob_V_del(3, 0) == .3)
-//    YMIR_ASSERT(mvec.prob_V_del(3, 3) == .4)
-//
-//    YMIR_ASSERT(mvec.prob_J_del(1, 0) == .4)
-//    YMIR_ASSERT(mvec.prob_J_del(1, 1) == .6)
-//    YMIR_ASSERT(mvec.prob_J_del(2, 0) == .125)
-//    YMIR_ASSERT(mvec.prob_J_del(2, 2) == .7)
-//
-//    YMIR_ASSERT(mvec.prob_VJ_ins_len(0) - .31 < 1e-7)
-//    YMIR_ASSERT(mvec.prob_VJ_ins_len(1) - .39 < 1e-7)
-//    YMIR_ASSERT(mvec.prob_VJ_ins_len(2) - .1 < 1e-7)
-//    YMIR_ASSERT(mvec.max_VJ_ins_len() == 4)
 
     YMIR_ASSERT2(mvec.eventClassSize(VJ_VAR_JOI_GEN), 9)
     YMIR_ASSERT2(mvec.eventClassSize(VJ_VAR_DEL), 9)
@@ -335,58 +568,6 @@ YMIR_TEST_START(test_model_param_vec_vdj)
     ModelParameterVector mvec(VDJ_RECOMB, v1, v2, v3, v4);
 
     YMIR_ASSERT2(mvec[0], 0)
-
-//    YMIR_ASSERT(mvec.prob_V_gene(1) == .5)
-//    YMIR_ASSERT(mvec.prob_V_gene(3) == .25)
-//
-//    YMIR_ASSERT(mvec.prob_JD_genes(1, 1) == .01)
-//    YMIR_ASSERT(mvec.prob_JD_genes(1, 2) == .02)
-//    YMIR_ASSERT(mvec.prob_JD_genes(3, 1) == .06)
-//    YMIR_ASSERT(mvec.prob_JD_genes(3, 2) == .84)
-//
-//    YMIR_ASSERT(mvec.prob_V_del(1, 0) == .75)
-//    YMIR_ASSERT(mvec.prob_V_del(1, 1) == .25)
-//    YMIR_ASSERT(mvec.prob_V_del(2, 0) == .4)
-//    YMIR_ASSERT(mvec.prob_V_del(2, 1) == .5)
-//    YMIR_ASSERT(mvec.prob_V_del(2, 2) == .1)
-//    YMIR_ASSERT(mvec.prob_V_del(3, 0) == .3)
-//    YMIR_ASSERT(mvec.prob_V_del(3, 3) == .4)
-//
-//    YMIR_ASSERT(mvec.prob_J_del(1, 0) == .4)
-//    YMIR_ASSERT(mvec.prob_J_del(1, 1) == .6)
-//    YMIR_ASSERT(mvec.prob_J_del(2, 0) == .125)
-//    YMIR_ASSERT(mvec.prob_J_del(2, 2) == .7)
-//
-//    YMIR_ASSERT(mvec.prob_D_del(1, 0, 0) == .17)
-//    YMIR_ASSERT(mvec.prob_D_del(1, 0, 1) == .27)
-//    YMIR_ASSERT(mvec.prob_D_del(1, 1, 0) == .37)
-//    YMIR_ASSERT(mvec.prob_D_del(1, 1, 1) == .19)
-//
-//    YMIR_ASSERT(mvec.prob_D_del(2, 0, 0) == .11)
-//    YMIR_ASSERT(mvec.prob_D_del(2, 0, 1) == .12)
-//    YMIR_ASSERT(mvec.prob_D_del(2, 2, 0) == .15)
-//    YMIR_ASSERT(mvec.prob_D_del(2, 2, 1) == .35)
-//
-//    YMIR_ASSERT(mvec.prob_VD_ins_len(0) == .76)
-//    YMIR_ASSERT(mvec.prob_VD_ins_len(1) == .24)
-//    YMIR_ASSERT(mvec.max_VD_ins_len() == 1)
-//
-//    YMIR_ASSERT(mvec.prob_DJ_ins_len(0) == .89)
-//    YMIR_ASSERT(mvec.prob_DJ_ins_len(1) == .10)
-//    YMIR_ASSERT(mvec.prob_DJ_ins_len(2) == .01)
-//    YMIR_ASSERT(mvec.max_DJ_ins_len() == 2)
-//
-//    YMIR_ASSERT(mvec[mvec.index_VD_ins_nuc()] == .05)
-//    YMIR_ASSERT(mvec[mvec.index_VD_ins_nuc() + 1] == .08)
-//    YMIR_ASSERT(mvec[mvec.index_VD_ins_nuc() + 4] == .4)
-//
-//    YMIR_ASSERT(mvec[mvec.index_DJ_ins_nuc()] == .009)
-//    YMIR_ASSERT(mvec[mvec.index_DJ_ins_nuc() + 1] == .06)
-//    YMIR_ASSERT(mvec[mvec.index_DJ_ins_nuc() + 4] == .39)
-//
-//    YMIR_ASSERT(mvec[mvec.index_VJ_ins_nuc()] == .05)
-//    YMIR_ASSERT(mvec[mvec.index_VJ_ins_nuc() + 1] == .08)
-//    YMIR_ASSERT(mvec[mvec.index_VJ_ins_nuc() + 4] == .4)
 
     YMIR_ASSERT2(mvec.event_prob(VDJ_VAR_GEN, 0, 0), .5)
     YMIR_ASSERT2(mvec.event_prob(VDJ_VAR_GEN, 0, 2), .25)
@@ -1017,92 +1198,7 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_maag_vj)
-    vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
-    vector<seq_len_t> v4;  // event family col numbers
-
-    // V-J
-    v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
-    v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
-    v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
-    v2.push_back(9);
-
-    v3.push_back(0);
-    v4.push_back(3);
-
-    // V del
-    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
-    v2.push_back(5);
-
-    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
-    v2.push_back(4);
-
-    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
-    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
-    v2.push_back(7);
-
-    v3.push_back(1);
-    v4.push_back(0);
-    v4.push_back(0);
-    v4.push_back(0);
-
-    // J del
-    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
-    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
-    v1.push_back(.01);
-    v2.push_back(7);
-    v4.push_back(0);
-
-    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
-    v1.push_back(.19); v1.push_back(.21);
-    v2.push_back(5);
-    v4.push_back(0);
-
-    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
-    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
-    v2.push_back(7);
-    v4.push_back(0);
-
-    v3.push_back(4);
-
-    // VJ ins len
-    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.1);
-    v2.push_back(7);
-    v4.push_back(0);
-
-    v3.push_back(7);
-
-    // VJ ins nuc
-    // prev A
-    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(8);
-
-    // prev C
-    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(9);
-
-    // prev G
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(10);
-
-    // prev T
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(11);
-
-    ModelParameterVector mvec(VJ_RECOMB, v1, v2, v3, v4);
+    ModelParameterVector mvec = make_test_events_vj();
 
     vector<string> alvec1;
     vector<string> seqvec1;
@@ -1216,166 +1312,8 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_maag_vdj)
-    vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
-    vector<seq_len_t> v4;  // event family col numbers
 
-    // V
-    v1.push_back(.5); v1.push_back(.25); v1.push_back(.25);
-    v2.push_back(3);
-
-    v3.push_back(0);
-    v4.push_back(0);
-
-    // J-D
-    // J-D (3 Js - 3 Ds)
-    v1.push_back(.01); v1.push_back(.02); v1.push_back(.03);
-    v1.push_back(.04); v1.push_back(.05); v1.push_back(.07);
-    v1.push_back(.08); v1.push_back(.09); v1.push_back(.61);
-
-    v2.push_back(9);
-
-    v3.push_back(1);
-    v4.push_back(3);
-
-    // V del
-    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
-    v2.push_back(5);
-
-    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
-    v2.push_back(4);
-
-    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
-    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
-    v2.push_back(7);
-
-    v3.push_back(2);
-    v4.push_back(0);
-    v4.push_back(0);
-    v4.push_back(0);
-
-    // J del
-    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
-    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
-    v1.push_back(.01);
-    v2.push_back(7);
-
-    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
-    v1.push_back(.19); v1.push_back(.21);
-    v2.push_back(5);
-
-    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
-    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
-    v2.push_back(7);
-
-    v3.push_back(5);
-    v4.push_back(0);
-    v4.push_back(0);
-    v4.push_back(0);
-
-    // D1 dels
-    v1.push_back(.17); // first row
-    v1.push_back(.27);
-    v1.push_back(.37); // second row
-    v1.push_back(.19);
-
-    v2.push_back(4);
-    v4.push_back(2);
-
-    // D2 dels
-    // 3 rows 2 columns
-    v1.push_back(.11); v1.push_back(.12);
-    v1.push_back(.13); v1.push_back(.14);
-    v1.push_back(.15); v1.push_back(.35);
-
-    v2.push_back(6);
-    v4.push_back(2);
-
-    // D3 dels
-    v1.push_back(.11); // first row
-    v1.push_back(.22);
-    v1.push_back(.33); // second row
-    v1.push_back(.34);
-
-    v2.push_back(4);
-    v4.push_back(2);
-
-    v3.push_back(8);
-
-    // VD ins len
-    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.1);
-    v2.push_back(7);
-
-    v3.push_back(11);
-    v4.push_back(0);
-
-    // DJ ins len
-    v1.push_back(.1); v1.push_back(.24); v1.push_back(.25); v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
-    v2.push_back(7);
-
-    v3.push_back(12);
-    v4.push_back(0);
-
-    // VD ins nuc
-    // prev A
-    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
-    v2.push_back(4);
-
-    v3.push_back(13);
-    v4.push_back(0);
-
-    // prev C
-    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
-    v2.push_back(4);
-
-    v3.push_back(14);
-    v4.push_back(0);
-
-    // prev G
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
-    v2.push_back(4);
-
-    v3.push_back(15);
-    v4.push_back(0);
-
-    // prev T
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
-    v2.push_back(4);
-
-    v3.push_back(16);
-    v4.push_back(0);
-
-    // DJ ins nuc
-    // prev A
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2);
-    v2.push_back(4);
-
-    v3.push_back(17);
-    v4.push_back(0);
-
-    // prev C
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.25); v1.push_back(.3);
-    v2.push_back(4);
-
-    v3.push_back(18);
-    v4.push_back(0);
-
-    // prev G
-    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
-    v2.push_back(4);
-
-    v3.push_back(19);
-    v4.push_back(0);
-
-    // prev T
-    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
-    v2.push_back(4);
-
-    v3.push_back(20);
-    v4.push_back(0);
-
-    ModelParameterVector mvec(VDJ_RECOMB, v1, v2, v3, v3);
+    ModelParameterVector mvec = make_test_events_vdj();
 
     vector<string> alvec1;
     vector<string> seqvec1;
@@ -1571,95 +1509,11 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_model_vj_file)
+
     ProbabilisticAssemblingModel model1(TEST_DATA_FOLDER + "randomfile");
     YMIR_ASSERT(!model1.status())
 
-    vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
-    vector<seq_len_t> v4;  // event family col numbers
-
-    // V-J
-    v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
-    v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
-    v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
-    v2.push_back(9);
-
-    v3.push_back(0);
-    v4.push_back(3);
-
-    // V del
-    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
-    v2.push_back(5);
-
-    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
-    v2.push_back(4);
-
-    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
-    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
-    v2.push_back(7);
-
-    v3.push_back(1);
-    v4.push_back(0);
-    v4.push_back(0);
-    v4.push_back(0);
-
-    // J del
-    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
-    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
-    v1.push_back(.01);
-    v2.push_back(7);
-    v4.push_back(0);
-
-    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
-    v1.push_back(.19); v1.push_back(.21);
-    v2.push_back(5);
-    v4.push_back(0);
-
-    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
-    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
-    v2.push_back(7);
-    v4.push_back(0);
-
-    v3.push_back(4);
-
-    // VJ ins len
-    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
-    v2.push_back(7);
-    v4.push_back(0);
-
-    v3.push_back(7);
-
-    // VJ ins nuc
-    // prev A
-    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(8);
-
-    // prev C
-    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(9);
-
-    // prev G
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(10);
-
-    // prev T
-    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(11);
-
-    ModelParameterVector mvec(VJ_RECOMB, v1, v2, v3, v4);
+    ModelParameterVector mvec = make_test_events_vj();
 
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
     YMIR_ASSERT(model.status())
@@ -1671,166 +1525,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_model_vdj_file)
 
-    vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
-    vector<seq_len_t> v4;  // event family col numbers
-
-    // V
-    v1.push_back(.5); v1.push_back(.25); v1.push_back(.25);
-    v2.push_back(3);
-
-    v3.push_back(0);
-    v4.push_back(0);
-
-    // J-D
-    // J-D (3 Js - 3 Ds)
-    v1.push_back(.01); v1.push_back(.02); v1.push_back(.03);
-    v1.push_back(.04); v1.push_back(.05); v1.push_back(.07);
-    v1.push_back(.08); v1.push_back(.09); v1.push_back(.61);
-
-    v2.push_back(9);
-
-    v3.push_back(1);
-    v4.push_back(3);
-
-    // V del
-    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
-    v2.push_back(5);
-
-    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
-    v2.push_back(4);
-
-    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
-    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
-    v2.push_back(7);
-
-    v3.push_back(2);
-    v4.push_back(0);
-    v4.push_back(0);
-    v4.push_back(0);
-
-    // J del
-    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
-    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
-    v1.push_back(.01);
-    v2.push_back(7);
-
-    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
-    v1.push_back(.19); v1.push_back(.21);
-    v2.push_back(5);
-
-    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
-    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
-    v2.push_back(7);
-
-    v3.push_back(5);
-    v4.push_back(0);
-    v4.push_back(0);
-    v4.push_back(0);
-
-    // D1 dels
-    // 3 rows 2 columns
-    v1.push_back(.11); v1.push_back(.12);
-    v1.push_back(.13); v1.push_back(.14);
-    v1.push_back(.15); v1.push_back(.35);
-
-    v2.push_back(6);
-    v4.push_back(2);
-
-    // D2 dels
-    v1.push_back(.17); // first row
-    v1.push_back(.27);
-    v1.push_back(.37); // second row
-    v1.push_back(.19);
-
-    v2.push_back(4);
-    v4.push_back(2);
-
-    // D3 dels
-    v1.push_back(.11); // first row
-    v1.push_back(.22);
-    v1.push_back(.33); // second row
-    v1.push_back(.34);
-
-    v2.push_back(4);
-    v4.push_back(2);
-
-    v3.push_back(8);
-
-    // VD ins len
-    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
-    v2.push_back(7);
-
-    v3.push_back(11);
-    v4.push_back(0);
-
-    // DJ ins len
-    v1.push_back(.1); v1.push_back(.24); v1.push_back(.25); v1.push_back(.05); v1.push_back(.01); v1.push_back(.15); v1.push_back(.2);
-    v2.push_back(7);
-
-    v3.push_back(12);
-    v4.push_back(0);
-
-    // VD ins nuc
-    // prev A
-    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
-    v2.push_back(4);
-
-    v3.push_back(13);
-    v4.push_back(0);
-
-    // prev C
-    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
-    v2.push_back(4);
-
-    v3.push_back(14);
-    v4.push_back(0);
-
-    // prev G
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
-    v2.push_back(4);
-
-    v3.push_back(15);
-    v4.push_back(0);
-
-    // prev T
-    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
-    v2.push_back(4);
-
-    v3.push_back(16);
-    v4.push_back(0);
-
-    // DJ ins nuc
-    // prev A
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
-    v2.push_back(4);
-
-    v3.push_back(17);
-    v4.push_back(0);
-
-    // prev C
-    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
-    v2.push_back(4);
-
-    v3.push_back(18);
-    v4.push_back(0);
-
-    // prev G
-    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
-    v2.push_back(4);
-
-    v3.push_back(19);
-    v4.push_back(0);
-
-    // prev T
-    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
-    v2.push_back(4);
-
-    v3.push_back(20);
-    v4.push_back(0);
-
-    ModelParameterVector mvec(VDJ_RECOMB, v1, v2, v3, v4);
+    ModelParameterVector mvec = make_test_events_vdj();
 
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vdj_model/");
     YMIR_ASSERT(model.status())
@@ -1847,176 +1542,96 @@ YMIR_TEST_START(test_model_vj_maag)
     vector<eventind_t> v3;  // event classes
     vector<seq_len_t> v4;  // event family col numbers
 
-    // V-J
-    v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
-    v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
-    v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
-    v2.push_back(9);
+    ModelParameterVector mvec = make_test_events_vj();
 
-    v3.push_back(0);
-    v4.push_back(3);
+    ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
+    YMIR_ASSERT(model.status())
 
-    // V del
-    v1.push_back(.4); v1.push_back(.5); v1.push_back(.05); v1.push_back(.02); v1.push_back(.03);
-    v2.push_back(5);
+    RepertoireParser parser;
+    YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
 
-    v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
-    v2.push_back(4);
+    bool V_err, J_err;
+    VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
+                                    "Jgene", TEST_DATA_FOLDER + "jgene.real.txt",
+                                    &V_err, &J_err);
+    YMIR_ASSERT(V_err)
+    YMIR_ASSERT(J_err)
 
-    v1.push_back(.75); v1.push_back(.005); v1.push_back(.01); v1.push_back(.02);
-    v1.push_back(.03); v1.push_back(.04); v1.push_back(.145);
-    v2.push_back(7);
+    Cloneset cloneset;
+    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha2.txt", &cloneset, vdj_genes))
 
-    v3.push_back(1);
-    v4.push_back(0);
-    v4.push_back(0);
-    v4.push_back(0);
+    MAAG maag = model.buildGraphs(cloneset, true, false)[1];
 
-    // J del
-    v1.push_back(.07); v1.push_back(.2); v1.push_back(.3);
-    v1.push_back(.34); v1.push_back(.03); v1.push_back(.05);
-    v1.push_back(.01);
-    v2.push_back(7);
-    v4.push_back(0);
+    YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
+    YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
+    YMIR_ASSERT2(maag.event_index(0, 0, 1, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 0))
+    YMIR_ASSERT2(maag.event_index(0, 0, 1, 2), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 2))
 
-    v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
-    v1.push_back(.19); v1.push_back(.21);
-    v2.push_back(5);
-    v4.push_back(0);
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 0), mvec.event_index(VJ_VAR_DEL, 0, 4));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 1), mvec.event_index(VJ_VAR_DEL, 0, 3));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 2), mvec.event_index(VJ_VAR_DEL, 0, 2));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 3), mvec.event_index(VJ_VAR_DEL, 0, 1));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 4), mvec.event_index(VJ_VAR_DEL, 0, 0));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 5), 0)
 
-    v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
-    v1.push_back(.03); v1.push_back(.04); v1.push_back(.6);
-    v2.push_back(7);
-    v4.push_back(0);
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 0), mvec.event_index(VJ_VAR_DEL, 2, 6))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 1), mvec.event_index(VJ_VAR_DEL, 2, 5))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 2), mvec.event_index(VJ_VAR_DEL, 2, 4))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 3), mvec.event_index(VJ_VAR_DEL, 2, 3))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec.event_index(VJ_VAR_DEL, 2, 2))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec.event_index(VJ_VAR_DEL, 2, 1))
 
-    v3.push_back(4);
+    YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
+    YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), 0)
 
-    // VJ ins len
-    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
-    v2.push_back(7);
-    v4.push_back(0);
+    YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
+    YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), mvec.event_index(VJ_JOI_DEL, 0, 2))
+    YMIR_ASSERT2(maag.event_index(3, 0, 2, 0), mvec.event_index(VJ_JOI_DEL, 0, 3))
+    YMIR_ASSERT2(maag.event_index(3, 0, 3, 0), mvec.event_index(VJ_JOI_DEL, 0, 4))
+    YMIR_ASSERT2(maag.event_index(3, 0, 4, 0), mvec.event_index(VJ_JOI_DEL, 0, 5))
+    YMIR_ASSERT2(maag.event_index(3, 0, 5, 0), mvec.event_index(VJ_JOI_DEL, 0, 6))
 
-    v3.push_back(7);
+    YMIR_ASSERT2(maag.event_index(3, 2, 0, 0), mvec.event_index(VJ_JOI_DEL, 2, 1))
+    YMIR_ASSERT2(maag.event_index(3, 2, 1, 0), mvec.event_index(VJ_JOI_DEL, 2, 2))
+    YMIR_ASSERT2(maag.event_index(3, 2, 2, 0), mvec.event_index(VJ_JOI_DEL, 2, 3))
+    YMIR_ASSERT2(maag.event_index(3, 2, 3, 0), mvec.event_index(VJ_JOI_DEL, 2, 4))
+    YMIR_ASSERT2(maag.event_index(3, 2, 4, 0), mvec.event_index(VJ_JOI_DEL, 2, 5))
+    YMIR_ASSERT2(maag.event_index(3, 2, 5, 0), mvec.event_index(VJ_JOI_DEL, 2, 6))
 
-    // VJ ins nuc
-    // prev A
-    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
-    v2.push_back(4);
-    v4.push_back(0);
+    YMIR_ASSERT2(maag.event_probability(0, 0, 0, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 0))
+    YMIR_ASSERT2(maag.event_probability(0, 0, 0, 1), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 1))
+    YMIR_ASSERT2(maag.event_probability(0, 0, 1, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 0))
+    YMIR_ASSERT2(maag.event_probability(0, 0, 1, 2), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 2))
 
-    v3.push_back(8);
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 0), mvec.event_prob(VJ_VAR_DEL, 0, 4));
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 1), mvec.event_prob(VJ_VAR_DEL, 0, 3));
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 2), mvec.event_prob(VJ_VAR_DEL, 0, 2));
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 3), mvec.event_prob(VJ_VAR_DEL, 0, 1));
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 4), mvec.event_prob(VJ_VAR_DEL, 0, 0));
+    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 5), 0)
 
-    // prev C
-    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
-    v2.push_back(4);
-    v4.push_back(0);
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 0), mvec.event_prob(VJ_VAR_DEL, 2, 6))
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 1), mvec.event_prob(VJ_VAR_DEL, 2, 5))
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 2), mvec.event_prob(VJ_VAR_DEL, 2, 4))
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 3), mvec.event_prob(VJ_VAR_DEL, 2, 3))
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 4), mvec.event_prob(VJ_VAR_DEL, 2, 2))
+    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 5), mvec.event_prob(VJ_VAR_DEL, 2, 1))
 
-    v3.push_back(9);
+    YMIR_ASSERT2(maag.event_probability(2, 0, 0, 1), 0)
 
-    // prev G
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
-    v2.push_back(4);
-    v4.push_back(0);
+    YMIR_ASSERT2(maag.event_probability(3, 0, 0, 0), 0)
+    YMIR_ASSERT2(maag.event_probability(3, 0, 1, 0), mvec.event_prob(VJ_JOI_DEL, 0, 2))
+    YMIR_ASSERT2(maag.event_probability(3, 0, 2, 0), mvec.event_prob(VJ_JOI_DEL, 0, 3))
+    YMIR_ASSERT2(maag.event_probability(3, 0, 3, 0), mvec.event_prob(VJ_JOI_DEL, 0, 4))
+    YMIR_ASSERT2(maag.event_probability(3, 0, 4, 0), mvec.event_prob(VJ_JOI_DEL, 0, 5))
+    YMIR_ASSERT2(maag.event_probability(3, 0, 5, 0), mvec.event_prob(VJ_JOI_DEL, 0, 6))
 
-    v3.push_back(10);
-
-    // prev T
-    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(11);
-
-//    ModelParameterVector mvec(VJ_RECOMB, v1, v2, v3, v4);
-//
-//    ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
-//    YMIR_ASSERT(model.status())
-//
-//    RepertoireParser parser;
-//    YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
-//
-//    bool V_err, J_err;
-//    VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
-//                                    "Jgene", TEST_DATA_FOLDER + "jgene.real.txt",
-//                                    &V_err, &J_err);
-//    YMIR_ASSERT(V_err)
-//    YMIR_ASSERT(J_err)
-//
-//    Cloneset cloneset;
-//    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha2.txt", &cloneset, vdj_genes))
-//
-//    MAAG maag = model.buildGraphs(cloneset, true, false)[1];
-//
-//    YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
-//    YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
-//    YMIR_ASSERT2(maag.event_index(0, 0, 1, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 0))
-//    YMIR_ASSERT2(maag.event_index(0, 0, 1, 2), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 2))
-//
-//    YMIR_ASSERT2(maag.event_index(1, 0, 0, 0), mvec.event_index(VJ_VAR_DEL, 0, 4));
-//    YMIR_ASSERT2(maag.event_index(1, 0, 0, 1), mvec.event_index(VJ_VAR_DEL, 0, 3));
-//    YMIR_ASSERT2(maag.event_index(1, 0, 0, 2), mvec.event_index(VJ_VAR_DEL, 0, 2));
-//    YMIR_ASSERT2(maag.event_index(1, 0, 0, 3), mvec.event_index(VJ_VAR_DEL, 0, 1));
-//    YMIR_ASSERT2(maag.event_index(1, 0, 0, 4), mvec.event_index(VJ_VAR_DEL, 0, 0));
-//    YMIR_ASSERT2(maag.event_index(1, 0, 0, 5), 0)
-//
-//    YMIR_ASSERT2(maag.event_index(1, 1, 0, 0), mvec.event_index(VJ_VAR_DEL, 2, 6))
-//    YMIR_ASSERT2(maag.event_index(1, 1, 0, 1), mvec.event_index(VJ_VAR_DEL, 2, 5))
-//    YMIR_ASSERT2(maag.event_index(1, 1, 0, 2), mvec.event_index(VJ_VAR_DEL, 2, 4))
-//    YMIR_ASSERT2(maag.event_index(1, 1, 0, 3), mvec.event_index(VJ_VAR_DEL, 2, 3))
-//    YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec.event_index(VJ_VAR_DEL, 2, 2))
-//    YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec.event_index(VJ_VAR_DEL, 2, 1))
-//
-//    YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
-//    YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), 0)
-//
-//    YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
-//    YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), mvec.event_index(VJ_JOI_DEL, 0, 2))
-//    YMIR_ASSERT2(maag.event_index(3, 0, 2, 0), mvec.event_index(VJ_JOI_DEL, 0, 3))
-//    YMIR_ASSERT2(maag.event_index(3, 0, 3, 0), mvec.event_index(VJ_JOI_DEL, 0, 4))
-//    YMIR_ASSERT2(maag.event_index(3, 0, 4, 0), mvec.event_index(VJ_JOI_DEL, 0, 5))
-//    YMIR_ASSERT2(maag.event_index(3, 0, 5, 0), mvec.event_index(VJ_JOI_DEL, 0, 6))
-//
-//    YMIR_ASSERT2(maag.event_index(3, 2, 0, 0), mvec.event_index(VJ_JOI_DEL, 2, 1))
-//    YMIR_ASSERT2(maag.event_index(3, 2, 1, 0), mvec.event_index(VJ_JOI_DEL, 2, 2))
-//    YMIR_ASSERT2(maag.event_index(3, 2, 2, 0), mvec.event_index(VJ_JOI_DEL, 2, 3))
-//    YMIR_ASSERT2(maag.event_index(3, 2, 3, 0), mvec.event_index(VJ_JOI_DEL, 2, 4))
-//    YMIR_ASSERT2(maag.event_index(3, 2, 4, 0), mvec.event_index(VJ_JOI_DEL, 2, 5))
-//    YMIR_ASSERT2(maag.event_index(3, 2, 5, 0), mvec.event_index(VJ_JOI_DEL, 2, 6))
-//
-//    YMIR_ASSERT2(maag.event_probability(0, 0, 0, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 0))
-//    YMIR_ASSERT2(maag.event_probability(0, 0, 0, 1), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 1))
-//    YMIR_ASSERT2(maag.event_probability(0, 0, 1, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 0))
-//    YMIR_ASSERT2(maag.event_probability(0, 0, 1, 2), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 2))
-//
-//    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 0), mvec.event_prob(VJ_VAR_DEL, 0, 4));
-//    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 1), mvec.event_prob(VJ_VAR_DEL, 0, 3));
-//    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 2), mvec.event_prob(VJ_VAR_DEL, 0, 2));
-//    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 3), mvec.event_prob(VJ_VAR_DEL, 0, 1));
-//    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 4), mvec.event_prob(VJ_VAR_DEL, 0, 0));
-//    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 5), 0)
-//
-//    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 0), mvec.event_prob(VJ_VAR_DEL, 2, 6))
-//    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 1), mvec.event_prob(VJ_VAR_DEL, 2, 5))
-//    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 2), mvec.event_prob(VJ_VAR_DEL, 2, 4))
-//    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 3), mvec.event_prob(VJ_VAR_DEL, 2, 3))
-//    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 4), mvec.event_prob(VJ_VAR_DEL, 2, 2))
-//    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 5), mvec.event_prob(VJ_VAR_DEL, 2, 1))
-//
-//    YMIR_ASSERT2(maag.event_probability(2, 0, 0, 1), 0)
-//
-//    YMIR_ASSERT2(maag.event_probability(3, 0, 0, 0), 0)
-//    YMIR_ASSERT2(maag.event_probability(3, 0, 1, 0), mvec.event_prob(VJ_JOI_DEL, 0, 2))
-//    YMIR_ASSERT2(maag.event_probability(3, 0, 2, 0), mvec.event_prob(VJ_JOI_DEL, 0, 3))
-//    YMIR_ASSERT2(maag.event_probability(3, 0, 3, 0), mvec.event_prob(VJ_JOI_DEL, 0, 4))
-//    YMIR_ASSERT2(maag.event_probability(3, 0, 4, 0), mvec.event_prob(VJ_JOI_DEL, 0, 5))
-//    YMIR_ASSERT2(maag.event_probability(3, 0, 5, 0), mvec.event_prob(VJ_JOI_DEL, 0, 6))
-//
-//    YMIR_ASSERT2(maag.event_probability(3, 2, 0, 0), mvec.event_prob(VJ_JOI_DEL, 2, 1))
-//    YMIR_ASSERT2(maag.event_probability(3, 2, 1, 0), mvec.event_prob(VJ_JOI_DEL, 2, 2))
-//    YMIR_ASSERT2(maag.event_probability(3, 2, 2, 0), mvec.event_prob(VJ_JOI_DEL, 2, 3))
-//    YMIR_ASSERT2(maag.event_probability(3, 2, 3, 0), mvec.event_prob(VJ_JOI_DEL, 2, 4))
-//    YMIR_ASSERT2(maag.event_probability(3, 2, 4, 0), mvec.event_prob(VJ_JOI_DEL, 2, 5))
-//    YMIR_ASSERT2(maag.event_probability(3, 2, 5, 0), mvec.event_prob(VJ_JOI_DEL, 2, 6))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 0, 0), mvec.event_prob(VJ_JOI_DEL, 2, 1))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 1, 0), mvec.event_prob(VJ_JOI_DEL, 2, 2))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 2, 0), mvec.event_prob(VJ_JOI_DEL, 2, 3))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 3, 0), mvec.event_prob(VJ_JOI_DEL, 2, 4))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 4, 0), mvec.event_prob(VJ_JOI_DEL, 2, 5))
+    YMIR_ASSERT2(maag.event_probability(3, 2, 5, 0), mvec.event_prob(VJ_JOI_DEL, 2, 6))
 
 YMIR_TEST_END
 
@@ -2030,6 +1645,8 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_maag_forward)
     YMIR_ASSERT(false)
+    // test for the full generaton probability
+    // YMIR_ASSERT2(fullProbability - maagfb.full_prob, 0)
 YMIR_TEST_END
 
 

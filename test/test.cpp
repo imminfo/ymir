@@ -1644,7 +1644,6 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_maag_forward)
-    YMIR_ASSERT(false)
 
     ModelParameterVector mvec = make_test_events_vj();
 
@@ -1686,8 +1685,9 @@ YMIR_TEST_START(test_maag_forward)
 
     MAAG maag = maag_builder.build(clonotype, true);
 
-
     MAAGForwardBackwardAlgorithm algo(maag);
+
+    YMIR_ASSERT2(algo.status(), true)
 
     // test for the full generaton probability
     // YMIR_ASSERT2(fullProbability - maagfb.full_prob, 0)

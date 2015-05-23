@@ -1238,6 +1238,10 @@ YMIR_TEST_START(test_maag_vj)
 
     MAAG maag = maag_builder.build(clonotype, true);
 
+    YMIR_ASSERT2(maag.nVar(), 2)
+    YMIR_ASSERT2(maag.nJoi(), 3)
+    YMIR_ASSERT2(maag.nDiv(), 0)
+
     YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
     YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
     YMIR_ASSERT2(maag.event_index(0, 0, 1, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 0))
@@ -1378,6 +1382,10 @@ YMIR_TEST_START(test_maag_vdj)
     Clonotype clonotype = cl_builder.buildClonotype();
 
     MAAG maag = maag_builder.build(clonotype, true);
+
+    YMIR_ASSERT2(maag.nVar(), 2)
+    YMIR_ASSERT2(maag.nJoi(), 3)
+    YMIR_ASSERT2(maag.nDiv(), 3)
 
     YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VDJ_VAR_GEN, 0, 0))
     YMIR_ASSERT2(maag.event_index(0, 1, 0, 0), mvec.event_index(VDJ_VAR_GEN, 0, 2))
@@ -1643,7 +1651,7 @@ YMIR_TEST_START(test_model_vdj_maag)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_maag_forward)
+YMIR_TEST_START(test_maag_forward_backward_vj)
 
     ModelParameterVector mvec = make_test_events_vj();
 
@@ -1691,10 +1699,12 @@ YMIR_TEST_START(test_maag_forward)
 
     YMIR_ASSERT2(algo.fullProbability() - maag.fullProbability(), 0)
 
+    YMIR_ASSERT2(algo.bfullProbability() - maag.fullProbability(), 0)
+
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_maag_backward)
+YMIR_TEST_START(test_maag_forward_backward_vdj)
     YMIR_ASSERT(false)
 YMIR_TEST_END
 
@@ -1772,8 +1782,8 @@ int main() {
 //    YMIR_TEST(test_model_vdj_maag(), "VDJ Model creating MAAGs")
 
     // Tests for forward-backward algorithms
-    YMIR_TEST(test_maag_forward(), "MAAG forward algorithm")
-    YMIR_TEST(test_maag_backward(), "MAAG backward algorithm")
+    YMIR_TEST(test_maag_forward_backward_vj(), "MAAG forward-backward algorithm for VJ")
+    YMIR_TEST(test_maag_forward_backward_vdj(), "MAAG forward-backward algorithm for VDJ")
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.
 

@@ -187,9 +187,9 @@ namespace ymir {
          * \return Number of the aligned specific gene segments.
          */
         ///@{
-        eventind_t nVar() const { return _chain[0].size(); }
-        eventind_t nJoi() const { return _chain[_chain.size() - 2].size(); }
-        eventind_t nDiv() const { return (_chain.size() == VJ_CHAIN_SIZE) ? 0 : _chain[3].size(); }
+        eventind_t nVar() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeRows(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_VAR_GEN_I); }
+        eventind_t nJoi() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeColumns(VJ_VAR_JOI_GEN_I) : _chain[VDJ_JOI_DEL_I].size(); }
+        eventind_t nDiv() const { return (_chain.size() == VJ_CHAIN_SIZE) ? 0 : _chain[VDJ_DIV_DEL_I].size(); }
         ///@}
 
 
@@ -259,7 +259,7 @@ namespace ymir {
         bool is_vdj() const { return _chain.size() == VDJ_CHAIN_SIZE; }
         ///@}
 
-        RECOMBINATION recombination() const { return _chain.size() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB ; }
+        RECOMBINATION recombination() const { return _chain.size() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB; }
 
     protected:
 

@@ -62,7 +62,7 @@ namespace ymir {
     *
     * \brief Type of stored probabilities of different events.
     */
-    typedef double prob_t;
+    typedef /*long*/ double prob_t;
     #endif
 
 

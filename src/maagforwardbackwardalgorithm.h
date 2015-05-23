@@ -114,7 +114,7 @@ namespace ymir {
             }
 
             // V deletions
-            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+                for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
                     _forward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) =
                             _forward_acc->matrix(VJ_VAR_JOI_GEN_I, 0)(v_ind, 0) * maag.matrix(VJ_VAR_DEL_I, v_ind)(0, col_i);

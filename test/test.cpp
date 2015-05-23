@@ -1089,7 +1089,7 @@ YMIR_TEST_START(test_markovchain_nuc)
 
     // .7 * .3 * .2 = .042
     YMIR_ASSERT(mc.nucProbability("") == 1);
-    YMIR_ASSERT(mc.nucProbability(s) == .042);
+    YMIR_ASSERT2(mc.nucProbability(s) - .042, 0);
     YMIR_ASSERT(mc.nucProbability(s.begin(), 4) == .042);
     YMIR_ASSERT(mc.nucProbability(s.begin() + 1, 3) == .06);
     YMIR_ASSERT(mc.nucProbability(s.begin(), 0) == 1);
@@ -1699,7 +1699,6 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
 
     YMIR_ASSERT2(algo.fullProbability() - maag.fullProbability(), 0)
 
-    cout << "NOW!!!" << endl;
     YMIR_ASSERT2(algo.bfullProbability() - maag.fullProbability(), 0)
 
 YMIR_TEST_END

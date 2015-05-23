@@ -110,9 +110,9 @@ namespace ymir {
             if (this->is_vj()) {
                 // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
                 return (_chain[0][0](v_index, j_index) *  // P(Vi & Ji)
-                       _chain[1][v_index] *               // P(#dels | Vi)
-                       _chain[2][0] *                     // P(V-J insertion seq)
-                       _chain[3][j_index])(0, 0);         // P(#dels | Ji)
+                        _chain[1][v_index] *               // P(#dels | Vi)
+                        _chain[2][0] *                     // P(V-J insertion seq)
+                        _chain[3][j_index])(0, 0);         // P(#dels | Ji)
 
             } else {
                 return 0;
@@ -163,7 +163,6 @@ namespace ymir {
                 if (this->is_vj()) {
                     for (eventind_t v_index = 0; v_index < this->nVar(); ++v_index) {
                         for (eventind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
-                            cout << v_index << ":" << j_index << endl;
                             sum_prob += this->fullProbability(v_index, j_index);
                         }
                     }

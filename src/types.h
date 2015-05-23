@@ -192,9 +192,9 @@ namespace ymir {
 
         VDJ_VAR_GEN_I = 0,
         VDJ_VAR_DEL_I = 1,
-        VDJ_VAR_DIV_INS_LEN_I = 2,
+        VDJ_VAR_DIV_INS_I = 2,
         VDJ_DIV_DEL_I = 3,
-        VDJ_DIV_JOI_INS_LEN_I = 4,
+        VDJ_DIV_JOI_INS_I = 4,
         VDJ_JOI_DEL_I = 5,
         VDJ_JOI_DIV_GEN_I = 6
     };

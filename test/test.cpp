@@ -1697,15 +1697,93 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
 
     YMIR_ASSERT2(algo.status(), true)
 
-    YMIR_ASSERT2(algo.fullProbability() - maag.fullProbability(), 0)
+    YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 8e-20)
 
-    YMIR_ASSERT2(algo.bfullProbability() - maag.fullProbability(), 0)
+    YMIR_ASSERT(abs(algo.bfullProbability() - maag.fullProbability()) < 8e-20)
 
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_maag_forward_backward_vdj)
-    YMIR_ASSERT(false)
+
+    ModelParameterVector mvec = make_test_events_vdj();
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1");
+    alvec1.push_back("Vseg2");
+    alvec1.push_back("Vseg3");
+    seqvec1.push_back("CCCG");
+    seqvec1.push_back("GGG");
+    seqvec1.push_back("CCCGGG");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1");
+    alvec2.push_back("Jseg2");
+    alvec2.push_back("Jseg3");
+    seqvec2.push_back("CCGTTT");
+    seqvec2.push_back("ATTT");
+    seqvec2.push_back("AGGTTT");
+
+    vector<string> alvec3;
+    vector<string> seqvec3;
+    alvec3.push_back("Dseg1");
+    alvec3.push_back("Dseg2");
+    alvec3.push_back("Dseg3");
+    seqvec3.push_back("GTTT");
+    seqvec3.push_back("ACCGGT");
+    seqvec3.push_back("CCCGGAC");
+
+    VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
+
+    MAAGBuilder maag_builder(mvec, genes);
+
+    ClonotypeBuilder cl_builder;
+    /*
+     D1:
+       CCCGACGGTTT
+             .GTTT
+     D2:
+       CCCGACGGTTT
+      A.CCG.GT
+         AC.CGGT
+
+     D3:
+       CCCGACGGTTT
+     CCCG.GAC
+       CCCG.GAC
+         CC.CGG.AC
+    */
+    cl_builder.setSequence("CCCGACGGTTT")
+            .setNucleotideSeq()
+            .addValignment(1, 4)
+            .addValignment(3, 5)
+            .addJalignment(1, 8)
+            .addJalignment(2, 9)
+            .addJalignment(3, 7)
+            .addDalignment(2, 2, 4, 2, 4)
+            .addDalignment(2, 3, 6, 6, 9)
+            .addDalignment(3, 5, 7, 4, 6)
+            .addDalignment(3, 1, 4, 1, 4)
+            .addDalignment(3, 3, 5, 6, 8)
+            .addDalignment(1, 1, 4, 8, 11);
+    Clonotype clonotype = cl_builder.buildClonotype();
+
+    MAAG maag = maag_builder.build(clonotype, true);
+
+    MAAGForwardBackwardAlgorithm algo(maag);
+
+    YMIR_ASSERT2(algo.status(), true)
+
+//    YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 8e-20)
+//
+//    YMIR_ASSERT(abs(algo.bfullProbability() - maag.fullProbability()) < 8e-20)
+
+    YMIR_ASSERT2(algo.fullProbability() - maag.fullProbability(), 0)
+
+    YMIR_ASSERT2(algo.bfullProbability() - maag.fullProbability(), 0)
+
 YMIR_TEST_END
 
 

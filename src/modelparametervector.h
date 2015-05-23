@@ -194,6 +194,8 @@ namespace ymir {
          *
          * \return Probability of the event.
          */
+        prob_t operator[] (eventind_t gl_event_index) { return _vec[gl_event_index]; }
+
         prob_t operator[] (eventind_t gl_event_index) const { return _vec[gl_event_index]; }
 
         prob_t operator() (eventind_t event_family, eventind_t loc_event_index) const {
@@ -318,6 +320,18 @@ namespace ymir {
          *
          */
         inline seq_len_t D_min_len(eventind_t d_index) const { return _d_genes_min_len[d_index - 1]; }
+
+
+        /**
+         * \brief Fill with pseudo-counts all data.
+         */
+        void clear() {
+            for (eventind_t i = 2; i < _edges.size(); ++i) {
+                for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
+                    _vec[j] =  _laplace[i-1];
+                }
+            }
+        }
 
     private:
 

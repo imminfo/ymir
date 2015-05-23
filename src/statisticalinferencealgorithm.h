@@ -88,6 +88,21 @@ namespace ymir {
                 ProbabilisticAssemblingModel & model,
                 const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10)) const {
 
+            /*
+             repertoire = repertoire.noncoding();
+             MAAGRepertoire maag_rep = model.buildGraphs(repertoire);
+             ModelParameterVector new_param_vec = model.event_probabilities();
+             new_param_vec.clear();
+             for (size_t i = 0; i < maag_rep.size(); ++i) {
+                MAAGForwardBackward fb(maag_rep[i]);
+                ModelParameterVector new_param_vec;
+                while (!fb.is_empty()) {
+                    event_pair_t ep = fb.nextEvent();
+                    new_param_vec[ep.first] += ep.second;
+                }
+             }
+            */
+
         }
 
 

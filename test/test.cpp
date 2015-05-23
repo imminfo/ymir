@@ -1699,6 +1699,7 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
 
     YMIR_ASSERT2(algo.fullProbability() - maag.fullProbability(), 0)
 
+    cout << "NOW!!!" << endl;
     YMIR_ASSERT2(algo.bfullProbability() - maag.fullProbability(), 0)
 
 YMIR_TEST_END

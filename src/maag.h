@@ -108,12 +108,12 @@ namespace ymir {
         ///@{
         prob_t fullProbability(eventind_t v_index, eventind_t j_index) const {
             if (this->is_vj()) {
-                // P(Vi) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji) * P(Ji)
+                // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
                 return (_chain[0][0](v_index, j_index) *  // P(Vi & Ji)
-                        _chain[1][v_index] *        // P(#dels | Vi)
-                        _chain[2][0] *              // P(V-J insertion seq)
-                        _chain[3][j_index])         // P(#dels | Ji)
-                        .sum();
+                       _chain[1][v_index] *               // P(#dels | Vi)
+                       _chain[2][0] *                     // P(V-J insertion seq)
+                       _chain[3][j_index])(0, 0);         // P(#dels | Ji)
+
             } else {
                 return 0;
             }
@@ -163,6 +163,7 @@ namespace ymir {
                 if (this->is_vj()) {
                     for (eventind_t v_index = 0; v_index < this->nVar(); ++v_index) {
                         for (eventind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
+                            cout << v_index << ":" << j_index << endl;
                             sum_prob += this->fullProbability(v_index, j_index);
                         }
                     }
@@ -188,7 +189,7 @@ namespace ymir {
          */
         ///@{
         eventind_t nVar() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeRows(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_VAR_GEN_I); }
-        eventind_t nJoi() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeColumns(VJ_VAR_JOI_GEN_I) : _chain[VDJ_JOI_DEL_I].size(); }
+        eventind_t nJoi() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeColumns(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_JOI_DEL_I); }
         eventind_t nDiv() const { return (_chain.size() == VJ_CHAIN_SIZE) ? 0 : _chain[VDJ_DIV_DEL_I].size(); }
         ///@}
 

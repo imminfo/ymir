@@ -32,7 +32,7 @@ namespace ymir {
         }
 
 
-        event_pair_t next() {
+        event_pair_t nextEvent() {
             if (_status) {
                 // for each cell of each matrix that is related to
                 // an event E return forward(E) * backward(E) / P,
@@ -49,12 +49,16 @@ namespace ymir {
 
         prob_t fullProbability() const { return _full_prob; }
 
+
+        prob_t bfullProbability() const { return _back_full_prob; }
+
     protected:
 
         bool _status;
         ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspond. */
         ProbMMC *_fb_acc;  /** Accumulator MMC for storing forward and backward probabilities. */
         prob_t _full_prob;  /** Full generation probability of the input MAAG. */
+        prob_t _back_full_prob;  /** Full generation probability of the input MAAG obtained with backward algorithm. Just for testing purposes. */
         size_t _node_i, _mat_i, _row, _column;
 
 
@@ -65,6 +69,7 @@ namespace ymir {
             _row = 0;
             _column = 0;
             _full_prob = 0;
+            _back_full_prob = 0;
             _forward_acc = nullptr;
             _backward_acc = nullptr;
             _fb_acc = nullptr;
@@ -167,7 +172,7 @@ namespace ymir {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
                     for (dim_t ins_col_i = 0; ins_col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++ins_col_i) {
                         _backward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) +=
-                                maag.matrix(VJ_VAR_JOI_INS_I, 0)(col_i, ins_col_i) * _backward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(col_i, ins_col_i);
+                                _backward_acc->matrix(VJ_VAR_JOI_INS_I, 0)(col_i, ins_col_i) * maag.matrix(VJ_VAR_JOI_INS_I, 0)(col_i, ins_col_i);
                     }
                 }
             }
@@ -180,6 +185,10 @@ namespace ymir {
                 }
             }
 
+            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+                _back_full_prob +=
+                        _backward_acc->matrix(VJ_VAR_JOI_GEN_I, 0)(v_ind, 0) * maag.matrix(VJ_VAR_JOI_GEN_I, 0)(v_ind, j_ind);
+            }
         }
 
 

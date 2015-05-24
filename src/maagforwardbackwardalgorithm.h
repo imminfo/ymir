@@ -294,7 +294,7 @@ namespace ymir {
 //                    _forward_acc->matrix(VDJ_JOI_DEL_I, 0).sum() * maag.matrix(VDJ_JOI_DIV_GEN_I, 0)(j_ind, d_ind);
 
             // update the full generation probability
-            _full_prob = _forward_acc->matrix(VDJ_JOI_DIV_GEN_I, 0)(0, 0);
+            _full_prob += _forward_acc->matrix(VDJ_JOI_DIV_GEN_I, 0)(0, 0);
         }
 
 
@@ -399,7 +399,6 @@ namespace ymir {
                 recompute_d_gen_fi = true;
                 for (eventind_t j_ind = 0; j_ind < maag.nJoi(); ++j_ind) {
                     // compute forward and backward probabilities for a specific J gene
-                    cout << d_ind << ":" << j_ind << endl;
                     this->forward_vdj(maag, d_ind, j_ind, recompute_d_gen_fi);
                     this->backward_vdj(maag, d_ind, j_ind);
                     recompute_d_gen_fi = false;

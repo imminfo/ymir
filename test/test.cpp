@@ -1758,16 +1758,16 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
     cl_builder.setSequence("CCCGACGGTTT")
             .setNucleotideSeq()
             .addValignment(1, 4)
-//            .addValignment(3, 5)
+            .addValignment(3, 5)
             .addJalignment(1, 8)
-//            .addJalignment(2, 9)
-//            .addJalignment(3, 7)
+            .addJalignment(2, 9)
+            .addJalignment(3, 7)
             .addDalignment(2, 2, 4, 2, 4)
             .addDalignment(2, 3, 6, 6, 9)
             .addDalignment(3, 5, 7, 4, 6)
-            .addDalignment(3, 1, 4, 1, 4);
-//            .addDalignment(3, 3, 5, 6, 8)
-//            .addDalignment(1, 1, 4, 8, 11);
+            .addDalignment(3, 1, 4, 1, 4)
+            .addDalignment(3, 3, 5, 6, 8)
+            .addDalignment(1, 1, 4, 8, 11);
     Clonotype clonotype = cl_builder.buildClonotype();
 
     MAAG maag = maag_builder.build(clonotype, true);
@@ -1779,10 +1779,6 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
 //    YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 8e-20)
 //
 //    YMIR_ASSERT(abs(algo.bfullProbability() - maag.fullProbability()) < 8e-20)
-
-    cout << "probs: maag -> algo" << endl;
-    cout << maag.fullProbability() << endl;
-    cout << algo.fullProbability() << endl;
 
     YMIR_ASSERT2(algo.fullProbability() - maag.fullProbability(), 0)
 

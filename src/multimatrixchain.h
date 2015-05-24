@@ -186,10 +186,10 @@ namespace ymir {
         /**
         * \brief Access to matrices in nodes.
         */
-        const matrix_t& matrix(node_ind_t node_i, matrix_ind_t mat_i) const {
+        const matrix_t& matrix(node_ind_t node_i, matrix_ind_t mat_i = 0) const {
             return _chain[node_i][mat_i];
         }
-        matrix_t& matrix(node_ind_t node_i, matrix_ind_t mat_i) {
+        matrix_t& matrix(node_ind_t node_i, matrix_ind_t mat_i = 0) {
             return _chain[node_i][mat_i];
         }
 

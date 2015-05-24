@@ -1776,13 +1776,9 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
 
     YMIR_ASSERT2(algo.status(), true)
 
-//    YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 8e-20)
-//
-//    YMIR_ASSERT(abs(algo.bfullProbability() - maag.fullProbability()) < 8e-20)
+    YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 6e-20)
 
-    YMIR_ASSERT2(algo.fullProbability() - maag.fullProbability(), 0)
-
-    YMIR_ASSERT2(algo.bfullProbability() - maag.fullProbability(), 0)
+    YMIR_ASSERT(abs(algo.bfullProbability() - maag.fullProbability()) < 6e-20)
 
 YMIR_TEST_END
 

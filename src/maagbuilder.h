@@ -112,7 +112,7 @@ namespace ymir {
             }
         }
 
-        MAAGRepertoire build(const Cloneset &cloneset, bool full_build = false) {
+        MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) {
             MAAGRepertoire res;
             res.reserve(cloneset.size());
             for (size_t i = 0; i < cloneset.size(); ++i) {
@@ -130,7 +130,7 @@ namespace ymir {
             return build(clonotype, false).fullProbability(action);
         }
 
-        vector<prob_t> buildAndCompute(const Cloneset &cloneset, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
+        vector<prob_t> buildAndCompute(const ClonesetView &cloneset, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
             vector<prob_t> res;
             res.reserve(cloneset.size());
             for (size_t i = 0; i < cloneset.size(); ++i) {
@@ -163,7 +163,7 @@ namespace ymir {
                             for (int row_i = 0; row_i < maag->nodeRows(node_i); ++row_i) {
                                 for (int col_i = 0; col_i < maag->nodeColumns(node_i); ++col_i) {
                                     maag->_chain[node_i][mat_i](row_i, col_i) =
-                                            (*_param_vec)[maag->_events->_chain[node_i][mat_i](row_i, col_i)];
+                                            (*_param_vec)[maag->event_index(node_i, mat_i, row_i, col_i)];
                                 }
                             }
                         }

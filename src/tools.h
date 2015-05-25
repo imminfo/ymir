@@ -67,6 +67,23 @@ namespace ymir {
         return res;
     }
 
+
+    inline bool is_out_of_frame(const std::string &sequence) {
+        return sequence.size() % 3 != 0;
+    }
+
+
+    inline bool has_end_codon(const std::string &sequence) {
+        std::string tmp;
+        for (size_t i = 0; i < sequence.size(); i += 3) {
+            tmp = sequence.substr(i, 3);
+            if (tmp == "TAG" || tmp == "TAA" || tmp == "TGA") {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
 
 #endif

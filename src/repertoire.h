@@ -79,12 +79,26 @@ namespace ymir {
 
 
         ClonesetView coding() const {
-
+            vector<size_t> inds;
+            inds.reserve(this->size() / 3);
+            for (size_t i = 0; i < this->size(); ++i) {
+                if (!is_out_of_frame((*this)[i].sequence()) && !has_end_codon((*this)[i].sequence())) {
+                    inds.push_back(i);
+                }
+            }
+            return (*this)[inds];
         }
 
 
         ClonesetView noncoding(bool out_of_frames_only = false) const {
-
+            vector<size_t> inds;
+            inds.reserve(this->size() / 3);
+            for (size_t i = 0; i < this->size(); ++i) {
+                if (is_out_of_frame((*this)[i].sequence()) || (!out_of_frames_only && has_end_codon((*this)[i].sequence()))) {
+                    inds.push_back(i);
+                }
+            }
+            return (*this)[inds];
         }
 
 

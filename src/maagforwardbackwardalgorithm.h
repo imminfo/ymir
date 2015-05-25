@@ -44,6 +44,11 @@ namespace ymir {
         }
 
 
+        bool is_empty() {
+
+        }
+
+
         bool status() const { return _status; }
 
 

@@ -28,8 +28,6 @@
 #include "probabilisticassemblingmodel.h"
 #include "maagforwardbackwardalgorithm.h"
 
-#include "unordered_map"
-
 
 namespace ymir {
 
@@ -88,28 +86,29 @@ namespace ymir {
                 ProbabilisticAssemblingModel & model,
                 const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10)) const {
 
-            /*
-             repertoire = repertoire.noncoding();
-             MAAGRepertoire maag_rep = model.buildGraphs(repertoire);
-             ModelParameterVector new_param_vec = model.event_probabilities();
-             new_param_vec.clear();
-             for (size_t i = 0; i < maag_rep.size(); ++i) {
-                MAAGForwardBackward fb(maag_rep[i]);
-                ModelParameterVector new_param_vec;
-                while (!fb.is_empty()) {
-                    event_pair_t ep = fb.nextEvent();
-                    new_param_vec[ep.first] += ep.second;
+            ClonesetView rep_nonc = repertoire.noncoding();
+            MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc);
+            ModelParameterVector new_param_vec = model.event_probabilities();
+            vector<prob_t> prob_vec;
+            prob_vec.resize(rep_nonc.size(), 0);
+            for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
+                cout << "Iteration:\t" << (size_t) iter << endl;
+
+                new_param_vec = model.event_probabilities();
+                new_param_vec.clear();
+                for (size_t i = 0; i < maag_rep.size(); ++i) {
+                    MAAGForwardBackwardAlgorithm fb(maag_rep[i]);
+                    while (!fb.is_empty()) {
+                        event_pair_t ep = fb.nextEvent();
+                        new_param_vec[ep.first] += ep.second;
+                    }
+                    prob_vec[i] = fb.fullProbability();
                 }
-             }
-            */
 
+                cout << "Loglikelihood:\t" << loglikelihood(prob_vec) << endl;
+            }
         }
 
-
-        // function for aggregating P list(s) / ModelParameterVector from assembly scenario matrices
-        void aggregate() {
-
-        }
     };
 
 

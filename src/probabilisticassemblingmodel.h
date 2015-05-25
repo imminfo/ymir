@@ -123,7 +123,7 @@ namespace ymir {
          *
          * \return Vector of full assembling probabilities.
          */
-        vector<prob_t> computeFullProbabilities(const Cloneset& repertoire,
+        vector<prob_t> computeFullProbabilities(const ClonesetView& repertoire,
                                                 bool aminoacid = false,
                                                 MAAG_COMPUTE_PROB_ACTION action = MAX_PROBABILITY) const {
             return this->_builder->buildAndCompute(repertoire, aminoacid, action);
@@ -139,10 +139,15 @@ namespace ymir {
          *
          * \return Set of MAAGs.
          */
-        MAAGRepertoire buildGraphs(const Cloneset& repertoire,
+        MAAGRepertoire buildGraphs(const ClonesetView& repertoire,
                                    bool full_build = true,
                                    bool aminoacid = false) const {
             return _builder->build(repertoire, full_build);
+        }
+
+
+        void updateEventProbabilities(MAAGRepertoire *repertoire) {
+            this->_builder->updateEventProbabilities(repertoire);
         }
 
 
@@ -215,6 +220,7 @@ namespace ymir {
         Json::Value _config;
         bool _vj_recomb;
         string _model_path;
+
         VDJRecombinationGenes *_genes;
         ModelParameterVector *_param_vec;
 

@@ -26,15 +26,12 @@
 
 
 #include <string>
+#include "math.h"
 
 #include "types.h"
 
 
 namespace ymir {
-
-//    event_matrix_t read_matrix(const string& filepath) {
-//
-//    }
 
 
     void write_matrix(const std::string &filepath) {
@@ -48,7 +45,7 @@ namespace ymir {
             case 'C': return 1;
             case 'G': return 2;
             case 'T': return 3;
-            default:  return 4;
+            default : return 4;
         }
     }
 
@@ -58,9 +55,17 @@ namespace ymir {
     }
 
 
-//    uint sample(uint vec_size, prob_t *probs) {
-//
-//    }
+    uint sample(uint vec_size, prob_t *probs) {
+
+    }
+
+
+    prob_t loglikelihood(const std::vector<prob_t> &vec) {
+        prob_t res = 0, vec_sum = 0;
+        for (size_t i = 0; i < vec.size(); ++i) { vec_sum += vec[i]; }
+        for (size_t i = 0; i < vec.size(); ++i) { res += std::log10(vec[i] / vec_sum); } // what to do in case of high precision numbers?
+        return res;
+    }
 
 }
 

@@ -48,256 +48,292 @@ namespace ymir {
      => (Model::Builder) => [GraphRepertoire]
     */
 
-//    class ClonesetView {
-//
-//    public:
-//
-//
-//        ClonesetView(shared_ptr<vector<Clonotype>> pvec, const vector<size_t>& shifts) :
-//                _source(pvec), _shifts(shifts) {}
-//
-//
-//        ClonesetView(const ClonesetView& other) : _source(other._source), _shifts(other._shifts) {}
-//
-//
-//        virtual ~ClonesetView() { }
-//
-//
-//
-//        virtual const Clonotype& operator[] (size_t index) const {
-//            return _source->at(_shifts[index]);
-//        }
-//
-//
-//        size_t size() const { return _shifts.size(); }
-//
-//
-//        ClonesetView coding() { }
-//
-//
-//        ClonesetView noncoding(bool out_of_frames_only = false) { }
-//
-//
-//        ClonesetView head() {};
-//        ClonesetView [](vector of indices) {};
-//        ClonesetView slice() {};
-//
-//
-//    protected:
-//
-//        shared_ptr<vector<Clonotype>> _source;
-//        vector<size_t> _shifts;
-//
-//
-//        ClonesetView() {}
-//
-//    };
-//
-//
-//    class Cloneset : public ClonesetView {
-//
-//    public:
-//
-//
-//        Cloneset() { }
-//
-//
-//        virtual ~Cloneset() { }
-//
-//
-//
-//    protected:
-//
-//
-//    };
+    typedef vector<MAAG> MAAGRepertoire;
 
 
-    /**
-    * \class AbstractRepertoireView
-    */
-    template <class T>
-    class AbstractRepertoireView {
+    class ClonesetView {
+
     public:
 
-        typedef iterator<random_access_iterator_tag, T> repertoire_iterator;
+        ClonesetView() : _source(nullptr) {
+            _shifts.resize(0);
+        }
 
-
-        AbstractRepertoireView(shared_ptr<vector<T>> pvec, const vector<size_t>& shifts) :
+        ClonesetView(shared_ptr<vector<Clonotype>> pvec, const vector<size_t>& shifts) :
                 _source(pvec), _shifts(shifts) {}
 
 
-        AbstractRepertoireView(const AbstractRepertoireView& other) : _source(other._source), _shifts(other._shifts) {}
+        ClonesetView(const ClonesetView& other) : _source(other._source), _shifts(other._shifts) {}
 
 
-        virtual ~AbstractRepertoireView() {}
+        virtual ~ClonesetView() { }
 
 
-        virtual const T& operator[] (size_t index) const {
-            return this->_source->at(this->_shifts[index]);
+        const Clonotype& operator[] (size_t index) const {
+            return _source->at(_shifts[index]);
         }
+        ClonesetView operator[](const vector<size_t> &indices) {};
 
 
-        size_t size() const { return this->_shifts.size(); }
+        size_t size() const { return _shifts.size(); }
 
 
-    protected:
-
-        shared_ptr<vector<T>> _source;
-        vector<size_t> _shifts;
-
-
-        AbstractRepertoireView() {}
-
-    };
-
-
-    /**
-    * \class AbstractRepertoire
-    */
-    template <class T>
-    class AbstractRepertoire : public AbstractRepertoireView<T> {
-    public:
-
-
-        AbstractRepertoire() {
-            vector<T> *_vecobj = new vector<T>();
-            shared_ptr<vector<T>> p(_vecobj);
-            this->_vec.swap(p);
-            this->_vec->reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
-            this->_source = this->_vec;
-            this->_shifts.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
-        }
-
-
-        AbstractRepertoire(const vector<T> &vec) : AbstractRepertoire() {
+        ClonesetView coding() {
 
         }
 
 
-        AbstractRepertoire(const AbstractRepertoire<T>& other) {}
+        ClonesetView noncoding(bool out_of_frames_only = false) {
 
-
-        virtual ~AbstractRepertoire() {}
-
-
-        void swap(vector<T>& vec) {
-            this->_vec->swap(vec);
-            this->_shifts.resize(this->_vec->size());
-            for (size_t i = 0; i < this->_vec->size(); ++i) {
-                this->_shifts[i] = i;
-            }
         }
 
 
-        T& operator[] (size_t index) {
-            return (*(this->_vec))[index];
-        }
-
-        const T& operator[] (size_t index) const {
-            return (*(this->_vec))[index];
-        }
-
-
-        AbstractRepertoireView<T> operator[] (const vector<size_t>& indices) {
-            return AbstractRepertoireView<T>(this->_vec, indices);
-        }
-
-
-        /**
-        * \brief Get read-only access to the first N elements.
-        *
-        * \param size N first elements.
-        *
-        * \return AbstractRepertoireView to the first N elements.
-        */
-        AbstractRepertoireView<T> head(size_t size) const {
+        ClonesetView head(size_t size) {
             vector<size_t> shifts;
             shifts.reserve(size);
             for (size_t i = 0; i < size; ++i) {
                 shifts.push_back(i);
             }
             return (*this)[shifts];
-        }
+        };
 
 
-        /**
-        * \brief Get read-only access to the sub-vector - continous sample of the repertoire.
-        *
-        * \param start Start index of the sub-vector.
-        * \param end End index of the sub-vector.
-        *
-        * \return AbstractRepertoireView to the sub-vector.
-        */
-        AbstractRepertoireView<T> slice(size_t start, size_t end) const {
-            vector<size_t> shifts;
-            shifts.reserve(end - start + 1);
-            for (size_t i = start; i < end; ++i) {
-                shifts.push_back(i);
+        ClonesetView slice(size_t start, size_t end) {
+            if (end > start) {
+                vector<size_t> shifts;
+                shifts.reserve(end - start + 1);
+                for (size_t i = start; i < end; ++i) {
+                    shifts.push_back(i);
+                }
+                return (*this)[shifts];
+            } else {
+                cerr << "Error in ClonesetView: the end index is lower than the start index!" << endl;
+                return ClonesetView();
             }
-            return (*this)[shifts];
+        };
+
+
+    protected:
+
+        shared_ptr<vector<Clonotype>> _source;
+        vector<size_t> _shifts;
+
+    };
+
+
+    class Cloneset : public ClonesetView {
+
+    public:
+
+
+        Cloneset() : _source(new vector<Clonotype>) {
+
         }
 
+        virtual ~Cloneset() { }
 
-        /**
-        * \brief Get read-only access to a random sample of the repertoire.
-        *
-        * \param size Size of the sample.
-        * \param seed Seed for generating random numbers.
-        * \param replace Should sampling be with replacement or not.
-        *
-        * \return AbstractRepertoireView to the random sample.
-        */
-        AbstractRepertoireView<T> sample(size_t size, size_t seed, bool replace = true) const {
-            // !!
-            // !!
-            // !!
+
+        void swap(vector<Clonotype>& vec) {
+            this->_source->swap(vec);
+            this->_shifts.resize(this->_source->size());
+            for (size_t i = 0; i < this->_source->size(); ++i) {
+                this->_shifts[i] = i;
+            }
+        }
+
+        Clonotype& operator[] (size_t index) {
+            return _source->at(_shifts[index]);
         }
 
 
     protected:
 
-        shared_ptr<vector<T>> _vec;
-
     };
 
 
-//    typedef AbstractRepertoireView<Clonotype> ClonesetView;
-
-    class ClonesetView : public AbstractRepertoireView<Clonotype> {
-
-    public:
-
-        ClonesetView() {
-
-        }
-
-
-        virtual ~ClonesetView() {
-
-        }
-
-
+//    /**
+//    * \class AbstractRepertoireView
+//    */
+//    template <class T>
+//    class AbstractRepertoireView {
+//    public:
+//
+//        typedef iterator<random_access_iterator_tag, T> repertoire_iterator;
+//
+//
+//        AbstractRepertoireView(shared_ptr<vector<T>> pvec, const vector<size_t>& shifts) :
+//                _source(pvec), _shifts(shifts) {}
+//
+//
+//        AbstractRepertoireView(const AbstractRepertoireView& other) : _source(other._source), _shifts(other._shifts) {}
+//
+//
+//        virtual ~AbstractRepertoireView() {}
+//
+//
+//        virtual const T& operator[] (size_t index) const {
+//            return this->_source->at(this->_shifts[index]);
+//        }
+//
+//
+//        size_t size() const { return this->_shifts.size(); }
+//
+//
+//    protected:
+//
+//        shared_ptr<vector<T>> _source;
+//        vector<size_t> _shifts;
+//
+//
+//        AbstractRepertoireView() {}
+//
+//    };
+//
+//
+//    /**
+//    * \class AbstractRepertoire
+//    */
+//    template <class T>
+//    class AbstractRepertoire : public AbstractRepertoireView<T> {
+//    public:
+//
+//
+//        AbstractRepertoire() {
+//            vector<T> *_vecobj = new vector<T>();
+//            shared_ptr<vector<T>> p(_vecobj);
+//            this->_vec.swap(p);
+//            this->_vec->reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
+//            this->_source = this->_vec;
+//            this->_shifts.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
+//        }
+//
+//
+//        AbstractRepertoire(const vector<T> &vec) : AbstractRepertoire() {
+//
+//        }
+//
+//
+//        AbstractRepertoire(const AbstractRepertoire<T>& other) {}
+//
+//
+//        virtual ~AbstractRepertoire() {}
+//
+//
+//        void swap(vector<T>& vec) {
+//            this->_vec->swap(vec);
+//            this->_shifts.resize(this->_vec->size());
+//            for (size_t i = 0; i < this->_vec->size(); ++i) {
+//                this->_shifts[i] = i;
+//            }
+//        }
+//
+//
+//        T& operator[] (size_t index) {
+//            return (*(this->_vec))[index];
+//        }
+//
+//        const T& operator[] (size_t index) const {
+//            return (*(this->_vec))[index];
+//        }
+//
+//
+//        AbstractRepertoireView<T> operator[] (const vector<size_t>& indices) {
+//            return AbstractRepertoireView<T>(this->_vec, indices);
+//        }
+//
+//
+//        /**
+//        * \brief Get read-only access to the first N elements.
+//        *
+//        * \param size N first elements.
+//        *
+//        * \return AbstractRepertoireView to the first N elements.
+//        */
+//        AbstractRepertoireView<T> head(size_t size) const {
+//            vector<size_t> shifts;
+//            shifts.reserve(size);
+//            for (size_t i = 0; i < size; ++i) {
+//                shifts.push_back(i);
+//            }
+//            return (*this)[shifts];
+//        }
+//
+//
+//        /**
+//        * \brief Get read-only access to the sub-vector - continous sample of the repertoire.
+//        *
+//        * \param start Start index of the sub-vector.
+//        * \param end End index of the sub-vector.
+//        *
+//        * \return AbstractRepertoireView to the sub-vector.
+//        */
+//        AbstractRepertoireView<T> slice(size_t start, size_t end) const {
+//            vector<size_t> shifts;
+//            shifts.reserve(end - start + 1);
+//            for (size_t i = start; i < end; ++i) {
+//                shifts.push_back(i);
+//            }
+//            return (*this)[shifts];
+//        }
+//
+//
+//        /**
+//        * \brief Get read-only access to a random sample of the repertoire.
+//        *
+//        * \param size Size of the sample.
+//        * \param seed Seed for generating random numbers.
+//        * \param replace Should sampling be with replacement or not.
+//        *
+//        * \return AbstractRepertoireView to the random sample.
+//        */
+//        AbstractRepertoireView<T> sample(size_t size, size_t seed, bool replace = true) const {
+//            // !!
+//            // !!
+//            // !!
+//        }
+//
+//
+//    protected:
+//
+//        shared_ptr<vector<T>> _vec;
+//
+//    };
+//
+//
+////    typedef AbstractRepertoireView<Clonotype> ClonesetView;
+//
+//    class ClonesetView : public AbstractRepertoireView<Clonotype> {
+//
+//    public:
+//
+//        ClonesetView() {
+//
+//        }
+//
+//
+//        virtual ~ClonesetView() {
+//
+//        }
+//
+//
 //        ClonesetView codingSequences() const {
 //
 //        }
-
-
+//
+//
 //        ClonesetView noncodingSequences() const {
 //
 //        }
-
-
+//
+//
 //        ClonesetView translate() {
 //
 //        }
-
-    };
-
-
-    typedef AbstractRepertoire<Clonotype> Cloneset;
-
-
-    typedef vector<MAAG> MAAGRepertoire;
+//
+//    };
+//
+//
+//    typedef AbstractRepertoire<Clonotype> Cloneset;
 
 }
 

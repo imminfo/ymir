@@ -55,7 +55,7 @@ namespace ymir {
 
     public:
 
-        ClonesetView() : _source(nullptr) {
+        ClonesetView() : _source(new vector<Clonotype>()) {
             _shifts.resize(0);
         }
 
@@ -127,8 +127,15 @@ namespace ymir {
 
 
         Cloneset() : ClonesetView() {
-
+            _shifts.resize(0);
         }
+
+
+        // swap constructor
+        Cloneset(vector<Clonotype>& vec) {
+            this->swap(vec);
+        }
+
 
         virtual ~Cloneset() { }
 

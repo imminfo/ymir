@@ -45,6 +45,7 @@ namespace ymir {
     class MAAG : protected ProbMMC {
 
         friend class MAAGForwardBackwardAlgorithm;  // ):
+        friend class MAAGBuilder;  // )):
 
     public:
 
@@ -259,7 +260,11 @@ namespace ymir {
         bool is_vdj() const { return _chain.size() == VDJ_CHAIN_SIZE; }
         ///@}
 
+
         RECOMBINATION recombination() const { return _chain.size() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB; }
+
+
+        bool has_events() const { return _events; }
 
     protected:
 

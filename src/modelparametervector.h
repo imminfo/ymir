@@ -194,7 +194,7 @@ namespace ymir {
          *
          * \return Probability of the event.
          */
-        prob_t operator[] (eventind_t gl_event_index) { return _vec[gl_event_index]; }
+        prob_t& operator[] (eventind_t gl_event_index) { return _vec[gl_event_index]; }
 
         prob_t operator[] (eventind_t gl_event_index) const { return _vec[gl_event_index]; }
 

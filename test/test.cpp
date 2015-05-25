@@ -40,6 +40,7 @@
 #include <list>
 #include <sstream>
 
+#include "tools.h"
 #include "parser.h"
 #include "statisticalinferencealgorithm.h"
 

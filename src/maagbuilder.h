@@ -148,8 +148,8 @@ namespace ymir {
          */
         ///@{
         void updateEventProbabilities(MAAG *maag) const {
-            if (maag->_events) {
-                for (int node_i = 0; node_i < maag->_chain.size(); ++node_i) {
+            if (maag->has_events()) {
+                for (int node_i = 0; node_i < maag->chainSize(); ++node_i) {
                     // either rebuild all insertions
                     if (maag->is_vj() && node_i == VarJoi_INSERTIONS_MATRIX_INDEX) {
 

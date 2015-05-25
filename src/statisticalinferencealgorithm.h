@@ -27,6 +27,7 @@
 
 #include "probabilisticassemblingmodel.h"
 #include "maagforwardbackwardalgorithm.h"
+#include "tools.h"
 
 
 namespace ymir {
@@ -56,7 +57,7 @@ namespace ymir {
             }
 
 
-            Json::Value& operator[](const string& param_name) { return _json[param_name]; }
+            const Json::Value& operator[](const string& param_name) const { return _json[param_name]; }
 
 
         private:
@@ -66,9 +67,9 @@ namespace ymir {
         };
 
 
-        virtual bool statisticalInference(const ClonesetView& repertoire,
-                ProbabilisticAssemblingModel & model,
-                const AlgorithmParameters& algo_param = AlgorithmParameters()) const =0;
+        virtual bool statisticalInference(const ClonesetView &repertoire,
+                                          ProbabilisticAssemblingModel &model,
+                                          const AlgorithmParameters &algo_param = AlgorithmParameters()) const =0;
 
     };
 
@@ -82,9 +83,9 @@ namespace ymir {
     class EMAlgorithm : public StatisticalInferenceAlgorithm {
     public:
 
-        virtual bool statisticalInference(const ClonesetView& repertoire,
-                ProbabilisticAssemblingModel & model,
-                const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10)) const {
+        virtual bool statisticalInference(const ClonesetView &repertoire,
+                                          ProbabilisticAssemblingModel &model,
+                                          const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10)) const {
 
             ClonesetView rep_nonc = repertoire.noncoding();
             MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc);

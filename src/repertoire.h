@@ -59,6 +59,7 @@ namespace ymir {
             _shifts.resize(0);
         }
 
+
         ClonesetView(shared_ptr<vector<Clonotype>> pvec, const vector<size_t>& shifts) :
                 _source(pvec), _shifts(shifts) {}
 
@@ -72,7 +73,14 @@ namespace ymir {
         const Clonotype& operator[] (size_t index) const {
             return _source->at(_shifts[index]);
         }
-        ClonesetView operator[](const vector<size_t> &indices) const {};
+        ClonesetView subvec(const vector<size_t> &indices) const {
+            vector<size_t> shifts;
+            shifts.reserve(indices.size());
+            for (size_t i = 0; i < indices.size(); ++i) {
+                shifts.push_back(_shifts[indices[i]]);
+            }
+            return ClonesetView(_source, shifts);
+        };
 
 
         size_t size() const { return _shifts.size(); }
@@ -86,7 +94,7 @@ namespace ymir {
                     inds.push_back(i);
                 }
             }
-            return (*this)[inds];
+            return this->subvec(inds);
         }
 
 
@@ -98,7 +106,7 @@ namespace ymir {
                     inds.push_back(i);
                 }
             }
-            return (*this)[inds];
+            return this->subvec(inds);
         }
 
 
@@ -108,7 +116,7 @@ namespace ymir {
             for (size_t i = 0; i < size; ++i) {
                 shifts.push_back(i);
             }
-            return (*this)[shifts];
+            return this->subvec(shifts);
         };
 
 
@@ -119,7 +127,7 @@ namespace ymir {
                 for (size_t i = start; i < end; ++i) {
                     shifts.push_back(i);
                 }
-                return (*this)[shifts];
+                return this->subvec(shifts);
             } else {
                 cerr << "Error in ClonesetView: the end index is lower than the start index." << endl;
                 return ClonesetView();
@@ -161,6 +169,7 @@ namespace ymir {
                 this->_shifts[i] = i;
             }
         }
+
 
         Clonotype& operator[] (size_t index) {
             return _source->at(_shifts[index]);

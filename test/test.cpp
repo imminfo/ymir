@@ -1022,20 +1022,45 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_clorep)
-    /*
-    [index]
-    [vector]
-    head
-    slice
-    sample w/ replacement
-    sample w/o replacement
-     */
-    YMIR_ASSERT(false)
-YMIR_TEST_END
+    RepertoireParser parser;
+    YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
 
+    bool V_err, J_err;
+    VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
+            , "Jgene", TEST_DATA_FOLDER + "jgene.real.txt", &V_err, &J_err);
+    YMIR_ASSERT(V_err)
+    YMIR_ASSERT(J_err)
 
-YMIR_TEST_START(test_clorep_view)
-    YMIR_ASSERT(false)
+    Cloneset cr;
+    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha.txt",
+                             &cr,
+                             vdj_genes,
+                             RepertoireParser::AlignmentColumnOptions()
+                                     .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
+                                     .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
+                                     .setD(RepertoireParser::SKIP)))
+
+    YMIR_ASSERT(!has_end_codon(cr[3].sequence()))
+    YMIR_ASSERT(is_out_of_frame(cr[3].sequence()))
+    YMIR_ASSERT(has_end_codon(cr[24].sequence()))
+    YMIR_ASSERT(is_out_of_frame(cr[24].sequence()))
+
+    ClonesetView crv = cr.head(10);
+    YMIR_ASSERT2(crv.size(), 10)
+    YMIR_ASSERT(cr[0].sequence() == crv[0].sequence())
+
+    vector<size_t> inds = {1, 5, 10};
+    crv = cr.subvec(inds);
+    YMIR_ASSERT(crv[0].sequence() == cr[1].sequence())
+    YMIR_ASSERT(crv[1].sequence() == cr[5].sequence())
+    YMIR_ASSERT(crv[2].sequence() == cr[10].sequence())
+
+    inds.clear(); inds.push_back(1); inds.push_back(2);
+    ClonesetView crv2 = crv.subvec(inds);
+
+    YMIR_ASSERT(crv2[0].sequence() == cr[5].sequence())
+    YMIR_ASSERT(crv2[1].sequence() == cr[10].sequence())
+
 YMIR_TEST_END
 
 
@@ -1835,8 +1860,7 @@ int main() {
 //    YMIR_TEST(test_mitcr_vdj_wo_d_alignment(), "MiTCR parser test for beta chain without D alignment")
 
     // Tests for clonal repertoires and clonal repertoire views.
-    YMIR_TEST(test_clorep(), "Cloneset creating / access")
-    YMIR_TEST(test_clorep_view(), "ClonesetView creating / access")
+    YMIR_TEST(test_clorep(), "Cloneset / ClonesetView manipulations")
 
     // Tests for markov chain.
     YMIR_TEST(test_markovchain_nuc(), "Markov chain nucleotide")

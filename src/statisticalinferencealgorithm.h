@@ -87,11 +87,16 @@ namespace ymir {
                                           ProbabilisticAssemblingModel &model,
                                           const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10)) const {
 
+            cout << "Statistical inference on a PAM:\t" << model.name() << endl;
+
             ClonesetView rep_nonc = repertoire.noncoding();
+            cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
+
             MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc);
             ModelParameterVector new_param_vec = model.event_probabilities();
             vector<prob_t> prob_vec;
             prob_vec.resize(rep_nonc.size(), 0);
+
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
                 cout << "Iteration:\t" << (size_t) iter << endl;
 

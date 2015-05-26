@@ -32,6 +32,7 @@
 #include "clonotype.h"
 #include "parser.h"
 #include "maag.h"
+#include "tools.h"
 
 
 namespace ymir {

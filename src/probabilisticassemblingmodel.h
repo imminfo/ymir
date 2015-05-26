@@ -213,6 +213,8 @@ namespace ymir {
          */
         bool status() const { return _status; }
 
+        string name() const { return _config.get("name", "Nameless model").asString(); }
+
     protected:
 
         bool _status, _verbose;

@@ -403,37 +403,55 @@ namespace ymir {
                             vector<seq_len_t> &seq_poses,
                             bool full_build) const
         {
-            probs.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), clonotype.sequence().size(), clonotype.sequence().size());
+            d_alignment_t d_alignment;
+            // indices of vertices to shrink the D-del matrix
+            seq_len_t d3_min = clonotype.sequence().size(), d3_max = clonotype.sequence().size(),
+                    d5_min = clonotype.sequence().size(), d5_max = clonotype.sequence().size();
+            seq_len_t max_min_D_len = _param_vec->D_min_len(clonotype.getDiv(0));  // (:
+            // find first and last indices for D gene matrix - find min seq start pos and max seq end pos
+            // among all D alignments
+            for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                if (max_min_D_len < _param_vec->D_min_len(clonotype.getDiv(d_index))) {
+                    max_min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
+                }
+
+                for (segindex_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
+                    d_alignment = clonotype.getDalignment(d_index, j);
+
+                    if (d3_min > d_alignment.seqstart) { d3_min = d_alignment.seqstart; }
+
+                    if (d5_max < d_alignment.seqend) { d5_max = d_alignment.seqend; }
+                }
+            }
+            d3_max = d5_max - (max_min_D_len - 1);
+            d5_min = d3_min + max_min_D_len - 1;
+
+            probs.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), d3_max - d3_min + 1, d5_max - d5_min + 1);
             if (full_build) {
-                events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), clonotype.sequence().size(), clonotype.sequence().size());
+                events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), d3_max - d3_min + 1, d5_max - d5_min + 1);
             }
 
             segindex_t d_index = 0, d_gene = 0;
             seq_len_t min_D_len = 0, d_len = 0;
-            d_alignment_t d_alignment;
 
-            // find first and last indices for D gene matrix - find min seq start pos and max seq end pos
-            // among all D alignments
-
-
-            for (int d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+            for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                 d_gene = clonotype.getDiv(d_index);
                 d_len = _genes->D()[d_gene].sequence.size();
                 min_D_len = _param_vec->D_min_len(d_gene);
 
                 // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
-                for (int j = 0; j < clonotype.nDalignments(d_index); ++j) {
+                for (segindex_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
                     d_alignment = clonotype.getDalignment(d_index, j);
 
                     for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len + 1; ++left_pos) {
                         for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seqend; ++right_pos) {
-                            probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - 1, right_pos - 1)
+                            probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - d3_min, right_pos - d5_min)
                                     = _param_vec->event_prob(VDJ_DIV_DEL,
                                                              d_gene - 1,
                                                              d_alignment.Dstart + left_pos - d_alignment.seqstart - 1,
                                                              d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
                             if (full_build) {
-                                events(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - 1, right_pos - 1)
+                                events(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - d3_min, right_pos - d5_min)
                                         = _param_vec->event_index(VDJ_DIV_DEL,
                                                                   d_gene - 1,
                                                                   d_alignment.Dstart + left_pos - d_alignment.seqstart - 1,
@@ -447,9 +465,9 @@ namespace ymir {
             // overhead by memory - just push all positions of the sequence from 1 to the last
             // insert D3 and D5 positions
             vector<seq_len_t> D35_poses;
-            D35_poses.reserve(clonotype.sequence().size() * 2);
-            for (seq_len_t i = 1; i < clonotype.sequence().size() + 1; ++i) { D35_poses.push_back(i); }
-            for (seq_len_t i = 1; i < clonotype.sequence().size() + 1; ++i) { D35_poses.push_back(i); }
+            D35_poses.reserve(d3_max - d3_min + 1 + d5_max - d5_min + 1);
+            for (seq_len_t i = d3_min; i <= d3_max; ++i) { D35_poses.push_back(i); }
+            for (seq_len_t i = d5_min; i <= d5_max; ++i) { D35_poses.push_back(i); }
 
             // Note! insert diversity gene seq poses BEFORE joining gene seq poses
             seq_poses.reserve(seq_poses.size() + D35_poses.size() + 2);  // +2 -> just in case (:

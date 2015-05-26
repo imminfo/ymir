@@ -5,6 +5,8 @@
 #ifndef YMIR_MAAGFORWARDBACKWARDALGORITHM_H
 #define YMIR_MAAGFORWARDBACKWARDALGORITHM_H
 
+#include <unordered_map>
+
 #include "maag.h"
 
 namespace ymir {
@@ -64,15 +66,12 @@ namespace ymir {
         ProbMMC *_fb_acc;  /** Accumulator MMC for storing forward and backward probabilities. */
         prob_t _full_prob;  /** Full generation probability of the input MAAG. */
         prob_t _back_full_prob;  /** Full generation probability of the input MAAG obtained with backward algorithm. Just for testing purposes. */
-        size_t _node_i, _mat_i, _row, _column;
+        vector<event_pair_t> _pairs;
 
 
         bool init_and_process(const MAAG &maag) {
             _status = false;
-            _node_i = 0;
-            _mat_i = 0;
-            _row = 0;
-            _column = 0;
+            _pairs.resize(0);
             _full_prob = 0;
             _back_full_prob = 0;
             _forward_acc = nullptr;

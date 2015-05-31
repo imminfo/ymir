@@ -94,19 +94,21 @@ namespace ymir {
 
 
         /**
-        * \typedef matrix_t
-        *
-        * \brief Type of matrices in the chain.
-        */
-        typedef Matrix<_Scalar, Dynamic, Dynamic> matrix_t;
-
-
-        /**
         * \typedef dim_t
         *
         * \brief Type of dimensions of matrices (rows and columns).
         */
-        typedef size_t dim_t;
+//        typedef size_t dim_t;
+        typedef seq_len_t dim_t;
+
+
+        /**
+        * \typedef matrix_t
+        *
+        * \brief Type of matrices in the chain.
+        */
+//        typedef Matrix<_Scalar, Dynamic, Dynamic> matrix_t;
+        typedef Matrix<_Scalar, dim_t> matrix_t;
 
     protected:
 
@@ -118,24 +120,47 @@ namespace ymir {
         struct Node {
         public:
 
-            Node() : _n(0) {}
+            Node() : _n(0), _vec(nullptr) {}
 
 
             Node(matrix_ind_t n, dim_t rows, dim_t cols) {
-                init(n, rows, cols);
+                this->init(n, rows, cols);
             }
 
 
             Node(const Node& other) {
                 _n = other._n;
-                _vec = new matrix_t[_n];
-                for (matrix_ind_t i = 0; i < _n; ++i) {
-                    _vec[i] = other._vec[i];
+                if (_n > 0) {
+                    _vec = new matrix_t[_n];
+                    for (matrix_ind_t i = 0; i < _n; ++i) {
+//                        _Scalar *d = new _Scalar[other._vec[0].rows() * other._vec[0].cols()];
+//                        _vec[i] = Eigen::Map<matrix_t, Eigen::Aligned>(d, other._vec[0].rows(), other._vec[0].cols());
+                        _vec[i] = other._vec[i];
+                    }
+                } else {
+                    _vec = nullptr;
                 }
             }
 
 
-            ~Node() { delete [] _vec; }
+            ~Node() {
+                if (_n) { delete [] _vec; }
+            }
+
+
+            Node& operator= (const Node& other) {
+                if (_n > 0) { delete [] _vec; }
+                _n = other._n;
+                if (_n > 0) {
+                    _vec = new matrix_t[_n];
+                    for (matrix_ind_t i = 0; i < _n; ++i) {
+                        _vec[i] = other._vec[i];
+                    }
+                } else {
+                    _vec = nullptr;
+                }
+                return *this;
+            }
 
 
             void init(matrix_ind_t n, dim_t rows, dim_t cols) {
@@ -145,14 +170,12 @@ namespace ymir {
                     _vec[i].resize(rows, cols);
                     _vec[i].fill(0);
                 }
-                // _vec = new matrix_t*[n];
-                // _vec[i] = new matrix_t(rows, cols);
             }
 
 
             ///@{
-            const matrix_t& operator[](matrix_ind_t mat_i) const { return _vec[mat_i]; }
             matrix_t& operator[](matrix_ind_t mat_i) { return _vec[mat_i]; }
+            const matrix_t& operator[](matrix_ind_t mat_i) const { return _vec[mat_i]; }
             ///@}
 
 
@@ -174,7 +197,21 @@ namespace ymir {
         }
 
 
-        virtual ~MultiMatrixChain() {
+        MultiMatrixChain(const MultiMatrixChain &other) {
+            _chain.clear();
+            _chain.reserve(other.chainSize());
+            for (size_t i = 0; i < other.chainSize(); ++i) {
+                _chain.push_back(other._chain[i]);
+            }
+        }
+
+
+        virtual ~MultiMatrixChain() { }
+
+
+        MultiMatrixChain& operator= (const MultiMatrixChain &other) {
+            _chain = other._chain;
+            return *this;
         }
 
 
@@ -225,14 +262,14 @@ namespace ymir {
         /**
         * \brief Add new node with pattern matrix.
         */
-        node_ind_t addNode() {
-            _chain.push_back(Node());
-            return _chain.size() - 1;
-        }
-        node_ind_t addNode(matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
-            _chain.push_back(Node(n_matrices, rows, cols));
-            return _chain.size() - 1;
-        }
+//        node_ind_t addNode() {
+//            _chain.push_back(Node());
+//            return _chain.size() - 1;
+//        }
+//        node_ind_t addNode(matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
+//            _chain.push_back(Node(n_matrices, rows, cols));
+//            return _chain.size() - 1;
+//        }
 
 
         void initNode(node_ind_t node_i, matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
@@ -243,14 +280,6 @@ namespace ymir {
         void swap(MultiMatrixChain<_Scalar> &other) {
             _chain.swap(other._chain);
         }
-
-
-//        MMCSlice<_Scalar> slice() const {
-//            // ???
-//            // ???
-//            // ???
-//        }
-
 
     protected:
 

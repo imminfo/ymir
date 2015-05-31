@@ -42,6 +42,11 @@
 
 
 namespace ymir {
+
+    #define DEFAULT_DIV_GENE_MIN_LEN 2
+
+    #define YDEBUG
+
     /**
     * \typedef numeric
     *

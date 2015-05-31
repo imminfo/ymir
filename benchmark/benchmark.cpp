@@ -83,18 +83,20 @@ int main() {
     tp2 = std::chrono::system_clock::now();
     cout << "VJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
     */
+
+
     //
     // VDJ MAAG
     //
     ProbabilisticAssemblingModel vdj_model(BENCH_DATA_FOLDER + "../../models/hTRB");
 
-    tp1 = std::chrono::system_clock::now();
-    vdj_model.computeFullProbabilities(cloneset_vdj);
-    tp2 = std::chrono::system_clock::now();
-    cout << "VDJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
+//    tp1 = std::chrono::system_clock::now();
+//    vdj_model.computeFullProbabilities(cloneset_vdj);
+//    tp2 = std::chrono::system_clock::now();
+//    cout << "VDJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
 
     tp1 = std::chrono::system_clock::now();
-    vdj_model.buildGraphs(cloneset_vdj, true);
+    MAAGRepertoire maag_vec(vdj_model.buildGraphs(cloneset_vdj, true));
     tp2 = std::chrono::system_clock::now();
     cout << "VDJ MAAG with metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
 

@@ -139,7 +139,7 @@ namespace ymir {
          *
          * \return Set of MAAGs.
          */
-        MAAGRepertoire buildGraphs(const ClonesetView& repertoire,
+        MAAGRepertoire buildGraphs(const ClonesetView &repertoire,
                                    bool full_build = true,
                                    bool aminoacid = false) const {
             return _builder->build(repertoire, full_build);

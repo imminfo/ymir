@@ -83,7 +83,6 @@ namespace ymir {
             vector<seq_len_t> seq_poses;
             seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
 
-
             if (clonotype.is_vj()) {
                 probs.resize(VJ_CHAIN_SIZE);
                 if (full_build) { events.resize(VJ_CHAIN_SIZE); }
@@ -102,21 +101,22 @@ namespace ymir {
                 this->buildDJinsertions(clonotype, probs, events, seq_poses, full_build);
             }
 
-            seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
-            copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
-
             if (full_build) {
+                seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
+                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
                 return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size());
             } else {
                 return MAAG(probs);
             }
         }
 
-        MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) {
+        MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) const {
             MAAGRepertoire res;
             res.reserve(cloneset.size());
+//            res.resize(cloneset.size());
             for (size_t i = 0; i < cloneset.size(); ++i) {
-                res.push_back(build(cloneset[i], full_build));
+                res.push_back(this->build(cloneset[i], full_build));
+//                res[i] = this->build(cloneset[i], full_build);
                 if ((i+1) % 50000 == 0) {
                     cout << "Built " << (int) (i+1) << " graphs." << endl;
                 }
@@ -127,7 +127,7 @@ namespace ymir {
 
 
         prob_t buildAndCompute(const Clonotype &clonotype, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
-            return build(clonotype, false).fullProbability(action);
+            return this->build(clonotype, false).fullProbability(action);
         }
 
         vector<prob_t> buildAndCompute(const ClonesetView &cloneset, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
@@ -152,11 +152,11 @@ namespace ymir {
                 for (int node_i = 0; node_i < maag->chainSize(); ++node_i) {
                     // either rebuild all insertions
                     if (maag->is_vj() && node_i == VarJoi_INSERTIONS_MATRIX_INDEX) {
-
+                        // ???
                     } else if (maag->is_vdj() && node_i == VarDiv_INSERTIONS_MATRIX_INDEX) {
-
+                        // ???
                     } else if (maag->is_vdj() && node_i == DivJoi_INSERTIONS_MATRIX_INDEX) {
-
+                        // ???
                     } else {
                         // or just replace all event probabilities with the new ones
                         for (int mat_i = 0; mat_i < maag->nodeSize(node_i); ++mat_i) {

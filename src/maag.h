@@ -50,13 +50,33 @@ namespace ymir {
     public:
 
         /**
+         * \brief Default constructor.
+         */
+        MAAG() {
+            _events = nullptr;
+            _sequence = nullptr;
+            _seq_poses = nullptr;
+            _n_poses = 0;
+        }
+
+        /**
          *
          */
         MAAG(const MAAG &other) : ProbMMC(other) {
-            if (other._events) {
-                _events = new EventIndMMC(*other._events);
+            if (other._events) { _events = new EventIndMMC(*other._events); }
+            else { _events = nullptr; }
+
+            _n_poses = other._n_poses;
+
+            if (other._seq_poses) {
+                _seq_poses = new seq_len_t[_n_poses];
+                copy(other._seq_poses, other._seq_poses + _n_poses, _seq_poses);
+            } else {
+                _seq_poses = nullptr;
             }
+
             if (other._sequence) { _sequence = new string(*other._sequence); }
+            else { _sequence = nullptr; }
         }
 
 
@@ -93,6 +113,35 @@ namespace ymir {
             if (_events) { delete _events; }
             if (_seq_poses) { delete [] _seq_poses; }
             if (_sequence) { delete _sequence; }
+        }
+
+
+        MAAG& operator= (const MAAG& other) {
+            _chain = other._chain;
+
+            if (other._events) {
+                if (_events) { delete _events; }
+                _events = new EventIndMMC(*other._events);
+            }
+            else { _events = nullptr; }
+
+            _n_poses = other._n_poses;
+
+            if (other._seq_poses) {
+                if (_seq_poses) { delete _seq_poses; }
+                _seq_poses = new seq_len_t[_n_poses];
+                copy(other._seq_poses, other._seq_poses + _n_poses, _seq_poses);
+            } else {
+                _seq_poses = nullptr;
+            }
+
+            if (other._sequence) {
+                if (_sequence) { delete _sequence; }
+                _sequence = new string(*other._sequence);
+            }
+            else { _sequence = nullptr; }
+
+            return *this;
         }
 
 
@@ -273,17 +322,6 @@ namespace ymir {
         seq_len_t *_seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
         seq_len_t _n_poses;
         string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
-
-
-
-        /**
-         * \brief Default constructor.
-         */
-        MAAG() {
-            _events = nullptr;
-            _sequence = nullptr;
-            _seq_poses = nullptr;
-        }
 
     };
 }

@@ -8,9 +8,9 @@
 
 //#include "types.h"
 #include <stdexcept>
-#include <iostream>
 
-using namespace std;
+
+#define YDEBUG
 
 namespace ymir {
 
@@ -99,14 +99,14 @@ namespace ymir {
 // operator() with check
         _Scalar& operator()(_Dim row, _Dim col) {
 #ifdef YDEBUG
-            if (!(row >= 0 && row < _rows && col > 0 && col < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
+            if (!(row >= 0 && row < _rows && col >= 0 && col < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
 #endif
             return _data[row * _cols + col];
         }
 
         const _Scalar& operator()(_Dim row, _Dim col) const {
 #ifdef YDEBUG
-            if (!(row >= 0 && row < _rows && col > 0 && col < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
+            if (!(row >= 0 && row < _rows && col >= 0 && col < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
 #endif
             return _data[row * _cols + col];
         }

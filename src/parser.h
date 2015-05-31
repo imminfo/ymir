@@ -25,7 +25,6 @@
 #define _PARSER_H
 
 
-#include <term.h>
 #include "iostream"
 #include "fstream"
 #include "sstream"

@@ -28,8 +28,9 @@
 #include <unordered_map>
 #include <iostream>
 #include "tuple"
+#include "matrix.h"
 
-#include "Eigen/Dense"
+//#include "Eigen/Dense"
 
 //#include "tools.h"
 
@@ -80,15 +81,16 @@ namespace ymir {
     typedef uint16_t eventind_t;
 
 
+    typedef uint16_t seq_len_t;
+
+
     /**
     * \typedef event_matrix_t
     *
     * \brief Matrix of stored event probabilities.
     */
-    typedef Eigen::Matrix<prob_t, Eigen::Dynamic, Eigen::Dynamic> event_matrix_t;
-
-
-    typedef uint16_t seq_len_t;
+//    typedef Eigen::Matrix<prob_t, Eigen::Dynamic, Eigen::Dynamic> event_matrix_t;
+    typedef Matrix<prob_t, seq_len_t> event_matrix_t;
 
 
     typedef uint8_t segindex_t;

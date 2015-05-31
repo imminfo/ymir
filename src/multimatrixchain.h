@@ -31,7 +31,7 @@
 
 
 using namespace std;
-using namespace Eigen;
+//using namespace Eigen;
 
 
 namespace ymir {
@@ -262,14 +262,14 @@ namespace ymir {
         /**
         * \brief Add new node with pattern matrix.
         */
-//        node_ind_t addNode() {
-//            _chain.push_back(Node());
-//            return _chain.size() - 1;
-//        }
-//        node_ind_t addNode(matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
-//            _chain.push_back(Node(n_matrices, rows, cols));
-//            return _chain.size() - 1;
-//        }
+        node_ind_t addNode() {
+            _chain.push_back(Node());
+            return _chain.size() - 1;
+        }
+        node_ind_t addNode(matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
+            _chain.push_back(Node(n_matrices, rows, cols));
+            return _chain.size() - 1;
+        }
 
 
         void initNode(node_ind_t node_i, matrix_ind_t n_matrices, dim_t rows, dim_t cols) {

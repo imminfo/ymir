@@ -1014,9 +1014,9 @@ YMIR_TEST_START(test_mitcr_vdj_with_d_alignment)
 
     YMIR_ASSERT2(cr.size(), 1)
     YMIR_ASSERT2( (int) cr[0].nDiv(), 3)
-    YMIR_ASSERT2( (int) cr[0].nDalignments(0), 1)
-    YMIR_ASSERT2( (int) cr[0].nDalignments(1), 2)
-    YMIR_ASSERT2( (int) cr[0].nDalignments(2), 3)
+    YMIR_ASSERT2( (int) cr[0].nDalignments(0), 3)
+    YMIR_ASSERT2( (int) cr[0].nDalignments(1), 4)
+    YMIR_ASSERT2( (int) cr[0].nDalignments(2), 5)
 
 YMIR_TEST_END
 

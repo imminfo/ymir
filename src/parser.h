@@ -356,9 +356,13 @@ namespace ymir {
                                 AbstractAligner::LocalAlignmentIndices indices =
                                         aligner.alignLocal(gene_segments.D()[seg_i + 1].sequence,
                                                            sequence,
-                                                           3);
-                                for (size_t align_i = 0; align_i < indices.size(); ++align_i) {
-                                    clone_builder.addDalignment(seg_i + 1, indices[align_i]);
+                                                           DEFAULT_DIV_GENE_MIN_LEN);
+                                if (indices.size() == 0) {
+                                    cerr << "No D alignments has been found!" << endl;
+                                } else {
+                                    for (size_t align_i = 0; align_i < indices.size(); ++align_i) {
+                                        clone_builder.addDalignment(seg_i + 1, indices[align_i]);
+                                    }
                                 }
                             }
                         }

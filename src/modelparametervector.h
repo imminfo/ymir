@@ -24,8 +24,6 @@
 #ifndef _MODELPARAMETERVECTOR_H_
 #define _MODELPARAMETERVECTOR_H_
 
-#define DEFAULT_DIV_GENE_MIN_LEN 3
-
 
 #include <vector>
 

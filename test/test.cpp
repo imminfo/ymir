@@ -299,7 +299,12 @@ ModelParameterVector make_test_events_vdj() {
     v3.push_back(20);
     v4.push_back(0);
 
-    return ModelParameterVector(VDJ_RECOMB, v1, v2, v3, v4);
+    vector<seq_len_t> v5; // min D genes len == 3
+    v5.push_back(3);
+    v5.push_back(3);
+    v5.push_back(3);
+
+    return ModelParameterVector(VDJ_RECOMB, v1, v2, v3, v4, vector<prob_t>(), true, v5);
 }
 
 

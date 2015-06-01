@@ -229,6 +229,8 @@ namespace ymir {
         MAAGBuilder *_builder;
         ClonotypeAssembler *_generator;
 
+        seq_len_t _min_D_len;
+
 
         /**
          * \brief Private default constructor.
@@ -293,6 +295,7 @@ namespace ymir {
                 } else {
                     string d_path = _model_path + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
                     _genes = new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok);
+                    _min_D_len = _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("min.len", DEFAULT_DIV_GENE_MIN_LEN).asUInt();
                     /* add P nucleotides */
                     cout << "OK" << endl;
                 }
@@ -455,6 +458,7 @@ namespace ymir {
                 vector<seq_len_t> event_col_num;  // event family col numbers
                 vector<prob_t> laplace;
                 vector<segindex_t> name_order;
+                vector<seq_len_t> min_D_len_vec;
 
                 bool is_ok = false;
                 if (_vj_recomb) {
@@ -581,7 +585,8 @@ namespace ymir {
                                      laplace,
                                      1);
 
-                        _param_vec = new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace);
+                        for (segindex_t i = 0; i < _genes->D().size() - 1; ++i) { min_D_len_vec.push_back(_min_D_len); }
+                        _param_vec = new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, true, min_D_len_vec);
                         is_ok = true;
                     }
                 }

@@ -17,7 +17,8 @@
     "diversity": {
       "file": "dsegments.txt",
       "P.nuc.3'": 0,
-      "P.nuc.5'": 0
+      "P.nuc.5'": 0,
+      "min.len": 3
     }
   },
   "probtables": {

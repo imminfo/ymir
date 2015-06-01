@@ -6,15 +6,20 @@
 #define YMIR_MATRIX_H
 
 
-//#include "types.h"
+#include "iostream"
 #include <stdexcept>
 
 
 #define YDEBUG
 
+
 namespace ymir {
 
 
+    /**
+     * \class Matrix
+     * \brief Simple matrix class.
+     */
     template <typename _Scalar, typename _Dim>
     class Matrix {
 
@@ -27,10 +32,12 @@ namespace ymir {
             _data = nullptr;
         }
 
+
         Matrix(_Dim rows, _Dim columns, _Scalar val = 0) : _rows(rows), _cols(columns) {
             _data = new _Scalar[_rows * _cols];
             this->fill(val);
         }
+
 
         // copy
         Matrix(const Matrix &other) {
@@ -48,6 +55,7 @@ namespace ymir {
                 _data = nullptr;
             }
         }
+
 
         // dest
         virtual ~Matrix() {
@@ -104,12 +112,14 @@ namespace ymir {
             return _data[row * _cols + col];
         }
 
+
         const _Scalar& operator()(_Dim row, _Dim col) const {
 #ifdef YDEBUG
             if (!(row >= 0 && row < _rows && col >= 0 && col < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
 #endif
             return _data[row * _cols + col];
         }
+
 
         // operator ==
         bool operator==(const Matrix &other) const {
@@ -126,6 +136,7 @@ namespace ymir {
             return true;
         }
 
+
         // operator*
         Matrix operator*(const Matrix &other) const {
 #ifdef YDEBUG
@@ -137,9 +148,11 @@ namespace ymir {
                 for (_Dim j = 0; j < other._cols; ++j) {
                     for (_Dim k = 0; k < _cols; ++k) {
                         res(i, j) += (*this)(i, k) * other(k, j);
+                        std::cout << "mult:" << (*this)(i, k) << "*" << other(k, j) << "=" << res(i, j) << std::endl;
                     }
                 }
             }
+            std::cout << "done" << std::endl;
             return res;
         }
 

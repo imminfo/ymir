@@ -148,11 +148,10 @@ namespace ymir {
                 for (_Dim j = 0; j < other._cols; ++j) {
                     for (_Dim k = 0; k < _cols; ++k) {
                         res(i, j) += (*this)(i, k) * other(k, j);
-                        std::cout << "mult:" << (*this)(i, k) << "*" << other(k, j) << "=" << res(i, j) << std::endl;
+//                        std::cout << "mult:" << (*this)(i, k) << "*" << other(k, j) << "=" << res(i, j) << std::endl;
                     }
                 }
             }
-            std::cout << "done" << std::endl;
             return res;
         }
 
@@ -161,7 +160,18 @@ namespace ymir {
             Matrix res(_rows, _cols);
             for (_Dim i = 0; i < _rows; ++i) {
                 for (_Dim j = 0; j < _cols; ++j) {
-                    res(i, j) = res(i, j) * val;
+                    res(i, j) = (*this)(i, j) * val;
+                }
+            }
+            return res;
+        }
+
+
+        size_t nonzeros() const {
+            size_t res = 0;
+            for (_Dim i = 0; i < _rows; ++i) {
+                for (_Dim j = 0; j < _cols; ++j) {
+                    res += (*this)(i, j) != 0;
                 }
             }
             return res;
@@ -181,7 +191,7 @@ namespace ymir {
         Matrix<_Scalar, _Dim> res(rhs.rows(), rhs.cols());
         for (_Dim i = 0; i < rhs.rows(); ++i) {
             for (_Dim j = 0; j < rhs.cols(); ++j) {
-                res(i, j) = res(i, j) * val;
+                res(i, j) = rhs(i, j) * val;
             }
         }
         return res;

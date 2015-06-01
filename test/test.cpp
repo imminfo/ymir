@@ -1803,8 +1803,6 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
     MAAGForwardBackwardAlgorithm algo(maag);
 
     YMIR_ASSERT2(algo.status(), true)
-    YMIR_ASSERT2(algo.fullProbability(), 0)
-    YMIR_ASSERT2(maag.fullProbability(), 1)
 
     YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 6e-20)
 

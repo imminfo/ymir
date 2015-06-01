@@ -146,7 +146,7 @@ namespace ymir {
 
 
         /**
-         * \brief Compute and return full assembling probability of this sequence (i.e., with all gene segments alignments).
+         * \brief Compute and return the full assembling probability of this sequence (i.e., with all gene segments alignments).
          *
          * \param v_index Which aligned Variable gene segment to choose.
          * \param d_index Which aligned Diversity gene segment to choose.
@@ -159,7 +159,7 @@ namespace ymir {
         prob_t fullProbability(eventind_t v_index, eventind_t j_index) const {
             if (this->is_vj()) {
                 // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
-                return (_chain[0][0](v_index, j_index) *  // P(Vi & Ji)
+                return (_chain[0][0](v_index, j_index) *   // P(Vi & Ji)
                         _chain[1][v_index] *               // P(#dels | Vi)
                         _chain[2][0] *                     // P(V-J insertion seq)
                         _chain[3][j_index])(0, 0);         // P(#dels | Ji)

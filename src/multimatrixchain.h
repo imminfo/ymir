@@ -163,6 +163,8 @@ namespace ymir {
 
             dim_t cols() const { return _cols; }
 
+            size_t start() const { return _start_index; }
+
 
         protected:
 
@@ -177,6 +179,7 @@ namespace ymir {
         MultiMatrixChain() {
             _chain.clear();
             _values.clear();
+            _values.reserve(300);
         }
 
 
@@ -269,9 +272,11 @@ namespace ymir {
         }
 
 
-        void fill(_Scalar val = 0) {
-            for (size_t i = 0; i < _values.size(); ++i) {
-                _values[i] = val;
+        void fill(node_ind_t node, matrix_ind_t mat, _Scalar val = 0) {
+            for (dim_t r = 0; r < _chain[node].rows(); ++r) {
+                for (dim_t c = 0; c < _chain[node].cols(); ++c) {
+                    _values[_chain[node](mat, r, c)] = val;
+                }
             }
         }
 

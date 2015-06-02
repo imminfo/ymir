@@ -24,7 +24,7 @@ int main() {
     RepertoireParser parser;
     parser.loadConfig(BENCH_DATA_FOLDER + "../../parsers/mitcrdots.json");
 
-    /*
+
     //
     // TCR alpha chain repertoire - VJ recombination
     //
@@ -44,7 +44,7 @@ int main() {
                          .setD(RepertoireParser::SKIP));
     tp2 = std::chrono::system_clock::now();
     cout << "Parsing VJ, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
-    */
+
     //
     // TCR beta chain repertoire - VDJ recombination
     //
@@ -70,7 +70,6 @@ int main() {
     //
     // VJ MAAG
     //
-    /*
     ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA");
 
     tp1 = std::chrono::system_clock::now();
@@ -82,7 +81,6 @@ int main() {
     vj_model.computeFullProbabilities(cloneset_vj);
     tp2 = std::chrono::system_clock::now();
     cout << "VJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
-    */
 
 
     //
@@ -90,13 +88,13 @@ int main() {
     //
     ProbabilisticAssemblingModel vdj_model(BENCH_DATA_FOLDER + "../../models/hTRB");
 
-//    tp1 = std::chrono::system_clock::now();
-//    vdj_model.computeFullProbabilities(cloneset_vdj);
-//    tp2 = std::chrono::system_clock::now();
-//    cout << "VDJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
+    tp1 = std::chrono::system_clock::now();
+    vdj_model.computeFullProbabilities(cloneset_vdj);
+    tp2 = std::chrono::system_clock::now();
+    cout << "VDJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
 
     tp1 = std::chrono::system_clock::now();
-    MAAGRepertoire maag_vec(vdj_model.buildGraphs(cloneset_vdj, true));
+    MAAGRepertoire(vdj_model.buildGraphs(cloneset_vdj, true));
     tp2 = std::chrono::system_clock::now();
     cout << "VDJ MAAG with metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
 

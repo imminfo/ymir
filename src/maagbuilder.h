@@ -112,11 +112,11 @@ namespace ymir {
 
         MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) const {
             MAAGRepertoire res;
-            res.reserve(cloneset.size());
-//            res.resize(cloneset.size());
+//            res.reserve(cloneset.size());
+            res.resize(cloneset.size());
             for (size_t i = 0; i < cloneset.size(); ++i) {
-                res.push_back(this->build(cloneset[i], full_build));
-//                res[i] = this->build(cloneset[i], full_build);
+//                res.push_back(this->build(cloneset[i], full_build)); // <- very bad performance
+                res[i] = this->build(cloneset[i], full_build);
                 if ((i+1) % 50000 == 0) {
                     cout << "Built " << (int) (i+1) << " graphs." << endl;
                 }

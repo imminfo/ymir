@@ -92,9 +92,16 @@ namespace ymir {
             }
             return _status;
         }
-        
 
-        void fillZero(ProbMMC *mmc, uint start_node = 0) { mmc->fill(0); }
+
+        void fillZero(ProbMMC *mmc, uint start_node = 0) {
+            for (uint i = start_node; i < mmc->chainSize(); ++i) {
+                for (uint j = 0; j < mmc->nodeSize(i); ++j) {
+                    mmc->fill(i, j, 0);
+                }
+            }
+        }
+
 
 
         //

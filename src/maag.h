@@ -84,8 +84,8 @@ namespace ymir {
          * \brief Special swap constructor for MAAGs that will be used only for computation of
          * the full probability.
          */
-        MAAG(ProbMMC &prob_mcc) {
-            this->swap(prob_mcc);
+        MAAG(ProbMMC &prob_mmc) {
+            this->swap(prob_mmc);
             _events = nullptr;
             _sequence = nullptr;
             _seq_poses = nullptr;
@@ -142,6 +142,25 @@ namespace ymir {
             else { _sequence = nullptr; }
 
             return *this;
+        }
+
+
+        void swap_maag(MAAG &other) {
+            _chain.swap(other._chain);
+
+            EventIndMMC *tmp = other._events;
+            other._events = _events;
+            _events = tmp;
+
+            _n_poses = other._n_poses;
+
+            seq_len_t *tmp2 = other._seq_poses;
+            other._seq_poses = _seq_poses;
+            _seq_poses = tmp2;
+
+            string *tmp3 = other._sequence;
+            other._sequence = _sequence;
+            _sequence = tmp3;
         }
 
 

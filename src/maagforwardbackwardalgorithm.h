@@ -94,13 +94,7 @@ namespace ymir {
         }
         
 
-        void fillZero(ProbMMC *mmc, uint start_node = 0) {
-            for (uint i = start_node; i < mmc->chainSize(); ++i) {
-                for (uint j = 0; j < mmc->nodeSize(i); ++j) {
-                    mmc->matrix(i, j).fill(0);
-                }
-            }
-        }
+        void fillZero(ProbMMC *mmc, uint start_node = 0) { mmc->fill(0); }
 
 
         //
@@ -113,14 +107,14 @@ namespace ymir {
 
             // VJ probabilities for the fixed J
             for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_VAR_JOI_GEN_I); ++row_i) {
-                _forward_acc->matrix(VJ_VAR_JOI_GEN_I)(row_i, 0) = maag.matrix(VJ_VAR_JOI_GEN_I)(row_i, j_ind);
+                (*_forward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0) = maag(VJ_VAR_JOI_GEN_I, 0, row_i, j_ind);
             }
 
             // V deletions
             for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
-                    _forward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) =
-                            _forward_acc->matrix(VJ_VAR_JOI_GEN_I)(v_ind, 0) * maag.matrix(VJ_VAR_DEL_I, v_ind)(0, col_i);
+                    (*_forward_acc)(VJ_VAR_DEL_I, v_ind, 0, col_i) =
+                            (*_forward_acc)(VJ_VAR_JOI_GEN_I, 0, v_ind, 0) * maag(VJ_VAR_DEL_I, v_ind, 0, col_i);
                 }
             }
 
@@ -129,27 +123,27 @@ namespace ymir {
                 prob_t temp_prob = 0;
                 // sum of fi for V del
                 for (dim_t v_i = 0; v_i < maag.nodeSize(VJ_VAR_DEL_I); ++v_i) {
-                    temp_prob += _forward_acc->matrix(VJ_VAR_DEL_I, v_i)(0, row_i);
+                    temp_prob += (*_forward_acc)(VJ_VAR_DEL_I, v_i, 0, row_i);
                 }
 
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++col_i) {
-                    _forward_acc->matrix(VJ_VAR_JOI_INS_I)(row_i, col_i) =
-                            temp_prob * maag.matrix(VJ_VAR_JOI_INS_I)(row_i, col_i);
+                    (*_forward_acc)(VJ_VAR_JOI_INS_I, 0, row_i, col_i) =
+                            temp_prob * maag(VJ_VAR_JOI_INS_I, 0, row_i, col_i);
                 }
             }
 
             // J deletions
             for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_JOI_DEL_I); ++row_i) {
                 for (dim_t row_vj_i = 0; row_vj_i < maag.nodeRows(VJ_VAR_JOI_INS_I); ++row_vj_i) {
-                    _forward_acc->matrix(VJ_JOI_DEL_I)(row_i, 0) += _forward_acc->matrix(VJ_VAR_JOI_INS_I)(row_vj_i, row_i);
+                    (*_forward_acc)(VJ_JOI_DEL_I, 0, row_i, 0) += (*_forward_acc)(VJ_VAR_JOI_INS_I, 0, row_vj_i, row_i);
                 }
-                _forward_acc->matrix(VJ_JOI_DEL_I)(row_i, 0) *= maag.matrix(VJ_JOI_DEL_I, j_ind)(row_i, 0);
+                (*_forward_acc)(VJ_JOI_DEL_I, 0, row_i, 0) *= maag(VJ_JOI_DEL_I, j_ind, row_i, 0);
             }
 
 
             // update the full generation probability
             for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_JOI_DEL_I); ++row_i) {
-                _full_prob += _forward_acc->matrix(VJ_JOI_DEL_I)(row_i, 0);
+                _full_prob += (*_forward_acc)(VJ_JOI_DEL_I, 0, row_i, 0);
             }
         }
 
@@ -160,13 +154,13 @@ namespace ymir {
 
             // J deletions
             for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_JOI_DEL_I); ++row_i) {
-                _backward_acc->matrix(VJ_JOI_DEL_I)(row_i, 0) = 1;
+                (*_backward_acc)(VJ_JOI_DEL_I, 0, row_i, 0) = 1;
             }
 
             // VJ insertions
             for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++col_i) {
                 for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_VAR_JOI_INS_I); ++row_i) {
-                    _backward_acc->matrix(VJ_VAR_JOI_INS_I)(row_i, col_i) += maag.matrix(VJ_JOI_DEL_I, j_ind)(col_i, 0);
+                    (*_backward_acc)(VJ_VAR_JOI_INS_I, 0, row_i, col_i) += maag(VJ_JOI_DEL_I, j_ind, col_i, 0);
                 }
             }
 
@@ -174,8 +168,8 @@ namespace ymir {
             for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
                     for (dim_t ins_col_i = 0; ins_col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++ins_col_i) {
-                        _backward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) +=
-                                _backward_acc->matrix(VJ_VAR_JOI_INS_I)(col_i, ins_col_i) * maag.matrix(VJ_VAR_JOI_INS_I)(col_i, ins_col_i);
+                        (*_backward_acc)(VJ_VAR_DEL_I, v_ind, 0, col_i) +=
+                                (*_backward_acc)(VJ_VAR_JOI_INS_I, 0, col_i, ins_col_i) * maag(VJ_VAR_JOI_INS_I, 0, col_i, ins_col_i);
                     }
                 }
             }
@@ -183,14 +177,14 @@ namespace ymir {
             // V-J genes
             for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
-                    _backward_acc->matrix(VJ_VAR_JOI_GEN_I)(v_ind, 0) +=
-                            _backward_acc->matrix(VJ_VAR_DEL_I, v_ind)(0, col_i) * maag.matrix(VJ_VAR_DEL_I, v_ind)(0, col_i);
+                    (*_backward_acc)(VJ_VAR_JOI_GEN_I, 0, v_ind, 0) +=
+                            (*_backward_acc)(VJ_VAR_DEL_I, v_ind, 0, col_i) * maag(VJ_VAR_DEL_I, v_ind, 0, col_i);
                 }
             }
 
             for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 _back_full_prob +=
-                        _backward_acc->matrix(VJ_VAR_JOI_GEN_I)(v_ind, 0) * maag.matrix(VJ_VAR_JOI_GEN_I)(v_ind, j_ind);
+                        (*_backward_acc)(VJ_VAR_JOI_GEN_I, 0, v_ind, 0) * maag(VJ_VAR_JOI_GEN_I, 0, v_ind, j_ind);
             }
         }
 
@@ -232,10 +226,10 @@ namespace ymir {
                 this->backward_vj(maag, j_ind);
                 // add fi * bi for this J to the accumulator
 //                for (node_ind_t node_i = 0; node_i < _forward_acc->chainSize(); ++node_i) {
-//                    for (dim_t row_i = 0; row_i < _forward_acc->matrix(node_i, 0).rows(); ++row_i) {
-//                        for (dim_t col_i = 0; col_i < _forward_acc->matrix(node_i, 0).cols(); ++col_i) {
+//                    for (dim_t row_i = 0; row_i < (*_forward_acc)(node_i, 0).rows(); ++row_i) {
+//                        for (dim_t col_i = 0; col_i < (*_forward_acc)(node_i, 0).cols(); ++col_i) {
 //                            _fb_acc->matrix(node_i, 0)(row_i, col_i) +=
-//                                    _forward_acc->matrix(node_i, 0)(row_i, col_i) * _backward_acc->matrix(node_i, 0)(row_i, col_i);
+//                                    (*_forward_acc)(node_i, 0)(row_i, col_i) * (*_backward_acc)(node_i, 0)(row_i, col_i);
 //                        }
 //                    }
 //                }
@@ -261,8 +255,8 @@ namespace ymir {
                 for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_DIV_DEL_I); ++row_i) {
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(VDJ_DIV_DEL_I); ++col_i) {
                         for (dim_t ins_row_i = 0; ins_row_i < maag.nodeRows(VDJ_VAR_DIV_INS_I); ++ins_row_i) {
-                            _forward_acc->matrix(VDJ_DIV_DEL_I)(row_i, col_i) +=
-                                    _forward_acc->matrix(VDJ_VAR_DIV_INS_I)(ins_row_i, row_i) * maag.matrix(VDJ_DIV_DEL_I, d_ind)(row_i, col_i);
+                            (*_forward_acc)(VDJ_DIV_DEL_I, 0, row_i, col_i) +=
+                                    (*_forward_acc)(VDJ_VAR_DIV_INS_I, 0, ins_row_i, row_i) * maag(VDJ_DIV_DEL_I, d_ind, row_i, col_i);
                         }
                     }
                 }
@@ -271,8 +265,8 @@ namespace ymir {
                 for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_DIV_JOI_INS_I); ++row_i) {
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(VDJ_DIV_JOI_INS_I); ++col_i) {
                         for (dim_t dgen_row_i = 0; dgen_row_i < maag.nodeRows(VDJ_DIV_DEL_I); ++dgen_row_i) {
-                            _forward_acc->matrix(VDJ_DIV_JOI_INS_I)(row_i, col_i) +=
-                                    _forward_acc->matrix(VDJ_DIV_DEL_I)(dgen_row_i, row_i) * maag.matrix(VDJ_DIV_JOI_INS_I)(row_i, col_i);
+                            (*_forward_acc)(VDJ_DIV_JOI_INS_I, 0, row_i, col_i) +=
+                                    (*_forward_acc)(VDJ_DIV_DEL_I, 0, dgen_row_i, row_i) * maag(VDJ_DIV_JOI_INS_I, 0, row_i, col_i);
                         }
                     }
                 }
@@ -284,21 +278,21 @@ namespace ymir {
             // J deletions
             for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_JOI_DEL_I); ++row_i) {
                 for (dim_t ins_row_i = 0; ins_row_i < maag.nodeRows(VDJ_DIV_JOI_INS_I); ++ins_row_i) {
-                    _forward_acc->matrix(VDJ_JOI_DEL_I)(row_i, 0) +=
-                            _forward_acc->matrix(VDJ_DIV_JOI_INS_I)(ins_row_i, row_i) * maag.matrix(VDJ_JOI_DEL_I, j_ind)(row_i, 0);
+                    (*_forward_acc)(VDJ_JOI_DEL_I, 0, row_i, 0) +=
+                            (*_forward_acc)(VDJ_DIV_JOI_INS_I, 0, ins_row_i, row_i) * maag(VDJ_JOI_DEL_I, j_ind, row_i, 0);
                 }
             }
 
             // J-D genes
             for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_JOI_DEL_I); ++row_i) {
-                _forward_acc->matrix(VDJ_JOI_DIV_GEN_I)(0, 0) +=
-                        _forward_acc->matrix(VDJ_JOI_DEL_I)(row_i, 0) * maag.matrix(VDJ_JOI_DIV_GEN_I)(j_ind, d_ind);
+                (*_forward_acc)(VDJ_JOI_DIV_GEN_I, 0, 0, 0) +=
+                        (*_forward_acc)(VDJ_JOI_DEL_I, 0, row_i, 0) * maag(VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind);
             }
-//            _forward_acc->matrix(VDJ_JOI_DIV_GEN_I)(0, 0) =
-//                    _forward_acc->matrix(VDJ_JOI_DEL_I).sum() * maag.matrix(VDJ_JOI_DIV_GEN_I)(j_ind, d_ind);
+//            (*_forward_acc)(VDJ_JOI_DIV_GEN_I)(0, 0) =
+//                    (*_forward_acc)(VDJ_JOI_DEL_I).sum() * maag.matrix(VDJ_JOI_DIV_GEN_I)(j_ind, d_ind);
 
             // update the full generation probability
-            _full_prob += _forward_acc->matrix(VDJ_JOI_DIV_GEN_I)(0, 0);
+            _full_prob += (*_forward_acc)(VDJ_JOI_DIV_GEN_I, 0, 0, 0);
         }
 
 
@@ -307,18 +301,18 @@ namespace ymir {
             this->fillZero(_backward_acc);
 
             // J-D pairs
-            _backward_acc->matrix(VDJ_JOI_DIV_GEN_I)(0, 0) = 1;
+            (*_backward_acc)(VDJ_JOI_DIV_GEN_I, 0, 0, 0) = 1;
 
             // J deletions
             for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_JOI_DEL_I); ++row_i) {
-                _backward_acc->matrix(VDJ_JOI_DEL_I)(row_i, 0) += maag.matrix(VDJ_JOI_DIV_GEN_I)(j_ind, d_ind);
+                (*_backward_acc)(VDJ_JOI_DEL_I, 0, row_i, 0) += maag(VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind);
             }
 
             // DJ insertions
             for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_DIV_JOI_INS_I); ++row_i) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VDJ_DIV_JOI_INS_I); ++col_i) {
-                    _backward_acc->matrix(VDJ_DIV_JOI_INS_I)(row_i, col_i) +=
-                            _backward_acc->matrix(VDJ_JOI_DEL_I)(col_i, 0) * maag.matrix(VDJ_JOI_DEL_I, j_ind)(col_i, 0);
+                    (*_backward_acc)(VDJ_DIV_JOI_INS_I, 0, row_i, col_i) +=
+                            (*_backward_acc)(VDJ_JOI_DEL_I, 0, col_i, 0) * maag(VDJ_JOI_DEL_I, j_ind, col_i, 0);
                 }
             }
 
@@ -326,8 +320,8 @@ namespace ymir {
             for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_DIV_DEL_I); ++row_i) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VDJ_DIV_DEL_I); ++col_i) {
                     for (dim_t ins_col_i = 0; ins_col_i < maag.nodeColumns(VDJ_DIV_JOI_INS_I); ++ins_col_i) {
-                        _backward_acc->matrix(VDJ_DIV_DEL_I)(row_i, col_i) +=
-                                _backward_acc->matrix(VDJ_DIV_JOI_INS_I)(col_i, ins_col_i) * maag.matrix(VDJ_DIV_JOI_INS_I)(col_i, ins_col_i);
+                        (*_backward_acc)(VDJ_DIV_DEL_I, 0, row_i, col_i) +=
+                                (*_backward_acc)(VDJ_DIV_JOI_INS_I, 0, col_i, ins_col_i) * maag(VDJ_DIV_JOI_INS_I, 0, col_i, ins_col_i);
                     }
                 }
             }
@@ -336,8 +330,8 @@ namespace ymir {
             for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_VAR_DIV_INS_I); ++row_i) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VDJ_VAR_DIV_INS_I); ++col_i) {
                     for (dim_t d_col_i = 0; d_col_i < maag.nodeColumns(VDJ_DIV_DEL_I); ++d_col_i) {
-                        _backward_acc->matrix(VDJ_VAR_DIV_INS_I)(row_i, col_i) +=
-                                _backward_acc->matrix(VDJ_DIV_DEL_I)(col_i, d_col_i) * maag.matrix(VDJ_DIV_DEL_I, d_ind)(col_i, d_col_i);
+                        (*_backward_acc)(VDJ_VAR_DIV_INS_I, 0, row_i, col_i) +=
+                                (*_backward_acc)(VDJ_DIV_DEL_I, 0, col_i, d_col_i) * maag(VDJ_DIV_DEL_I, d_ind, col_i, d_col_i);
                     }
                 }
             }
@@ -346,15 +340,15 @@ namespace ymir {
             for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VDJ_VAR_DEL_I); ++col_i) {
                     for (dim_t ins_col_i = 0; ins_col_i < maag.nodeColumns(VDJ_VAR_DIV_INS_I); ++ins_col_i) {
-                        _backward_acc->matrix(VDJ_VAR_DEL_I, v_ind)(0, col_i) +=
-                                _backward_acc->matrix(VDJ_VAR_DIV_INS_I)(col_i, ins_col_i) * maag.matrix(VDJ_VAR_DIV_INS_I)(col_i, ins_col_i);
+                        (*_backward_acc)(VDJ_VAR_DEL_I, v_ind, 0, col_i) +=
+                                (*_backward_acc)(VDJ_VAR_DIV_INS_I, 0, col_i, ins_col_i) * maag(VDJ_VAR_DIV_INS_I, 0, col_i, ins_col_i);
                     }
-                    _backward_acc->matrix(VDJ_VAR_GEN_I, v_ind)(0, 0) +=
-                            _backward_acc->matrix(VDJ_VAR_DEL_I, v_ind)(0, col_i) * maag.matrix(VDJ_VAR_DEL_I, v_ind)(0, col_i);
+                    (*_backward_acc)(VDJ_VAR_GEN_I, v_ind, 0, 0) +=
+                            (*_backward_acc)(VDJ_VAR_DEL_I, v_ind, 0, col_i) * maag(VDJ_VAR_DEL_I, v_ind, 0, col_i);
                 }
 
                 // update the full (back) generation probability
-                _back_full_prob += _backward_acc->matrix(VDJ_VAR_GEN_I, v_ind)(0, 0) * maag.matrix(VDJ_VAR_GEN_I, v_ind)(0, 0);
+                _back_full_prob += (*_backward_acc)(VDJ_VAR_GEN_I, v_ind, 0, 0) * maag(VDJ_VAR_GEN_I, v_ind, 0, 0);
             }
         }
 
@@ -408,20 +402,20 @@ namespace ymir {
             // V genes and deletions
             for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 // gene probability
-                _forward_acc->matrix(VDJ_VAR_GEN_I, v_ind)(0, 0) = maag.matrix(VDJ_VAR_GEN_I, v_ind)(0, 0);
+                (*_forward_acc)(VDJ_VAR_GEN_I, v_ind, 0, 0) = maag(VDJ_VAR_GEN_I, v_ind, 0, 0);
 
                 // deletions probabilities
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VDJ_VAR_DEL_I); ++col_i) {
-                    _forward_acc->matrix(VDJ_VAR_DEL_I, v_ind)(0, col_i) =
-                            _forward_acc->matrix(VDJ_VAR_GEN_I, v_ind)(0, 0) * maag.matrix(VDJ_VAR_DEL_I, v_ind)(0, col_i);
+                    (*_forward_acc)(VDJ_VAR_DEL_I, v_ind, 0, col_i) =
+                            (*_forward_acc)(VDJ_VAR_GEN_I, v_ind, 0, 0) * maag(VDJ_VAR_DEL_I, v_ind, 0, col_i);
                 }
             }
             // VD insertions
             for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_VAR_DIV_INS_I); ++row_i) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VDJ_VAR_DIV_INS_I); ++col_i) {
                     for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
-                        _forward_acc->matrix(VDJ_VAR_DIV_INS_I)(row_i, col_i) +=
-                                _forward_acc->matrix(VDJ_VAR_DEL_I, v_ind)(0, row_i) * maag.matrix(VDJ_VAR_DIV_INS_I)(row_i, col_i);
+                        (*_forward_acc)(VDJ_VAR_DIV_INS_I, 0, row_i, col_i) +=
+                                (*_forward_acc)(VDJ_VAR_DEL_I, v_ind, 0, row_i) * maag(VDJ_VAR_DIV_INS_I, 0, row_i, col_i);
                     }
                 }
             }
@@ -437,10 +431,10 @@ namespace ymir {
                     recompute_d_gen_fi = false;
                     // add fi * bi for this J to the accumulator
 //                    for (node_ind_t node_i = 0; node_i < _forward_acc->chainSize(); ++node_i) {
-//                        for (dim_t row_i = 0; row_i < _forward_acc->matrix(node_i, 0).rows(); ++row_i) {
-//                            for (dim_t col_i = 0; col_i < _forward_acc->matrix(node_i, 0).cols(); ++col_i) {
+//                        for (dim_t row_i = 0; row_i < (*_forward_acc)(node_i, 0).rows(); ++row_i) {
+//                            for (dim_t col_i = 0; col_i < (*_forward_acc)(node_i, 0).cols(); ++col_i) {
 //                                _fb_acc->matrix(node_i, 0)(row_i, col_i) +=
-//                                        _forward_acc->matrix(node_i, 0)(row_i, col_i) * _backward_acc->matrix(node_i, 0)(row_i, col_i);
+//                                        (*_forward_acc)(node_i, 0)(row_i, col_i) * (*_backward_acc)(node_i, 0)(row_i, col_i);
 //                            }
 //                        }
 //                    }

@@ -159,10 +159,10 @@ namespace ymir {
         prob_t fullProbability(eventind_t v_index, eventind_t j_index) const {
             if (this->is_vj()) {
                 // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
-                return (_chain[0][0](v_index, j_index) *   // P(Vi & Ji)
-                        _chain[1][v_index] *               // P(#dels | Vi)
-                        _chain[2][0] *                     // P(V-J insertion seq)
-                        _chain[3][j_index])(0, 0);         // P(#dels | Ji)
+                return (matrix(0, 0)(v_index, j_index) *   // P(Vi & Ji)
+                        matrix(1, v_index) *               // P(#dels | Vi)
+                        matrix(2, 0) *                     // P(V-J insertion seq)
+                        matrix(3, j_index))(0, 0);         // P(#dels | Ji)
 
             } else {
                 return 0;
@@ -172,13 +172,13 @@ namespace ymir {
         prob_t fullProbability(eventind_t v_index, eventind_t d_index, eventind_t j_index) const {
             if (this->is_vdj()) {
                 // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
-                return (_chain[0][v_index] *      // P(Vi)
-                        _chain[1][v_index] *      // P(#dels | Vi)
-                        _chain[2][0] *            // P(V-D3' insertion seq)
-                        _chain[3][d_index] *      // P(D5'-D3' deletions | Di)
-                        _chain[4][0] *            // P(D5'-J insertion seq)
-                        _chain[5][j_index] *      // P(#dels | Ji)
-                        _chain[6][0](j_index, d_index))(0, 0);  // P(Ji & Di)
+                return (matrix(0, v_index) *      // P(Vi)
+                        matrix(1, v_index) *      // P(#dels | Vi)
+                        matrix(2, 0) *            // P(V-D3' insertion seq)
+                        matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
+                        matrix(4, 0) *            // P(D5'-J insertion seq)
+                        matrix(5, j_index) *      // P(#dels | Ji)
+                        matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
             } else {
                 return 0;
             }

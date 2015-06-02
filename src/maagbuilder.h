@@ -162,7 +162,7 @@ namespace ymir {
                         for (int mat_i = 0; mat_i < maag->nodeSize(node_i); ++mat_i) {
                             for (int row_i = 0; row_i < maag->nodeRows(node_i); ++row_i) {
                                 for (int col_i = 0; col_i < maag->nodeColumns(node_i); ++col_i) {
-                                    maag->_chain[node_i][mat_i](row_i, col_i) =
+                                    (*maag)(node_i, mat_i, row_i, col_i) =
                                             (*_param_vec)[maag->event_index(node_i, mat_i, row_i, col_i)];
                                 }
                             }

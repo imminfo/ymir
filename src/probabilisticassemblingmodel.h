@@ -585,7 +585,7 @@ namespace ymir {
                                      laplace,
                                      1);
 
-                        for (segindex_t i = 0; i < _genes->D().size() - 1; ++i) { min_D_len_vec.push_back(_min_D_len); }
+                        for (segindex_t i = 0; i < _genes->D().size(); ++i) { min_D_len_vec.push_back(_min_D_len); }
                         _param_vec = new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, true, min_D_len_vec);
                         is_ok = true;
                     }

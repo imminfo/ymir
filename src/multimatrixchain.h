@@ -30,18 +30,15 @@
 #include "types.h"
 
 
+#define YDEBUG
+
 using namespace std;
-//using namespace Eigen;
 
 
 namespace ymir {
 
     template <typename _Scalar>
     class MultiMatrixChain;
-
-
-    template <typename _Scalar>
-    class MMCSlice;
 
 
     /**
@@ -51,8 +48,6 @@ namespace ymir {
     */
     typedef MultiMatrixChain<eventind_t> EventIndMMC;
 
-    typedef MMCSlice<eventind_t> EventIndMMCSlice;
-
 
     /**
     * \class ProbMatrixChain
@@ -60,8 +55,6 @@ namespace ymir {
     * \brief Class for storing chain of matrices of scenario event probabilities.
     */
     typedef MultiMatrixChain<prob_t> ProbMMC;
-
-    typedef MMCSlice<prob_t> ProbMMCSlice;
 
 
     /**
@@ -120,73 +113,62 @@ namespace ymir {
         struct Node {
         public:
 
-            Node() : _n(0), _vec(nullptr) {}
+            Node() : _n(0), _start_index(0), _rows(0), _cols(0) {}
 
 
-            Node(matrix_ind_t n, dim_t rows, dim_t cols) {
-                this->init(n, rows, cols);
+            Node(size_t start_index, matrix_ind_t n, dim_t rows, dim_t cols) {
+                this->init(start_index, n, rows, cols);
             }
 
 
             Node(const Node& other) {
                 _n = other._n;
-                if (_n > 0) {
-                    _vec = new matrix_t[_n];
-                    for (matrix_ind_t i = 0; i < _n; ++i) {
-//                        _Scalar *d = new _Scalar[other._vec[0].rows() * other._vec[0].cols()];
-//                        _vec[i] = Eigen::Map<matrix_t, Eigen::Aligned>(d, other._vec[0].rows(), other._vec[0].cols());
-                        _vec[i] = other._vec[i];
-                    }
-                } else {
-                    _vec = nullptr;
-                }
+                _rows = other._rows;
+                _cols = other._cols;
+                _start_index = other._start_index;
             }
 
 
-            ~Node() {
-                if (_n) { delete [] _vec; }
-            }
+            ~Node() { }
 
 
             Node& operator= (const Node& other) {
-                if (_n > 0) { delete [] _vec; }
                 _n = other._n;
-                if (_n > 0) {
-                    _vec = new matrix_t[_n];
-                    for (matrix_ind_t i = 0; i < _n; ++i) {
-                        _vec[i] = other._vec[i];
-                    }
-                } else {
-                    _vec = nullptr;
-                }
+                _rows = other._rows;
+                _cols = other._cols;
+                _start_index = other._start_index;
                 return *this;
             }
 
 
-            void init(matrix_ind_t n, dim_t rows, dim_t cols) {
+            void init(size_t start_index, matrix_ind_t n, dim_t rows, dim_t cols) {
                 _n = n;
-                _vec = new matrix_t[n];
-                for (matrix_ind_t i = 0; i < _n; ++i) {
-                    _vec[i].resize(rows, cols);
-                    _vec[i].fill(0);
-                }
+                _rows = rows;
+                _cols = cols;
+                _start_index = start_index;
             }
 
 
-            ///@{
-            matrix_t& operator[](matrix_ind_t mat_i) { return _vec[mat_i]; }
-            const matrix_t& operator[](matrix_ind_t mat_i) const { return _vec[mat_i]; }
-            ///@}
+            size_t operator() (matrix_ind_t mat, dim_t row, dim_t column) const {
+#ifdef YDEBUG
+                if (!(row >= 0 && row < _rows && column >= 0 && column < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
+#endif
+                return _start_index + mat * (_rows * _cols) + row * _cols + column;
+            }
 
 
             matrix_ind_t size() const { return _n; }
 
-//            matrix_t *ptr(matrix_ind_t mat_i) const { return _vec + mat_i; }
+            dim_t rows() const { return _rows; }
+
+            dim_t cols() const { return _cols; }
+
 
         protected:
 
-            matrix_t *_vec;
+            size_t _start_index;
             matrix_ind_t _n;
+            dim_t _rows, _cols;
 
         };
 
@@ -194,15 +176,13 @@ namespace ymir {
 
         MultiMatrixChain() {
             _chain.clear();
+            _values.clear();
         }
 
 
         MultiMatrixChain(const MultiMatrixChain &other) {
-            _chain.clear();
-            _chain.reserve(other.chainSize());
-            for (size_t i = 0; i < other.chainSize(); ++i) {
-                _chain.push_back(other._chain[i]);
-            }
+            _chain = other._chain;
+            _values = other._values;
         }
 
 
@@ -211,6 +191,7 @@ namespace ymir {
 
         MultiMatrixChain& operator= (const MultiMatrixChain &other) {
             _chain = other._chain;
+            _values = other._values;
             return *this;
         }
 
@@ -220,23 +201,16 @@ namespace ymir {
         }
 
 
-        /**
-        * \brief Access to matrices in nodes.
-        */
-        const matrix_t& matrix(node_ind_t node_i, matrix_ind_t mat_i = 0) const {
-            return _chain[node_i][mat_i];
-        }
-        matrix_t& matrix(node_ind_t node_i, matrix_ind_t mat_i = 0) {
-            return _chain[node_i][mat_i];
-        }
-
-
         node_ind_t chainSize() const { return _chain.size(); }
 
 
+        ///@{
         matrix_ind_t nodeSize(node_ind_t node_i) const { return _chain[node_i].size(); }
-        size_t nodeRows(node_ind_t node_i) const { return _chain[node_i][0].rows(); }
-        size_t nodeColumns(node_ind_t node_i) const { return _chain[node_i][0].cols(); }
+
+        size_t nodeRows(node_ind_t node_i) const { return _chain[node_i].rows(); }
+
+        size_t nodeColumns(node_ind_t node_i) const { return _chain[node_i].cols(); }
+        ///@}
 
 
         /**
@@ -250,11 +224,12 @@ namespace ymir {
         * \return Element at position (i,j) from matrix mat_i from node node_i.
         */
         ///@{
-        const _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
-            return _chain[node_i][mat_i](row, col);
-        }
         _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) {
-            return _chain[node_i][mat_i](row, col);
+            return _values[_chain[node_i](mat_i, row, col)];
+        }
+
+        const _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
+            return _values[_chain[node_i](mat_i, row, col)];
         }
         ///@}
 
@@ -262,67 +237,62 @@ namespace ymir {
         /**
         * \brief Add new node with pattern matrix.
         */
+        ///@{
         node_ind_t addNode() {
             _chain.push_back(Node());
             return _chain.size() - 1;
         }
+
         node_ind_t addNode(matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
-            _chain.push_back(Node(n_matrices, rows, cols));
+            _chain.push_back(Node());
+            initNode(_chain.size() - 1, n_matrices, rows, cols);
             return _chain.size() - 1;
         }
+        ///@}
 
 
         void initNode(node_ind_t node_i, matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
-            _chain[node_i].init(n_matrices, rows, cols);
+            _chain[node_i].init(_values.size(), n_matrices, rows, cols);
+            _values.resize(_values.size() + rows * cols * n_matrices, 0);
         }
 
 
         void swap(MultiMatrixChain<_Scalar> &other) {
             _chain.swap(other._chain);
+            _values.swap(other._values);
+        }
+
+
+        void finish() {
+            _chain.reserve(_chain.size());
+            _values.reserve(_values.size());
+        }
+
+
+        void fill(_Scalar val = 0) {
+            for (size_t i = 0; i < _values.size(); ++i) {
+                _values[i] = val;
+            }
+        }
+
+
+        matrix_t matrix(node_ind_t node, matrix_ind_t mat) const {
+            matrix_t res(_chain[node].rows(), _chain[node].cols(), 0);
+            for (dim_t r = 0; r < _chain[node].rows(); ++r) {
+                for (dim_t c = 0; c < _chain[node].cols(); ++c) {
+                    res(r, c) = (*this)(node, mat, r, c);
+                }
+            }
+            return res;
         }
 
     protected:
 
         vector<Node> _chain;
+        vector<_Scalar> _values;
 
     };
 
-
-    /**
-    * \class MMCSlice
-    *
-    * \brief Plain list of matrices, i.e., without multiple matrices at each node.
-    */
-    template <typename _Scalar>
-    class MMCSlice {
-    friend class MultiMatrixChain<_Scalar>; // yes-yes, I know friends are bad.
-
-    public:
-
-        MMCSlice(typename MultiMatrixChain<_Scalar>::node_ind_t n) : _i(0), _n(n) {
-            this->_vec = new typename MultiMatrixChain<_Scalar>::matrix_t*[_n];
-        }
-
-
-        ~MMCSlice() { delete [] this->_vec; }
-
-
-        const typename MultiMatrixChain<_Scalar>::matrix_t& operator[](typename MultiMatrixChain<_Scalar>::node_ind_t mat_i) const {
-            return *(this->_vec[mat_i]);
-        }
-
-    protected:
-
-        typename MultiMatrixChain<_Scalar>::matrix_t** _vec;
-        typename MultiMatrixChain<_Scalar>::node_ind_t _i, _n;
-
-
-        MMCSlice<_Scalar>& addMatrix(typename MultiMatrixChain<_Scalar>::matrix_t *pmat) {
-            this->_vec[_i] = pmat;
-            ++_i;
-            return *this;
-        }
-    };
 }
 
 #endif

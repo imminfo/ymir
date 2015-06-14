@@ -72,15 +72,15 @@ int main() {
     //
     ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA");
 
-    tp1 = std::chrono::system_clock::now();
-    vj_model.buildGraphs(cloneset_vj, true);
-    tp2 = std::chrono::system_clock::now();
-    cout << "VJ MAAG with metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
-
-    tp1 = std::chrono::system_clock::now();
-    vj_model.computeFullProbabilities(cloneset_vj);
-    tp2 = std::chrono::system_clock::now();
-    cout << "VJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
+//    tp1 = std::chrono::system_clock::now();
+//    vj_model.buildGraphs(cloneset_vj, true);
+//    tp2 = std::chrono::system_clock::now();
+//    cout << "VJ MAAG with metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
+//
+//    tp1 = std::chrono::system_clock::now();
+//    vj_model.computeFullProbabilities(cloneset_vj);
+//    tp2 = std::chrono::system_clock::now();
+//    cout << "VJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
 
 
     //
@@ -88,10 +88,10 @@ int main() {
     //
     ProbabilisticAssemblingModel vdj_model(BENCH_DATA_FOLDER + "../../models/hTRB");
 
-    tp1 = std::chrono::system_clock::now();
-    vdj_model.computeFullProbabilities(cloneset_vdj);
-    tp2 = std::chrono::system_clock::now();
-    cout << "VDJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
+//    tp1 = std::chrono::system_clock::now();
+//    vdj_model.computeFullProbabilities(cloneset_vdj);
+//    tp2 = std::chrono::system_clock::now();
+//    cout << "VDJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
 
     tp1 = std::chrono::system_clock::now();
     MAAGRepertoire(vdj_model.buildGraphs(cloneset_vdj, true));

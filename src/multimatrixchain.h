@@ -179,7 +179,7 @@ namespace ymir {
         MultiMatrixChain() {
             _chain.clear();
             _values.clear();
-            _values.reserve(300);
+//            _values.reserve(300);
         }
 
 
@@ -267,8 +267,8 @@ namespace ymir {
 
 
         void finish() {
-            _chain.reserve(_chain.size());
-            _values.reserve(_values.size());
+            _chain.shrink_to_fit();
+            _values.shrink_to_fit();
         }
 
 

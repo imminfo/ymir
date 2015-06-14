@@ -62,7 +62,10 @@ namespace ymir {
         /**
          *
          */
-        MAAG(const MAAG &other) : ProbMMC(other) {
+        MAAG(const MAAG &other) {
+            _chain = other._chain;
+            _values = other._values;
+
             if (other._events) { _events = new EventIndMMC(*other._events); }
             else { _events = nullptr; }
 
@@ -107,7 +110,7 @@ namespace ymir {
 
 
         /**
-         * 
+         *
          */
         virtual ~MAAG() {
             if (_events) { delete _events; }
@@ -118,6 +121,7 @@ namespace ymir {
 
         MAAG& operator= (const MAAG& other) {
             _chain = other._chain;
+//            _values = other._values;
 
             if (other._events) {
                 if (_events) { delete _events; }
@@ -147,6 +151,7 @@ namespace ymir {
 
         void swap_maag(MAAG &other) {
             _chain.swap(other._chain);
+            _values.swap(other._values);
 
             EventIndMMC *tmp = other._events;
             other._events = _events;

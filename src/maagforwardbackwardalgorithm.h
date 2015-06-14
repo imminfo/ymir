@@ -17,6 +17,7 @@ namespace ymir {
     protected:
 
         typedef ProbMMC::dim_t dim_t;
+        typedef ProbMMC::matrix_ind_t matrix_ind_t;
         typedef ProbMMC::node_ind_t node_ind_t;
 
     public:
@@ -30,7 +31,7 @@ namespace ymir {
         virtual ~MAAGForwardBackwardAlgorithm() {
             if (_forward_acc) { delete _forward_acc; }
             if (_backward_acc) { delete _backward_acc; }
-            if (_fb_acc) { delete _fb_acc; }
+//            if (_fb_acc) { delete _fb_acc; }
         }
 
 
@@ -63,7 +64,6 @@ namespace ymir {
 
         bool _status;
         ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspond. */
-        ProbMMC *_fb_acc;  /** Accumulator MMC for storing forward and backward probabilities. */
         prob_t _full_prob;  /** Full generation probability of the input MAAG. */
         prob_t _back_full_prob;  /** Full generation probability of the input MAAG obtained with backward algorithm. Just for testing purposes. */
         vector<event_pair_t> _pairs;
@@ -76,7 +76,7 @@ namespace ymir {
             _back_full_prob = 0;
             _forward_acc = nullptr;
             _backward_acc = nullptr;
-            _fb_acc = nullptr;
+            _pairs.reserve(maag._chain.size());
             if (maag._events) {
 //                _chain = maag._chain;
 //                _events = maag._events;
@@ -98,6 +98,17 @@ namespace ymir {
             for (uint i = start_node; i < mmc->chainSize(); ++i) {
                 for (uint j = 0; j < mmc->nodeSize(i); ++j) {
                     mmc->fill(i, j, 0);
+                }
+            }
+        }
+
+
+        void pushEventPairs(const MAAG &maag, node_ind_t node_i, matrix_ind_t mat_i_fb, matrix_ind_t mat_i_algo) {
+            for (dim_t row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
+                for (dim_t col_i = 0; col_i < maag.nodeColumns(node_i); ++col_i) {
+                    _pairs.push_back(event_pair_t(
+                            maag.event_index(node_i, mat_i_fb, row_i, col_i),
+                            (*_forward_acc)(node_i, mat_i_algo, row_i, col_i) * (*_backward_acc)(node_i, mat_i_algo, row_i, col_i)));
                 }
             }
         }
@@ -220,26 +231,21 @@ namespace ymir {
             // J deletions (for fixed J in future)
             _backward_acc->initNode(VJ_JOI_DEL_I, 1, maag.nodeRows(VJ_JOI_DEL_I), 1);
 
-            _fb_acc = new ProbMMC();
-            _fb_acc->resize(maag.chainSize());
-            for (uint i = 0; i < maag.chainSize(); ++i) {
-                _fb_acc->initNode(i, maag.nodeSize(i), maag.nodeRows(i), maag.nodeColumns(i));
-            }
-
             // Compute fi * bi / Pgen for each event.
             for (eventind_t j_ind = 0; j_ind < maag.nJoi(); ++j_ind) {
                 // compute forward and backward probabilities for a specific J gene
                 this->forward_vj(maag, j_ind);
                 this->backward_vj(maag, j_ind);
+
                 // add fi * bi for this J to the accumulator
-//                for (node_ind_t node_i = 0; node_i < _forward_acc->chainSize(); ++node_i) {
-//                    for (dim_t row_i = 0; row_i < (*_forward_acc)(node_i, 0).rows(); ++row_i) {
-//                        for (dim_t col_i = 0; col_i < (*_forward_acc)(node_i, 0).cols(); ++col_i) {
-//                            _fb_acc->matrix(node_i, 0)(row_i, col_i) +=
-//                                    (*_forward_acc)(node_i, 0)(row_i, col_i) * (*_backward_acc)(node_i, 0)(row_i, col_i);
-//                        }
-//                    }
-//                }
+                for (node_ind_t node_i = 0; node_i < _forward_acc->chainSize(); ++node_i) {
+                    for (dim_t row_i = 0; row_i < _forward_acc->nodeRows(node_i); ++row_i) {
+                        for (dim_t col_i = 0; col_i < _forward_acc->nodeColumns(node_i); ++col_i) {
+//                            (*_fb_acc)(node_i, 0, row_i, col_i) +=
+//                                    (*_forward_acc)(node_i, 0, row_i, col_i) * (*_backward_acc)(node_i, 0, row_i, col_i);
+                        }
+                    }
+                }
             }
         }
 
@@ -397,12 +403,6 @@ namespace ymir {
 //            _backward_acc->initNode(VDJ_JOI_DIV_GEN_I, 1, maag.nodeRows(VDJ_JOI_DIV_GEN_I), 1);
             _backward_acc->initNode(VDJ_JOI_DIV_GEN_I, 1, 1, 1);
 
-            _fb_acc = new ProbMMC();
-            _fb_acc->resize(maag.chainSize());
-            for (uint i = 0; i < maag.chainSize(); ++i) {
-                _fb_acc->initNode(i, maag.nodeSize(i), maag.nodeRows(i), maag.nodeColumns(i));
-            }
-
             // Because fi for V genes, V deletions and VD insertions are constant for all
             // pairs of J-D, we compute them here.
             this->fillZero(_forward_acc);
@@ -436,15 +436,16 @@ namespace ymir {
                     this->forward_vdj(maag, d_ind, j_ind, recompute_d_gen_fi);
                     this->backward_vdj(maag, d_ind, j_ind);
                     recompute_d_gen_fi = false;
+
                     // add fi * bi for this J to the accumulator
-//                    for (node_ind_t node_i = 0; node_i < _forward_acc->chainSize(); ++node_i) {
-//                        for (dim_t row_i = 0; row_i < (*_forward_acc)(node_i, 0).rows(); ++row_i) {
-//                            for (dim_t col_i = 0; col_i < (*_forward_acc)(node_i, 0).cols(); ++col_i) {
-//                                _fb_acc->matrix(node_i, 0)(row_i, col_i) +=
-//                                        (*_forward_acc)(node_i, 0)(row_i, col_i) * (*_backward_acc)(node_i, 0)(row_i, col_i);
-//                            }
-//                        }
-//                    }
+                    for (node_ind_t node_i = 0; node_i < _forward_acc->chainSize(); ++node_i) {
+                        for (dim_t row_i = 0; row_i < _forward_acc->nodeRows(node_i); ++row_i) {
+                            for (dim_t col_i = 0; col_i < _forward_acc->nodeColumns(node_i); ++col_i) {
+//                                (*_fb_acc)(node_i, 0, row_i, col_i) +=
+//                                        (*_forward_acc)(node_i, 0, row_i, col_i) * (*_backward_acc)(node_i, 0, row_i, col_i);
+                            }
+                        }
+                    }
                 }
             }
         }

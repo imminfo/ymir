@@ -104,6 +104,12 @@ namespace ymir {
             probs.finish();
             events.finish();
             if (full_build) {
+
+                // TODO:
+                // if DJ insertions matrix is consists only of zeros for gene Dn, then
+                // remove VD insertions, D deletions and DJ insertions for the Dn gene.
+                //
+
                 seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
                 copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
                 return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size());
@@ -112,13 +118,99 @@ namespace ymir {
             }
         }
 
+
+        MAAG* buildPtr(const Clonotype &clonotype, bool full_build = false) const {
+            ProbMMC probs;
+            EventIndMMC events;
+            vector<seq_len_t> seq_poses;
+            seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
+
+            if (clonotype.is_vj()) {
+                probs.resize(VJ_CHAIN_SIZE);
+                if (full_build) { events.resize(VJ_CHAIN_SIZE); }
+            } else {
+                probs.resize(VDJ_CHAIN_SIZE);
+                if (full_build) { events.resize(VDJ_CHAIN_SIZE); }
+            }
+
+            this->buildVariable(clonotype, probs, events, seq_poses, full_build);
+            this->buildJoining(clonotype, probs, events, seq_poses, full_build);
+            if (clonotype.is_vj()) {
+                this->buildVJinsertions(clonotype, probs, events, seq_poses, full_build);
+            } else {
+                this->buildDiversity(clonotype, probs, events, seq_poses, full_build);
+                this->buildVDinsertions(clonotype, probs, events, seq_poses, full_build);
+                this->buildDJinsertions(clonotype, probs, events, seq_poses, full_build);
+            }
+
+            probs.finish();
+            events.finish();
+            if (full_build) {
+                seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
+                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
+                return new MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size());
+            } else {
+                return new MAAG(probs);
+            }
+        }
+
+
         MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) const {
             MAAGRepertoire res;
 //            res.reserve(cloneset.size());
             res.resize(cloneset.size());
+            MAAG tmp;
             for (size_t i = 0; i < cloneset.size(); ++i) {
-//                res.push_back(this->build(cloneset[i], full_build));
+                cout << "==================\nindex: " << i << endl;
+                cout << "==================" << endl;
+//                res.push_back(MAAG(&(this->build(cloneset[i], full_build))));
                 res[i] = this->build(cloneset[i], full_build);
+                int INDEX;
+
+                cout << "VD ins 1" << endl;
+                INDEX = 2;
+                cout << "rows\t" << res[i].matrix(INDEX, 0).rows() << endl;
+                cout << "cols\t" << res[i].matrix(INDEX, 0).cols() << endl;
+                cout << "zeros\t" << res[i].matrix(INDEX, 0).zeros() << endl;
+                cout << "nonzeros\t" << res[i].matrix(INDEX, 0).nonzeros() << endl << endl;
+
+                cout << "VD ins 1" << endl;
+                INDEX = 2;
+                cout << "rows\t" << res[i].matrix(INDEX, 1).rows() << endl;
+                cout << "cols\t" << res[i].matrix(INDEX, 1).cols() << endl;
+                cout << "zeros\t" << res[i].matrix(INDEX, 1).zeros() << endl;
+                cout << "nonzeros\t" << res[i].matrix(INDEX, 1).nonzeros() << endl << endl;
+
+                cout << "D1 del" << endl;
+                INDEX = 3;
+                cout << "rows\t" << res[i].matrix(INDEX, 0).rows() << endl;
+                cout << "cols\t" << res[i].matrix(INDEX, 0).cols() << endl;
+                cout << "zeros\t" << res[i].matrix(INDEX, 0).zeros() << endl;
+                cout << "nonzeros\t" << res[i].matrix(INDEX, 0).nonzeros() << endl << endl;
+
+                cout << "D2 del" << endl;
+                INDEX = 3;
+                cout << "rows\t" << res[i].matrix(INDEX, 1).rows() << endl;
+                cout << "cols\t" << res[i].matrix(INDEX, 1).cols() << endl;
+                cout << "zeros\t" << res[i].matrix(INDEX, 1).zeros() << endl;
+                cout << "nonzeros\t" << res[i].matrix(INDEX, 1).nonzeros() << endl << endl;
+
+                cout << "DJ ins 1" << endl;
+                INDEX = 4;
+                cout << "rows\t" << res[i].matrix(INDEX, 0).rows() << endl;
+                cout << "cols\t" << res[i].matrix(INDEX, 0).cols() << endl;
+                cout << "zeros\t" << res[i].matrix(INDEX, 0).zeros() << endl;
+                cout << "nonzeros\t" << res[i].matrix(INDEX, 0).nonzeros() << endl << endl;
+
+                cout << "DJ ins 2" << endl;
+                INDEX = 4;
+                cout << "rows\t" << res[i].matrix(INDEX, 1).rows() << endl;
+                cout << "cols\t" << res[i].matrix(INDEX, 1).cols() << endl;
+                cout << "zeros\t" << res[i].matrix(INDEX, 1).zeros() << endl;
+                cout << "nonzeros\t" << res[i].matrix(INDEX, 1).nonzeros() << endl << endl;
+
+
+//                tmp = this->build(cloneset[i], full_build);
 //                res[i].swap_maag(this->build(cloneset[i], full_build));
                 if ((i+1) % 50000 == 0) {
                     cout << "Built " << (int) (i+1) << " graphs." << endl;
@@ -433,6 +525,37 @@ namespace ymir {
             if (full_build) {
                 events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), d3_max - d3_min + 1, d5_max - d5_min + 1);
             }
+
+
+            // vector seq_start -> 1-based matrix row index; 0 means no such index in the matrix
+            seq_len_t seq_row[clonotype.sequence().size()];
+            std::fill(seq_row, seq_row + clonotype.sequence().size(), 0);
+            // vector seq_end -> 1-based matrix column index; 0 means no such index in the matrix
+            seq_len_t seq_col[clonotype.sequence().size()];
+            std::fill(seq_col, seq_col + clonotype.sequence().size(), 0);
+
+            // find indices of D alignments and use only them to reduce memory usage.
+            int last_max_seq_start = -1, last_max_seq_end = -1;
+            seq_len_t seq_row_ind = 0, seq_col_ind = 0;
+            for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                for (segindex_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
+                    d_alignment = clonotype.getDalignment(d_index, j);
+
+                    // 1-based alignemnt???
+                    if (!seq_row[d_alignment.seqstart] && d_alignment.seqstart > last_max_seq_start) {
+                        last_max_seq_start = d_alignment.seqstart;
+                        seq_row[d_alignment.seqstart] = seq_row_ind;
+                        ++seq_row_ind;
+                    }
+
+                    if (!seq_col[d_alignment.seqend] && d_alignment.seqend > last_max_seq_end) {
+                        last_max_seq_end = d_alignment.seqend;
+                        seq_col[d_alignment.seqend] = seq_col_ind;
+                        ++seq_col_ind;
+                    }
+                }
+            }
+
 
             segindex_t d_index = 0, d_gene = 0;
             seq_len_t min_D_len = 0, d_len = 0;

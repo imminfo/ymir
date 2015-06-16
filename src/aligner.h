@@ -138,7 +138,7 @@ namespace ymir {
             bool open_match;
             seq_len_t p_start, t_start;
 
-            for (seq_len_t pattern_i = 1; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
+            for (seq_len_t pattern_i = 1 /* WTF?! */ ; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
                 open_match = false;
                 min_subsize = min(p_size - pattern_i, (int) t_size);
                 for (seq_len_t i = 0; i < min_subsize; ++i) {

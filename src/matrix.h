@@ -178,6 +178,17 @@ namespace ymir {
         }
 
 
+        size_t zeros() const {
+            size_t res = 0;
+            for (_Dim i = 0; i < _rows; ++i) {
+                for (_Dim j = 0; j < _cols; ++j) {
+                    res += (*this)(i, j) == 0;
+                }
+            }
+            return res;
+        }
+
+
     protected:
 
         _Scalar *_data;

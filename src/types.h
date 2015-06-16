@@ -44,7 +44,7 @@
 
 namespace ymir {
 
-    #define DEFAULT_DIV_GENE_MIN_LEN 2
+    #define DEFAULT_DIV_GENE_MIN_LEN 3
 
     /**
     * \typedef numeric

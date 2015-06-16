@@ -20,7 +20,6 @@ using namespace ymir;
 int main() {
     std::chrono::system_clock::time_point tp1, tp2;
 
-
     RepertoireParser parser;
     parser.loadConfig(BENCH_DATA_FOLDER + "../../parsers/mitcrdots.json");
 
@@ -97,7 +96,6 @@ int main() {
     MAAGRepertoire(vdj_model.buildGraphs(cloneset_vdj, true));
     tp2 = std::chrono::system_clock::now();
     cout << "VDJ MAAG with metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
-
 
 //    Cloneset repertoire50K, repertoire200K, repertoire500K;
 //  With and without parallelisation

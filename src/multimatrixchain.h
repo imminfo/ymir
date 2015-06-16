@@ -179,13 +179,19 @@ namespace ymir {
         MultiMatrixChain() {
             _chain.clear();
             _values.clear();
-//            _values.reserve(300);
+            _values.reserve(5000);
         }
 
 
         MultiMatrixChain(const MultiMatrixChain &other) {
             _chain = other._chain;
             _values = other._values;
+        }
+
+
+        MultiMatrixChain(MultiMatrixChain &&other) {
+            _chain.swap(other._chain);
+            _values.swap(other._values);
         }
 
 
@@ -269,6 +275,8 @@ namespace ymir {
         void finish() {
             _chain.shrink_to_fit();
             _values.shrink_to_fit();
+//            cout << _values.size() << endl;
+//            cout << _values.capacity() << endl;
         }
 
 

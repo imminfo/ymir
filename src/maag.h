@@ -62,9 +62,9 @@ namespace ymir {
         /**
          *
          */
-        MAAG(const MAAG &other) {
-            _chain = other._chain;
-            _values = other._values;
+        MAAG(const MAAG &other) : ProbMMC(other) {
+//            _chain = other._chain;
+//            _values = other._values;
 
             if (other._events) { _events = new EventIndMMC(*other._events); }
             else { _events = nullptr; }
@@ -80,6 +80,26 @@ namespace ymir {
 
             if (other._sequence) { _sequence = new string(*other._sequence); }
             else { _sequence = nullptr; }
+        }
+
+
+        MAAG(MAAG &&other) {
+            _chain.swap(other._chain);
+            _values.swap(other._values);
+
+            EventIndMMC *tmp = other._events;
+            other._events = _events;
+            _events = tmp;
+
+            _n_poses = other._n_poses;
+
+            seq_len_t *tmp2 = other._seq_poses;
+            other._seq_poses = _seq_poses;
+            _seq_poses = tmp2;
+
+            string *tmp3 = other._sequence;
+            other._sequence = _sequence;
+            _sequence = tmp3;
         }
 
 
@@ -121,7 +141,7 @@ namespace ymir {
 
         MAAG& operator= (const MAAG& other) {
             _chain = other._chain;
-//            _values = other._values;
+            _values = other._values;
 
             if (other._events) {
                 if (_events) { delete _events; }

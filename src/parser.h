@@ -351,18 +351,22 @@ namespace ymir {
                         if (do_align_J) {}
 
                         if (do_align_D) {
+                            bool align_ok = false;
                             for (segindex_t seg_i = 0; seg_i < gene_segments.D().size() - 1; ++seg_i) {
                                 AbstractAligner::LocalAlignmentIndices indices =
                                         aligner.alignLocal(gene_segments.D()[seg_i + 1].sequence,
                                                            sequence,
                                                            DEFAULT_DIV_GENE_MIN_LEN);
-                                if (indices.size() == 0) {
-                                    cerr << "No D alignments has been found!" << endl;
-                                } else {
+                                if (indices.size()) {
+                                    align_ok = true;
                                     for (size_t align_i = 0; align_i < indices.size(); ++align_i) {
                                         clone_builder.addDalignment(seg_i + 1, indices[align_i]);
                                     }
                                 }
+                            }
+                            if (!align_ok) {
+                                cerr << "Diversity gene could NOT be aligned (line " << (size_t) glob_index << ")" << endl;
+                                ++bad_index;
                             }
                         }
 
@@ -370,6 +374,10 @@ namespace ymir {
                         if (glob_index % 50000 == 0) {
                             cout << get_parser_name() + ": parsed " << glob_index << " lines" << endl;
                         }
+
+                        //
+                        // remove bad clonotypes here
+                        //
 
                         vec.push_back(clone_builder.buildClonotype());
                     }

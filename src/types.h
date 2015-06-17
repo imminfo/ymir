@@ -94,6 +94,11 @@ namespace ymir {
     typedef uint8_t segindex_t;
 
 
+    /**
+     * \struct d_alignment_t
+     *
+     * \brief 1-based alignemnt of a Diversity gene to a sequence.
+     */
     struct d_alignment_t {
         seq_len_t Dstart, Dend, seqstart, seqend;
 

@@ -925,8 +925,19 @@ YMIR_TEST_START(test_nuc_aligner)
 
 
     YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 3).size(), 0)
+
     YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2).size(), 2)
+    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].Dstart, 1)
+    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].Dend, 2)
+    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].seqstart, 3)
+    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].seqend, 4)
+
     YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2).size(), 3)
+    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].Dstart, 5)
+    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].Dend, 6)
+    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].seqstart, 5)
+    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].seqend, 6)
+
     YMIR_ASSERT2(nna.alignLocal("ACT", "ACTGACGACGGTATCTAC", 2).size(), 5)
 YMIR_TEST_END
 
@@ -1019,9 +1030,13 @@ YMIR_TEST_START(test_mitcr_vdj_with_d_alignment)
 
     YMIR_ASSERT2(cr.size(), 1)
     YMIR_ASSERT2( (int) cr[0].nDiv(), 3)
-    YMIR_ASSERT2( (int) cr[0].nDalignments(0), 3)
-    YMIR_ASSERT2( (int) cr[0].nDalignments(1), 4)
-    YMIR_ASSERT2( (int) cr[0].nDalignments(2), 5)
+    YMIR_ASSERT2( (int) cr[0].nDalignments(0), 1)
+    YMIR_ASSERT2( (int) cr[0].nDalignments(1), 2)
+    YMIR_ASSERT2( (int) cr[0].nDalignments(2), 3)
+    // this is if default gene len is equal to 2
+//    YMIR_ASSERT2( (int) cr[0].nDalignments(0), 3)
+//    YMIR_ASSERT2( (int) cr[0].nDalignments(1), 4)
+//    YMIR_ASSERT2( (int) cr[0].nDalignments(2), 5)
 
 YMIR_TEST_END
 

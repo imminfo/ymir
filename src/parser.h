@@ -352,15 +352,15 @@ namespace ymir {
 
                         if (do_align_D) {
                             bool align_ok = false;
-                            for (segindex_t seg_i = 0; seg_i < gene_segments.D().size() - 1; ++seg_i) {
+                            for (segindex_t seg_i = 1; seg_i <= gene_segments.D().max(); ++seg_i) {
                                 AbstractAligner::LocalAlignmentIndices indices =
-                                        aligner.alignLocal(gene_segments.D()[seg_i + 1].sequence,
+                                        aligner.alignLocal(gene_segments.D()[seg_i].sequence,
                                                            sequence,
                                                            DEFAULT_DIV_GENE_MIN_LEN);
                                 if (indices.size()) {
                                     align_ok = true;
                                     for (size_t align_i = 0; align_i < indices.size(); ++align_i) {
-                                        clone_builder.addDalignment(seg_i + 1, indices[align_i]);
+                                        clone_builder.addDalignment(seg_i, indices[align_i]);
                                     }
                                 }
                             }

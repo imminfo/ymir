@@ -161,57 +161,13 @@ namespace ymir {
             res.resize(cloneset.size());
             MAAG tmp;
             for (size_t i = 0; i < cloneset.size(); ++i) {
-                cout << "==================\nindex: " << i << endl;
-                cout << "==================" << endl;
 //                res.push_back(MAAG(&(this->build(cloneset[i], full_build))));
+
                 res[i] = this->build(cloneset[i], full_build);
-                int INDEX;
-
-                cout << "VD ins 1" << endl;
-                INDEX = 2;
-                cout << "rows\t" << res[i].matrix(INDEX, 0).rows() << endl;
-                cout << "cols\t" << res[i].matrix(INDEX, 0).cols() << endl;
-                cout << "zeros\t" << res[i].matrix(INDEX, 0).zeros() << endl;
-                cout << "nonzeros\t" << res[i].matrix(INDEX, 0).nonzeros() << endl << endl;
-
-                cout << "VD ins 1" << endl;
-                INDEX = 2;
-                cout << "rows\t" << res[i].matrix(INDEX, 1).rows() << endl;
-                cout << "cols\t" << res[i].matrix(INDEX, 1).cols() << endl;
-                cout << "zeros\t" << res[i].matrix(INDEX, 1).zeros() << endl;
-                cout << "nonzeros\t" << res[i].matrix(INDEX, 1).nonzeros() << endl << endl;
-
-                cout << "D1 del" << endl;
-                INDEX = 3;
-                cout << "rows\t" << res[i].matrix(INDEX, 0).rows() << endl;
-                cout << "cols\t" << res[i].matrix(INDEX, 0).cols() << endl;
-                cout << "zeros\t" << res[i].matrix(INDEX, 0).zeros() << endl;
-                cout << "nonzeros\t" << res[i].matrix(INDEX, 0).nonzeros() << endl << endl;
-
-                cout << "D2 del" << endl;
-                INDEX = 3;
-                cout << "rows\t" << res[i].matrix(INDEX, 1).rows() << endl;
-                cout << "cols\t" << res[i].matrix(INDEX, 1).cols() << endl;
-                cout << "zeros\t" << res[i].matrix(INDEX, 1).zeros() << endl;
-                cout << "nonzeros\t" << res[i].matrix(INDEX, 1).nonzeros() << endl << endl;
-
-                cout << "DJ ins 1" << endl;
-                INDEX = 4;
-                cout << "rows\t" << res[i].matrix(INDEX, 0).rows() << endl;
-                cout << "cols\t" << res[i].matrix(INDEX, 0).cols() << endl;
-                cout << "zeros\t" << res[i].matrix(INDEX, 0).zeros() << endl;
-                cout << "nonzeros\t" << res[i].matrix(INDEX, 0).nonzeros() << endl << endl;
-
-                cout << "DJ ins 2" << endl;
-                INDEX = 4;
-                cout << "rows\t" << res[i].matrix(INDEX, 1).rows() << endl;
-                cout << "cols\t" << res[i].matrix(INDEX, 1).cols() << endl;
-                cout << "zeros\t" << res[i].matrix(INDEX, 1).zeros() << endl;
-                cout << "nonzeros\t" << res[i].matrix(INDEX, 1).nonzeros() << endl << endl;
-
 
 //                tmp = this->build(cloneset[i], full_build);
 //                res[i].swap_maag(this->build(cloneset[i], full_build));
+
                 if ((i+1) % 50000 == 0) {
                     cout << "Built " << (int) (i+1) << " graphs." << endl;
                 }
@@ -500,15 +456,14 @@ namespace ymir {
         {
             d_alignment_t d_alignment;
 
-            // vector seq_start -> 1-based matrix row index; 0 means no such index in the matrix
-            seq_len_t *seq_row = new seq_len_t[clonotype.sequence().size() + 1];
-            std::fill(seq_row, seq_row + clonotype.sequence().size() + 1, 0);
-            // vector seq_end -> 1-based matrix column index; 0 means no such index in the matrix
-            seq_len_t *seq_col = new seq_len_t[clonotype.sequence().size() + 1];
-            std::fill(seq_col, seq_col + clonotype.sequence().size() + 1, 0);
+            // vector seq_start -> 0 means no such index in the matrix, 1 otherwise.
+            seq_len_t seq_arr_size = clonotype.sequence().size() + 1;
+            seq_len_t *seq_row = new seq_len_t[seq_arr_size];
+            std::fill(seq_row, seq_row + seq_arr_size, 0);
+            // vector seq_end -> 0 means no such index in the matrix, 1 otherwise.
+            seq_len_t *seq_col = new seq_len_t[seq_arr_size];
+            std::fill(seq_col, seq_col + seq_arr_size, 0);
 
-            // find indices of D alignments and use only them to reduce memory usage.
-            seq_len_t last_max_seq_start = 0, last_max_seq_end = 0, seq_row_ind = 0, seq_col_ind = 0;
             for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                 seq_len_t min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
 
@@ -516,25 +471,39 @@ namespace ymir {
                     d_alignment = clonotype.getDalignment(d_index, j);
 
                     // yes-yes, I know that it could be done more efficiently. But I don't want to.
-                    for (seq_len_t seqstart_i = d_alignment.seqstart; seqstart_i <= d_alignment.seqend - min_D_len + 1; ++seqstart_i) {
-                        if (!seq_row[seqstart_i] && seqstart_i > last_max_seq_start) {
-                            last_max_seq_start = seqstart_i;
-                            seq_row[seqstart_i] = seq_row_ind;
-                            ++seq_row_ind;
-                        }
+                    for (seq_len_t i = d_alignment.seqstart; i <= d_alignment.seqend - min_D_len + 1; ++i) {
+                        seq_row[i] = 1;
                     }
 
-                    for (seq_len_t seqend_i = d_alignment.seqstart + min_D_len - (seq_len_t) 1; seqend_i <= d_alignment.seqend; ++seqend_i) {
-                        if (!seq_col[seqend_i] && seqend_i > last_max_seq_end) {
-                            last_max_seq_end = seqend_i;
-                            seq_col[seqend_i] = seq_col_ind;
-                            ++seq_col_ind;
-                        }
+                    for (seq_len_t i = d_alignment.seqstart + min_D_len - (seq_len_t) 1; i <= d_alignment.seqend; ++i) {
+                        seq_col[i] = 1;
                     }
                 }
             }
+
+            // make new vector seq_start -> 1based index in rows of Ddel matrices
+            seq_len_t seq_ind = 1;
+            for (seq_len_t i = 0; i < seq_arr_size; ++i) {
+                if (seq_row[i]) {
+                    seq_row[i] = seq_ind;
+                    ++seq_ind;
+                }
+            }
+
+            // make new vector seq_end -> 1based index in columns of Ddel matrices
+            seq_ind = 1;
+            for (seq_len_t i = 0; i < seq_arr_size; ++i) {
+                if (seq_col[i]) {
+                    seq_col[i] = seq_ind;
+                    ++seq_ind;
+                }
+            }
+
+            // find indices of D alignments and use only them to reduce memory usage.
+            seq_len_t last_max_seq_start = 0, last_max_seq_end = 0, seq_row_ind = 0, seq_col_ind = 0;
+
             seq_len_t seq_row_nonzeros = 0, seq_col_nonzeros = 0;
-            for (seq_len_t i = 0; i < clonotype.sequence().size() + 1; ++i) {
+            for (seq_len_t i = 0; i < seq_arr_size; ++i) {
                 seq_row_nonzeros += seq_row[i] != 0;
                 seq_col_nonzeros += seq_col[i] != 0;
             }
@@ -559,13 +528,13 @@ namespace ymir {
 
                     for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len + 1; ++left_pos) {
                         for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seqend; ++right_pos) {
-                            probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - d3_min, right_pos - d5_min)
+                            probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                     = _param_vec->event_prob(VDJ_DIV_DEL,
                                                              d_gene - 1,
                                                              d_alignment.Dstart + left_pos - d_alignment.seqstart - 1,
                                                              d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
                             if (full_build) {
-                                events(DIVERSITY_GENES_MATRIX_INDEX, d_index, left_pos - d3_min, right_pos - d5_min)
+                                events(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                         = _param_vec->event_index(VDJ_DIV_DEL,
                                                                   d_gene - 1,
                                                                   d_alignment.Dstart + left_pos - d_alignment.seqstart - 1,
@@ -576,12 +545,11 @@ namespace ymir {
                 }
             }
 
-            // overhead by memory - just push all positions of the sequence from 1 to the last
             // insert D3 and D5 positions
             vector<seq_len_t> D35_poses;
             D35_poses.reserve(seq_row_nonzeros + seq_col_nonzeros + 2);
-            for (seq_len_t i = 0; i < clonotype.sequence().size() + 1; ++i) { if (seq_row[i]) { D35_poses.push_back(i); } }
-            for (seq_len_t i = 0; i < clonotype.sequence().size() + 1; ++i) { if (seq_col[i]) { D35_poses.push_back(i); } }
+            for (seq_len_t i = 1; i < seq_arr_size; ++i) { if (seq_row[i]) { D35_poses.push_back(i); } }
+            for (seq_len_t i = 1; i < seq_arr_size; ++i) { if (seq_col[i]) { D35_poses.push_back(i); } }
 
             delete [] seq_row;
             delete [] seq_col;

@@ -499,61 +499,49 @@ namespace ymir {
                             bool full_build) const
         {
             d_alignment_t d_alignment;
-            // indices of vertices to shrink the D-del matrix
-            seq_len_t d3_min = clonotype.sequence().size(), d3_max = clonotype.sequence().size(),
-                    d5_min = clonotype.sequence().size(), d5_max = clonotype.sequence().size();
-            seq_len_t max_min_D_len = _param_vec->D_min_len(clonotype.getDiv(0));  // (:
-            // find first and last indices for D gene matrix - find min seq start pos and max seq end pos
-            // among all D alignments
-            for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
-                if (max_min_D_len < _param_vec->D_min_len(clonotype.getDiv(d_index))) {
-                    max_min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
-                }
-
-                for (segindex_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
-                    d_alignment = clonotype.getDalignment(d_index, j);
-
-                    if (d3_min > d_alignment.seqstart) { d3_min = d_alignment.seqstart; }
-
-                    if (d5_max < d_alignment.seqend) { d5_max = d_alignment.seqend; }
-                }
-            }
-            d3_max = d5_max - (max_min_D_len - 1);
-            d5_min = d3_min + max_min_D_len - 1;
-
-            probs.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), d3_max - d3_min + 1, d5_max - d5_min + 1);
-            if (full_build) {
-                events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), d3_max - d3_min + 1, d5_max - d5_min + 1);
-            }
-
 
             // vector seq_start -> 1-based matrix row index; 0 means no such index in the matrix
-            seq_len_t seq_row[clonotype.sequence().size()];
-            std::fill(seq_row, seq_row + clonotype.sequence().size(), 0);
+            seq_len_t *seq_row = new seq_len_t[clonotype.sequence().size() + 1];
+            std::fill(seq_row, seq_row + clonotype.sequence().size() + 1, 0);
             // vector seq_end -> 1-based matrix column index; 0 means no such index in the matrix
-            seq_len_t seq_col[clonotype.sequence().size()];
-            std::fill(seq_col, seq_col + clonotype.sequence().size(), 0);
+            seq_len_t *seq_col = new seq_len_t[clonotype.sequence().size() + 1];
+            std::fill(seq_col, seq_col + clonotype.sequence().size() + 1, 0);
 
             // find indices of D alignments and use only them to reduce memory usage.
-            int last_max_seq_start = -1, last_max_seq_end = -1;
-            seq_len_t seq_row_ind = 0, seq_col_ind = 0;
+            seq_len_t last_max_seq_start = 0, last_max_seq_end = 0, seq_row_ind = 0, seq_col_ind = 0;
             for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                seq_len_t min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
+
                 for (segindex_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
                     d_alignment = clonotype.getDalignment(d_index, j);
 
-                    // 1-based alignemnt???
-                    if (!seq_row[d_alignment.seqstart] && d_alignment.seqstart > last_max_seq_start) {
-                        last_max_seq_start = d_alignment.seqstart;
-                        seq_row[d_alignment.seqstart] = seq_row_ind;
-                        ++seq_row_ind;
+                    // yes-yes, I know that it could be done more efficiently. But I don't want to.
+                    for (seq_len_t seqstart_i = d_alignment.seqstart; seqstart_i <= d_alignment.seqend - min_D_len + 1; ++seqstart_i) {
+                        if (!seq_row[seqstart_i] && seqstart_i > last_max_seq_start) {
+                            last_max_seq_start = seqstart_i;
+                            seq_row[seqstart_i] = seq_row_ind;
+                            ++seq_row_ind;
+                        }
                     }
 
-                    if (!seq_col[d_alignment.seqend] && d_alignment.seqend > last_max_seq_end) {
-                        last_max_seq_end = d_alignment.seqend;
-                        seq_col[d_alignment.seqend] = seq_col_ind;
-                        ++seq_col_ind;
+                    for (seq_len_t seqend_i = d_alignment.seqstart + min_D_len - (seq_len_t) 1; seqend_i <= d_alignment.seqend; ++seqend_i) {
+                        if (!seq_col[seqend_i] && seqend_i > last_max_seq_end) {
+                            last_max_seq_end = seqend_i;
+                            seq_col[seqend_i] = seq_col_ind;
+                            ++seq_col_ind;
+                        }
                     }
                 }
+            }
+            seq_len_t seq_row_nonzeros = 0, seq_col_nonzeros = 0;
+            for (seq_len_t i = 0; i < clonotype.sequence().size() + 1; ++i) {
+                seq_row_nonzeros += seq_row[i] != 0;
+                seq_col_nonzeros += seq_col[i] != 0;
+            }
+
+            probs.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
+            if (full_build) {
+                events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
             }
 
 
@@ -591,9 +579,12 @@ namespace ymir {
             // overhead by memory - just push all positions of the sequence from 1 to the last
             // insert D3 and D5 positions
             vector<seq_len_t> D35_poses;
-            D35_poses.reserve(d3_max - d3_min + 1 + d5_max - d5_min + 1);
-            for (seq_len_t i = d3_min; i <= d3_max; ++i) { D35_poses.push_back(i); }
-            for (seq_len_t i = d5_min; i <= d5_max; ++i) { D35_poses.push_back(i); }
+            D35_poses.reserve(seq_row_nonzeros + seq_col_nonzeros + 2);
+            for (seq_len_t i = 0; i < clonotype.sequence().size() + 1; ++i) { if (seq_row[i]) { D35_poses.push_back(i); } }
+            for (seq_len_t i = 0; i < clonotype.sequence().size() + 1; ++i) { if (seq_col[i]) { D35_poses.push_back(i); } }
+
+            delete [] seq_row;
+            delete [] seq_col;
 
             // Note! insert diversity gene seq poses BEFORE joining gene seq poses
             seq_poses.reserve(seq_poses.size() + D35_poses.size() + 2);  // +2 -> just in case (:

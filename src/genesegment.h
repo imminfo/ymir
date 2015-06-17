@@ -49,6 +49,9 @@ namespace ymir {
     class GeneSegmentAlphabet {
     public:
 
+        /**
+         *
+         */
         struct GeneSegment {
             string allele;
             string sequence;
@@ -60,6 +63,9 @@ namespace ymir {
         };
 
 
+        /**
+         *
+         */
         GeneSegmentAlphabet(const string& name, const string& filepath, bool *is_ok = nullptr)
                 : _name(name) {
             this->addGeneSegment("other", "", 0);
@@ -111,6 +117,9 @@ namespace ymir {
         segindex_t size() const { return this->_vec.size(); }
 
 
+        segindex_t max() const { return this->_vec.size() - 1; }
+
+
         /**
         * \brief Append P(alindromic)-nucleotides to all gene segment sequences from
         * 3'end, 5'end or both.
@@ -158,7 +167,7 @@ namespace ymir {
                 segindex_t cur_index = 1;
                 while (!ifs.eof()) {
                     getline(ifs, line);
-                    if (line[0] != '\n') {
+                    if (line[0] != '\n' && line.size() > 3) {
                         line_stream.str(line);
                         if (header) {
                             // gene segment name

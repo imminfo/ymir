@@ -199,6 +199,8 @@ ModelParameterVector make_test_events_vdj() {
     v4.push_back(0);
 
     // D1 dels
+    // max 1 D3' del
+    // max 1 D5' del
     v1.push_back(.17); // first row
     v1.push_back(.27);
     v1.push_back(.37); // second row
@@ -208,6 +210,8 @@ ModelParameterVector make_test_events_vdj() {
     v4.push_back(2);
 
     // D2 dels
+    // max 2 D3' del
+    // max 1 D5' del
     // 3 rows 2 columns
     v1.push_back(.11); v1.push_back(.12);
     v1.push_back(.13); v1.push_back(.14);
@@ -217,6 +221,8 @@ ModelParameterVector make_test_events_vdj() {
     v4.push_back(2);
 
     // D3 dels
+    // max 1 D3' del
+    // max 1 D5' del
     v1.push_back(.11); // first row
     v1.push_back(.22);
     v1.push_back(.33); // second row
@@ -1401,6 +1407,8 @@ YMIR_TEST_START(test_maag_vdj)
      D1:
        CCCGACGGTTT
              .GTTT
+             .GTT.T
+             G.TTT
      D2:
        CCCGACGGTTT
       A.CCG.GT
@@ -1427,8 +1435,7 @@ YMIR_TEST_START(test_maag_vdj)
             .addDalignment(1, 1, 4, 8, 11);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    cout << "HERE!!!" << endl;
-
+    cout << "HERE HERE" << endl;
     MAAG maag = maag_builder.build(clonotype, true);
 
     YMIR_ASSERT2(maag.nVar(), 2)
@@ -1452,27 +1459,31 @@ YMIR_TEST_START(test_maag_vdj)
     YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec.event_index(VDJ_VAR_DEL, 2, 2))
     YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec.event_index(VDJ_VAR_DEL, 2, 1))
 
-    YMIR_ASSERT2(maag.event_index(2, 0, 0, 8), 0)
-    YMIR_ASSERT2(maag.event_index(2, 0, 5, 8), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 3))
-    YMIR_ASSERT2(maag.event_index(2, 0, 5, 7), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 2))
-    YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 0))
+    // D: 1 2 4 6 8
+//    YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), 1)
+//    YMIR_ASSERT2(maag.event_index(2, 0, 5, 8), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 3))
+//    YMIR_ASSERT2(maag.event_index(2, 0, 5, 7), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 2))
+//    YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 0))
 
-//    YMIR_ASSERT2(maag.event_index(3, 0, 1, 3 - 2), mvec.event_index(VDJ_DIV_DEL, 1, 1, 2))
-//    YMIR_ASSERT2(maag.event_index(3, 0, 5, 7 - 2), mvec.event_index(VDJ_DIV_DEL, 1, 2, 1))
-//    YMIR_ASSERT2(maag.event_index(3, 0, 6, 8 - 2), mvec.event_index(VDJ_DIV_DEL, 1, 3, 0))
-//    YMIR_ASSERT2(maag.event_index(3, 0, 5, 8 - 2), mvec.event_index(VDJ_DIV_DEL, 1, 2, 0))
-//
-//    YMIR_ASSERT2(maag.event_index(3, 2, 0, 3 - 2), 0)
-//    YMIR_ASSERT2(maag.event_index(3, 2, 7, 10 - 2), mvec.event_index(VDJ_DIV_DEL, 0, 0, 0))
-//    YMIR_ASSERT2(maag.event_index(3, 2, 8, 10 - 2), mvec.event_index(VDJ_DIV_DEL, 0, 1, 0))
-//    YMIR_ASSERT2(maag.event_index(3, 2, 7, 9 - 2), mvec.event_index(VDJ_DIV_DEL, 0, 0, 1))
+    // rows 2 3 | cols 4 6
+    YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
+    YMIR_ASSERT2(maag.event_index(3, 0, 0, 1), 0)
+    YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), 0)
+    YMIR_ASSERT2(maag.event_index(3, 0, 1, 1), mvec.event_index(VDJ_DIV_DEL, 1, 2, 0))
 
-    YMIR_ASSERT2(maag.event_index(4, 0, 0, 0), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 5 - 2))
-    YMIR_ASSERT2(maag.event_index(4, 0, 5 - 2, 4), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 4))
-    YMIR_ASSERT2(maag.event_index(4, 0, 4 - 2, 4), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 5))
-    YMIR_ASSERT2(maag.event_index(4, 0, 5 - 2, 5), 0)
-    YMIR_ASSERT2(maag.event_index(4, 0, 6 - 2, 1), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 0))
-    YMIR_ASSERT2(maag.event_index(4, 0, 10 - 2, 2), 0)
+    // rows 1 2 | cols 3 4
+    YMIR_ASSERT2(maag.event_index(3, 2, 0, 0), mvec.event_index(VDJ_DIV_DEL, 0, 0, 1))
+    YMIR_ASSERT2(maag.event_index(3, 2, 0, 1), mvec.event_index(VDJ_DIV_DEL, 0, 0, 0))
+    YMIR_ASSERT2(maag.event_index(3, 2, 1, 0), 0)
+    YMIR_ASSERT2(maag.event_index(3, 2, 1, 1), mvec.event_index(VDJ_DIV_DEL, 0, 1, 0))
+
+    // D: 4 6 8 11
+//    YMIR_ASSERT2(maag.event_index(4, 0, 0, 0), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 5 - 2))
+//    YMIR_ASSERT2(maag.event_index(4, 0, 5 - 2, 4), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 4))
+//    YMIR_ASSERT2(maag.event_index(4, 0, 4 - 2, 4), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 5))
+//    YMIR_ASSERT2(maag.event_index(4, 0, 5 - 2, 5), 0)
+//    YMIR_ASSERT2(maag.event_index(4, 0, 6 - 2, 1), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 0))
+//    YMIR_ASSERT2(maag.event_index(4, 0, 10 - 2, 2), 0)
 
     YMIR_ASSERT2(maag.event_index(5, 0, 0, 0), 0)
     YMIR_ASSERT2(maag.event_index(5, 0, 1, 0), mvec.event_index(VDJ_JOI_DEL, 0, 2))
@@ -1513,15 +1524,15 @@ YMIR_TEST_START(test_maag_vdj)
     YMIR_ASSERT2(maag.event_probability(1, 1, 0, 4), mvec.event_prob(VDJ_VAR_DEL, 2, 2))
     YMIR_ASSERT2(maag.event_probability(1, 1, 0, 5), mvec.event_prob(VDJ_VAR_DEL, 2, 1))
 
-    YMIR_ASSERT2(maag.event_probability(2, 0, 0, 10 - 2), 0)
+//    YMIR_ASSERT2(maag.event_probability(2, 0, 0, 10 - 2), 0)
 
 //    YMIR_ASSERT2(maag.event_probability(3, 0, 1, 3 - 2), mvec.event_prob(VDJ_DIV_DEL, 1, 1, 2))
 //    YMIR_ASSERT2(maag.event_probability(3, 0, 5, 7 - 2), mvec.event_prob(VDJ_DIV_DEL, 1, 2, 1))
 //    YMIR_ASSERT2(maag.event_probability(3, 0, 6, 8 - 2), mvec.event_prob(VDJ_DIV_DEL, 1, 3, 0))
 //    YMIR_ASSERT2(maag.event_probability(3, 0, 5, 8 - 2), mvec.event_prob(VDJ_DIV_DEL, 1, 2, 0))
 
-    YMIR_ASSERT2(maag.event_probability(4, 0, 5 - 2, 5), 0)
-    YMIR_ASSERT2(maag.event_probability(4, 0, 10 - 2, 2), 0)
+//    YMIR_ASSERT2(maag.event_probability(4, 0, 5 - 2, 5), 0)
+//    YMIR_ASSERT2(maag.event_probability(4, 0, 10 - 2, 2), 0)
 
     YMIR_ASSERT2(maag.event_probability(5, 0, 0, 0), 0)
     YMIR_ASSERT2(maag.event_probability(5, 0, 1, 0), mvec.event_prob(VDJ_JOI_DEL, 0, 2))

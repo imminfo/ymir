@@ -158,7 +158,7 @@ namespace ymir {
             for (size_t i = 0; i < _event_classes.size(); ++i) { if (_event_classes[i] != other._event_classes[i]) { return false; } }
             for (size_t i = 0; i < _event_family_col_numbers.size(); ++i) { if (_event_family_col_numbers[i] != other._event_family_col_numbers[i]) { return false; } }
             for (size_t i = 0; i < _laplace.size(); ++i) { if (_laplace[i] != other._laplace[i]) { return false; } }
-            for (size_t i = 0; i < _d_genes_min_len.size(); ++i) { if (_d_genes_min_len[i] != other._d_genes_min_len[i]) { return false; } }
+            for (size_t i = 0; i < _d_genes_min_len.size(); ++i) { /* cout << (int) _d_genes_min_len[i] << ":" << (int) other._d_genes_min_len[i] << endl; */ if (_d_genes_min_len[i] != other._d_genes_min_len[i]) { return false; } }
 
             return true;
         }

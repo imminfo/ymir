@@ -1401,7 +1401,6 @@ YMIR_TEST_START(test_maag_vdj)
             .addDalignment(1, 1, 4, 8, 11);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    cout << "HERE HERE" << endl;
     MAAG maag = maag_builder.build(clonotype, true);
 
     YMIR_ASSERT2(maag.nVar(), 2)

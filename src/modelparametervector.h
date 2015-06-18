@@ -208,80 +208,33 @@ namespace ymir {
          * segment families as (segindex_deletion_index - 1), but deletions and insertions should be passed as it is (#deletions).
          */
         eventind_t event_index(EVENT_CLASS event_class, eventind_t event_family, eventind_t event_index) const {
-            return _edges[_event_classes[event_class] + event_family] + event_index;
+            if (_edges[_event_classes[event_class] + event_family] + event_index < _edges[_event_classes[event_class] + event_family + 1]) {
+                return _edges[_event_classes[event_class] + event_family] + event_index;
+            }
+            return 0;
+
+//            return _edges[_event_classes[event_class] + event_family] + event_index;
         }
+
         eventind_t event_index(EVENT_CLASS event_class, eventind_t event_family, eventind_t event_row, eventind_t event_column) const {
-            return _edges[_event_classes[event_class] + event_family]
-                   + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column;
+            if (event_column < _event_family_col_numbers[_event_classes[event_class] + event_family] && _edges[_event_classes[event_class] + event_family]
+                + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column < _edges[_event_classes[event_class] + event_family + 1]) {
+                return _edges[_event_classes[event_class] + event_family]
+                       + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column;
+            }
+            return 0;
+
+//            return _edges[_event_classes[event_class] + event_family]
+//                   + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column;
         }
 
         prob_t event_prob(EVENT_CLASS event_class, eventind_t event_family, eventind_t event_index) const {
             return _vec[this->event_index(event_class, event_family, event_index)];
         }
+
         prob_t event_prob(EVENT_CLASS event_class, eventind_t event_family, eventind_t event_row, eventind_t event_column) const {
             return _vec[this->event_index(event_class, event_family, event_row, event_column)];
         }
-
-
-
-        //============= EVENT ACCESS =============//
-
-
-
-//        eventind_t index_V_gene(segindex_t v_index) const { return event_index(); }
-//        prob_t prob_V_gene(segindex_t v_index) const { return _vec[index_V_gene(v_index)]; }  // Hmmm...
-//
-//
-//        eventind_t index_VJ_genes(segindex_t v_index, segindex_t j_index) const {
-//            return _edges[1] + (v_index - 1) * _v_gene_num + (j_index - 1);
-//        }
-//        prob_t prob_VJ_genes(segindex_t v_index, segindex_t j_index) const {
-//            return _vec[index_VJ_genes(v_index, j_index)];
-//        }  // Hmmm...
-//
-//
-//        eventind_t index_JD_genes(segindex_t j_index, segindex_t d_index) const { return _edges[2] + (j_index - 1) * _d_gene_num + (d_index - 1); }
-//        prob_t prob_JD_genes(segindex_t j_index, segindex_t d_index) const { return _vec[index_JD_genes(j_index, d_index)]; }
-//
-//
-//        eventind_t index_V_del(segindex_t v_index, seq_len_t del_num) const { return _edges[3 + (v_index - 1)] + del_num; }
-//        prob_t prob_V_del(segindex_t v_index, seq_len_t del_num) const { return _vec[index_V_del(v_index, del_num)]; }
-//
-//
-//        eventind_t index_J_del(segindex_t j_index, seq_len_t del_num) const { return _edges[3 + (_edges[2] - 1) + (j_index - 1)] + del_num; }
-//        prob_t prob_J_del(segindex_t j_index, seq_len_t del_num) const { return _vec[index_J_del(j_index, del_num)]; }
-//
-//
-//        eventind_t index_D_del(segindex_t d_index, seq_len_t d5_del_num, seq_len_t d3_del_num) const {
-//            return _edges[3 + (_edges[2] - 1) + 2 + (d_index - 1)] + d5_del_num*_d_gene_max_dels[d_index - 1] + d3_del_num;
-//        }
-//        prob_t prob_D_del(segindex_t d_index, seq_len_t d5_del_num, seq_len_t d3_del_num) const {
-//            return _vec[index_D_del(d_index, d5_del_num, d3_del_num)];
-//        }
-//
-//
-//        eventind_t index_VJ_ins_len(seq_len_t ins_len) const {
-//            return _edges[_edges.size() - 7] + ins_len; // - 1 - 4 - 2
-//        }
-//        prob_t prob_VJ_ins_len(seq_len_t ins_len) const {
-//            return _vec[index_VJ_ins_len(ins_len)];
-//        }
-//
-//
-//        eventind_t index_VD_ins_len(seq_len_t ins_len) const {
-//            return _edges[_edges.size() - 12] + ins_len; // - 1 - 8 - 3
-//        }
-//        prob_t prob_VD_ins_len(seq_len_t ins_len) const {
-//            return _vec[index_VD_ins_len(ins_len)];
-//        }
-//
-//
-//        eventind_t index_DJ_ins_len(seq_len_t ins_len) const {
-//            return _edges[_edges.size() - 11] + ins_len; // -1 - 8 - 2
-//        }
-//        prob_t prob_DJ_ins_len(seq_len_t ins_len) const {
-//            return _vec[index_DJ_ins_len(ins_len)];
-//        }
 
 
         /**

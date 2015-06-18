@@ -19,6 +19,7 @@ using namespace ymir;
 
 int main() {
     std::chrono::system_clock::time_point tp1, tp2;
+    time_t vj_prob, vj_meta, vdj_prob, vdj_meta;
 
     RepertoireParser parser;
     parser.loadConfig(BENCH_DATA_FOLDER + "../../parsers/mitcrdots.json");
@@ -71,15 +72,15 @@ int main() {
     //
     ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA");
 
-//    tp1 = std::chrono::system_clock::now();
-//    vj_model.buildGraphs(cloneset_vj, true);
-//    tp2 = std::chrono::system_clock::now();
-//    cout << "VJ MAAG with metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
-//
-//    tp1 = std::chrono::system_clock::now();
-//    vj_model.computeFullProbabilities(cloneset_vj);
-//    tp2 = std::chrono::system_clock::now();
-//    cout << "VJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
+    tp1 = std::chrono::system_clock::now();
+    vj_model.buildGraphs(cloneset_vj, true);
+    tp2 = std::chrono::system_clock::now();
+    vj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+
+    tp1 = std::chrono::system_clock::now();
+    vj_model.computeFullProbabilities(cloneset_vj);
+    tp2 = std::chrono::system_clock::now();
+    vj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
 
     //
@@ -87,15 +88,25 @@ int main() {
     //
     ProbabilisticAssemblingModel vdj_model(BENCH_DATA_FOLDER + "../../models/hTRB");
 
-//    tp1 = std::chrono::system_clock::now();
-//    vdj_model.computeFullProbabilities(cloneset_vdj);
-//    tp2 = std::chrono::system_clock::now();
-//    cout << "VDJ MAAG without metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
-
     tp1 = std::chrono::system_clock::now();
     MAAGRepertoire(vdj_model.buildGraphs(cloneset_vdj, true));
     tp2 = std::chrono::system_clock::now();
-    cout << "VDJ MAAG with metadata, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
+    vdj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+
+    tp1 = std::chrono::system_clock::now();
+    vdj_model.computeFullProbabilities(cloneset_vdj);
+    tp2 = std::chrono::system_clock::now();
+    vdj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+
+    //
+    // Results
+    //
+    cout << "========================" << endl << "Results:" << endl;
+    cout << "VJ MAAG computing, seconds: " << vj_prob << endl;
+    cout << "VJ MAAG metadata, seconds: " << vj_meta << endl;
+    cout << "VDJ MAAG computing, seconds: " << vdj_prob << endl;
+    cout << "VDJ MAAG metadata, seconds: " << vdj_meta << endl;
+
 
 //    Cloneset repertoire50K, repertoire200K, repertoire500K;
 //  With and without parallelisation

@@ -519,7 +519,6 @@ namespace ymir {
 
             for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                 d_gene = clonotype.getDiv(d_index);
-                cout << "D gene = " << (int) d_gene << endl;
                 d_len = _genes->D()[d_gene].sequence.size();
                 min_D_len = _param_vec->D_min_len(d_gene);
 
@@ -529,15 +528,6 @@ namespace ymir {
 
                     for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len + 1; ++left_pos) {
                         for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seqend; ++right_pos) {
-                            cout << (int) (d_alignment.Dstart + left_pos - d_alignment.seqstart - 1) <<
-                                    ":" <<
-                                    (int) (d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos))) <<
-                                    " => " <<
-                                    (_param_vec->event_index(VDJ_DIV_DEL,
-                                                              d_gene - 1,
-                                                              d_alignment.Dstart + left_pos - d_alignment.seqstart - 1,
-                                                              d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)))) <<
-                                    endl;
                             probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                     = _param_vec->event_prob(VDJ_DIV_DEL,
                                                              d_gene - 1,

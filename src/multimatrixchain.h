@@ -216,9 +216,9 @@ namespace ymir {
         ///@{
         matrix_ind_t nodeSize(node_ind_t node_i) const { return _chain[node_i].size(); }
 
-        size_t nodeRows(node_ind_t node_i) const { return _chain[node_i].rows(); }
+        dim_t nodeRows(node_ind_t node_i) const { return _chain[node_i].rows(); }
 
-        size_t nodeColumns(node_ind_t node_i) const { return _chain[node_i].cols(); }
+        dim_t nodeColumns(node_ind_t node_i) const { return _chain[node_i].cols(); }
         ///@}
 
 

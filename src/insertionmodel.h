@@ -15,7 +15,7 @@ namespace ymir {
     /**
     * \class InsertionModel
     *
-    * \brief Class for representing VJ / VD / DJ insertions models - either a mononucleotide or a dinucleotide model.
+    * \brief Class for representing VJ / VD / DJ insertions models - either a mono-nucleotide or a di-nucleotide model.
     */
     class InsertionModel {
     public:

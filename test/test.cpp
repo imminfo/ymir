@@ -1090,7 +1090,31 @@ YMIR_TEST_START(test_clorep)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_markovchain_nuc)
+YMIR_TEST_START(test_markovchain_nuc_mono)
+
+    vector<prob_t> probs = {.1, .2, .3, .4};
+    InsertionModel m(MonoNucleotide, probs.begin());
+
+    string s = "ACGT";
+
+    // .1 * .2 * .3 * .4
+    YMIR_ASSERT(abs(m.nucProbability(s.begin(), 4, NULL_CHAR)) - .0024 < 1e-18)
+    YMIR_ASSERT(abs(m.nucProbability(s.begin(), 4)) - .0024 < 1e-18)
+    YMIR_ASSERT(abs(m.nucProbability(s, NULL_CHAR)) - .0024 < 1e-18)
+
+    // .1 * .2 * .3 * .4
+    YMIR_ASSERT(abs(m.nucProbability(s.begin(), 4, 'A')) - .0024 < 1e-18)
+    YMIR_ASSERT(abs(m.nucProbability(s, 'A')) - .0024 < 1e-18)
+
+    // 1 * .2 * .3
+    YMIR_ASSERT(abs(m.nucProbability(s.substr(0, 3), 'A')) - .006 < 1e-18)
+    // .1 * .2 * .3
+    YMIR_ASSERT(abs(m.nucProbability(s.substr(0, 3), NULL_CHAR)) - .006 < 1e-18)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_markovchain_nuc_di)
     event_matrix_t mat;
     mat.resize(4, 4);
     // A
@@ -1139,10 +1163,15 @@ YMIR_TEST_START(test_markovchain_nuc)
     InsertionModel mc(mat);
     string s = "ACGT";
 
-    // .7 * .3 * .2 = .042
+    // .25 * .7 * .3 * .2 = ???
     YMIR_ASSERT(mc.nucProbability("") == 1);
     YMIR_ASSERT2(mc.nucProbability(s) - .042, 0);
     YMIR_ASSERT(mc.nucProbability(s.begin(), 4) == .042);
+
+    // .1 * .7 * .3 * .2 = ???
+    YMIR_ASSERT2(mc.nucProbability(s.begin(), 4, 'A'), .042);
+
+    //
     YMIR_ASSERT(mc.nucProbability(s.begin() + 1, 3) == .06);
     YMIR_ASSERT(mc.nucProbability(s.begin(), 0) == 1);
 
@@ -1812,7 +1841,8 @@ int main() {
     YMIR_TEST(test_clorep(), "Cloneset / ClonesetView manipulations")
 
     // Tests for markov chain.
-    YMIR_TEST(test_markovchain_nuc(), "Insertion model (nucleotide) error")
+    YMIR_TEST(test_markovchain_nuc_mono(), "Mono-nucleotide insertion model (nucleotide) error")
+    YMIR_TEST(test_markovchain_nuc_di(), "Di-nucleotide insertion model (nucleotide) error")
     YMIR_TEST(test_markovchain_aa(), "Insertion model (amino acid) error")
 
     // Test for Multi-Matrix Chains

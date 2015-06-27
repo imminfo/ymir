@@ -46,6 +46,8 @@ namespace ymir {
 
     #define DEFAULT_DIV_GENE_MIN_LEN 3
 
+    #define NULL_CHAR '_'
+
     /**
     * \typedef numeric
     *
@@ -209,6 +211,14 @@ namespace ymir {
         VDJ_JOI_DEL_I = 5,
         VDJ_JOI_DIV_GEN_I = 6
     };
+
+
+    enum INSERTION_MODEL_TYPE {
+        MonoNucleotide,
+        DiNucleotide
+    };
+
+
 }
 
 #endif

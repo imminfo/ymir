@@ -20,7 +20,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define NCURSES_TERM_H_incl 1
+//#define NCURSES_TERM_H_incl 1
 
 #define YMIR_TEST(res, s) {all_tests += 1; if (res.size() == 0) {tests_passed += 1;} \
                             else { \
@@ -1136,7 +1136,7 @@ YMIR_TEST_START(test_markovchain_nuc)
     vec.push_back(.25);
     vec.push_back(.3);
 
-    MarkovChain mc(mat);
+    InsertionModel mc(mat);
     string s = "ACGT";
 
     // .7 * .3 * .2 = .042
@@ -1812,8 +1812,8 @@ int main() {
     YMIR_TEST(test_clorep(), "Cloneset / ClonesetView manipulations")
 
     // Tests for markov chain.
-    YMIR_TEST(test_markovchain_nuc(), "Markov chain nucleotide")
-    YMIR_TEST(test_markovchain_aa(), "Markov chain amino acid")
+    YMIR_TEST(test_markovchain_nuc(), "Insertion model (nucleotide) error")
+    YMIR_TEST(test_markovchain_aa(), "Insertion model (amino acid) error")
 
     // Test for Multi-Matrix Chains
     YMIR_TEST(test_mmc(), "Multi-Matrix chain all interface")

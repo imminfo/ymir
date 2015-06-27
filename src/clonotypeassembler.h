@@ -41,7 +41,7 @@ namespace ymir {
             std::default_random_engine rg;
 
             if (_param_vec.recombination() == VJ_RECOMB) {
-                const MarkovChain mc_vj(_param_vec.get_iterator(_param_vec.event_prob(VJ_VAR_JOI_INS_NUC, 0, 0)));
+                const InsertionModel mc_vj(MonoNucleotide, _param_vec.get_iterator(_param_vec.event_prob(VJ_VAR_JOI_INS_NUC, 0, 0)));
                 std::uniform_int_distribution<int> vgenes(1,6);
                 vgenes(rg);
 
@@ -59,8 +59,8 @@ namespace ymir {
                 }
             }
             else {
-                const MarkovChain mc_vd(_param_vec.get_iterator(_param_vec.event_prob(VDJ_VAR_DIV_INS_NUC, 0, 0)));
-                const MarkovChain mc_dj(_param_vec.get_iterator(_param_vec.event_prob(VDJ_DIV_JOI_INS_NUC, 0, 0)));
+                const InsertionModel mc_vd(DiNucleotide, _param_vec.get_iterator(_param_vec.event_prob(VDJ_VAR_DIV_INS_NUC, 0, 0)));
+                const InsertionModel mc_dj(DiNucleotide, _param_vec.get_iterator(_param_vec.event_prob(VDJ_DIV_JOI_INS_NUC, 0, 0)));
 
                 for (size_t clonotype_i = 0; clonotype_i < count; ++clonotype_i) {
                     sequence = "";

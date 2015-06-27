@@ -40,7 +40,7 @@
 #include "maag.h"
 #include "genesegment.h"
 #include "modelparametervector.h"
-#include "markovchain.h"
+#include "insertionmodel.h"
 
 
 namespace ymir {
@@ -575,7 +575,7 @@ namespace ymir {
                                vector<seq_len_t> &seq_poses,
                                bool full_build) const
         {
-            MarkovChain mc(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
+            InsertionModel mc(MonoNucleotide, _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
 
             seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                     j_vertices = probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
@@ -617,7 +617,7 @@ namespace ymir {
                                vector<seq_len_t> &seq_poses,
                                bool full_build) const
         {
-            MarkovChain mc(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
+            InsertionModel mc(DiNucleotide, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
 
             seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                     d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
@@ -659,7 +659,7 @@ namespace ymir {
                                vector<seq_len_t> &seq_poses,
                                bool full_build) const
         {
-            MarkovChain mc(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
+            InsertionModel mc(DiNucleotide, _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
 
             seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                     d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX),
@@ -717,7 +717,7 @@ namespace ymir {
                              seq_len_t left_vertices_end,
                              seq_len_t right_vertices_start,
                              seq_len_t right_vertices_end,
-                             const MarkovChain& mc) const
+                             const InsertionModel& mc) const
         {
             int insertion_len;
             bool good_insertion;

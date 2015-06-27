@@ -103,12 +103,16 @@ namespace ymir {
 
             probs.finish();
             events.finish();
+
             if (full_build) {
 
                 // TODO:
                 // if DJ insertions matrix is consists only of zeros for gene Dn, then
                 // remove VD insertions, D deletions and DJ insertions for the Dn gene.
                 //
+                if (clonotype.is_vdj()) {
+
+                }
 
                 seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
                 copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
@@ -117,7 +121,6 @@ namespace ymir {
                 return MAAG(probs);
             }
         }
-
 
         MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) const {
             MAAGRepertoire res;
@@ -141,6 +144,10 @@ namespace ymir {
         ///@}
 
 
+        /**
+         * \brief Compute generation probabilities.
+         */
+        ///@{
         prob_t buildAndCompute(const Clonotype &clonotype, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
             return this->build(clonotype, false).fullProbability(action);
         }
@@ -156,6 +163,7 @@ namespace ymir {
             }
             return res;
         }
+        ///@}
 
 
         /**

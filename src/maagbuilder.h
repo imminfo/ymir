@@ -119,42 +119,6 @@ namespace ymir {
         }
 
 
-        MAAG* buildPtr(const Clonotype &clonotype, bool full_build = false) const {
-            ProbMMC probs;
-            EventIndMMC events;
-            vector<seq_len_t> seq_poses;
-            seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
-
-            if (clonotype.is_vj()) {
-                probs.resize(VJ_CHAIN_SIZE);
-                if (full_build) { events.resize(VJ_CHAIN_SIZE); }
-            } else {
-                probs.resize(VDJ_CHAIN_SIZE);
-                if (full_build) { events.resize(VDJ_CHAIN_SIZE); }
-            }
-
-            this->buildVariable(clonotype, probs, events, seq_poses, full_build);
-            this->buildJoining(clonotype, probs, events, seq_poses, full_build);
-            if (clonotype.is_vj()) {
-                this->buildVJinsertions(clonotype, probs, events, seq_poses, full_build);
-            } else {
-                this->buildDiversity(clonotype, probs, events, seq_poses, full_build);
-                this->buildVDinsertions(clonotype, probs, events, seq_poses, full_build);
-                this->buildDJinsertions(clonotype, probs, events, seq_poses, full_build);
-            }
-
-            probs.finish();
-            events.finish();
-            if (full_build) {
-                seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
-                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
-                return new MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size());
-            } else {
-                return new MAAG(probs);
-            }
-        }
-
-
         MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) const {
             MAAGRepertoire res;
 //            res.reserve(cloneset.size());

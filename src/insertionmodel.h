@@ -53,30 +53,11 @@ namespace ymir {
         /**
         * \brief Probability of the given nucleotide sequence.
         */
-        prob_t nucProbability(const string& sequence) const {
-            prob_t res = 1;
-
-            if (_type == MonoNucleotide) {
-                for (seq_len_t i = 0; i < sequence.size(); ++i) {
-                    res *= _arr[nuc_hash(sequence[i])];
-                }
-            } else {
-                seq_len_t i_start = 1;
-                if (sequence[0] == NULL_CHAR) {
-                    res = .25;
-                    i_start = 2;
-                }
-                for (seq_len_t i = i_start; i < sequence.size(); ++i) {
-                    res *= (*this)(nuc_hash(sequence[i - 1]), nuc_hash(sequence[i]));
-                }
-            }
-
-//            return sequence.size() ? res : 0;
-            return res;
+        prob_t nucProbability(const string& sequence, char first_char = NULL_CHAR) const {
+            return this->nucProbability(sequence.cbegin(), sequence.size(), first_char);
         }
 
-
-        prob_t nucProbability(string::const_iterator start, seq_len_t sequence_len) const {
+        prob_t nucProbability(string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const {
             prob_t res = 1;
 
             if (_type == MonoNucleotide) {
@@ -85,17 +66,12 @@ namespace ymir {
                 }
             } else {
                 string::const_iterator next = start + 1;
-                seq_len_t i_start = 1;
-                if (*start == NULL_CHAR) {
-                    res = .25;
-                    i_start = 2;
-                }
-                for (seq_len_t i = i_start; i < sequence_len; ++i, ++start, ++next) {
+                res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*start));
+                for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
                     res *= (*this)(nuc_hash(*start), nuc_hash(*next));
                 }
             }
 
-//            return sequence_len ? res : 0;
             return res;
         }
 

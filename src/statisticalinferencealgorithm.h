@@ -100,7 +100,6 @@ namespace ymir {
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
                 cout << "Iteration:\t" << (size_t) iter << endl;
 
-                new_param_vec = model.event_probabilities();
                 new_param_vec.clear();
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
                     MAAGForwardBackwardAlgorithm fb(maag_rep[i]);
@@ -111,8 +110,16 @@ namespace ymir {
                     prob_vec[i] = fb.fullProbability();
                 }
 
+                new_param_vec.normaliseEventFamilies();
+                *(model._param_vec) = new_param_vec;
+                model.make_builder();
+                model.updateEventProbabilities(&maag_rep);
+
                 cout << "Loglikelihood:\t" << loglikelihood(prob_vec) << endl;
             }
+
+            model.make_assembler();
+            return true;
         }
 
     };

@@ -37,9 +37,10 @@ namespace ymir {
 
         event_pair_t nextEvent() {
             if (_status) {
-                // for each cell of each matrix that is related to
-                // an event E return forward(E) * backward(E) / P,
-                // where P is the full probability of generation.
+                event_pair_t res = _pairs[_pairs_i];
+                res.second = res.second / _full_prob;
+                ++_pairs_i;
+                return res;
             }
 
             _status = false;
@@ -48,7 +49,12 @@ namespace ymir {
 
 
         bool is_empty() {
-
+            if (_status) {
+                if (_pairs_i != _pairs.size()) {
+                    return false;
+                }
+            }
+            return true;
         }
 
 
@@ -60,18 +66,25 @@ namespace ymir {
 
         prob_t bfullProbability() const { return _back_full_prob; }
 
+
+        const vector<event_pair_t>& event_pairs() const { return _pairs; }
+
     protected:
 
         bool _status;
         ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspond. */
         prob_t _full_prob;  /** Full generation probability of the input MAAG. */
         prob_t _back_full_prob;  /** Full generation probability of the input MAAG obtained with backward algorithm. Just for testing purposes. */
+
         // TODO:
         // lazy evaluation for _pairs filling with values.
         vector<event_pair_t> _pairs;
+        size_t _pairs_i;
+
 
 
         bool init_and_process(const MAAG &maag) {
+            _pairs_i = 0;
             _status = false;
             _pairs.resize(0);
             _full_prob = 0;

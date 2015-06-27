@@ -60,15 +60,17 @@ namespace ymir {
         prob_t nucProbability(string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const {
             prob_t res = 1;
 
-            if (_type == MonoNucleotide) {
-                for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
-                    res *= _arr[nuc_hash(*start)];
-                }
-            } else {
-                string::const_iterator next = start + 1;
-                res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*start));
-                for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
-                    res *= (*this)(nuc_hash(*start), nuc_hash(*next));
+            if (sequence_len) {
+                if (_type == MonoNucleotide) {
+                    for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
+                        res *= _arr[nuc_hash(*start)];
+                    }
+                } else {
+                    string::const_iterator next = start + 1;
+                    res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*start));
+                    for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
+                        res *= (*this)(nuc_hash(*start), nuc_hash(*next));
+                    }
                 }
             }
 

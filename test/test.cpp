@@ -1115,6 +1115,7 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_markovchain_nuc_di)
+
     event_matrix_t mat;
     mat.resize(4, 4);
     // A
@@ -1163,22 +1164,19 @@ YMIR_TEST_START(test_markovchain_nuc_di)
     InsertionModel mc(mat);
     string s = "ACGT";
 
-    // .25 * .7 * .3 * .2 = ???
+    // .25 * .7 * .3 * .2 = .0105
     YMIR_ASSERT(mc.nucProbability("") == 1);
-    YMIR_ASSERT2(mc.nucProbability(s) - .042, 0);
-    YMIR_ASSERT(mc.nucProbability(s.begin(), 4) == .042);
+    YMIR_ASSERT2(mc.nucProbability(s) - .0105, 0);
+    YMIR_ASSERT(mc.nucProbability(s.begin(), 4) == .0105);
 
-    // .1 * .7 * .3 * .2 = ???
-    YMIR_ASSERT2(mc.nucProbability(s.begin(), 4, 'A'), .042);
-
-    //
-    YMIR_ASSERT(mc.nucProbability(s.begin() + 1, 3) == .06);
-    YMIR_ASSERT(mc.nucProbability(s.begin(), 0) == 1);
+    // .4 * .7 * .3 * .2 = .0126
+    YMIR_ASSERT2(mc.nucProbability(s.begin(), 4, 'C'), .0168);
 
     mc.updateProbabilities(vec.begin());
 
-    YMIR_ASSERT(mc.nucProbability(s) == .042);
-    YMIR_ASSERT(mc.nucProbability(s.begin(), 4) == .042);
+    YMIR_ASSERT2(mc.nucProbability(s) - .0105, 0);
+    YMIR_ASSERT2(mc.nucProbability(s.begin(), 4, 'C'), .0168);
+
 YMIR_TEST_END
 
 

@@ -66,6 +66,8 @@ namespace ymir {
         ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspond. */
         prob_t _full_prob;  /** Full generation probability of the input MAAG. */
         prob_t _back_full_prob;  /** Full generation probability of the input MAAG obtained with backward algorithm. Just for testing purposes. */
+        // TODO:
+        // lazy evaluation for _pairs filling with values.
         vector<event_pair_t> _pairs;
 
 
@@ -238,14 +240,16 @@ namespace ymir {
                 this->backward_vj(maag, j_ind);
 
                 // add fi * bi for this J to the accumulator
-                for (node_ind_t node_i = 0; node_i < _forward_acc->chainSize(); ++node_i) {
-                    for (dim_t row_i = 0; row_i < _forward_acc->nodeRows(node_i); ++row_i) {
-                        for (dim_t col_i = 0; col_i < _forward_acc->nodeColumns(node_i); ++col_i) {
-//                            (*_fb_acc)(node_i, 0, row_i, col_i) +=
-//                                    (*_forward_acc)(node_i, 0, row_i, col_i) * (*_backward_acc)(node_i, 0, row_i, col_i);
-                        }
-                    }
+                for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_VAR_JOI_GEN_I); ++row_i) {
+                    _pairs.push_back(event_pair_t(
+                            maag.event_index(VJ_VAR_JOI_GEN_I, 0, row_i, j_ind),
+                            (*_forward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0) * (*_backward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0)));
                 }
+                for (matrix_ind_t mat_i = 0; mat_i < maag.nVar(); ++mat_i) {
+                    this->pushEventPairs(maag, VJ_VAR_DEL_I, mat_i, mat_i);
+                }
+                this->pushEventPairs(maag, VJ_VAR_JOI_INS_I, 0, 0);
+                this->pushEventPairs(maag, VJ_JOI_DEL_I, j_ind, 0);
             }
         }
 
@@ -437,15 +441,18 @@ namespace ymir {
                     this->backward_vdj(maag, d_ind, j_ind);
                     recompute_d_gen_fi = false;
 
-                    // add fi * bi for this J to the accumulator
-                    for (node_ind_t node_i = 0; node_i < _forward_acc->chainSize(); ++node_i) {
-                        for (dim_t row_i = 0; row_i < _forward_acc->nodeRows(node_i); ++row_i) {
-                            for (dim_t col_i = 0; col_i < _forward_acc->nodeColumns(node_i); ++col_i) {
-//                                (*_fb_acc)(node_i, 0, row_i, col_i) +=
-//                                        (*_forward_acc)(node_i, 0, row_i, col_i) * (*_backward_acc)(node_i, 0, row_i, col_i);
-                            }
-                        }
+                    // add fi * bi to the accumulator
+                    this->pushEventPairs(maag, VDJ_VAR_DIV_INS_I, 0, 0);
+                    for (matrix_ind_t mat_i = 0; mat_i < maag.nVar(); ++mat_i) {
+                        this->pushEventPairs(maag, VDJ_VAR_DEL_I, mat_i, mat_i);
                     }
+                    this->pushEventPairs(maag, VDJ_VAR_DIV_INS_I, d_ind, 0);
+                    this->pushEventPairs(maag, VDJ_DIV_DEL_I, d_ind, 0);
+                    this->pushEventPairs(maag, VDJ_DIV_JOI_INS_I, d_ind, 0);
+                    this->pushEventPairs(maag, VDJ_JOI_DEL_I, j_ind, 0);
+                    _pairs.push_back(event_pair_t(
+                            maag.event_index(VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind),
+                            (*_forward_acc)(VDJ_JOI_DEL_I, 0, 0, 0) * (*_backward_acc)(VDJ_JOI_DEL_I, 0, 0, 0)));
                 }
             }
         }

@@ -141,8 +141,9 @@ namespace ymir {
          */
         MAAGRepertoire buildGraphs(const ClonesetView &repertoire,
                                    bool full_build = true,
-                                   bool aminoacid = false) const {
-            return _builder->build(repertoire, full_build);
+                                   bool aminoacid = false,
+                                   bool verbose = true) const {
+            return _builder->build(repertoire, full_build, verbose);
         }
 
 
@@ -188,8 +189,12 @@ namespace ymir {
          */
         void updateEventProbabilitiesVector(const ModelParameterVector &vec) {
 #ifdef YDEBUG
-            if (_param_vec->recombination() == vec.recombination() && _param_vec->size() == vec.size()) {
-                throw(std::runtime_error("Model parameter vectors are not comparable!"));
+            if (_param_vec->recombination() != vec.recombination()) {
+                throw(std::runtime_error("Model parameter vectors are not comparable due to different recombination types!"));
+            }
+
+            if (_param_vec->size() != vec.size()) {
+                throw(std::runtime_error("Model parameter vectors are not comparable due to different sizes!"));
             }
 #endif
 
@@ -205,20 +210,6 @@ namespace ymir {
 //            }
 //
 //            return false;
-        }
-
-
-        /**
-        * \brief Read the model from the given folder.
-        *
-        * Search for model.json file.
-        */
-        bool read(const string& folderpath) {
-            // check for folder and return false if something wrong.
-            // read json file with model
-//            print name
-//            print full name
-//            print comment
         }
 
 

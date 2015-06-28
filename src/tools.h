@@ -61,10 +61,10 @@ namespace ymir {
     }
 
 
-    prob_t loglikelihood(const std::vector<prob_t> &vec) {
-        prob_t res = 0, vec_sum = 0;
+    prob_t loglikelihood(const std::vector<prob_t> &vec, prob_t laplace = 1e-50) {
+        prob_t res = 0, vec_sum = laplace * vec.size();
         for (size_t i = 0; i < vec.size(); ++i) { vec_sum += vec[i]; }
-        for (size_t i = 0; i < vec.size(); ++i) { res += std::log10(vec[i] / vec_sum); } // what to do in case of high precision numbers?
+        for (size_t i = 0; i < vec.size(); ++i) { res += std::log10((vec[i] + laplace) / vec_sum); } // what to do in case of high precision numbers?
         return res;
     }
 

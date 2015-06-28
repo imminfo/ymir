@@ -365,7 +365,7 @@ namespace ymir {
                                 }
                             }
                             if (!align_ok) {
-                                cerr << "Diversity gene could NOT be aligned (line " << (size_t) glob_index << ")" << endl;
+                                cerr << "Diversity gene could NOT be aligned with the given minimal gene length (min gene length " << (size_t) DEFAULT_DIV_GENE_MIN_LEN << ", line " << (size_t) glob_index << ")" << endl;
                                 ++bad_index;
                             }
                         }

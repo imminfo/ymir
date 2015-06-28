@@ -69,6 +69,25 @@ namespace ymir {
     }
 
 
+    void prob_summary(const std::vector<prob_t> &prob_vec) {
+        size_t zeros = 0, negative = 0, bignums = 0, nans = 0;
+
+        for (size_t i = 0; i < prob_vec.size(); ++i) {
+            zeros += prob_vec[i] ? 0 : 1;
+            negative += prob_vec[i] < 0 ? 1 : 0;
+            bignums += prob_vec[i] > 1 ? 1 : 0;
+            nans += isnan(prob_vec[i]) ? 1 : 0;
+        }
+
+        std::cout << "Loglikelihood:\t" << loglikelihood(prob_vec) << std::endl;
+        std::cout << "Error probabilities:\t" << (size_t) (zeros + negative + bignums + nans) << std::endl;
+        std::cout << "  Zeros:\t" << (size_t) zeros << std::endl;
+        std::cout << "  NaNs:\t" << (size_t) nans << std::endl;
+        std::cout << "  Negatives:\t" << (size_t) negative << std::endl;
+        std::cout << "  Bigger than one:\t" << (size_t) bignums << std::endl;
+    }
+
+
     inline bool is_out_of_frame(const std::string &sequence) {
         return sequence.size() % 3 != 0;
     }

@@ -35,6 +35,7 @@
 
 #define TEST_DATA_FOLDER string("/Users/vdn/ymir/test/data/")
 
+#define YMIR_TEST_PRECISION 1e-14
 
 #include <iostream>
 #include <list>

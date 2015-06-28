@@ -72,6 +72,8 @@ int main() {
     //
     ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA");
 
+    EMAlgorithm().statisticalInference(cloneset_vj, vj_model);
+
     tp1 = std::chrono::system_clock::now();
     vj_model.buildGraphs(cloneset_vj, true);
     tp2 = std::chrono::system_clock::now();

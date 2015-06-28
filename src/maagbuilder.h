@@ -267,9 +267,14 @@ namespace ymir {
             }
         }
 
-        void updateEventProbabilities(MAAGRepertoire *repertoire) const {
+        void updateEventProbabilities(MAAGRepertoire *repertoire, bool verbose = true) const {
             for (size_t i = 0; i < repertoire->size(); ++i) {
                 this->updateEventProbabilities(&*(repertoire->begin() + i));  // facepalm
+                if (verbose) {
+                    if ((i+1) % 50000 == 0) {
+                        cout << "Updated " << (int) (i+1) << " graphs." << endl;
+                    }
+                }
             }
         }
         ///@}

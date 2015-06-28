@@ -98,25 +98,29 @@ namespace ymir {
             vector<prob_t> prob_vec;
             prob_vec.resize(rep_nonc.size(), 0);
 
+            cout << "Initial:" << endl;
+            for (size_t i = 0; i < prob_vec.size(); ++i) {
+                prob_vec[i] = maag_rep[i].fullProbability();
+            }
+            prob_summary(prob_vec);
 
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
                 cout << "Iteration:\t" << (size_t) iter << endl;
 
-                size_t zeros = 0;
-
                 new_param_vec.clear();
-//                cout << (size_t) new_param_vec.size() << endl;
+
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
                     MAAGForwardBackwardAlgorithm fb(maag_rep[i]);
+
+                    bool nanflag = false;
                     while (!fb.is_empty()) {
                         event_pair_t ep = fb.nextEvent();
                         new_param_vec[ep.first] += ep.second;
-                        if (isnan(ep.second)) cout << ep.first << endl;
+                        if (isnan(ep.second)) nanflag = true;
                     }
                     prob_vec[i] = fb.fullProbability();
-//                    cout << prob_vec[i] << endl;
+//                    if (nanflag) cout << prob_vec[i] << endl;
 //                    if (isnan(prob_vec[i])) cout << (size_t) i << endl;
-                    zeros += prob_vec[i] ? 0 : 1;
                 }
 
                 new_param_vec.normaliseEventFamilies();
@@ -124,8 +128,10 @@ namespace ymir {
                 model.updateEventProbabilitiesVector(new_param_vec);
                 model.updateEventProbabilities(&maag_rep);
 
-                cout << "Loglikelihood:\t" << loglikelihood(prob_vec) << endl;
-                cout << "Zeros:\t" << zeros << endl;
+                for (size_t i = 0; i < prob_vec.size(); ++i) {
+                    prob_vec[i] = maag_rep[i].fullProbability();
+                }
+                prob_summary(prob_vec);
             }
 
             return true;

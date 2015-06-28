@@ -689,7 +689,7 @@ namespace ymir {
          * \param left_vertices_end Ending index in seq_poses for the vertices in the left matrix.
          * \param right_vertices_start Starting index in seq_poses for the vertices in the right matrix.
          * \param right_vertices_end Ending index in seq_poses for the vertices in the right matrix.
-         * \param mc MarkovChain that use for generation of N nucleotides.
+         * \param mc Insertion model that uses for generation of N nucleotides.
         */
         void buildInsertions(const Clonotype &clonotype,
                              ProbMMC &probs,

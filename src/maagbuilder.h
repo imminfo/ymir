@@ -56,6 +56,9 @@ namespace ymir {
     public:
 
 
+        /**
+         * \brief Constructor for the builder from given vector with event probabilities and gene segments.
+         */
         MAAGBuilder(const ModelParameterVector &param_vec, const VDJRecombinationGenes &genes) : MAAG() {
             _param_vec = new ModelParameterVector(param_vec);
             _genes = new VDJRecombinationGenes(genes);
@@ -75,6 +78,8 @@ namespace ymir {
          * \param cloneset Set of clonotypes from which build the repertoires of MAAGs.
          * \param full_build If true than make MAAG with stored event indices.
          * \param aminoacid If true than build MAAGs from the aminoacid sequences.
+         *
+         * \return Newly constructed MAAG.
          */
         ///@{
         MAAG build(const Clonotype &clonotype, bool full_build = false) const {

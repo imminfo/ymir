@@ -42,7 +42,7 @@ namespace ymir {
     *
     * \brief Interface for algorithms for statistical inference of assembling model parameters.
     */
-    class StatisticalInferenceAlgorithm : protected ProbabilisticAssemblingModel {
+    class StatisticalInferenceAlgorithm {
     public:
 
         struct AlgorithmParameters {
@@ -111,14 +111,12 @@ namespace ymir {
                 }
 
                 new_param_vec.normaliseEventFamilies();
-                *(model._param_vec) = new_param_vec;
-                model.make_builder();
+                model.updateEventProbabilitiesVector(new_param_vec);
                 model.updateEventProbabilities(&maag_rep);
 
                 cout << "Loglikelihood:\t" << loglikelihood(prob_vec) << endl;
             }
 
-            model.make_assembler();
             return true;
         }
 

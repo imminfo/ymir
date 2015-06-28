@@ -284,6 +284,9 @@ namespace ymir {
             }
         }
 
+
+        size_t size() const { return _vec.size(); }
+
     private:
 
         vector<prob_t> _vec;

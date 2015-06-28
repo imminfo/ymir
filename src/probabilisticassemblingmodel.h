@@ -125,7 +125,7 @@ namespace ymir {
          */
         vector<prob_t> computeFullProbabilities(const ClonesetView& repertoire,
                                                 bool aminoacid = false,
-                                                MAAG_COMPUTE_PROB_ACTION action = MAX_PROBABILITY) const {
+                                                MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
             return this->_builder->buildAndCompute(repertoire, aminoacid, action);
         }
 
@@ -146,6 +146,9 @@ namespace ymir {
         }
 
 
+        /**
+         *
+         */
         void updateEventProbabilities(MAAGRepertoire *repertoire) {
             this->_builder->updateEventProbabilities(repertoire);
         }
@@ -177,6 +180,30 @@ namespace ymir {
          * \brief Access to vector of probabilities.
          */
         const ModelParameterVector& event_probabilities() const { return *_param_vec; }
+
+        /**
+         *
+         */
+        void updateEventProbabilitiesVector(const ModelParameterVector &vec) {
+#ifdef YDEBUG
+            if (_param_vec->recombination() == vec.recombination() && _param_vec->size() == vec.size()) {
+                throw(std::runtime_error("Model parameter vectors are not comparable!"));
+            }
+#endif
+
+            *_param_vec = vec;
+            this->make_builder();
+            this->make_assembler();
+
+//            if (_param_vec->recombination() == vec.recombination() && _param_vec->size() == vec.size()) {
+//                *_param_vec = vec;
+//                this->make_builder();
+//                this->make_assembler();
+//                return true;
+//            }
+//
+//            return false;
+        }
 
 
         /**

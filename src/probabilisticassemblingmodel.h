@@ -71,8 +71,8 @@ namespace ymir {
     public:
 
         /**
-        *
-        */
+         * \brief Model constructor from the given folder with a model's parameters.
+         */
         ProbabilisticAssemblingModel(const string& folderpath) {
             _model_path = folderpath + "/";
 
@@ -147,7 +147,7 @@ namespace ymir {
 
 
         /**
-         *
+         * \brief Update event probabilities in the given MAAG repertoire with new ones.
          */
         void updateEventProbabilities(MAAGRepertoire *repertoire) {
             this->_builder->updateEventProbabilities(repertoire);
@@ -182,7 +182,9 @@ namespace ymir {
         const ModelParameterVector& event_probabilities() const { return *_param_vec; }
 
         /**
+         * \brief Set a new event probabilities vector to this model.
          *
+         * \param vec Vector with new event probabilities.
          */
         void updateEventProbabilitiesVector(const ModelParameterVector &vec) {
 #ifdef YDEBUG

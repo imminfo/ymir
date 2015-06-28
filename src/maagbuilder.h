@@ -74,7 +74,7 @@ namespace ymir {
          * \param clonotype Clonotype from which build the MAAG.
          * \param cloneset Set of clonotypes from which build the repertoires of MAAGs.
          * \param full_build If true than make MAAG with stored event indices.
-         * ???? \param aminoacid If true than build MAAGs from the aminoacid sequences.
+         * \param aminoacid If true than build MAAGs from the aminoacid sequences.
          */
         ///@{
         MAAG build(const Clonotype &clonotype, bool full_build = false) const {
@@ -145,7 +145,13 @@ namespace ymir {
 
 
         /**
-         * \brief Compute generation probabilities.
+         * \brief Compute generation probabilities without building the full information about MAAGs.
+         *
+         * \param clonotype
+         * \param cloneset
+         * \param aminoacid If true then compute amino acid generation probabilities.
+         * \param action What action to perform for computing generation probabilties - either sum all probabilities
+         * or choose the max one.
          */
         ///@{
         prob_t buildAndCompute(const Clonotype &clonotype, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
@@ -168,6 +174,9 @@ namespace ymir {
 
         /**
          * \brief Replace event probabilities in the given MAAGs if they have stored event indices.
+         *
+         * \param maag MAAG with an event indices matrix.
+         * \param repertoire Repertoire with MAAGs with event indices matrices.
          */
         ///@{
         void updateEventProbabilities(MAAG *maag) const {

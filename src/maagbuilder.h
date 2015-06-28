@@ -197,7 +197,7 @@ namespace ymir {
 
         void updateEventProbabilities(MAAGRepertoire *repertoire) const {
             for (size_t i = 0; i < repertoire->size(); ++i) {
-                this->updateEventProbabilities(repertoire->data() + i);
+                this->updateEventProbabilities(&*(repertoire->begin() + i));  // facepalm
             }
         }
         ///@}
@@ -693,6 +693,7 @@ namespace ymir {
         {
             int insertion_len;
             bool good_insertion;
+            char last_char = NULL_CHAR;
 
             for (size_t left_vertex_i = left_vertices_start; left_vertex_i <= left_vertices_end; ++left_vertex_i) {
                 for (size_t right_vertex_i = right_vertices_start; right_vertex_i <= right_vertices_end; ++right_vertex_i) {
@@ -700,17 +701,14 @@ namespace ymir {
                     good_insertion = (insertion_len >= 0) && (insertion_len <= max_size);
                     if (good_insertion) {
                         if (seq_poses[left_vertex_i] == 0) {
-                            // seq_iterator(0) and multiplication by .25 here because we don't know the last nucleotide
-                            // of the aligned gene segment. And, honestly, it doesn't even matter and won't dramatically affect the result.
-                            probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
-                                    = mc.nucProbability(clonotype.seq_iterator(0), insertion_len)
-                                      * .25
-                                      * (*_param_vec)[null_insertion + insertion_len];
+                            last_char = NULL_CHAR;
                         } else {
-                            probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
-                                    = mc.nucProbability(clonotype.seq_iterator(seq_poses[left_vertex_i] - 1), insertion_len)
-                                      * (*_param_vec)[null_insertion + insertion_len];
+                            last_char = clonotype.sequence()[seq_poses[left_vertex_i] - 1];
                         }
+
+                        probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
+                                = mc.nucProbability(clonotype.seq_iterator(seq_poses[left_vertex_i]), insertion_len, last_char)
+                                  * (*_param_vec)[null_insertion + insertion_len];
 
                         if (full_build) {
                             events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)

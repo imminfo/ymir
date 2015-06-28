@@ -359,6 +359,9 @@ namespace ymir {
 
         bool has_events() const { return _events; }
 
+
+        const string& sequence() const { if (_sequence) { return *_sequence; } else { return ""; }}
+
     protected:
 
         EventIndMMC *_events;  /** Matrix of indices of events for each edge. */

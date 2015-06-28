@@ -695,7 +695,7 @@ namespace ymir {
                              ProbMMC &probs,
                              EventIndMMC &events,
                              vector<seq_len_t> &seq_poses,
-                             seq_len_t ins_node_index,
+                             ProbMMC::node_ind_t ins_node_index,
                              eventind_t null_insertion,
                              seq_len_t max_size,
                              bool full_build,

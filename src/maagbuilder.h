@@ -127,7 +127,7 @@ namespace ymir {
             }
         }
 
-        MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false) const {
+        MAAGRepertoire build(const ClonesetView &cloneset, bool full_build = false, bool verbose = true) const {
             MAAGRepertoire res;
 //            res.reserve(cloneset.size());
             res.resize(cloneset.size());
@@ -140,8 +140,10 @@ namespace ymir {
 //                tmp = this->build(cloneset[i], full_build);
 //                res[i].swap_maag(this->build(cloneset[i], full_build));
 
-                if ((i+1) % 50000 == 0) {
-                    cout << "Built " << (int) (i+1) << " graphs." << endl;
+                if (verbose) {
+                    if ((i+1) % 50000 == 0) {
+                        cout << "Built " << (int) (i+1) << " graphs." << endl;
+                    }
                 }
             }
             return res;
@@ -186,14 +188,70 @@ namespace ymir {
         ///@{
         void updateEventProbabilities(MAAG *maag) const {
             if (maag->has_events()) {
+                vector<seq_len_t> seq_poses_vec(maag->_seq_poses, maag->_seq_poses + maag->_n_poses);
                 for (int node_i = 0; node_i < maag->chainSize(); ++node_i) {
                     // either rebuild all insertions
                     if (maag->is_vj() && node_i == VarJoi_INSERTIONS_MATRIX_INDEX) {
-                        // ???
+                        InsertionModel im(MonoNucleotide, _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
+
+                        seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                                j_vertices = maag->nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
+
+                        this->buildInsertions(maag->sequence(),
+                                              *maag,
+                                              *maag->_events,
+                                              seq_poses_vec,
+                                              VarJoi_INSERTIONS_MATRIX_INDEX,
+                                              _param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0),
+                                              _param_vec->max_VJ_ins_len(),
+                                              false,
+                                              0,
+                                              v_vertices - 1,
+                                              v_vertices,
+                                              v_vertices + j_vertices - 1,
+                                              im);
+
                     } else if (maag->is_vdj() && node_i == VarDiv_INSERTIONS_MATRIX_INDEX) {
-                        // ???
+                        InsertionModel im(DiNucleotide, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
+
+                        seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                                d3_vertices = maag->nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
+
+                        this->buildInsertions(maag->sequence(),
+                                              *maag,
+                                              *maag->_events,
+                                              seq_poses_vec,
+                                              VarDiv_INSERTIONS_MATRIX_INDEX,
+                                              _param_vec->event_index(VDJ_VAR_DIV_INS_LEN, 0, 0),
+                                              _param_vec->max_VD_ins_len(),
+                                              false,
+                                              0,
+                                              v_vertices - 1,
+                                              v_vertices,
+                                              v_vertices + d3_vertices - 1,
+                                              im);
+
                     } else if (maag->is_vdj() && node_i == DivJoi_INSERTIONS_MATRIX_INDEX) {
-                        // ???
+                        InsertionModel im(DiNucleotide, _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
+
+                        seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                                d3_vertices = maag->nodeRows(DIVERSITY_GENES_MATRIX_INDEX),
+                                d5_vertices = maag->nodeColumns(DIVERSITY_GENES_MATRIX_INDEX),
+                                j_vertices = maag->nodeRows(JOINING_DELETIONS_VDJ_MATRIX_INDEX);
+
+                        this->buildInsertions(maag->sequence(),
+                                              *maag,
+                                              *maag->_events,
+                                              seq_poses_vec,
+                                              DivJoi_INSERTIONS_MATRIX_INDEX,
+                                              _param_vec->event_index(VDJ_DIV_JOI_INS_LEN, 0, 0),
+                                              _param_vec->max_DJ_ins_len(),
+                                              false,
+                                              v_vertices + d3_vertices,
+                                              v_vertices + d3_vertices + d5_vertices - 1,
+                                              v_vertices + d3_vertices + d5_vertices,
+                                              v_vertices + d3_vertices + d5_vertices + j_vertices - 1,
+                                              im);
                     } else {
                         // or just replace all event probabilities with the new ones
                         for (int mat_i = 0; mat_i < maag->nodeSize(node_i); ++mat_i) {
@@ -558,7 +616,7 @@ namespace ymir {
         void buildVJinsertions(const Clonotype &clonotype,
                                ProbMMC &probs,
                                EventIndMMC &events,
-                               vector<seq_len_t> &seq_poses,
+                               const vector<seq_len_t> &seq_poses,
                                bool full_build) const
         {
             InsertionModel mc(MonoNucleotide, _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
@@ -572,7 +630,7 @@ namespace ymir {
                 events.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
             }
 
-            this->buildInsertions(clonotype,
+            this->buildInsertions(clonotype.sequence(),
                                   probs,
                                   events,
                                   seq_poses,
@@ -600,7 +658,7 @@ namespace ymir {
         void buildVDinsertions(const Clonotype &clonotype,
                                ProbMMC &probs,
                                EventIndMMC &events,
-                               vector<seq_len_t> &seq_poses,
+                               const vector<seq_len_t> &seq_poses,
                                bool full_build) const
         {
             InsertionModel mc(DiNucleotide, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
@@ -614,7 +672,7 @@ namespace ymir {
                 events.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d3_vertices);
             }
 
-            this->buildInsertions(clonotype,
+            this->buildInsertions(clonotype.sequence(),
                                   probs,
                                   events,
                                   seq_poses,
@@ -642,7 +700,7 @@ namespace ymir {
         void buildDJinsertions(const Clonotype &clonotype,
                                ProbMMC &probs,
                                EventIndMMC &events,
-                               vector<seq_len_t> &seq_poses,
+                               const vector<seq_len_t> &seq_poses,
                                bool full_build) const
         {
             InsertionModel mc(DiNucleotide, _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
@@ -658,7 +716,7 @@ namespace ymir {
                 events.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d5_vertices, j_vertices);
             }
 
-            this->buildInsertions(clonotype,
+            this->buildInsertions(clonotype.sequence(),
                                   probs,
                                   events,
                                   seq_poses,
@@ -691,10 +749,10 @@ namespace ymir {
          * \param right_vertices_end Ending index in seq_poses for the vertices in the right matrix.
          * \param mc Insertion model that uses for generation of N nucleotides.
         */
-        void buildInsertions(const Clonotype &clonotype,
+        void buildInsertions(const string &sequence,
                              ProbMMC &probs,
                              EventIndMMC &events,
-                             vector<seq_len_t> &seq_poses,
+                             const vector<seq_len_t> &seq_poses,
                              ProbMMC::node_ind_t ins_node_index,
                              eventind_t null_insertion,
                              seq_len_t max_size,
@@ -717,11 +775,11 @@ namespace ymir {
                         if (seq_poses[left_vertex_i] == 0) {
                             last_char = NULL_CHAR;
                         } else {
-                            last_char = clonotype.sequence()[seq_poses[left_vertex_i] - 1];
+                            last_char = sequence[seq_poses[left_vertex_i] - 1];
                         }
 
                         probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
-                                = mc.nucProbability(clonotype.seq_iterator(seq_poses[left_vertex_i]), insertion_len, last_char)
+                                = mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char)
                                   * (*_param_vec)[null_insertion + insertion_len];
 
                         if (full_build) {

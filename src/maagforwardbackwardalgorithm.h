@@ -121,9 +121,11 @@ namespace ymir {
         void pushEventPairs(const MAAG &maag, node_ind_t node_i, matrix_ind_t mat_i_fb, matrix_ind_t mat_i_algo) {
             for (dim_t row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(node_i); ++col_i) {
-                    _pairs.push_back(event_pair_t(
-                            maag.event_index(node_i, mat_i_fb, row_i, col_i),
-                            (*_forward_acc)(node_i, mat_i_algo, row_i, col_i) * (*_backward_acc)(node_i, mat_i_algo, row_i, col_i)));
+                    if (maag.event_index(node_i, mat_i_fb, row_i, col_i)) {
+                        _pairs.push_back(event_pair_t(
+                                maag.event_index(node_i, mat_i_fb, row_i, col_i),
+                                (*_forward_acc)(node_i, mat_i_algo, row_i, col_i) * (*_backward_acc)(node_i, mat_i_algo, row_i, col_i)));
+                    }
                 }
             }
         }

@@ -129,9 +129,12 @@ namespace ymir {
 
         void inferInsertionNucleotides(const MAAG &maag, node_ind_t ins_node,
                                        seq_len_t left_start_pos, seq_len_t left_end_pos,
-                                       seq_len_t right_start_pos, seq_len_t right_end_pos) {
+                                       seq_len_t right_start_pos, seq_len_t right_end_pos,
+                                       eventind_t event_index_start) {
             node_ind_t forw_node = ins_node - 1, back_node = ins_node;
             prob_t scenario_prob = 0;
+            prob_t *arr = nullptr, *temp_arr = nullptr;
+            int n = 0;
 
 #ifdef YDEBUG
             if (left_end_pos - left_start_pos + 1 != maag.nodeRows(forw_node)) { throw(std::runtime_error("Wrong position boundaries (forward node)!")); }
@@ -139,19 +142,60 @@ namespace ymir {
 #endif
 
             if (maag.is_vj()) {
-                prob_t arr[4];
+                arr = new prob_t[4];
                 fill(arr, arr + 4, 0);
+
                 for (seq_len_t left_pos = left_start_pos; left_pos <= left_end_pos; ++left_pos) {
                     for (seq_len_t right_pos = right_start_pos; right_pos <= right_end_pos; ++right_pos) {
+                        fill(temp_arr, temp_arr + 4, 0);
+                        n = 0;
+
+                        if (maag.seq_pos(right_pos) - maag.seq_pos(left_pos) - 1 > 0) {
+                            for (seq_len_t pos = left_pos + 1; pos <= right_pos - 1; ++pos) {
+                                arr[nuc_hash(maag.sequence()[pos - 1])] += 1;
+                                ++n;
+                            }
+
+                            scenario_prob = (*_forward_acc)(forw_node, 0, 0, left_pos) * (_backward_acc)(back_node, 0, 0, right_pos);
+
+                            for (auto i = 0; i < 4; ++i) {
+                                arr[i] = (arr[i] * scenario_prob) / n;
+                            }
+                        }
                     }
                 }
             } else {
-                prob_t arr[16];
+                arr = new prob_t[16];
                 fill(arr, arr + 16, 0);
-                for (dim_t row_i = 0; row_i < maag.nodeRows(ins_node); ++row_i) {
-                    for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
-                        scenario_prob = (*_forward_acc)(forw_node, 0, row_i, col_i) * (_backward_acc)(back_node, 0, row_i, col_i);
-                        maag.seq_pos(col_i) - maag.seq_pos(row_i) - 1;
+
+                for (seq_len_t left_pos = left_start_pos; left_pos <= left_end_pos; ++left_pos) {
+                    for (seq_len_t right_pos = right_start_pos; right_pos <= right_end_pos; ++right_pos) {
+                        if (maag.seq_pos(right_pos) - maag.seq_pos(left_pos) - 1 > 0) {
+                            for (dim_t row_i = 0; row_i < maag.nodeRows(forw_node); ++row_i) {
+                                fill(temp_arr, temp_arr + 16, 0);
+                                n = 0;
+
+                                if (left_pos) {
+                                    for (seq_len_t pos = left_pos + 1; pos <= right_pos - 1; ++pos) {
+                                        arr[4 * nuc_hash(maag.sequence()[pos - 2]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
+                                        ++n;
+                                    }
+                                } else {
+                                    arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 1])]
+                                    for (seq_len_t pos = left_pos + 2; pos <= right_pos - 1; ++pos) {
+                                        arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
+                                        ++n;
+                                    }
+                                }
+
+                                scenario_prob = (*_forward_acc)(forw_node, 0, row_i, left_pos) * (_backward_acc)(back_node, 0, 0, right_pos);
+
+                                for (auto i = 0; i < 16; ++i) {
+                                    // ???
+                                    arr[i] = (arr[i] * scenario_prob) / n;
+                                }
+                            }
+                        }
                     }
                 }
             }

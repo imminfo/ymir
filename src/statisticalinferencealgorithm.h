@@ -98,7 +98,7 @@ namespace ymir {
             vector<prob_t> prob_vec;
             prob_vec.resize(rep_nonc.size(), 0);
 
-            cout << "Initial:" << endl;
+            cout << "Initial data summary:" << endl;
             for (size_t i = 0; i < prob_vec.size(); ++i) {
                 prob_vec[i] = maag_rep[i].fullProbability();
                 if (isnan(prob_vec[i])) cout << (size_t) i << endl;

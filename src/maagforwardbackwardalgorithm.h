@@ -37,6 +37,10 @@ namespace ymir {
 
         event_pair_t nextEvent() {
             if (_status) {
+                if (!_vectorised) {
+                    this->vectorise_pair_map();
+                    _vectorised = true;
+                }
                 event_pair_t res = _pairs[_pairs_i];
 //                cout << res.second << " -> ";
                 res.second = res.second / _full_prob;
@@ -74,6 +78,7 @@ namespace ymir {
     protected:
 
         bool _status;
+        bool _vectorised;
         ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspond. */
         prob_t _full_prob;  /** Full generation probability of the input MAAG. */
         prob_t _back_full_prob;  /** Full generation probability of the input MAAG obtained with backward algorithm. Just for testing purposes. */
@@ -82,12 +87,14 @@ namespace ymir {
         // lazy evaluation for _pairs filling with values.
         vector<event_pair_t> _pairs;
         size_t _pairs_i;
+        unordered_map<eventind_t, prob_t> _pair_map;
 
 
 
         bool init_and_process(const MAAG &maag) {
             _pairs_i = 0;
             _status = false;
+            _vectorised = false;
             _pairs.resize(0);
             _full_prob = 0;
             _back_full_prob = 0;
@@ -120,28 +127,70 @@ namespace ymir {
         }
 
 
-        void pushEventPairs(const MAAG &maag, node_ind_t node_i, matrix_ind_t mat_i_fb, matrix_ind_t mat_i_algo) {
-            for (dim_t row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
-                for (dim_t col_i = 0; col_i < maag.nodeColumns(node_i); ++col_i) {
-                    if (maag.event_index(node_i, mat_i_fb, row_i, col_i)) {
-                        _pairs.push_back(event_pair_t(
-                                maag.event_index(node_i, mat_i_fb, row_i, col_i),
-                                (*_forward_acc)(node_i, mat_i_algo, row_i, col_i) * (*_backward_acc)(node_i, mat_i_algo, row_i, col_i)));
+        void inferInsertionNucleotides(const MAAG &maag, node_ind_t ins_node,
+                                       seq_len_t left_start_pos, seq_len_t left_end_pos,
+                                       seq_len_t right_start_pos, seq_len_t right_end_pos) {
+            node_ind_t forw_node = ins_node - 1, back_node = ins_node;
+            prob_t scenario_prob = 0;
 
-//                        if (isnan(_pairs[_pairs.size() - 1].second)) {
-//                            cout << "NAN:::" << endl;
-//                            cout << "node:" << (size_t) node_i << endl;
-//                            cout << "mat_i_algo:" << (size_t) mat_i_algo << endl;
-//                            cout << "row_i:" << (size_t) row_i << endl;
-//                            cout << "col_i:" << (size_t) col_i << endl;
-//                            cout << (*_forward_acc)(node_i, mat_i_algo, row_i, col_i) << "  ";
-//                            cout << (*_backward_acc)(node_i, mat_i_algo, row_i, col_i) << endl;
-//                        }
-                    }
+#ifdef YDEBUG
+            if (left_end_pos - left_start_pos + 1 != maag.nodeRows(forw_node)) { throw(std::runtime_error("Wrong position boundaries (forward node)!")); }
+            if (right_end_pos - right_start_pos + 1 != maag.nodeColumns(back_node)) { throw(std::runtime_error("Wrong position boundaries (backward node)!")); }
+#endif
+
+            for (dim_t row_i = 0; row_i < maag.nodeRows(ins_node); ++row_i) {
+                for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
+                    scenario_prob = ;
+                    maag.seq_pos(col_i) - maag.seq_pos(row_i) - 1;
                 }
             }
         }
 
+
+        void pushEventPair(const MAAG &maag, node_ind_t node_i, matrix_ind_t maag_mat_i, dim_t maag_row_i, dim_t maag_col_i,
+                                                                matrix_ind_t fb_mat_i, dim_t fb_row_i, dim_t fb_col_i) {
+            if (maag.event_index(node_i, maag_mat_i, maag_row_i, maag_col_i)) {
+                auto elem = _pair_map.find(maag.event_index(node_i, maag_mat_i, maag_row_i, maag_col_i));
+
+                if (elem != _pair_map.end()) {
+                    _pair_map[maag.event_index(node_i, maag_mat_i, maag_row_i, maag_col_i)] +=
+                            (*_forward_acc)(node_i, fb_mat_i, fb_row_i, fb_col_i) * (*_backward_acc)(node_i, fb_mat_i, fb_row_i, fb_col_i);
+                } else {
+                    _pair_map[maag.event_index(node_i, maag_mat_i, maag_row_i, maag_col_i)] =
+                            (*_forward_acc)(node_i, fb_mat_i, fb_row_i, fb_col_i) * (*_backward_acc)(node_i, fb_mat_i, fb_row_i, fb_col_i);
+                }
+            }
+        }
+
+
+        void pushEventPairs(const MAAG &maag, node_ind_t node_i, matrix_ind_t maag_mat_i, matrix_ind_t fb_mat_i) {
+            for (dim_t row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
+                for (dim_t col_i = 0; col_i < maag.nodeColumns(node_i); ++col_i) {
+                    this->pushEventPair(maag, node_i, maag_mat_i, row_i, col_i, fb_mat_i, row_i, col_i);
+//                    _pairs.push_back(event_pair_t(
+//                            maag.event_index(node_i, mat_i_fb, row_i, col_i),
+//                            (*_forward_acc)(node_i, mat_i_algo, row_i, col_i) * (*_backward_acc)(node_i, mat_i_algo, row_i, col_i)));
+//
+//                    if (isnan(_pairs[_pairs.size() - 1].second)) {
+//                        cout << "NAN:::" << endl;
+//                        cout << "node:" << (size_t) node_i << endl;
+//                        cout << "mat_i_algo:" << (size_t) mat_i_algo << endl;
+//                        cout << "row_i:" << (size_t) row_i << endl;
+//                        cout << "col_i:" << (size_t) col_i << endl;
+//                        cout << (*_forward_acc)(node_i, mat_i_algo, row_i, col_i) << "  ";
+//                        cout << (*_backward_acc)(node_i, mat_i_algo, row_i, col_i) << endl;
+//                        }
+                }
+            }
+        }
+
+
+        void vectorise_pair_map() {
+            _pairs.reserve(_pair_map.size());
+            for (auto it = _pair_map.begin(); it != _pair_map.end(); ++it) {
+                _pairs.push_back(event_pair_t(it->first, it->second));
+            }
+        }
 
 
         //
@@ -272,9 +321,10 @@ namespace ymir {
 
                 // add fi * bi for this J to the accumulator
                 for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_VAR_JOI_GEN_I); ++row_i) {
-                    _pairs.push_back(event_pair_t(
-                            maag.event_index(VJ_VAR_JOI_GEN_I, 0, row_i, j_ind),
-                            (*_forward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0) * (*_backward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0)));
+                    this->pushEventPair(maag, VJ_VAR_JOI_GEN_I, 0, row_i, j_ind, 0, row_i, 0);
+//                    _pairs.push_back(event_pair_t(
+//                            maag.event_index(VJ_VAR_JOI_GEN_I, 0, row_i, j_ind),
+//                            (*_forward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0) * (*_backward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0)));
                 }
                 for (matrix_ind_t mat_i = 0; mat_i < maag.nVar(); ++mat_i) {
                     this->pushEventPairs(maag, VJ_VAR_DEL_I, mat_i, mat_i);
@@ -481,9 +531,10 @@ namespace ymir {
                     this->pushEventPairs(maag, VDJ_DIV_DEL_I, d_ind, 0);
                     this->pushEventPairs(maag, VDJ_DIV_JOI_INS_I, d_ind, 0);
                     this->pushEventPairs(maag, VDJ_JOI_DEL_I, j_ind, 0);
-                    _pairs.push_back(event_pair_t(
-                            maag.event_index(VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind),
-                            (*_forward_acc)(VDJ_JOI_DEL_I, 0, 0, 0) * (*_backward_acc)(VDJ_JOI_DEL_I, 0, 0, 0)));
+                    this->pushEventPair(maag, VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind, 0, 0, 0);
+//                    _pairs.push_back(event_pair_t(
+//                            maag.event_index(VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind),
+//                            (*_forward_acc)(VDJ_JOI_DEL_I, 0, 0, 0) * (*_backward_acc)(VDJ_JOI_DEL_I, 0, 0, 0)));
                 }
             }
         }

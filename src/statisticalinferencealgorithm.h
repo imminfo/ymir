@@ -89,7 +89,7 @@ namespace ymir {
 
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
 
-            ClonesetView rep_nonc = repertoire.noncoding().slice(1, 10);
+            ClonesetView rep_nonc = repertoire.noncoding(); //.slice(1, 10);
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
             cout << "Building MAAGs..." << endl;
@@ -111,7 +111,7 @@ namespace ymir {
                 new_param_vec.clear();
 
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
-                    cout << "INDEX:::" << (size_t) i << endl;
+//                    cout << "INDEX:::" << (size_t) i << endl;
                     MAAGForwardBackwardAlgorithm fb(maag_rep[i]);
 
                     bool nanflag = false;

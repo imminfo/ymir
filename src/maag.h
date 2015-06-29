@@ -362,6 +362,9 @@ namespace ymir {
 
         const string& sequence() const { if (_sequence) { return *_sequence; } else { return ""; }}
 
+
+        seq_len_t seq_pos(size_t i) const { return _seq_poses[i]; }
+
     protected:
 
         EventIndMMC *_events;  /** Matrix of indices of events for each edge. */

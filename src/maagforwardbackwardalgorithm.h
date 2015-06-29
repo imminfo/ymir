@@ -138,10 +138,22 @@ namespace ymir {
             if (right_end_pos - right_start_pos + 1 != maag.nodeColumns(back_node)) { throw(std::runtime_error("Wrong position boundaries (backward node)!")); }
 #endif
 
-            for (dim_t row_i = 0; row_i < maag.nodeRows(ins_node); ++row_i) {
-                for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
-                    scenario_prob = ;
-                    maag.seq_pos(col_i) - maag.seq_pos(row_i) - 1;
+            if (maag.is_vj()) {
+                prob_t arr[4];
+                fill(arr, arr + 4, 0);
+                for (seq_len_t left_pos = left_start_pos; left_pos <= left_end_pos; ++left_pos) {
+                    for (seq_len_t right_pos = right_start_pos; right_pos <= right_end_pos; ++right_pos) {
+
+                    }
+                }
+            } else {
+                prob_t arr[16];
+                fill(arr, arr + 16, 0);
+                for (dim_t row_i = 0; row_i < maag.nodeRows(ins_node); ++row_i) {
+                    for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
+                        scenario_prob = (*_forward_acc)(forw_node, 0, row_i, col_i) * (_backward_acc)(back_node, 0, row_i, col_i);
+                        maag.seq_pos(col_i) - maag.seq_pos(row_i) - 1;
+                    }
                 }
             }
         }

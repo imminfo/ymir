@@ -143,7 +143,6 @@ namespace ymir {
                 fill(arr, arr + 4, 0);
                 for (seq_len_t left_pos = left_start_pos; left_pos <= left_end_pos; ++left_pos) {
                     for (seq_len_t right_pos = right_start_pos; right_pos <= right_end_pos; ++right_pos) {
-
                     }
                 }
             } else {

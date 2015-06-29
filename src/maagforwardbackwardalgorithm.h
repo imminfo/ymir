@@ -31,6 +31,8 @@ namespace ymir {
         virtual ~MAAGForwardBackwardAlgorithm() {
             if (_forward_acc) { delete _forward_acc; }
             if (_backward_acc) { delete _backward_acc; }
+            if (_nuc_arr1) { delete _nuc_arr1; }
+            if (_nuc_arr2) { delete _nuc_arr2; }
 //            if (_fb_acc) { delete _fb_acc; }
         }
 
@@ -43,7 +45,7 @@ namespace ymir {
                 }
                 event_pair_t res = _pairs[_pairs_i];
 //                cout << res.second << " -> ";
-                res.second = res.second / _full_prob;
+//                res.second = res.second / _full_prob;
 //                cout << res.second << endl;
                 ++_pairs_i;
                 return res;
@@ -75,6 +77,11 @@ namespace ymir {
 
         const vector<event_pair_t>& event_pairs() const { return _pairs; }
 
+
+        prob_t* VJ_nuc_probs() { return _nuc_arr1; }
+        prob_t* VD_nuc_probs() { return _nuc_arr1; }
+        prob_t* DJ_nuc_probs() { return _nuc_arr2; }
+
     protected:
 
         bool _status;
@@ -83,14 +90,15 @@ namespace ymir {
         prob_t _full_prob;  /** Full generation probability of the input MAAG. */
         prob_t _back_full_prob;  /** Full generation probability of the input MAAG obtained with backward algorithm. Just for testing purposes. */
 
-        // TODO:
-        // lazy evaluation for _pairs filling with values.
         vector<event_pair_t> _pairs;
         size_t _pairs_i;
         unordered_map<eventind_t, prob_t> _pair_map;
+        prob_t *_nuc_arr1, *_nuc_arr2;
 
 
-
+        /**
+         *
+         */
         bool init_and_process(const MAAG &maag) {
             _pairs_i = 0;
             _status = false;
@@ -100,14 +108,19 @@ namespace ymir {
             _back_full_prob = 0;
             _forward_acc = nullptr;
             _backward_acc = nullptr;
-            _pairs.reserve(maag._chain.size());
+            _nuc_arr1 = nullptr;
+            _nuc_arr2 = nullptr;
+//            _pairs.reserve(maag._chain.size());
             if (maag._events) {
 //                _chain = maag._chain;
 //                _events = maag._events;
                 _status = true;
                 if (maag.recombination() == VJ_RECOMB) {
+                    _nuc_arr1 = new prob_t[4];
                     this->forward_backward_vj(maag);
                 } else if (maag.recombination() == VDJ_RECOMB) {
+                    _nuc_arr1 = new prob_t[16];
+                    _nuc_arr2 = new prob_t[16];
                     this->forward_backward_vdj(maag);
                 } else {
                     cerr << "MAAG forward-backward algorithm error: unknown recombination type." << endl;
@@ -130,93 +143,116 @@ namespace ymir {
         void inferInsertionNucleotides(const MAAG &maag, node_ind_t ins_node,
                                        seq_len_t left_start_pos, seq_len_t left_end_pos,
                                        seq_len_t right_start_pos, seq_len_t right_end_pos,
-                                       eventind_t event_index_start) {
+                                       prob_t *nuc_arr) {
             node_ind_t forw_node = ins_node - 1, back_node = ins_node;
             prob_t scenario_prob = 0;
-            prob_t *arr = nullptr, *temp_arr = nullptr;
+            prob_t *temp_arr = nullptr;
             int n = 0;
+            seq_len_t left_pos, right_pos;
 
-#ifdef YDEBUG
-            if (left_end_pos - left_start_pos + 1 != maag.nodeRows(forw_node)) { throw(std::runtime_error("Wrong position boundaries (forward node)!")); }
-            if (right_end_pos - right_start_pos + 1 != maag.nodeColumns(back_node)) { throw(std::runtime_error("Wrong position boundaries (backward node)!")); }
-#endif
+//#ifdef YDEBUG
+//            if (left_end_pos - left_start_pos + 1 != maag.nodeRows(forw_node)) { throw(std::runtime_error("Wrong position boundaries (forward node)!")); }
+//            if (right_end_pos - right_start_pos + 1 != maag.nodeColumns(back_node)) { throw(std::runtime_error("Wrong position boundaries (backward node)!")); }
+//#endif
 
             if (maag.is_vj()) {
-                arr = new prob_t[4];
-                fill(arr, arr + 4, 0);
-
-                for (seq_len_t left_pos = left_start_pos; left_pos <= left_end_pos; ++left_pos) {
-                    for (seq_len_t right_pos = right_start_pos; right_pos <= right_end_pos; ++right_pos) {
+                temp_arr = new prob_t[4];
+                for (dim_t row_i = 0; row_i < maag.nodeRows(ins_node); ++row_i) {
+                    left_pos = left_start_pos + row_i;
+                    for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
+                        right_pos = right_start_pos + col_i;
                         fill(temp_arr, temp_arr + 4, 0);
                         n = 0;
 
                         if (maag.seq_pos(right_pos) - maag.seq_pos(left_pos) - 1 > 0) {
                             for (seq_len_t pos = left_pos + 1; pos <= right_pos - 1; ++pos) {
-                                arr[nuc_hash(maag.sequence()[pos - 1])] += 1;
-                                ++n;
+                                temp_arr[nuc_hash(maag.sequence()[pos - 1])] += 1;
+                                ++n;  // why is it zero ????
                             }
 
-                            scenario_prob = (*_forward_acc)(forw_node, 0, 0, left_pos) * (_backward_acc)(back_node, 0, 0, right_pos);
+                            scenario_prob = (*_forward_acc)(forw_node, 0, 0, row_i)
+                                            * maag(ins_node, 0, row_i, col_i)
+                                            * (*_backward_acc)(back_node, 0, row_i, col_i);
 
                             for (auto i = 0; i < 4; ++i) {
-                                arr[i] = (arr[i] * scenario_prob) / n;
+                                nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
                             }
                         }
                     }
                 }
             } else {
-                arr = new prob_t[16];
-                fill(arr, arr + 16, 0);
-
-                for (seq_len_t left_pos = left_start_pos; left_pos <= left_end_pos; ++left_pos) {
-                    for (seq_len_t right_pos = right_start_pos; right_pos <= right_end_pos; ++right_pos) {
+                temp_arr = new prob_t[16];
+                for (dim_t row_i = 0; row_i < maag.nodeRows(ins_node); ++row_i) {
+                    left_pos = left_start_pos + row_i;
+                    for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
                         if (maag.seq_pos(right_pos) - maag.seq_pos(left_pos) - 1 > 0) {
-                            for (dim_t row_i = 0; row_i < maag.nodeRows(forw_node); ++row_i) {
-                                fill(temp_arr, temp_arr + 16, 0);
-                                n = 0;
+                            right_pos = right_start_pos + col_i;
+                            fill(temp_arr, temp_arr + 16, 0);
+                            n = 0;
 
-                                if (left_pos) {
-                                    for (seq_len_t pos = left_pos + 1; pos <= right_pos - 1; ++pos) {
-                                        arr[4 * nuc_hash(maag.sequence()[pos - 2]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
-                                        ++n;
-                                    }
-                                } else {
-                                    arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 1])]
-                                    for (seq_len_t pos = left_pos + 2; pos <= right_pos - 1; ++pos) {
-                                        arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
-                                        ++n;
-                                    }
+                            if (left_pos) {
+                                for (seq_len_t pos = left_pos + 1; pos <= right_pos - 1; ++pos) {
+                                    temp_arr[4 * nuc_hash(maag.sequence()[pos - 2]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
+                                    ++n;
                                 }
+                            } else {
+                                temp_arr[4 * nuc_hash('A') + nuc_hash(maag.sequence()[0])] = .25;
+                                temp_arr[4 * nuc_hash('C') + nuc_hash(maag.sequence()[0])] = .25;
+                                temp_arr[4 * nuc_hash('G') + nuc_hash(maag.sequence()[0])] = .25;
+                                temp_arr[4 * nuc_hash('T') + nuc_hash(maag.sequence()[0])] = .25;
+                                for (seq_len_t pos = left_pos + 2; pos <= right_pos - 1; ++pos) {
+                                    temp_arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
+                                    ++n;
+                                }
+                            }
 
-                                scenario_prob = (*_forward_acc)(forw_node, 0, row_i, left_pos) * (_backward_acc)(back_node, 0, 0, right_pos);
+                            scenario_prob = (*_forward_acc)(forw_node, 0, 0, row_i)
+                                            * maag(ins_node, 0, row_i, col_i)
+                                            * (*_backward_acc)(back_node, 0, row_i, col_i);
+
+                            for (auto i = 0; i < 16; ++i) {
+                                nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
+                            }
+
+                            for (dim_t frow_i = 1; frow_i < maag.nodeRows(forw_node); ++frow_i) {
+                                scenario_prob = (*_forward_acc)(forw_node, 0, frow_i, row_i)
+                                                * maag(ins_node, 0, row_i, col_i)
+                                                * (*_backward_acc)(back_node, 0, row_i, col_i);
 
                                 for (auto i = 0; i < 16; ++i) {
-                                    // ???
-                                    arr[i] = (arr[i] * scenario_prob) / n;
+                                    nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
                                 }
                             }
                         }
                     }
                 }
             }
+
+            delete [] temp_arr;
         }
 
 
-        void pushEventPair(const MAAG &maag, node_ind_t node_i, matrix_ind_t maag_mat_i, dim_t maag_row_i, dim_t maag_col_i,
-                                                                matrix_ind_t fb_mat_i, dim_t fb_row_i, dim_t fb_col_i) {
-            if (maag.event_index(node_i, maag_mat_i, maag_row_i, maag_col_i)) {
-                auto elem = _pair_map.find(maag.event_index(node_i, maag_mat_i, maag_row_i, maag_col_i));
+        /**
+         * \brief Access to a hash map which maps event probabilities to event indices.
+         */
+        ///@{
+        void pushEventValue(eventind_t event_index, prob_t prob_value) {
+            if (event_index) {
+                auto elem = _pair_map.find(event_index);
 
                 if (elem != _pair_map.end()) {
-                    _pair_map[maag.event_index(node_i, maag_mat_i, maag_row_i, maag_col_i)] +=
-                            (*_forward_acc)(node_i, fb_mat_i, fb_row_i, fb_col_i) * (*_backward_acc)(node_i, fb_mat_i, fb_row_i, fb_col_i);
+                    _pair_map[event_index] += prob_value;
                 } else {
-                    _pair_map[maag.event_index(node_i, maag_mat_i, maag_row_i, maag_col_i)] =
-                            (*_forward_acc)(node_i, fb_mat_i, fb_row_i, fb_col_i) * (*_backward_acc)(node_i, fb_mat_i, fb_row_i, fb_col_i);
+                    _pair_map[event_index] = prob_value;
                 }
             }
         }
 
+        void pushEventPair(const MAAG &maag, node_ind_t node_i, matrix_ind_t maag_mat_i, dim_t maag_row_i, dim_t maag_col_i,
+                                                                matrix_ind_t fb_mat_i, dim_t fb_row_i, dim_t fb_col_i) {
+            this->pushEventValue(maag.event_index(node_i, maag_mat_i, maag_row_i, maag_col_i),
+                                 (*_forward_acc)(node_i, fb_mat_i, fb_row_i, fb_col_i) * (*_backward_acc)(node_i, fb_mat_i, fb_row_i, fb_col_i));
+        }
 
         void pushEventPairs(const MAAG &maag, node_ind_t node_i, matrix_ind_t maag_mat_i, matrix_ind_t fb_mat_i) {
             for (dim_t row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
@@ -238,13 +274,15 @@ namespace ymir {
                 }
             }
         }
+        ///@}
 
 
         void vectorise_pair_map() {
-            _pairs.reserve(_pair_map.size());
+            _pairs.reserve(_pair_map.size() + 40);
             for (auto it = _pair_map.begin(); it != _pair_map.end(); ++it) {
-                _pairs.push_back(event_pair_t(it->first, it->second));
+                _pairs.push_back(event_pair_t(it->first, it->second / _full_prob));
             }
+            _pair_map.clear();
         }
 
 
@@ -386,6 +424,11 @@ namespace ymir {
                 }
                 this->pushEventPairs(maag, VJ_VAR_JOI_INS_I, 0, 0);
                 this->pushEventPairs(maag, VJ_JOI_DEL_I, j_ind, 0);
+
+                this->inferInsertionNucleotides(maag, VJ_VAR_JOI_INS_I,
+                                                0, maag.nodeColumns(VJ_VAR_DEL_I) - 1,
+                                                maag.nodeColumns(VJ_VAR_DEL_I), maag.nodeColumns(VJ_VAR_DEL_I) + maag.nodeRows(VJ_JOI_DEL_I) - 1,
+                                                _nuc_arr1);
             }
         }
 
@@ -590,6 +633,22 @@ namespace ymir {
 //                    _pairs.push_back(event_pair_t(
 //                            maag.event_index(VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind),
 //                            (*_forward_acc)(VDJ_JOI_DEL_I, 0, 0, 0) * (*_backward_acc)(VDJ_JOI_DEL_I, 0, 0, 0)));
+
+                    seq_len_t v_vertices = maag.nodeColumns(VDJ_VAR_DEL_I),
+                            d3_vertices = maag.nodeRows(VDJ_DIV_DEL_I),
+                            d5_vertices = maag.nodeColumns(VDJ_DIV_DEL_I),
+                            j_vertices = maag.nodeRows(VDJ_JOI_DEL_I);
+
+                    this->inferInsertionNucleotides(maag, VDJ_VAR_DIV_INS_I,
+                                                    0, v_vertices - 1,
+                                                    v_vertices, v_vertices + d3_vertices - 1,
+                                                    _nuc_arr1);
+
+
+                    this->inferInsertionNucleotides(maag, VDJ_DIV_JOI_INS_I,
+                                                    v_vertices + d3_vertices, v_vertices + d3_vertices + d5_vertices - 1,
+                                                    v_vertices + d3_vertices + d5_vertices, v_vertices + d3_vertices + d5_vertices + j_vertices - 1,
+                                                    _nuc_arr2);
                 }
             }
         }

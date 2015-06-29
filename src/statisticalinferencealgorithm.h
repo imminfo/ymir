@@ -120,6 +120,15 @@ namespace ymir {
                         new_param_vec[ep.first] += ep.second;
                         if (isnan(ep.second)) { cout << "NAN!!" << endl; throw(std::runtime_error("Multiplication of matrices with wrong dimensions!")); } //nanflag = true;
                     }
+
+                    if (maag_rep[i].is_vj()) {
+                        new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] = fb.VJ_nuc_probs()[0];
+                        new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] = fb.VJ_nuc_probs()[1];
+                        new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] = fb.VJ_nuc_probs()[2];
+                        new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] = fb.VJ_nuc_probs()[3];
+                    } else {
+
+                    }
 //                    prob_vec[i] = fb.fullProbability();
 //                    if (nanflag) cout << prob_vec[i] << endl;
 //                    if (isnan(prob_vec[i])) cout << (size_t) i << endl;

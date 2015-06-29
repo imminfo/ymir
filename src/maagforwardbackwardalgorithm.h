@@ -38,7 +38,9 @@ namespace ymir {
         event_pair_t nextEvent() {
             if (_status) {
                 event_pair_t res = _pairs[_pairs_i];
+//                cout << res.second << " -> ";
                 res.second = res.second / _full_prob;
+//                cout << res.second << endl;
                 ++_pairs_i;
                 return res;
             }
@@ -125,6 +127,16 @@ namespace ymir {
                         _pairs.push_back(event_pair_t(
                                 maag.event_index(node_i, mat_i_fb, row_i, col_i),
                                 (*_forward_acc)(node_i, mat_i_algo, row_i, col_i) * (*_backward_acc)(node_i, mat_i_algo, row_i, col_i)));
+
+//                        if (isnan(_pairs[_pairs.size() - 1].second)) {
+//                            cout << "NAN:::" << endl;
+//                            cout << "node:" << (size_t) node_i << endl;
+//                            cout << "mat_i_algo:" << (size_t) mat_i_algo << endl;
+//                            cout << "row_i:" << (size_t) row_i << endl;
+//                            cout << "col_i:" << (size_t) col_i << endl;
+//                            cout << (*_forward_acc)(node_i, mat_i_algo, row_i, col_i) << "  ";
+//                            cout << (*_backward_acc)(node_i, mat_i_algo, row_i, col_i) << endl;
+//                        }
                     }
                 }
             }
@@ -162,6 +174,10 @@ namespace ymir {
                 }
 
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++col_i) {
+//                    if (isnan(temp_prob * maag(VJ_VAR_JOI_INS_I, 0, row_i, col_i))) {
+//                        cout << "temp:" << temp_prob<< endl;
+//                        cout << "maag:" << maag(VJ_VAR_JOI_INS_I, 0, row_i, col_i) << endl;
+//                    }
                     (*_forward_acc)(VJ_VAR_JOI_INS_I, 0, row_i, col_i) =
                             temp_prob * maag(VJ_VAR_JOI_INS_I, 0, row_i, col_i);
                 }

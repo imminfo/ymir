@@ -246,8 +246,15 @@ namespace ymir {
                 for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
                     prob_sum += _vec[j];
                 }
-                for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
-                    _vec[j] = (_vec[j] + _laplace[i-1]) / prob_sum;
+
+                if (prob_sum) {
+                    for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
+                        _vec[j] = (_vec[j] + _laplace[i-1]) / prob_sum;
+                    }
+                } else {
+                    for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
+                        _vec[j] = 0;
+                    }
                 }
             }
         }
@@ -280,7 +287,8 @@ namespace ymir {
             _vec[0] = 0;
             for (eventind_t i = 2; i < _edges.size(); ++i) {
                 for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
-                    _vec[j] =  _laplace[i-1];
+                    _vec[j] =  0;
+//                    _vec[j] =  _laplace[i-1];
                 }
             }
         }

@@ -299,6 +299,11 @@ namespace ymir {
             return res;
         }
 
+
+        _Scalar operator[](size_t index) const { return _values[index]; }
+
+        size_t values_size() const { return _values.size(); }
+
     protected:
 
         vector<Node> _chain;

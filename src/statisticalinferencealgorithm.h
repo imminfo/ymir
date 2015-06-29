@@ -89,7 +89,7 @@ namespace ymir {
 
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
 
-            ClonesetView rep_nonc = repertoire.noncoding();
+            ClonesetView rep_nonc = repertoire.noncoding().slice(1, 10);
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
             cout << "Building MAAGs..." << endl;
@@ -101,6 +101,7 @@ namespace ymir {
             cout << "Initial:" << endl;
             for (size_t i = 0; i < prob_vec.size(); ++i) {
                 prob_vec[i] = maag_rep[i].fullProbability();
+                if (isnan(prob_vec[i])) cout << (size_t) i << endl;
             }
             prob_summary(prob_vec);
 
@@ -110,15 +111,16 @@ namespace ymir {
                 new_param_vec.clear();
 
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
+                    cout << "INDEX:::" << (size_t) i << endl;
                     MAAGForwardBackwardAlgorithm fb(maag_rep[i]);
 
                     bool nanflag = false;
                     while (!fb.is_empty()) {
                         event_pair_t ep = fb.nextEvent();
                         new_param_vec[ep.first] += ep.second;
-                        if (isnan(ep.second)) nanflag = true;
+                        if (isnan(ep.second)) { cout << "NAN!!" << endl; throw(std::runtime_error("Multiplication of matrices with wrong dimensions!")); } //nanflag = true;
                     }
-                    prob_vec[i] = fb.fullProbability();
+//                    prob_vec[i] = fb.fullProbability();
 //                    if (nanflag) cout << prob_vec[i] << endl;
 //                    if (isnan(prob_vec[i])) cout << (size_t) i << endl;
                 }

@@ -62,15 +62,35 @@ namespace ymir {
 
             if (sequence_len) {
                 if (_type == MonoNucleotide) {
+                    auto tmp = start;
                     for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
                         res *= _arr[nuc_hash(*start)];
                     }
+                    if (isnan(res)) {
+                        cout << "NAN res!!" << endl;
+                        res = 1;
+                        for (seq_len_t i = 0; i < sequence_len; ++i, ++tmp) {
+                            cout << "char:" << (*tmp) << " " << res << " -> ";
+                            res *= _arr[nuc_hash(*tmp)];
+                            cout << res << endl;
+                        }
+                    }
                 } else {
+                    auto tmp1 = start, tmp2 = start + 1;
                     string::const_iterator next = start + 1;
                     res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*start));
                     for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
                         res *= (*this)(nuc_hash(*start), nuc_hash(*next));
                     }
+//                    if (isnan(res)) {
+//                        cout << "NAN res!!" << endl;
+//                        res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*tmp1));
+//                        for (seq_len_t i = 1; i < sequence_len; ++i, ++tmp1, ++tmp2) {
+//                            cout << "char:" << (*tmp1) << ":" << (*tmp2) << " " << res << " -> ";
+//                            res *= (*this)(nuc_hash(*tmp1), nuc_hash(*tmp2));
+//                            cout << res << endl;
+//                        }
+//                    }
                 }
             }
 

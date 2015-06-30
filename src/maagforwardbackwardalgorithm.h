@@ -11,6 +11,11 @@
 
 namespace ymir {
 
+    class MAAGForwardBackwardAlgorithm;
+    class ForwardBackwardAlgorithm;
+    class VJForwardBackward;
+    class VDJForwardBackward;
+
 
     class MAAGForwardBackwardAlgorithm {
 
@@ -117,10 +122,13 @@ namespace ymir {
                 _status = true;
                 if (maag.recombination() == VJ_RECOMB) {
                     _nuc_arr1 = new prob_t[4];
+                    fill(_nuc_arr1, _nuc_arr1 + 4, 0);
                     this->forward_backward_vj(maag);
                 } else if (maag.recombination() == VDJ_RECOMB) {
                     _nuc_arr1 = new prob_t[16];
                     _nuc_arr2 = new prob_t[16];
+                    fill(_nuc_arr1, _nuc_arr1 + 16, 0);
+                    fill(_nuc_arr2, _nuc_arr2 + 16, 0);
                     this->forward_backward_vdj(maag);
                 } else {
                     cerr << "MAAG forward-backward algorithm error: unknown recombination type." << endl;
@@ -161,13 +169,14 @@ namespace ymir {
                     left_pos = left_start_pos + row_i;
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
                         right_pos = right_start_pos + col_i;
-                        fill(temp_arr, temp_arr + 4, 0);
-                        n = 0;
 
                         if (maag.seq_pos(right_pos) - maag.seq_pos(left_pos) - 1 > 0) {
-                            for (seq_len_t pos = left_pos + 1; pos <= right_pos - 1; ++pos) {
+                            fill(temp_arr, temp_arr + 4, 0);
+                            n = 0;
+
+                            for (seq_len_t pos = maag.seq_pos(left_pos) + 1; pos <= maag.seq_pos(right_pos) - 1; ++pos) {
                                 temp_arr[nuc_hash(maag.sequence()[pos - 1])] += 1;
-                                ++n;  // why is it zero ????
+                                ++n;
                             }
 
                             scenario_prob = (*_forward_acc)(forw_node, 0, 0, row_i)
@@ -175,7 +184,20 @@ namespace ymir {
                                             * (*_backward_acc)(back_node, 0, row_i, col_i);
 
                             for (auto i = 0; i < 4; ++i) {
+                                if (isnan(nuc_arr[i])) {
+                                    cout << "NAN before!!" << endl;
+                                }
                                 nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
+                                if (isnan(nuc_arr[i])) {
+                                    cout  << "NAN" << endl;
+                                    cout << "forw:" << (*_forward_acc)(forw_node, 0, 0, row_i) << endl;
+                                    cout << "maag:" << maag(ins_node, 0, row_i, col_i) << endl;
+                                    cout << "back:" << (*_backward_acc)(back_node, 0, row_i, col_i) << endl;
+                                    cout << "n:" << (size_t) n << endl;
+                                    cout << scenario_prob << endl;
+                                    cout << ((temp_arr[i] * scenario_prob) / n) << endl;
+                                    throw(std::runtime_error("Wrong position boundaries (forward node)!"));
+                                }
                             }
                         }
                     }
@@ -185,13 +207,14 @@ namespace ymir {
                 for (dim_t row_i = 0; row_i < maag.nodeRows(ins_node); ++row_i) {
                     left_pos = left_start_pos + row_i;
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
+                        right_pos = right_start_pos + col_i;
+
                         if (maag.seq_pos(right_pos) - maag.seq_pos(left_pos) - 1 > 0) {
-                            right_pos = right_start_pos + col_i;
                             fill(temp_arr, temp_arr + 16, 0);
                             n = 0;
 
                             if (left_pos) {
-                                for (seq_len_t pos = left_pos + 1; pos <= right_pos - 1; ++pos) {
+                                for (seq_len_t pos = maag.seq_pos(left_pos + 1); pos <= maag.seq_pos(right_pos - 1); ++pos) {
                                     temp_arr[4 * nuc_hash(maag.sequence()[pos - 2]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
                                     ++n;
                                 }
@@ -200,7 +223,7 @@ namespace ymir {
                                 temp_arr[4 * nuc_hash('C') + nuc_hash(maag.sequence()[0])] = .25;
                                 temp_arr[4 * nuc_hash('G') + nuc_hash(maag.sequence()[0])] = .25;
                                 temp_arr[4 * nuc_hash('T') + nuc_hash(maag.sequence()[0])] = .25;
-                                for (seq_len_t pos = left_pos + 2; pos <= right_pos - 1; ++pos) {
+                                for (seq_len_t pos = maag.seq_pos(left_pos + 2); pos <= maag.seq_pos(right_pos - 1); ++pos) {
                                     temp_arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
                                     ++n;
                                 }
@@ -425,6 +448,10 @@ namespace ymir {
                 this->pushEventPairs(maag, VJ_VAR_JOI_INS_I, 0, 0);
                 this->pushEventPairs(maag, VJ_JOI_DEL_I, j_ind, 0);
 
+                if (isnan(_nuc_arr1[0]) || isnan(_nuc_arr1[1]) || isnan(_nuc_arr1[2]) || isnan(_nuc_arr1[3])) {
+                    cout << maag.sequence() << endl;
+                    cout << "NAN here!" << endl;
+                }
                 this->inferInsertionNucleotides(maag, VJ_VAR_JOI_INS_I,
                                                 0, maag.nodeColumns(VJ_VAR_DEL_I) - 1,
                                                 maag.nodeColumns(VJ_VAR_DEL_I), maag.nodeColumns(VJ_VAR_DEL_I) + maag.nodeRows(VJ_JOI_DEL_I) - 1,
@@ -657,6 +684,42 @@ namespace ymir {
         MAAGForwardBackwardAlgorithm() { }
 
     };
+
+
+    class ForwardBackwardAlgorithm {
+    public:
+
+
+        ForwardBackwardAlgorithm() { }
+
+
+        virtual ~ForwardBackwardAlgorithm() { }
+
+
+        event_pair_t nextEvent() {
+
+        }
+
+
+    protected:
+        ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspondingly. */
+
+        virtual void forward() =0;
+
+        virtual void backward() =0;
+
+    };
+
+
+    class VJForwardBackward : public ForwardBackwardAlgorithm {
+
+    };
+
+
+    class VDJForwardBackward : public ForwardBackwardAlgorithm {
+
+    };
+
 
 }
 

@@ -30,10 +30,10 @@
 #include "math.h"
 
 #include "types.h"
+//#include "repertoire.h"
 
 
 namespace ymir {
-
 
     void write_matrix(const std::string &filepath) {
 
@@ -81,11 +81,21 @@ namespace ymir {
 
         std::cout << "Loglikelihood:\t" << loglikelihood(prob_vec) << std::endl;
         std::cout << "Error probabilities:\t" << (size_t) (zeros + negative + bignums + nans) << std::endl;
-        std::cout << "  Zeros:\t" << (size_t) zeros << std::endl;
-        std::cout << "  NaNs:\t" << (size_t) nans << std::endl;
-        std::cout << "  Negatives:\t" << (size_t) negative << std::endl;
-        std::cout << "  Bigger than one:\t" << (size_t) bignums << std::endl;
+        if (zeros) std::cout << "  Zeros:            \t" << (size_t) zeros << std::endl;
+        if (negative) std::cout << "  NaNs:             \t" << (size_t) nans << std::endl;
+        if (bignums) std::cout << "  Negatives:        \t" << (size_t) negative << std::endl;
+        if (nans) std::cout << "  Bigger than one:  \t" << (size_t) bignums << std::endl;
     }
+
+
+//    void prob_summary(const MAAGRepertoire &maag_rep) {
+//        vector<prob_t> prob_vec;
+//        prob_vec.resize(maag_rep.size());
+//        for (size_t i = 0; i < prob_vec.size(); ++i) {
+//            prob_vec[i] = maag_rep[i].fullProbability();
+//        }
+//        prob_summary(prob_vec);
+//    }
 
 
     inline bool is_out_of_frame(const std::string &sequence) {

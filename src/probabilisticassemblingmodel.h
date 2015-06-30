@@ -390,9 +390,9 @@ namespace ymir {
                         }
                         else if (element == "ins.nucl") {
                             if (container && container->file_exists()) {
-                                if (container->row_names().size() != 4 || container->column_names().size() != 4) {
+                                if (container->row_names().size() != 4 || container->column_names().size() != 1) {
                                     stringstream ss;
-                                    ss << "ERROR: wrong number of columns and rows (expected: 4 X 4, got: " << (int) container->row_names().size() << "X" << (int) container->column_names().size() << ")";
+                                    ss << "ERROR: wrong number of columns and rows (expected: 4 X 1, got: " << (int) container->row_names().size() << "X" << (int) container->column_names().size() << ")";
                                     err_message = ss.str();
                                 } else {
                                     containers[VJ_VAR_JOI_INS_NUC] = container;

@@ -72,7 +72,7 @@ int main() {
     //
     ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA");
 
-    EMAlgorithm().statisticalInference(cloneset_vj, vj_model);
+    EMAlgorithm().statisticalInference(cloneset_vj, vj_model, EMAlgorithm::AlgorithmParameters().set("niter", 20));
 
     tp1 = std::chrono::system_clock::now();
     vj_model.buildGraphs(cloneset_vj, true);

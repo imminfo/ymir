@@ -267,7 +267,7 @@ namespace ymir {
             }
         }
 
-        void updateEventProbabilities(MAAGRepertoire *repertoire, bool verbose = true) const {
+        void updateEventProbabilities(MAAGRepertoire *repertoire, bool verbose = false) const {
             for (size_t i = 0; i < repertoire->size(); ++i) {
                 this->updateEventProbabilities(&*(repertoire->begin() + i));  // facepalm
                 if (verbose) {

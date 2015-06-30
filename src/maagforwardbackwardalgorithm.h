@@ -44,10 +44,6 @@ namespace ymir {
 
         event_pair_t nextEvent() {
             if (_status) {
-                if (!_vectorised) {
-                    this->vectorise_pair_map();
-                    _vectorised = true;
-                }
                 event_pair_t res = _pairs[_pairs_i];
 //                cout << res.second << " -> ";
 //                res.second = res.second / _full_prob;
@@ -189,7 +185,7 @@ namespace ymir {
                                 }
                                 nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
                                 if (isnan(nuc_arr[i])) {
-                                    cout  << "NAN" << endl;
+                                    cout << "NAN" << endl;
                                     cout << "forw:" << (*_forward_acc)(forw_node, 0, 0, row_i) << endl;
                                     cout << "maag:" << maag(ins_node, 0, row_i, col_i) << endl;
                                     cout << "back:" << (*_backward_acc)(back_node, 0, row_i, col_i) << endl;
@@ -260,14 +256,11 @@ namespace ymir {
          */
         ///@{
         void pushEventValue(eventind_t event_index, prob_t prob_value) {
-            if (event_index) {
+            if (prob_value && event_index) {
                 auto elem = _pair_map.find(event_index);
 
-                if (elem != _pair_map.end()) {
-                    _pair_map[event_index] += prob_value;
-                } else {
-                    _pair_map[event_index] = prob_value;
-                }
+                if (elem == _pair_map.end()) { _pair_map[event_index] = 0; }
+                _pair_map[event_index] += prob_value;
             }
         }
 
@@ -442,21 +435,19 @@ namespace ymir {
 //                            maag.event_index(VJ_VAR_JOI_GEN_I, 0, row_i, j_ind),
 //                            (*_forward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0) * (*_backward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0)));
                 }
-                for (matrix_ind_t mat_i = 0; mat_i < maag.nVar(); ++mat_i) {
-                    this->pushEventPairs(maag, VJ_VAR_DEL_I, mat_i, mat_i);
-                }
-                this->pushEventPairs(maag, VJ_VAR_JOI_INS_I, 0, 0);
-                this->pushEventPairs(maag, VJ_JOI_DEL_I, j_ind, 0);
+//                for (matrix_ind_t mat_i = 0; mat_i < maag.nVar(); ++mat_i) {
+//                    this->pushEventPairs(maag, VJ_VAR_DEL_I, mat_i, mat_i);
+//                }
+//                this->pushEventPairs(maag, VJ_VAR_JOI_INS_I, 0, 0);
+//                this->pushEventPairs(maag, VJ_JOI_DEL_I, j_ind, 0);
 
-                if (isnan(_nuc_arr1[0]) || isnan(_nuc_arr1[1]) || isnan(_nuc_arr1[2]) || isnan(_nuc_arr1[3])) {
-                    cout << maag.sequence() << endl;
-                    cout << "NAN here!" << endl;
-                }
                 this->inferInsertionNucleotides(maag, VJ_VAR_JOI_INS_I,
                                                 0, maag.nodeColumns(VJ_VAR_DEL_I) - 1,
                                                 maag.nodeColumns(VJ_VAR_DEL_I), maag.nodeColumns(VJ_VAR_DEL_I) + maag.nodeRows(VJ_JOI_DEL_I) - 1,
                                                 _nuc_arr1);
             }
+
+            this->vectorise_pair_map();
         }
 
 
@@ -678,6 +669,8 @@ namespace ymir {
                                                     _nuc_arr2);
                 }
             }
+
+            this->vectorise_pair_map();
         }
 
 

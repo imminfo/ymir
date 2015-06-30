@@ -281,15 +281,25 @@ namespace ymir {
 
 
         /**
-         * \brief Fill with pseudo-counts all data.
+         * \brief Fill the vector with the given value.
          */
-        void clear() {
+        void fill(prob_t val = 0) {
             _vec[0] = 0;
-            for (eventind_t i = 2; i < _edges.size(); ++i) {
-                for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
-                    _vec[j] =  0;
-//                    _vec[j] =  _laplace[i-1];
-                }
+            for (size_t i = 1; i < _vec.size(); ++i) {
+                _vec[i] = val;
+            }
+//            for (eventind_t i = 2; i < _edges.size(); ++i) {
+//                for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
+//                    _vec[j] =  val;
+////                    _vec[j] =  _laplace[i-1];
+//                }
+//            }
+        }
+
+
+        void familyFill(eventind_t event_family, prob_t val = 0) {
+            for (eventind_t i = _edges[_event_classes[event_family]]; i < _edges[_event_classes[event_family + 1]]; ++i) {
+                _vec[i] = val;
             }
         }
 

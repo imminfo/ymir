@@ -89,20 +89,23 @@ namespace ymir {
 
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
 
-            ClonesetView rep_nonc = repertoire.noncoding(); //.head(20000);
+            ClonesetView rep_nonc = repertoire.noncoding();
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
             ModelParameterVector new_param_vec = model.event_probabilities();
             new_param_vec.fill(1);
             new_param_vec.normaliseEventFamilies();
             model.updateEventProbabilitiesVector(new_param_vec);
+
             cout << "Building MAAGs..." << endl;
             MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, true, false, false);
+            maag_rep.erase(maag_rep.begin() + 61877);
+
             vector<prob_t> prob_vec;
-            prob_vec.resize(rep_nonc.size(), 0);
+            prob_vec.resize(maag_rep.size(), 0);
 
             cout << endl << "Initial data summary:" << endl;
-            for (size_t i = 0; i < prob_vec.size(); ++i) {
+            for (size_t i = 0; i < maag_rep.size(); ++i) {
                 prob_vec[i] = maag_rep[i].fullProbability();
                 if (isnan(prob_vec[i])) cout << (size_t) i << endl;
             }
@@ -120,6 +123,8 @@ namespace ymir {
                     bool nanflag = false;
                     while (!fb.is_empty()) {
                         event_pair_t ep = fb.nextEvent();
+//                        cout << new_param_vec[ep.first] << " + " << ep.second << " -> " << (new_param_vec[ep.first] + ep.second) << endl;
+//                        cout << ep.first << " " << endl;
                         new_param_vec[ep.first] += ep.second;
                         if (isnan(ep.second)) { cout << "NAN!!" << endl; throw(std::runtime_error("Multiplication of matrices with wrong dimensions!")); } //nanflag = true;
                     }
@@ -138,18 +143,18 @@ namespace ymir {
 //                    if (isnan(prob_vec[i])) cout << (size_t) i << endl;
                 }
 
-//                new_param_vec.familyFill(VJ_VAR_JOI_GEN, 1);  // fixed - OK
+                new_param_vec.familyFill(VJ_VAR_JOI_GEN, 1);  // drops
                 new_param_vec.familyFill(VJ_VAR_DEL, 1);  // drops
-                new_param_vec.familyFill(VJ_VAR_JOI_INS_LEN, 1);  // grows - OK
-                new_param_vec.familyFill(VJ_VAR_JOI_INS_NUC, 1);  // drops
+//                new_param_vec.familyFill(VJ_VAR_JOI_INS_LEN, 1);  // grows - OK
+//                new_param_vec.familyFill(VJ_VAR_JOI_INS_NUC, 1);  // grows - OK
                 new_param_vec.familyFill(VJ_JOI_DEL, 1);  // drops and then grows and the drops again
 
                 new_param_vec.normaliseEventFamilies();
 
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] << endl;
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] << endl;
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] << endl;
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] << endl;
+                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] << endl;
+                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] << endl;
+                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] << endl;
+                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] << endl;
 
                 model.updateEventProbabilitiesVector(new_param_vec);
                 model.updateEventProbabilities(&maag_rep);

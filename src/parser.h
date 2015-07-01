@@ -346,12 +346,12 @@ namespace ymir {
                             ++index;
                         }
 
+                        bool align_ok = false;
                         if (do_align_V) {}
 
                         if (do_align_J) {}
 
                         if (do_align_D) {
-                            bool align_ok = false;
                             for (segindex_t seg_i = 1; seg_i <= gene_segments.D().max(); ++seg_i) {
                                 AbstractAligner::LocalAlignmentIndices indices =
                                         aligner.alignLocal(gene_segments.D()[seg_i].sequence,
@@ -379,7 +379,9 @@ namespace ymir {
                         // remove bad clonotypes here
                         //
 
+//                        if (align_ok) {
                         vec.push_back(clone_builder.buildClonotype());
+//                        }
                     }
                     line_stream.clear();
                 }

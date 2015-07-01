@@ -108,33 +108,11 @@ ModelParameterVector make_test_events_vj() {
     v3.push_back(7);
 
     // VJ ins nuc
-    // prev A
-    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+    v1.push_back(.1); v1.push_back(.2); v1.push_back(.3); v1.push_back(.4);
     v2.push_back(4);
     v4.push_back(0);
 
     v3.push_back(8);
-
-    // prev C
-    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(9);
-
-    // prev G
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(10);
-
-    // prev T
-    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(11);
 
     return ModelParameterVector(VJ_RECOMB, v1, v2, v3, v4);
 }
@@ -190,41 +168,12 @@ ModelParameterVector make_test_events_vj2() {
 
     v3.push_back(4);
 
-    // VJ ins len
-    v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
-    v2.push_back(7);
-    v4.push_back(0);
-
-    v3.push_back(7);
-
     // VJ ins nuc
-    // prev A
-    v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+    v1.push_back(.4); v1.push_back(.3); v1.push_back(.2); v1.push_back(.1);
     v2.push_back(4);
     v4.push_back(0);
 
     v3.push_back(8);
-
-    // prev C
-    v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(9);
-
-    // prev G
-    v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(10);
-
-    // prev T
-    v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
-    v2.push_back(4);
-    v4.push_back(0);
-
-    v3.push_back(11);
 
     return ModelParameterVector(VJ_RECOMB, v1, v2, v3, v4);
 }
@@ -2165,9 +2114,9 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     alvec1.push_back("Vseg1");
     alvec1.push_back("Vseg2");
     alvec1.push_back("Vseg3");
-    seqvec1.push_back("CCCG");
+    seqvec1.push_back("CCCA");
     seqvec1.push_back("GGG");
-    seqvec1.push_back("CCCGGG");
+    seqvec1.push_back("CCCAGG");
 
     vector<string> alvec2;
     vector<string> seqvec2;
@@ -2175,11 +2124,15 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     alvec2.push_back("Jseg2");
     alvec2.push_back("Jseg3");
     seqvec2.push_back("CCGTTT");
-    seqvec2.push_back("ATTT");
+    seqvec2.push_back("AATT");
     seqvec2.push_back("AGGTTT");
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
+    mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] = 1;
+    mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] = 0;
+    mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] = 0;
+    mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] = 0;
     MAAGBuilder maag_builder(mvec, genes);
 
     ClonotypeBuilder cl_builder;
@@ -2187,13 +2140,14 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     // poses:
     // vs: 0-1-2-3-4-5
     // js: 7-8-9-10-11
-    cl_builder.setSequence("CCCGACGGTTT")
+    cl_builder.setSequence("CCCAAAAAAATT")
             .setNucleotideSeq()
             .addValignment(1, 4)
-            .addValignment(3, 5)
-            .addJalignment(1, 8)
-            .addJalignment(2, 9)
-            .addJalignment(3, 7);
+//            .addValignment(3, 5)
+//            .addJalignment(1, 8)
+//            .addJalignment(2, 9)
+            .addJalignment(2, 10);
+//            .addJalignment(3, 7);
     Clonotype clonotype = cl_builder.buildClonotype();
 
     MAAG maag = maag_builder.build(clonotype, true);
@@ -2201,6 +2155,16 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     MAAGForwardBackwardAlgorithm algo(maag);
 
     YMIR_ASSERT2(algo.status(), true)
+
+    while (!algo.is_empty()) {
+        auto temp = algo.nextEvent();
+        cout << temp.first << " : " << temp.second << endl;
+    }
+
+    cout << algo.VJ_nuc_probs()[0] << endl;
+    cout << algo.VJ_nuc_probs()[1] << endl;
+    cout << algo.VJ_nuc_probs()[2] << endl;
+    cout << algo.VJ_nuc_probs()[3] << endl;
 
     YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 8e-20)
 
@@ -2277,13 +2241,14 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
 
     MAAG maag = maag_builder.build(clonotype, true);
 
-    MAAGForwardBackwardAlgorithm algo(maag);
-
-    YMIR_ASSERT2(algo.status(), true)
-
-    YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 6e-20)
-
-    YMIR_ASSERT(abs(algo.bfullProbability() - maag.fullProbability()) < 6e-20)
+    YMIR_ASSERT(false)
+//    MAAGForwardBackwardAlgorithm algo(maag);
+//
+//    YMIR_ASSERT2(algo.status(), true)
+//
+//    YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 6e-20)
+//
+//    YMIR_ASSERT(abs(algo.bfullProbability() - maag.fullProbability()) < 6e-20)
 
 YMIR_TEST_END
 

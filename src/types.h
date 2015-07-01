@@ -160,6 +160,15 @@ namespace ymir {
 
 
     /**
+     * \enum ERROR_MODE
+     */
+    enum ERROR_MODE {
+        NO_ERRORS,
+        COMPUTE_ERRORS
+    };
+
+
+    /**
      * \enum EVENT_CLASS
      */
     enum EVENT_CLASS {

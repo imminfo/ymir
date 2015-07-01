@@ -259,7 +259,9 @@ namespace ymir {
             if (prob_value && event_index) {
                 auto elem = _pair_map.find(event_index);
 
-                if (elem == _pair_map.end()) { _pair_map[event_index] = 0; }
+                if (elem == _pair_map.end()) {
+                    _pair_map[event_index] = 0;
+                }
                 _pair_map[event_index] += prob_value;
             }
         }
@@ -294,6 +296,16 @@ namespace ymir {
 
 
         void vectorise_pair_map() {
+            _nuc_arr1[0] /= _full_prob;
+            _nuc_arr1[1] /= _full_prob;
+            _nuc_arr1[2] /= _full_prob;
+            _nuc_arr1[3] /= _full_prob;
+
+//            _nuc_arr2[0] /= _full_prob;
+//            _nuc_arr2[1] /= _full_prob;
+//            _nuc_arr2[2] /= _full_prob;
+//            _nuc_arr2[3] /= _full_prob;
+
             _pairs.reserve(_pair_map.size() + 40);
             for (auto it = _pair_map.begin(); it != _pair_map.end(); ++it) {
                 _pairs.push_back(event_pair_t(it->first, it->second / _full_prob));
@@ -431,15 +443,12 @@ namespace ymir {
                 // add fi * bi for this J to the accumulator
                 for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_VAR_JOI_GEN_I); ++row_i) {
                     this->pushEventPair(maag, VJ_VAR_JOI_GEN_I, 0, row_i, j_ind, 0, row_i, 0);
-//                    _pairs.push_back(event_pair_t(
-//                            maag.event_index(VJ_VAR_JOI_GEN_I, 0, row_i, j_ind),
-//                            (*_forward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0) * (*_backward_acc)(VJ_VAR_JOI_GEN_I, 0, row_i, 0)));
                 }
-//                for (matrix_ind_t mat_i = 0; mat_i < maag.nVar(); ++mat_i) {
-//                    this->pushEventPairs(maag, VJ_VAR_DEL_I, mat_i, mat_i);
-//                }
-//                this->pushEventPairs(maag, VJ_VAR_JOI_INS_I, 0, 0);
-//                this->pushEventPairs(maag, VJ_JOI_DEL_I, j_ind, 0);
+                for (matrix_ind_t mat_i = 0; mat_i < maag.nVar(); ++mat_i) {
+                    this->pushEventPairs(maag, VJ_VAR_DEL_I, mat_i, mat_i);
+                }
+                this->pushEventPairs(maag, VJ_VAR_JOI_INS_I, 0, 0);
+                this->pushEventPairs(maag, VJ_JOI_DEL_I, j_ind, 0);
 
                 this->inferInsertionNucleotides(maag, VJ_VAR_JOI_INS_I,
                                                 0, maag.nodeColumns(VJ_VAR_DEL_I) - 1,
@@ -646,7 +655,7 @@ namespace ymir {
                     this->pushEventPairs(maag, VDJ_VAR_DIV_INS_I, d_ind, 0);
                     this->pushEventPairs(maag, VDJ_DIV_DEL_I, d_ind, 0);
                     this->pushEventPairs(maag, VDJ_DIV_JOI_INS_I, d_ind, 0);
-                    this->pushEventPairs(maag, VDJ_JOI_DEL_I, j_ind, 0);
+                    this->pushEventPairs(maag, VDJ_JOI_DEL_I, j_ind, 0);  // crashes here
                     this->pushEventPair(maag, VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind, 0, 0, 0);
 //                    _pairs.push_back(event_pair_t(
 //                            maag.event_index(VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind),

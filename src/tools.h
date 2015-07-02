@@ -85,9 +85,9 @@ namespace ymir {
         std::cout << "Loglikelihood:\t" << loglikelihood(prob_vec) << std::endl;
         std::cout << "Error probabilities:\t" << (size_t) (zeros + negative + bignums + nans) << std::endl;
         if (zeros) std::cout << "  Zeros:            \t" << (size_t) zeros << std::endl;
-        if (negative) std::cout << "  NaNs:             \t" << (size_t) nans << std::endl;
-        if (bignums) std::cout << "  Negatives:        \t" << (size_t) negative << std::endl;
-        if (nans) std::cout << "  Bigger than one:  \t" << (size_t) bignums << std::endl;
+        if (nans) std::cout << "  NaNs:             \t" << (size_t) nans << std::endl;
+        if (negative) std::cout << "  Negatives:        \t" << (size_t) negative << std::endl;
+        if (bignums) std::cout << "  Bigger than one:  \t" << (size_t) bignums << std::endl;
     }
 
 

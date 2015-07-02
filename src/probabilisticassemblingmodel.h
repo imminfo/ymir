@@ -134,16 +134,16 @@ namespace ymir {
          * \brief Build a set of MAAGs from the given cloneset.
          *
          * \param repertoire Cloneset.
-         * \param full_builder If true than build full MAAG (with additional matrices for event indices).
+         * \param save_metadatae If true than build full MAAG (with additional matrices for event indices).
          * \param aminoacid If true than build graphs of aminoacid CDR3 sequences, traslating the given repertoire first.
          *
          * \return Set of MAAGs.
          */
         MAAGRepertoire buildGraphs(const ClonesetView &repertoire,
-                                   bool full_build = true,
+                                   bool save_metadata = true,
                                    bool aminoacid = false,
                                    bool verbose = true) const {
-            return _builder->build(repertoire, full_build, verbose);
+            return _builder->build(repertoire, save_metadata, verbose);
         }
 
 

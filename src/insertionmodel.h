@@ -21,18 +21,18 @@ namespace ymir {
     class InsertionModel {
     public:
 
-        InsertionModel(INSERTION_MODEL_TYPE mt) {
+        InsertionModel(InsertionModelType mt) {
             this->_type = mt;
             this->initProbabilities();
         }
 
 
-        InsertionModel(INSERTION_MODEL_TYPE mt, vector<prob_t>::const_iterator start) : InsertionModel(mt) {
+        InsertionModel(InsertionModelType mt, vector<prob_t>::const_iterator start) : InsertionModel(mt) {
             this->updateProbabilities(start);
         }
 
 
-        InsertionModel(const event_matrix_t& mat) : InsertionModel(DiNucleotide) {
+        InsertionModel(const event_matrix_t& mat) : InsertionModel(DI_NUCLEOTIDE) {
             this->updateProbabilities(mat);
         }
 
@@ -54,7 +54,7 @@ namespace ymir {
 
 
         void initProbabilities() {
-            if (_type == MonoNucleotide) {
+            if (_type == MONO_NUCLEOTIDE) {
                 this->_arr = new prob_t[4];
             } else {
                 this->_arr = new prob_t[16];
@@ -65,15 +65,17 @@ namespace ymir {
         /**
         * \brief Probability of the given nucleotide sequence.
         */
+        ///@{
         prob_t nucProbability(const string& sequence, char first_char = NULL_CHAR) const {
-            return this->nucProbability(sequence.cbegin(), sequence.size(), first_char);
+            return this->nucProbability<string::const_iterator>(sequence.cbegin(), sequence.size(), first_char);
         }
 
-        prob_t nucProbability(string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const {
+        template <class Iterator>
+        prob_t nucProbability(Iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const {
             prob_t res = 1;
 
             if (sequence_len) {
-                if (_type == MonoNucleotide) {
+                if (_type == MONO_NUCLEOTIDE) {
                     auto tmp = start;
                     for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
                         res *= _arr[nuc_hash(*start)];
@@ -89,7 +91,7 @@ namespace ymir {
                     }
                 } else {
                     auto tmp1 = start, tmp2 = start + 1;
-                    string::const_iterator next = start + 1;
+                    auto next = start + 1;
                     res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*start));
                     for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
                         res *= (*this)(nuc_hash(*start), nuc_hash(*next));
@@ -108,11 +110,26 @@ namespace ymir {
 
             return res;
         }
+        ///@}
+
+
+        /**
+         *
+         */
+        ///@{
+        prob_t aaProbability(const string& sequence, char first_char = NULL_CHAR) const {
+            return this->aaProbability(sequence.cbegin(), sequence.size(), first_char);
+        }
+
+        prob_t aaProbability(string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const {
+            return 0;
+        }
+        ///@}
 
 
         string generate(seq_len_t len, default_random_engine &rg) {
             discrete_distribution<int> distr;
-            if (_type == MonoNucleotide) {
+            if (_type == MONO_NUCLEOTIDE) {
                 distr = std::discrete_distribution<int>(_arr, _arr + 4);
             } else {
                 distr = std::discrete_distribution<int>(_arr, _arr + 16);
@@ -120,44 +137,10 @@ namespace ymir {
 
             string res = "";
             for (seq_len_t i = 0; i < len; ++i) {
-                cout << inv_nuc_hash(distr(rg)) << endl;
                 res += inv_nuc_hash(distr(rg));
             }
             return res;
         }
-
-
-        /**
-        * \brief Probability of the given amino acid sequence.
-        */
-//        prob_t aaProbability(const string& sequence, seq_len_t left_shift = 0, seq_len_t right_shift = 0) const {
-//            return 0;
-//        }
-
-
-//        const event_matrix_t& nuc_prob_table() const {
-//
-//        }
-
-
-//        const event_matrix_t& aa_prob_table() const {
-//
-//        }
-
-
-//        const event_matrix_t& generateAminoAcidProbTable() {
-//
-//        }
-
-
-//        bool readAminoAcidProbTable() {
-//            return false;
-//        }
-//
-//
-//        bool writeAminoAcidProbTable() const {
-//            return false;
-//        }
 
 
         /**
@@ -172,32 +155,22 @@ namespace ymir {
         */
         ///@{
         void updateProbabilities(vector<prob_t>::const_iterator start) {
-            if (_type == MonoNucleotide) {
-                for (uint8_t i = 0; i < 4; ++i, ++start) {
-                    this->_arr[i] = *start;
-                }
-            } else {
-                for (uint8_t i = 0; i < 16; ++i, ++start) {
-                    this->_arr[i] = *start;
-                }
+            uint8_t last = _type == MONO_NUCLEOTIDE ? 4 : 16;
+            for (uint8_t i = 0; i < last; ++i, ++start) {
+                this->_arr[i] = *start;
             }
         }
 
         void updateProbabilities(prob_t *start) {
-            if (_type == MonoNucleotide) {
-                for (uint8_t i = 0; i < 4; ++i) {
-                    this->_arr[i] = *(start + i);
-                }
-            } else {
-                for (uint8_t i = 0; i < 16; ++i) {
-                    this->_arr[i] = *(start + i);
-                }
+            uint8_t last = _type == MONO_NUCLEOTIDE ? 4 : 16;
+            for (uint8_t i = 0; i < last; ++i) {
+                this->_arr[i] = *(start + i);
             }
         }
 
         void updateProbabilities(const event_matrix_t& mat) {
 #ifdef YDEBUG
-            if (_type == MonoNucleotide) { throw(std::runtime_error("Can't initialise the mono-nucleotide insertion model with a matrix!")); }
+            if (_type == MONO_NUCLEOTIDE) { throw(std::runtime_error("Can't initialise the mono-nucleotide insertion model with a matrix!")); }
 #endif
 
             for (uint8_t i = 0; i < 4; ++i) {
@@ -217,25 +190,15 @@ namespace ymir {
         prob_t operator()(uint8_t row, uint8_t col) const { return this->_arr[4*row + col]; }
         ///@}
 
-
-        // update parameters given the AssemblyGraphRepertoire / AsemblyScenarioMatrix / iterator
-        // getNucleotideSequenceProbability
-        // getAminoAcidSequenceProbability
-        // generate amino acid table
-        // read amino acid table from file
-        // read markov model w/ nucleotides from prob table
-        // initialise markov model with input prob table / matrix
-        // write ... to prob table (?)
-
     protected:
 
-        INSERTION_MODEL_TYPE _type;
+        InsertionModelType _type;
         prob_t* _arr;  /** Representation for a vector (#elements = 4) or a matrix (#elements = 16) with transition probabilities; rows and cols are for A-C-G-T (sequentially). */
 
 
         InsertionModel() {
             this->_arr = new prob_t[4];
-            _type = MonoNucleotide;
+            _type = MONO_NUCLEOTIDE;
         }
 
     };

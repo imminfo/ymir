@@ -1308,7 +1308,7 @@ YMIR_TEST_END
 YMIR_TEST_START(test_markovchain_nuc_mono)
 
     vector<prob_t> probs = {.1, .2, .3, .4};
-    InsertionModel m(MonoNucleotide, probs.begin());
+    InsertionModel m(MONO_NUCLEOTIDE, probs.begin());
 
     string s = "ACGT";
 
@@ -1327,16 +1327,16 @@ YMIR_TEST_START(test_markovchain_nuc_mono)
     YMIR_ASSERT(abs(m.nucProbability(s.substr(0, 3), NULL_CHAR)) - .006 < 1e-18)
 
     probs = {1, 0, 0, 0};
-    m = InsertionModel(MonoNucleotide, probs.begin());
+    m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
     std::default_random_engine rg;
     YMIR_ASSERT2(m.generate(5, rg), "AAAAA");
 
     probs = {0, 0, 0, 1};
-    m = InsertionModel(MonoNucleotide, probs.begin());
+    m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
     YMIR_ASSERT2(m.generate(1, rg), "T");
 
     probs = {0, 1, 0, 0};
-    m = InsertionModel(MonoNucleotide, probs.begin());
+    m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
     YMIR_ASSERT2(m.generate(3, rg), "CCC");
 
 YMIR_TEST_END
@@ -1404,6 +1404,9 @@ YMIR_TEST_START(test_markovchain_nuc_di)
 
     YMIR_ASSERT2(mc.nucProbability(s) - .0105, 0);
     YMIR_ASSERT2(mc.nucProbability(s.begin(), 4, 'C'), .0168);
+
+    // .25 * .25 * .1
+    YMIR_ASSERT2(mc.nucProbability(s.rbegin(), 3, '_'), .00625);
 
 YMIR_TEST_END
 
@@ -1543,7 +1546,7 @@ YMIR_TEST_START(test_maag_vj)
             .addJalignment(3, 7);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, true);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
 
     YMIR_ASSERT2(maag.nVar(), 2)
     YMIR_ASSERT2(maag.nJoi(), 3)
@@ -1656,7 +1659,7 @@ YMIR_TEST_START(test_maag_vdj)
             .addDalignment(1, 1, 4, 8, 11);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, true);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
 
     YMIR_ASSERT2(maag.nVar(), 2)
     YMIR_ASSERT2(maag.nJoi(), 3)
@@ -1732,9 +1735,9 @@ YMIR_TEST_START(test_maag_vdj)
     // i've already tested chain products in previous tests!
     // ):<
     // also it's (A, B) not (A - B < eps) because this results are pretty precise on this toy example
-    YMIR_ASSERT2(maag.fullProbability(0, 0, 0), maag_builder.build(clonotype, false).fullProbability(0, 0, 0))
-    YMIR_ASSERT2(maag.fullProbability(1, 1, 1), maag_builder.build(clonotype, false).fullProbability(1, 1, 1))
-    YMIR_ASSERT2(maag.fullProbability(0, 2, 2), maag_builder.build(clonotype, false).fullProbability(0, 2, 2))
+    YMIR_ASSERT2(maag.fullProbability(0, 0, 0), maag_builder.build(clonotype, NO_METADATA).fullProbability(0, 0, 0))
+    YMIR_ASSERT2(maag.fullProbability(1, 1, 1), maag_builder.build(clonotype, NO_METADATA).fullProbability(1, 1, 1))
+    YMIR_ASSERT2(maag.fullProbability(0, 2, 2), maag_builder.build(clonotype, NO_METADATA).fullProbability(0, 2, 2))
 
 YMIR_TEST_END
 
@@ -1779,7 +1782,7 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
             .addJalignment(3, 7);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, true);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
 
     ModelParameterVector mvec2 = make_test_events_vj2();
 
@@ -1899,7 +1902,7 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
             .addDalignment(1, 1, 4, 8, 11);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, true);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
 
     ModelParameterVector mvec2 = make_test_events_vdj2();
 
@@ -2033,7 +2036,7 @@ YMIR_TEST_START(test_model_vj_maag)
     Cloneset cloneset;
     YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha2.txt", &cloneset, vdj_genes))
 
-    MAAG maag = model.buildGraphs(cloneset, true, false)[1];
+    MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, false)[1];
 
     YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
     YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
@@ -2163,7 +2166,7 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
 //            .addJalignment(3, 7);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, true);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
 
     MAAGForwardBackwardAlgorithm algo(maag);
 
@@ -2252,7 +2255,7 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
             .addDalignment(1, 1, 4, 8, 11);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, true);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
 
     YMIR_ASSERT(false)
 //    MAAGForwardBackwardAlgorithm algo(maag);

@@ -76,13 +76,13 @@ namespace ymir {
          *
          * \param clonotype Clonotype from which build the MAAG.
          * \param cloneset Set of clonotypes from which build the repertoires of MAAGs.
-         * \param save_metadata If true than make MAAG with stored event indices.
+         * \param metadata_mode If true than make MAAG with stored event indices.
          * \param aminoacid If true than build MAAGs from the aminoacid sequences.
          *
          * \return Newly constructed MAAG.
          */
         ///@{
-        MAAG build(const Clonotype &clonotype, bool save_metadata = false) const {
+        MAAG build(const Clonotype &clonotype, MetadataMode metadata_mode = NO_METADATA, ErrorMode = NO_ERRORS, SequenceType = NUCLEOTIDE) const {
             ProbMMC probs;
             EventIndMMC events;
             vector<seq_len_t> seq_poses;
@@ -90,26 +90,26 @@ namespace ymir {
 
             if (clonotype.is_vj()) {
                 probs.resize(VJ_CHAIN_SIZE);
-                if (save_metadata) { events.resize(VJ_CHAIN_SIZE); }
+                if (metadata_mode) { events.resize(VJ_CHAIN_SIZE); }
             } else {
                 probs.resize(VDJ_CHAIN_SIZE);
-                if (save_metadata) { events.resize(VDJ_CHAIN_SIZE); }
+                if (metadata_mode) { events.resize(VDJ_CHAIN_SIZE); }
             }
 
-            this->buildVariable(clonotype, probs, events, seq_poses, save_metadata);
-            this->buildJoining(clonotype, probs, events, seq_poses, save_metadata);
+            this->buildVariable(clonotype, probs, events, seq_poses, metadata_mode);
+            this->buildJoining(clonotype, probs, events, seq_poses, metadata_mode);
             if (clonotype.is_vj()) {
-                this->buildVJinsertions(clonotype, probs, events, seq_poses, save_metadata);
+                this->buildVJinsertions(clonotype, probs, events, seq_poses, metadata_mode);
             } else {
-                this->buildDiversity(clonotype, probs, events, seq_poses, save_metadata);
-                this->buildVDinsertions(clonotype, probs, events, seq_poses, save_metadata);
-                this->buildDJinsertions(clonotype, probs, events, seq_poses, save_metadata);
+                this->buildDiversity(clonotype, probs, events, seq_poses, metadata_mode);
+                this->buildVDinsertions(clonotype, probs, events, seq_poses, metadata_mode);
+                this->buildDJinsertions(clonotype, probs, events, seq_poses, metadata_mode);
             }
 
             probs.finish();
             events.finish();
 
-            if (save_metadata) {
+            if (metadata_mode) {
 
                 // TODO:
                 // - if the D deletions matrix contains only zeros, then remove this matrix
@@ -122,24 +122,24 @@ namespace ymir {
 
                 seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
                 copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
-                return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size());
+                return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size(), true);
             } else {
                 return MAAG(probs);
             }
         }
 
-        MAAGRepertoire build(const ClonesetView &cloneset, bool save_metadata = false, bool verbose = true) const {
+        MAAGRepertoire build(const ClonesetView &cloneset, MetadataMode metadata_mode = NO_METADATA, bool verbose = true) const {
             MAAGRepertoire res;
 //            res.reserve(cloneset.size());
             res.resize(cloneset.size());
             MAAG tmp;
             for (size_t i = 0; i < cloneset.size(); ++i) {
-//                res.push_back(MAAG(&(this->build(cloneset[i], save_metadata))));
+//                res.push_back(MAAG(&(this->build(cloneset[i], metadata_mode))));
 
-                res[i] = this->build(cloneset[i], save_metadata);
+                res[i] = this->build(cloneset[i], metadata_mode);
 
-//                tmp = this->build(cloneset[i], save_metadata);
-//                res[i].swap_maag(this->build(cloneset[i], save_metadata));
+//                tmp = this->build(cloneset[i], metadata_mode);
+//                res[i].swap_maag(this->build(cloneset[i], metadata_mode));
 
                 if (verbose) {
                     if ((i+1) % 50000 == 0) {
@@ -162,11 +162,11 @@ namespace ymir {
          * or choose the max one.
          */
         ///@{
-        prob_t buildAndCompute(const Clonotype &clonotype, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
-            return this->build(clonotype, false).fullProbability(action);
+        prob_t buildAndCompute(const Clonotype &clonotype, bool aminoacid = false, MAAGComputeProbAction action = SUM_PROBABILITY) const {
+            return this->build(clonotype, NO_METADATA).fullProbability(action);
         }
 
-        vector<prob_t> buildAndCompute(const ClonesetView &cloneset, bool aminoacid = false, MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
+        vector<prob_t> buildAndCompute(const ClonesetView &cloneset, bool aminoacid = false, MAAGComputeProbAction action = SUM_PROBABILITY) const {
             vector<prob_t> res;
             res.reserve(cloneset.size());
             for (size_t i = 0; i < cloneset.size(); ++i) {
@@ -193,7 +193,7 @@ namespace ymir {
                 for (int node_i = 0; node_i < maag->chainSize(); ++node_i) {
                     // either rebuild all insertions
                     if (maag->is_vj() && node_i == VarJoi_INSERTIONS_MATRIX_INDEX) {
-                        InsertionModel im(MonoNucleotide, _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
+                        InsertionModel im(MONO_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
 
                         seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                                 j_vertices = maag->nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
@@ -213,7 +213,7 @@ namespace ymir {
                                               im);
 
                     } else if (maag->is_vdj() && node_i == VarDiv_INSERTIONS_MATRIX_INDEX) {
-                        InsertionModel im(DiNucleotide, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
+                        InsertionModel im(DI_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
 
                         seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                                 d3_vertices = maag->nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
@@ -233,7 +233,7 @@ namespace ymir {
                                               im);
 
                     } else if (maag->is_vdj() && node_i == DivJoi_INSERTIONS_MATRIX_INDEX) {
-                        InsertionModel im(DiNucleotide, _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
+                        InsertionModel im(DI_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
 
                         seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                                 d3_vertices = maag->nodeRows(DIVERSITY_GENES_MATRIX_INDEX),
@@ -300,13 +300,13 @@ namespace ymir {
         * \param probs Multi-Matrix Chain with event probabilities.
         * \param events Multi-Matrix Chain with event indices.
         * \param seq_poses Vector of positions.
-        * \param save_metadata Boolean if build should be full.
+        * \param metadata_mode Boolean if build should be full.
         */
         void buildVariable(const Clonotype &clonotype,
                            ProbMMC &probs,
                            EventIndMMC &events,
                            vector<seq_len_t> &seq_poses,
-                           bool save_metadata) const
+                           bool metadata_mode) const
         {
             // find max V alignment
             seq_len_t len = 0;
@@ -323,23 +323,23 @@ namespace ymir {
             seq_len_t v_end = 0;
 
             probs.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
-            if (save_metadata) {
+            if (metadata_mode) {
                 events.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             }
 
             if (clonotype.is_vj()) {
                 probs.initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
-                if (save_metadata) {
+                if (metadata_mode) {
                     events.initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
                 }
             } else {
                 probs.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
-                if (save_metadata) {
+                if (metadata_mode) {
                     events.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
                 }
             }
 
-            EVENT_CLASS V_DEL = clonotype.is_vj() ? VJ_VAR_DEL : VDJ_VAR_DEL;
+            EventClass V_DEL = clonotype.is_vj() ? VJ_VAR_DEL : VDJ_VAR_DEL;
             for (segindex_t v_index = 0; v_index < v_num; ++v_index) {
                 v_gene = clonotype.getVar(v_index);
                 v_len = _genes->V()[v_gene].sequence.size();
@@ -365,7 +365,7 @@ namespace ymir {
                     // OPTIMISATION: first find where zeros are start and then just fill this part of the vector with zeros without any "ifs"
                 }
 
-                if (save_metadata) {
+                if (metadata_mode) {
                     if (clonotype.is_vj()) {
                         // probability of choosing this V gene segment
                         for (segindex_t j_index = 0; j_index < j_num; ++j_index) {
@@ -399,13 +399,13 @@ namespace ymir {
         * \param probs Multi-Matrix Chain with event probabilities.
         * \param events Multi-Matrix Chain with event indices.
         * \param seq_poses Vector of positions.
-        * \param save_metadata Boolean if build should be full.
+        * \param metadata_mode Boolean if build should be full.
         */
         void buildJoining(const Clonotype &clonotype,
                           ProbMMC &probs,
                           EventIndMMC &events,
                           vector<seq_len_t> &seq_poses,
-                          bool save_metadata) const
+                          bool metadata_mode) const
         {
             int J_index_dels = JOINING_DELETIONS_VJ_MATRIX_INDEX,
                     J_index_genes = JOINING_GENES_VDJ_MATRIX_INDEX;
@@ -426,14 +426,14 @@ namespace ymir {
 
             // add J deletions nodes
             probs.initNode(J_index_dels, j_num, len + 1, 1);
-            if (save_metadata) {
+            if (metadata_mode) {
                 events.initNode(J_index_dels, j_num, len + 1, 1);
             }
 
             // add J or J-D gene nodes
             if (clonotype.is_vdj()) {
                 probs.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
-                if (save_metadata) {
+                if (metadata_mode) {
                     events.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
                 }
             }
@@ -443,7 +443,7 @@ namespace ymir {
             segindex_t j_gene = 0;
             seq_len_t j_start = 0;
 
-            EVENT_CLASS J_DEL = clonotype.is_vj() ? VJ_JOI_DEL : VDJ_JOI_DEL;
+            EventClass J_DEL = clonotype.is_vj() ? VJ_JOI_DEL : VDJ_JOI_DEL;
             for (segindex_t j_index = 0; j_index < j_num; ++j_index) {
                 j_gene = clonotype.getJoi(j_index);
                 j_len = _genes->J()[j_gene].sequence.size();
@@ -465,7 +465,7 @@ namespace ymir {
 
                 }
 
-                if (save_metadata) {
+                if (metadata_mode) {
                     if (clonotype.is_vdj()) {
                         for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                             events(J_index_genes, 0, j_index, d_index)
@@ -496,13 +496,13 @@ namespace ymir {
         * \param probs Multi-Matrix Chain with event probabilities.
         * \param events Multi-Matrix Chain with event indices.
         * \param seq_poses Vector of positions.
-        * \param save_metadata Boolean if build should be full.
+        * \param metadata_mode Boolean if build should be full.
         */
         void buildDiversity(const Clonotype &clonotype,
                             ProbMMC &probs,
                             EventIndMMC &events,
                             vector<seq_len_t> &seq_poses,
-                            bool save_metadata) const
+                            bool metadata_mode) const
         {
             d_alignment_t d_alignment;
 
@@ -559,7 +559,7 @@ namespace ymir {
             }
 
             probs.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
-            if (save_metadata) {
+            if (metadata_mode) {
                 events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
             }
 
@@ -583,7 +583,7 @@ namespace ymir {
                                                              d_gene - 1,
                                                              d_alignment.Dstart + left_pos - d_alignment.seqstart - 1,
                                                              d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
-                            if (save_metadata) {
+                            if (metadata_mode) {
                                 events(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                         = _param_vec->event_index(VDJ_DIV_DEL,
                                                                   d_gene - 1,
@@ -617,22 +617,22 @@ namespace ymir {
         * \param probs Multi-Matrix Chain with event probabilities.
         * \param events Multi-Matrix Chain with event indices.
         * \param seq_poses Vector of positions.
-        * \param save_metadata Boolean if build should be full.
+        * \param metadata_mode Boolean if build should be full.
         */
         void buildVJinsertions(const Clonotype &clonotype,
                                ProbMMC &probs,
                                EventIndMMC &events,
                                const vector<seq_len_t> &seq_poses,
-                               bool save_metadata) const
+                               bool metadata_mode) const
         {
-            InsertionModel mc(MonoNucleotide, _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
+            InsertionModel mc(MONO_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
 
             seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                     j_vertices = probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
 
             probs.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
 
-            if (save_metadata) {
+            if (metadata_mode) {
                 events.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
             }
 
@@ -643,12 +643,13 @@ namespace ymir {
                                   VarJoi_INSERTIONS_MATRIX_INDEX,
                                   _param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0),
                                   _param_vec->max_VJ_ins_len(),
-                                  save_metadata,
+                                  metadata_mode,
                                   0,
                                   v_vertices - 1,
                                   v_vertices,
                                   v_vertices + j_vertices - 1,
-                                  mc);
+                                  mc,
+                                  false);
         }
 
 
@@ -659,22 +660,22 @@ namespace ymir {
         * \param probs Multi-Matrix Chain with event probabilities.
         * \param events Multi-Matrix Chain with event indices.
         * \param seq_poses Vector of positions.
-        * \param save_metadata Boolean if build should be full.
+        * \param metadata_mode Boolean if build should be full.
         */
         void buildVDinsertions(const Clonotype &clonotype,
                                ProbMMC &probs,
                                EventIndMMC &events,
                                const vector<seq_len_t> &seq_poses,
-                               bool save_metadata) const
+                               bool metadata_mode) const
         {
-            InsertionModel mc(DiNucleotide, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
+            InsertionModel mc(DI_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
 
             seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                     d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
 
             probs.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d3_vertices);
 
-            if (save_metadata) {
+            if (metadata_mode) {
                 events.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d3_vertices);
             }
 
@@ -685,12 +686,13 @@ namespace ymir {
                                   VarDiv_INSERTIONS_MATRIX_INDEX,
                                   _param_vec->event_index(VDJ_VAR_DIV_INS_LEN, 0, 0),
                                   _param_vec->max_VD_ins_len(),
-                                  save_metadata,
+                                  metadata_mode,
                                   0,
                                   v_vertices - 1,
                                   v_vertices,
                                   v_vertices + d3_vertices - 1,
-                                  mc);
+                                  mc,
+                                  false);
         }
 
 
@@ -701,15 +703,15 @@ namespace ymir {
         * \param probs Multi-Matrix Chain with event probabilities.
         * \param events Multi-Matrix Chain with event indices.
         * \param seq_poses Vector of positions.
-        * \param save_metadata Boolean if build should be full.
+        * \param metadata_mode Boolean if build should be full.
         */
         void buildDJinsertions(const Clonotype &clonotype,
                                ProbMMC &probs,
                                EventIndMMC &events,
                                const vector<seq_len_t> &seq_poses,
-                               bool save_metadata) const
+                               bool metadata_mode) const
         {
-            InsertionModel mc(DiNucleotide, _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
+            InsertionModel mc(DI_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
 
             seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                     d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX),
@@ -718,7 +720,7 @@ namespace ymir {
 
             probs.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d5_vertices, j_vertices);
 
-            if (save_metadata) {
+            if (metadata_mode) {
                 events.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d5_vertices, j_vertices);
             }
 
@@ -729,12 +731,13 @@ namespace ymir {
                                   DivJoi_INSERTIONS_MATRIX_INDEX,
                                   _param_vec->event_index(VDJ_DIV_JOI_INS_LEN, 0, 0),
                                   _param_vec->max_DJ_ins_len(),
-                                  save_metadata,
+                                  metadata_mode,
                                   v_vertices + d3_vertices,
                                   v_vertices + d3_vertices + d5_vertices - 1,
                                   v_vertices + d3_vertices + d5_vertices,
                                   v_vertices + d3_vertices + d5_vertices + j_vertices - 1,
-                                  mc);
+                                  mc,
+                                  true);
         }
 
 
@@ -748,7 +751,7 @@ namespace ymir {
          * \param ins_node_index Node of the event / prob matrix with insertions.
          * \param null_insertion Event index of insertions of length zero.
          * \param max_size Maximum size of the length of insertions.
-         * \param save_metadata Boolean if build should be full.
+         * \param metadata_mode Boolean if build should be full.
          * \param left_vertices_start Starting index in seq_poses for the vertices in the left matrix.
          * \param left_vertices_end Ending index in seq_poses for the vertices in the left matrix.
          * \param right_vertices_start Starting index in seq_poses for the vertices in the right matrix.
@@ -762,12 +765,13 @@ namespace ymir {
                              ProbMMC::node_ind_t ins_node_index,
                              eventind_t null_insertion,
                              seq_len_t max_size,
-                             bool save_metadata,
+                             bool metadata_mode,
                              seq_len_t left_vertices_start,
                              seq_len_t left_vertices_end,
                              seq_len_t right_vertices_start,
                              seq_len_t right_vertices_end,
-                             const InsertionModel& mc) const
+                             const InsertionModel& mc,
+                             bool reversed = false) const
         {
             int insertion_len;
             bool good_insertion;
@@ -778,11 +782,29 @@ namespace ymir {
                     insertion_len = seq_poses[right_vertex_i] - seq_poses[left_vertex_i] - 1;
                     good_insertion = (insertion_len >= 0) && (insertion_len <= max_size);
                     if (good_insertion) {
-                        if (seq_poses[left_vertex_i] == 0) {
-                            last_char = NULL_CHAR;
+                        if (!reversed) {
+                            if (seq_poses[left_vertex_i] == 0) {
+                                last_char = NULL_CHAR;
+                            } else {
+                                last_char = sequence[seq_poses[left_vertex_i] - 1];
+                            }
+
+                            probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
+                                    = mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char)
+                                      * (*_param_vec)[null_insertion + insertion_len];
                         } else {
-                            last_char = sequence[seq_poses[left_vertex_i] - 1];
+                            if (seq_poses[right_vertex_i] == sequence.size()) {
+                                last_char = NULL_CHAR;
+                            } else {
+                                last_char = sequence[seq_poses[right_vertex_i] + 1];
+                            }
+
+                            probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
+                                    = mc.nucProbability(sequence.rbegin() + (sequence.size() - seq_poses[right_vertex_i]), insertion_len, last_char)
+                                      * (*_param_vec)[null_insertion + insertion_len];
                         }
+
+
 
                         if (isnan(mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char) * (*_param_vec)[null_insertion + insertion_len])) {
 //                            cout << "nuc prob: " << (mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char)) << endl;
@@ -795,17 +817,14 @@ namespace ymir {
                             cout << "J: " << (int) seq_poses[right_vertex_i] << endl;
                         }
 
-                        probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
-                                = mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char)
-                                  * (*_param_vec)[null_insertion + insertion_len];
 
-                        if (save_metadata) {
+                        if (metadata_mode) {
                             events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
                                     = null_insertion + insertion_len;
                         }
                     } else {
                         probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0;
-                        if (save_metadata) {
+                        if (metadata_mode) {
                             events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0;
                         }
                     }

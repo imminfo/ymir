@@ -57,6 +57,7 @@ namespace ymir {
             _sequence = nullptr;
             _seq_poses = nullptr;
             _n_poses = 0;
+            _nuc = true;
         }
 
         /**
@@ -80,6 +81,8 @@ namespace ymir {
 
             if (other._sequence) { _sequence = new string(*other._sequence); }
             else { _sequence = nullptr; }
+
+            _nuc = other._nuc;
         }
 
 
@@ -100,6 +103,8 @@ namespace ymir {
             string *tmp3 = other._sequence;
             other._sequence = _sequence;
             _sequence = tmp3;
+
+            _nuc = other._nuc;
         }
 
 
@@ -119,13 +124,14 @@ namespace ymir {
         /**
          * \brief Special swap constructor for MAAGs that will be used for statistical inference.
          */
-        MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, string sequence, seq_len_t *seq_poses, seq_len_t n_poses) {
+        MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, string sequence, seq_len_t *seq_poses, seq_len_t n_poses, bool nuc) {
             this->swap(prob_mcc);
             _events = new EventIndMMC();
             _events->swap(eventind_mcc);
             _sequence = new string(sequence);
             _seq_poses = seq_poses;
             _n_poses = n_poses;
+            _nuc = nuc;
         }
 
 
@@ -165,6 +171,8 @@ namespace ymir {
             }
             else { _sequence = nullptr; }
 
+            _nuc = other._nuc;
+
             return *this;
         }
 
@@ -186,6 +194,8 @@ namespace ymir {
             string *tmp3 = other._sequence;
             other._sequence = _sequence;
             _sequence = tmp3;
+
+            _nuc = other._nuc;
         }
 
 
@@ -363,6 +373,9 @@ namespace ymir {
         const string& sequence() const { if (_sequence) { return *_sequence; } else { return ""; }}
 
 
+        bool is_nuc() const { return _nuc; }
+
+
         seq_len_t seq_pos(size_t i) const { return _seq_poses[i]; }
 
     protected:
@@ -372,6 +385,7 @@ namespace ymir {
         seq_len_t *_seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
         seq_len_t _n_poses;
         string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
+        bool _nuc;
 
     };
 }

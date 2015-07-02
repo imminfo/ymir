@@ -238,7 +238,7 @@ namespace ymir {
             }
         }
 
-        prob_t fullProbability(MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
+        prob_t fullProbability(MAAGComputeProbAction action = SUM_PROBABILITY) const {
             // choose the max full probability from all possible recombinations of V(D)J gene segment indices
             if (action == MAX_PROBABILITY) {
                 prob_t max_prob = 0, cur_prob = 0;
@@ -364,7 +364,7 @@ namespace ymir {
         ///@}
 
 
-        RECOMBINATION recombination() const { return _chain.size() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB; }
+        Recombination recombination() const { return _chain.size() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB; }
 
 
         bool has_events() const { return _events; }

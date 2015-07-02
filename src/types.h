@@ -137,13 +137,13 @@ namespace ymir {
     /**
      * \enum MAAG_COMPUTE_PROB_ACTION
      */
-    enum MAAG_COMPUTE_PROB_ACTION {
+    enum MAAGComputeProbAction {
         MAX_PROBABILITY,
         SUM_PROBABILITY
     };
 
 
-    enum GENE_SEGMENTS {
+    enum GeneSegments {
         VARIABLE,
         JOINING,
         DIVERSITY
@@ -153,25 +153,42 @@ namespace ymir {
     /**
      * \enum MODEL_VECTOR_TYPE
      */
-    enum RECOMBINATION {
+    enum Recombination {
         VJ_RECOMB,
         VDJ_RECOMB
     };
 
 
     /**
+     * \enum MetadataMode
+     */
+    enum MetadataMode {
+        NO_METADATA = 0,
+        SAVE_METADATA = 1
+    };
+
+
+    /**
      * \enum ERROR_MODE
      */
-    enum ERROR_MODE {
-        NO_ERRORS,
-        COMPUTE_ERRORS
+    enum ErrorMode {
+        NO_ERRORS = 0,
+        COMPUTE_ERRORS = 1
+    };
+
+    /**
+     * \enum SequenceType
+     */
+    enum SequenceType {
+        NUCLEOTIDE,
+        AMINOACID
     };
 
 
     /**
      * \enum EVENT_CLASS
      */
-    enum EVENT_CLASS {
+    enum EventClass {
         NULL_EVENT = 0,
 
         VJ_VAR_JOI_GEN = 1,
@@ -206,7 +223,7 @@ namespace ymir {
     };
 
 
-    enum MAAG_NODE_EVENT_INDEX {
+    enum MAAGNodeEventIndex {
         VJ_VAR_JOI_GEN_I = 0,
         VJ_VAR_DEL_I = 1,
         VJ_VAR_JOI_INS_I = 2,
@@ -222,12 +239,15 @@ namespace ymir {
     };
 
 
-    enum INSERTION_MODEL_TYPE {
-        MonoNucleotide,
-        DiNucleotide
+    enum InsertionModelType {
+        MONO_NUCLEOTIDE,
+        DI_NUCLEOTIDE
     };
 
 
+    /**
+     *
+     */
     struct CodonTable {
 
         struct Codons {

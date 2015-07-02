@@ -205,6 +205,10 @@ namespace ymir {
     class NaiveAminoAcidAligner : public AbstractAligner {
     public:
 
+        NaiveAminoAcidAligner() {
+            _codons = CodonTable();
+        }
+
         virtual seq_len_t align5end(const string& pattern, const string& text) const {
             return -1;
         }
@@ -218,6 +222,10 @@ namespace ymir {
         virtual LocalAlignmentIndices alignLocal(const string& pattern, const string& text, seq_len_t match_min_len = 3) const {
             return LocalAlignmentIndices(vector<seq_len_t>(1));
         }
+
+    protected:
+
+        CodonTable _codons;
 
     };
 }

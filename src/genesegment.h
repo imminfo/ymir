@@ -284,7 +284,7 @@ namespace ymir {
         /**
         * \param segindex 0 for V(ariable), 1 for J(oining), 2 for D(iversity) gene segment.
         */
-        void appendPalindromicNucleotides(GENE_SEGMENTS gene, seq_len_t from_5_end = 4, seq_len_t from_3_end = 4) {
+        void appendPalindromicNucleotides(GeneSegments gene, seq_len_t from_5_end = 4, seq_len_t from_3_end = 4) {
             if (gene == VARIABLE) {
                 if (this->_V) { this->_V->appendPalindromicNucleotides(from_5_end, from_3_end); }
             } else if (gene == JOINING) {

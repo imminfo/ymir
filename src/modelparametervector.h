@@ -80,7 +80,7 @@ namespace ymir {
          * length as lens_vec.
          * \param laplace_vec Vector of pseudo counts for each event family.
          */
-        ModelParameterVector(RECOMBINATION vec_type,
+        ModelParameterVector(Recombination vec_type,
                              const vector<prob_t>& param_vec,
                              const vector<eventind_t>& lens_vec,
                              const vector<eventind_t>& event_classes,
@@ -164,7 +164,7 @@ namespace ymir {
         }
 
 
-        RECOMBINATION recombination() const { return _recomb; }
+        Recombination recombination() const { return _recomb; }
 
 
         //============= VECTOR INDICES ACCESS =============//
@@ -207,7 +207,7 @@ namespace ymir {
          * 0-based indices for families and events! All segment indices must be passed as (segindex - 1),
          * segment families as (segindex_deletion_index - 1), but deletions and insertions should be passed as it is (#deletions).
          */
-        eventind_t event_index(EVENT_CLASS event_class, eventind_t event_family, eventind_t event_index) const {
+        eventind_t event_index(EventClass event_class, eventind_t event_family, eventind_t event_index) const {
             if (_edges[_event_classes[event_class] + event_family] + event_index < _edges[_event_classes[event_class] + event_family + 1]) {
                 return _edges[_event_classes[event_class] + event_family] + event_index;
             }
@@ -216,7 +216,7 @@ namespace ymir {
 //            return _edges[_event_classes[event_class] + event_family] + event_index;
         }
 
-        eventind_t event_index(EVENT_CLASS event_class, eventind_t event_family, eventind_t event_row, eventind_t event_column) const {
+        eventind_t event_index(EventClass event_class, eventind_t event_family, eventind_t event_row, eventind_t event_column) const {
             if (event_column < _event_family_col_numbers[_event_classes[event_class] + event_family] && _edges[_event_classes[event_class] + event_family]
                 + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column < _edges[_event_classes[event_class] + event_family + 1]) {
                 return _edges[_event_classes[event_class] + event_family]
@@ -228,11 +228,11 @@ namespace ymir {
 //                   + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column;
         }
 
-        prob_t event_prob(EVENT_CLASS event_class, eventind_t event_family, eventind_t event_index) const {
+        prob_t event_prob(EventClass event_class, eventind_t event_family, eventind_t event_index) const {
             return _vec[this->event_index(event_class, event_family, event_index)];
         }
 
-        prob_t event_prob(EVENT_CLASS event_class, eventind_t event_family, eventind_t event_row, eventind_t event_column) const {
+        prob_t event_prob(EventClass event_class, eventind_t event_family, eventind_t event_row, eventind_t event_column) const {
             return _vec[this->event_index(event_class, event_family, event_row, event_column)];
         }
 
@@ -314,7 +314,7 @@ namespace ymir {
         vector<seq_len_t> _event_family_col_numbers;  /** Vector of the number of rows of each event family. */
         vector<prob_t> _laplace;
         vector<seq_len_t> _d_genes_min_len;
-        RECOMBINATION _recomb;
+        Recombination _recomb;
 
 
         /**

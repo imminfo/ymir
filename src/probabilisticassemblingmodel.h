@@ -125,7 +125,7 @@ namespace ymir {
          */
         vector<prob_t> computeFullProbabilities(const ClonesetView& repertoire,
                                                 bool aminoacid = false,
-                                                MAAG_COMPUTE_PROB_ACTION action = SUM_PROBABILITY) const {
+                                                MAAGComputeProbAction action = SUM_PROBABILITY) const {
             return this->_builder->buildAndCompute(repertoire, aminoacid, action);
         }
 
@@ -140,7 +140,7 @@ namespace ymir {
          * \return Set of MAAGs.
          */
         MAAGRepertoire buildGraphs(const ClonesetView &repertoire,
-                                   bool save_metadata = true,
+                                   MetadataMode save_metadata = SAVE_METADATA,
                                    bool aminoacid = false,
                                    bool verbose = true) const {
             return _builder->build(repertoire, save_metadata, verbose);

@@ -98,7 +98,7 @@ namespace ymir {
             model.updateEventProbabilitiesVector(new_param_vec);
 
             cout << "Building MAAGs..." << endl;
-            MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, true, false, false);
+            MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, false, false);
             maag_rep.erase(maag_rep.begin() + 61877);
 
             vector<prob_t> prob_vec;
@@ -113,6 +113,8 @@ namespace ymir {
 
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
                 cout << endl << "Iteration:\t" << (size_t) iter << endl;
+
+//                cout << new_param_vec[5] << endl;
 
                 new_param_vec.fill(0);
 
@@ -143,18 +145,13 @@ namespace ymir {
 //                    if (isnan(prob_vec[i])) cout << (size_t) i << endl;
                 }
 
-                new_param_vec.familyFill(VJ_VAR_JOI_GEN, 1);  // drops
+//                new_param_vec.familyFill(VJ_VAR_JOI_GEN, 1);  // drops
                 new_param_vec.familyFill(VJ_VAR_DEL, 1);  // drops
-//                new_param_vec.familyFill(VJ_VAR_JOI_INS_LEN, 1);  // grows - OK
-//                new_param_vec.familyFill(VJ_VAR_JOI_INS_NUC, 1);  // grows - OK
+                new_param_vec.familyFill(VJ_VAR_JOI_INS_LEN, 1);  // grows - OK
+                new_param_vec.familyFill(VJ_VAR_JOI_INS_NUC, 1);  // grows - OK
                 new_param_vec.familyFill(VJ_JOI_DEL, 1);  // drops and then grows and the drops again
 
                 new_param_vec.normaliseEventFamilies();
-
-                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] << endl;
-                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] << endl;
-                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] << endl;
-                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] << endl;
 
                 model.updateEventProbabilitiesVector(new_param_vec);
                 model.updateEventProbabilities(&maag_rep);

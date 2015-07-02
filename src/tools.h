@@ -51,6 +51,17 @@ namespace ymir {
     }
 
 
+    inline char inv_nuc_hash(uint8_t hash) {
+        switch (hash) {
+            case 0: return 'A';
+            case 1: return 'C';
+            case 2: return 'G';
+            case 3: return 'T';
+            default : return 4;
+        }
+    }
+
+
     std::string translate(const std::string &nuc_seq) {
         return "nothing";
     }

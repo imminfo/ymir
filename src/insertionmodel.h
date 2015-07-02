@@ -5,6 +5,7 @@
 #ifndef YMIR_INSERTIONMODEL_H
 #define YMIR_INSERTIONMODEL_H
 
+#include <random>
 #include "string"
 
 #include "types.h"
@@ -33,6 +34,17 @@ namespace ymir {
 
         InsertionModel(const event_matrix_t& mat) : InsertionModel(DiNucleotide) {
             this->updateProbabilities(mat);
+        }
+
+
+        InsertionModel& operator=(const InsertionModel &other) {
+            if (_arr != other._arr) {
+                if (_arr) { delete _arr; }
+
+                _type = other._type;
+                this->initProbabilities();
+                this->updateProbabilities(other._arr);
+            }
         }
 
 
@@ -98,6 +110,23 @@ namespace ymir {
         }
 
 
+        string generate(seq_len_t len, default_random_engine &rg) {
+            discrete_distribution<int> distr;
+            if (_type == MonoNucleotide) {
+                distr = std::discrete_distribution<int>(_arr, _arr + 4);
+            } else {
+                distr = std::discrete_distribution<int>(_arr, _arr + 16);
+            }
+
+            string res = "";
+            for (seq_len_t i = 0; i < len; ++i) {
+                cout << inv_nuc_hash(distr(rg)) << endl;
+                res += inv_nuc_hash(distr(rg));
+            }
+            return res;
+        }
+
+
         /**
         * \brief Probability of the given amino acid sequence.
         */
@@ -150,6 +179,18 @@ namespace ymir {
             } else {
                 for (uint8_t i = 0; i < 16; ++i, ++start) {
                     this->_arr[i] = *start;
+                }
+            }
+        }
+
+        void updateProbabilities(prob_t *start) {
+            if (_type == MonoNucleotide) {
+                for (uint8_t i = 0; i < 4; ++i) {
+                    this->_arr[i] = *(start + i);
+                }
+            } else {
+                for (uint8_t i = 0; i < 16; ++i) {
+                    this->_arr[i] = *(start + i);
                 }
             }
         }

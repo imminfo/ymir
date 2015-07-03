@@ -203,6 +203,17 @@ namespace ymir {
 
 //    class NaiveAminoAcidAligner : public AbstractAligner<string, seq_len_t> {
     class NaiveAminoAcidAligner : public AbstractAligner {
+
+        /**
+         * \struct CodonTree
+         *
+         * \brief A structure for representing all possible nucleotide sequences of the given amino acid sequence
+         * as a tree.
+         */
+        struct CodonTree {
+
+        };
+
     public:
 
         NaiveAminoAcidAligner() { }

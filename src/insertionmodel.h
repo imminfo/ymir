@@ -80,15 +80,15 @@ namespace ymir {
                     for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
                         res *= _arr[nuc_hash(*start)];
                     }
-                    if (isnan(res)) {
-                        cout << "NAN res!!" << endl;
-                        res = 1;
-                        for (seq_len_t i = 0; i < sequence_len; ++i, ++tmp) {
-                            cout << "char:" << (*tmp) << " " << res << " -> ";
-                            res *= _arr[nuc_hash(*tmp)];
-                            cout << res << endl;
-                        }
-                    }
+//                    if (isnan(res)) {
+//                        cout << "NAN res!!" << endl;
+//                        res = 1;
+//                        for (seq_len_t i = 0; i < sequence_len; ++i, ++tmp) {
+//                            cout << "char:" << (*tmp) << " " << res << " -> ";
+//                            res *= _arr[nuc_hash(*tmp)];
+//                            cout << res << endl;
+//                        }
+//                    }
                 } else {
                     auto tmp1 = start, tmp2 = start + 1;
                     auto next = start + 1;

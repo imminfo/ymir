@@ -1091,6 +1091,7 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_clonebuilder_clonealign)
+
     ClonotypeBuilder cb;
 
     cb.setNucleotideSeq();
@@ -1129,11 +1130,14 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
     YMIR_ASSERT(c.nVar() == 3)
     YMIR_ASSERT(c.nJoi() == 1)
     YMIR_ASSERT(c.nDiv() == 3)
+
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_nuc_aligner)
+
     NaiveNucleotideAligner nna;
+
     YMIR_ASSERT2(nna.align5end("ACGT", "ACGTT"), 4)
     YMIR_ASSERT2(nna.align5end("ACGT", "ACGT"), 4)
     YMIR_ASSERT2(nna.align5end("ACGT", "ACG"), 3)
@@ -1160,15 +1164,37 @@ YMIR_TEST_START(test_nuc_aligner)
     YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].seqend, 6)
 
     YMIR_ASSERT2(nna.alignLocal("ACT", "ACTGACGACGGTATCTAC", 2).size(), 5)
+
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_aa_aligner)
+
+    NaiveAminoAcidAligner naa;
+
+    // {'R', "CGT"}, {'R', "CGC"}, {'R', "CGA"}, {'R', "CGG"}, {'R', "AGA"}, {'R', "AGG"},
+    // {'S', "TCT"}, {'S', "TCC"}, {'S', "TCA"}, {'S', "TCG"}, {'S', "AGT"}, {'S', "AGC"},
+    YMIR_ASSERT2(naa.align5end("AAA", "SR"), 0)
+    YMIR_ASSERT2(naa.align5end("TC", "SR"), 2)
+    YMIR_ASSERT2(naa.align5end("TCA", "SR"), 3)
+    YMIR_ASSERT2(naa.align5end("TCGCG", "SR"), 5)
+
+    YMIR_ASSERT2(naa.align5end("AG", "SR"), 2)
+    YMIR_ASSERT2(naa.align5end("AGTAGA", "SR"), 6)
+    YMIR_ASSERT2(naa.align5end("AGTAGG", "SR"), 6)
+
+    YMIR_ASSERT2(naa.align3end("AAA", "SR"), 1)
+    YMIR_ASSERT2(naa.align3end("TGA", "SR"), 2)
+    YMIR_ASSERT2(naa.align3end("TTTAGG", "SR"), 4)
+    YMIR_ASSERT2(naa.align3end("AGTAGG", "SR"), 6)
+
     YMIR_ASSERT(false)
+
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_mitcr_vj)
+
     RepertoireParser parser;
     YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
 

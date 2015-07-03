@@ -259,7 +259,7 @@ namespace ymir {
             {}
 
 
-            const std::string& next() {
+            std::string next() {
                 std::string res = _current->second;
                 ++_current;
                 return res;
@@ -303,9 +303,19 @@ namespace ymir {
 
         Codons codons(char aminoacid) const { return Codons(_codons.equal_range(aminoacid)); }
 
+
+
     protected:
         std::unordered_multimap<char, std::string> _codons;
     };
+
+
+    typedef std::pair<std::string*, uint> codons_t;
+    codons_t codons(char aminoacid) {
+        switch (aminoacid) {
+            default: return codons_t(nullptr, 0);
+        }
+    }
 }
 
 #endif

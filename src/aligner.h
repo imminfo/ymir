@@ -204,27 +204,78 @@ namespace ymir {
 //    class NaiveAminoAcidAligner : public AbstractAligner<string, seq_len_t> {
     class NaiveAminoAcidAligner : public AbstractAligner {
 
-        /**
-         * \struct CodonTree
-         *
-         * \brief A structure for representing all possible nucleotide sequences of the given amino acid sequence
-         * as a tree.
-         */
-        struct CodonTree {
-
-        };
-
     public:
 
         NaiveAminoAcidAligner() { }
 
+
         virtual seq_len_t align5end(const string& pattern, const string& text) const {
-            return -1;
+            seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0, max_matches = 0, all_matches = 0;
+            string codon_s = "";
+            for (seq_len_t i = 0; i < std::min((seq_len_t) (1 + p_size / 3), t_size); ++i) {
+                max_matches = 0;
+                // go through all codons and find the maximal match
+                CodonTable::Codons codon = _codons.codons(text[i]);
+                while(!codon.end()) {
+                    matches = 0;
+                    codon_s = codon.next();
+                    if (pattern[i*3] == codon_s[0] && i*3 < p_size) {
+                        ++matches;
+                        if (pattern[i*3 + 1] == codon_s[1] && (i*3 + 1) < p_size) {
+                            ++matches;
+                            if (pattern[i*3 + 2] == codon_s[2] && (i*3 + 2) < p_size) {
+                                ++matches;
+                            }
+                        }
+                    }
+
+                    if (matches > max_matches) {
+                        max_matches = matches;
+                        if (max_matches == 3) { break; }
+                    }
+                }
+
+                // if match == 3 then go to the next amino acid
+                all_matches += max_matches;
+                if (max_matches != 3) { break; }
+            }
+
+            return all_matches;
         }
 
 
         virtual seq_len_t align3end(const string& pattern, const string& text) const {
-            return -1;
+            seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0, max_matches = 0, all_matches = 0;
+            string codon_s = "";
+            for (seq_len_t i = 0; i < std::min((seq_len_t) (1 + p_size / 3), t_size); ++i) {
+                max_matches = 0;
+                // go through all codons and find the maximal match
+                CodonTable::Codons codon = _codons.codons(text[t_size - i - 1]);
+                while(!codon.end()) {
+                    matches = 0;
+                    codon_s = codon.next();
+                    if (pattern[p_size - 1 - i*3] == codon_s[2] && i*3 < p_size) {
+                        ++matches;
+                        if (pattern[p_size - 1 - i*3 - 1] == codon_s[1] && (i*3 + 1) < p_size) {
+                            ++matches;
+                            if (pattern[p_size - 1 - i*3 - 2] == codon_s[0] && (i*3 + 2) < p_size) {
+                                ++matches;
+                            }
+                        }
+                    }
+
+                    if (matches > max_matches) {
+                        max_matches = matches;
+                        if (max_matches == 3) { break; }
+                    }
+                }
+
+                // if match == 3 then go to the next amino acid
+                all_matches += max_matches;
+                if (max_matches != 3) { break; }
+            }
+
+            return all_matches;
         }
 
 

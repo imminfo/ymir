@@ -1172,9 +1172,9 @@ YMIR_TEST_START(test_aa_aligner)
 
     NaiveAminoAcidAligner naa;
 
-    // {'R', "CGT"}, {'R', "CGC"}, {'R', "CGA"}, {'R', "CGG"}, {'R', "AGA"}, {'R', "AGG"},
     // {'S', "TCT"}, {'S', "TCC"}, {'S', "TCA"}, {'S', "TCG"}, {'S', "AGT"}, {'S', "AGC"},
-    YMIR_ASSERT2(naa.align5end("AAA", "SR"), 0)
+    // {'R', "CGT"}, {'R', "CGC"}, {'R', "CGA"}, {'R', "CGG"}, {'R', "AGA"}, {'R', "AGG"},
+    YMIR_ASSERT2(naa.align5end("GGG", "SR"), 0)
     YMIR_ASSERT2(naa.align5end("TC", "SR"), 2)
     YMIR_ASSERT2(naa.align5end("TCA", "SR"), 3)
     YMIR_ASSERT2(naa.align5end("TCGCG", "SR"), 5)
@@ -1183,12 +1183,14 @@ YMIR_TEST_START(test_aa_aligner)
     YMIR_ASSERT2(naa.align5end("AGTAGA", "SR"), 6)
     YMIR_ASSERT2(naa.align5end("AGTAGG", "SR"), 6)
 
+    YMIR_ASSERT2(naa.align3end("T", "SR"), 1)
+    YMIR_ASSERT2(naa.align3end("CT", "SR"), 1)
+    YMIR_ASSERT2(naa.align3end("GT", "SR"), 2)
+
     YMIR_ASSERT2(naa.align3end("AAA", "SR"), 1)
     YMIR_ASSERT2(naa.align3end("TGA", "SR"), 2)
     YMIR_ASSERT2(naa.align3end("TTTAGG", "SR"), 4)
     YMIR_ASSERT2(naa.align3end("AGTAGG", "SR"), 6)
-
-    YMIR_ASSERT(false)
 
 YMIR_TEST_END
 

@@ -168,6 +168,13 @@ ModelParameterVector make_test_events_vj2() {
 
     v3.push_back(4);
 
+    // VJ ins len
+    v1.push_back(.1); v1.push_back(.05); v1.push_back(.2); v1.push_back(.15); v1.push_back(.24); v1.push_back(.01); v1.push_back(.25);
+    v2.push_back(7);
+    v4.push_back(0);
+
+    v3.push_back(7);
+
     // VJ ins nuc
     v1.push_back(.4); v1.push_back(.3); v1.push_back(.2); v1.push_back(.1);
     v2.push_back(4);
@@ -1192,6 +1199,8 @@ YMIR_TEST_START(test_aa_aligner)
     YMIR_ASSERT2(naa.align3end("TTTAGG", "SR"), 4)
     YMIR_ASSERT2(naa.align3end("AGTAGG", "SR"), 6)
 
+    YMIR_ASSERT(naa.alignLocal("TGATGAA", "SR").size() != 0)
+
 YMIR_TEST_END
 
 
@@ -1545,7 +1554,7 @@ YMIR_TEST_START(test_maag_vj)
     alvec1.push_back("Vseg3");
     seqvec1.push_back("CCCG");
     seqvec1.push_back("GGG");
-    seqvec1.push_back("CCCGGG");
+    seqvec1.push_back("CCCGAG");
 
     vector<string> alvec2;
     vector<string> seqvec2;
@@ -1564,7 +1573,7 @@ YMIR_TEST_START(test_maag_vj)
     // CCCG.AC.GGTTT
     // poses:
     // vs: 0-1-2-3-4-5
-    // js: 7-8-9-10-11
+    // js: 7-8-9-10-11-12
     cl_builder.setSequence("CCCGACGGTTT")
             .setNucleotideSeq()
             .addValignment(1, 4)
@@ -1574,11 +1583,25 @@ YMIR_TEST_START(test_maag_vj)
             .addJalignment(3, 7);
     Clonotype clonotype = cl_builder.buildClonotype();
 
+//    cout << "here" << endl;
     MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
 
     YMIR_ASSERT2(maag.nVar(), 2)
     YMIR_ASSERT2(maag.nJoi(), 3)
     YMIR_ASSERT2(maag.nDiv(), 0)
+
+    YMIR_ASSERT2(maag.position(0), 0)
+    YMIR_ASSERT2(maag.position(3), 3)
+    YMIR_ASSERT2(maag.position(5), 5)
+    YMIR_ASSERT2(maag.position(6), 7)
+    YMIR_ASSERT2(maag.position(8), 9)
+    YMIR_ASSERT2(maag.position(10), 11)
+    YMIR_ASSERT2(maag.position(11), 12)
+
+//    cout << "VJ 0:" << maag.rows(0) << ":" << maag.cols(0) << endl;
+//    cout << "Vdel 1:" << maag.rows(1) << ":" << maag.cols(1) << endl;
+//    cout << "VJins 2:" << maag.rows(2) << ":" << maag.cols(2) << endl;
+//    cout << "Jdel 3:" << maag.rows(3) << ":" << maag.cols(3) << endl;
 
     YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
     YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
@@ -1689,6 +1712,14 @@ YMIR_TEST_START(test_maag_vdj)
 
     MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
 
+//    cout << "V 0:" << maag.rows(0) << ":" << maag.cols(0) << endl;
+//    cout << "Vdel 1:" << maag.rows(1) << ":" << maag.cols(1) << endl;
+//    cout << "VDins 2:" << maag.rows(2) << ":" << maag.cols(2) << endl;
+//    cout << "Ddel 3:" << maag.rows(3) << ":" << maag.cols(3) << endl;
+//    cout << "DJins 4:" << maag.rows(4) << ":" << maag.cols(4) << endl;
+//    cout << "Jdel 5:" << maag.rows(5) << ":" << maag.cols(5) << endl;
+//    cout << "JD 6:" << maag.rows(6) << ":" << maag.cols(6) << endl;
+
     YMIR_ASSERT2(maag.nVar(), 2)
     YMIR_ASSERT2(maag.nJoi(), 3)
     YMIR_ASSERT2(maag.nDiv(), 3)
@@ -1759,13 +1790,18 @@ YMIR_TEST_START(test_maag_vdj)
     YMIR_ASSERT2(maag.event_index(6, 0, 2, 1), mvec.event_index(VDJ_JOI_DIV_GEN, 0, 2, 2))
     YMIR_ASSERT2(maag.event_index(6, 0, 2, 2), mvec.event_index(VDJ_JOI_DIV_GEN, 0, 2, 0))
 
+//    cout << "save" << endl;
+//    cout << maag_builder.build(clonotype, SAVE_METADATA).fullProbability() << endl;
+//    cout << "no-save" << endl;
+//    cout << maag_builder.build(clonotype, NO_METADATA).fullProbability() << endl;
+
     // i don't want to compute by hand all this crazy matrices!
     // i've already tested chain products in previous tests!
     // ):<
     // also it's (A, B) not (A - B < eps) because this results are pretty precise on this toy example
-    YMIR_ASSERT2(maag.fullProbability(0, 0, 0), maag_builder.build(clonotype, NO_METADATA).fullProbability(0, 0, 0))
+    YMIR_ASSERT2(maag.fullProbability(0, 0, 0), maag_builder.build(clonotype, NO_METADATA).fullProbability(0, 0, 0))  // error is here
     YMIR_ASSERT2(maag.fullProbability(1, 1, 1), maag_builder.build(clonotype, NO_METADATA).fullProbability(1, 1, 1))
-    YMIR_ASSERT2(maag.fullProbability(0, 2, 2), maag_builder.build(clonotype, NO_METADATA).fullProbability(0, 2, 2))
+    YMIR_ASSERT2(maag.fullProbability(0, 2, 2), maag_builder.build(clonotype, NO_METADATA).fullProbability(0, 2, 2))  // error is here
 
 YMIR_TEST_END
 
@@ -1816,7 +1852,15 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
 
     YMIR_ASSERT(!(mvec == mvec2))
 
+    // A .1 C .2 G .3 T .4
+    // CCCGAC
+    // .2 * .2 * .2 * .3 * .1 * .2 = .000048
+//    cout << maag.event_probability(2, 0, 0, 0) << endl;
+//    cout << mvec.event_prob(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1) << endl;
+//    YMIR_ASSERT2(maag.event_probability(2, 0, 0, 0), mvec2.event_prob(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
+
     MAAGBuilder maag_builder2(mvec2, genes);
+
     maag_builder2.updateEventProbabilities(&maag);
 
     YMIR_ASSERT2(maag.nVar(), 2)
@@ -1842,6 +1886,11 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
     YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec2.event_index(VJ_VAR_DEL, 2, 2))
     YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec2.event_index(VJ_VAR_DEL, 2, 1))
 
+    // A .4 C .3 G .2 T .1
+    // CCCGAC
+    // .3 * .3 * .3 * .2 * .4 * .3 = .000648
+//    cout << maag.event_probability(2, 0, 0, 0) << endl;
+//    cout << mvec2.event_prob(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1) << endl;
     YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec2.event_index(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
     YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), 0)
 
@@ -2200,15 +2249,15 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
 
     YMIR_ASSERT2(algo.status(), true)
 
-    while (!algo.is_empty()) {
-        auto temp = algo.nextEvent();
-        cout << temp.first << " : " << temp.second << endl;
-    }
-
-    cout << algo.VJ_nuc_probs()[0] << endl;
-    cout << algo.VJ_nuc_probs()[1] << endl;
-    cout << algo.VJ_nuc_probs()[2] << endl;
-    cout << algo.VJ_nuc_probs()[3] << endl;
+//    while (!algo.is_empty()) {
+//        auto temp = algo.nextEvent();
+//        cout << temp.first << " : " << temp.second << endl;
+//    }
+//
+//    cout << algo.VJ_nuc_probs()[0] << endl;
+//    cout << algo.VJ_nuc_probs()[1] << endl;
+//    cout << algo.VJ_nuc_probs()[2] << endl;
+//    cout << algo.VJ_nuc_probs()[3] << endl;
 
     YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 8e-20)
 

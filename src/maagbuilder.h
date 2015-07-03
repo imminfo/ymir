@@ -253,6 +253,7 @@ namespace ymir {
                                               v_vertices + d3_vertices + d5_vertices,
                                               v_vertices + d3_vertices + d5_vertices + j_vertices - 1,
                                               im);
+
                     } else {
                         // or just replace all event probabilities with the new ones
                         for (int mat_i = 0; mat_i < maag->nodeSize(node_i); ++mat_i) {
@@ -386,9 +387,7 @@ namespace ymir {
                 }
             }
 
-            for (seq_len_t i = 0; i < len + 1; ++i) {
-                seq_poses.push_back(i);
-            }
+            for (seq_len_t i = 0; i <= len; ++i) { seq_poses.push_back(i); }
         }
 
 
@@ -422,6 +421,7 @@ namespace ymir {
                 }
             }
             len = clonotype.sequence().size() - len + 1;
+//            cout << "len = " << len << endl;
 
 
             // add J deletions nodes
@@ -790,17 +790,22 @@ namespace ymir {
                             }
 
                             probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
-                                    = mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char)
+                                    = mc.nucProbability<std::string::const_iterator>(sequence.cbegin() + seq_poses[left_vertex_i],
+                                                                                     insertion_len,
+                                                                                     last_char)
                                       * (*_param_vec)[null_insertion + insertion_len];
                         } else {
-                            if (seq_poses[right_vertex_i] == sequence.size()) {
+                            if (seq_poses[right_vertex_i] == sequence.size() + 1) {
                                 last_char = NULL_CHAR;
                             } else {
-                                last_char = sequence[seq_poses[right_vertex_i] + 1];
+                                last_char = sequence[seq_poses[right_vertex_i] - 1];
                             }
 
+//                            cout << "diff:" << ((sequence.size() - seq_poses[right_vertex_i])) << endl;
                             probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
-                                    = mc.nucProbability(sequence.rbegin() + (sequence.size() - seq_poses[right_vertex_i]), insertion_len, last_char)
+                                    = mc.nucProbability<std::string::const_reverse_iterator>(sequence.crbegin() + (sequence.size() - seq_poses[right_vertex_i] + 1),
+                                                                                             insertion_len,
+                                                                                             last_char)
                                       * (*_param_vec)[null_insertion + insertion_len];
                         }
 

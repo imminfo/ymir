@@ -806,16 +806,16 @@ namespace ymir {
 
 
 
-                        if (isnan(mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char) * (*_param_vec)[null_insertion + insertion_len])) {
-//                            cout << "nuc prob: " << (mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char)) << endl;
-                            cout << "sequence: " << sequence << endl;
-                            cout << "sequence len: " << (int) sequence.size() << endl;
-//                            cout << "last char: " << last_char << endl;
-                            cout << "ins len: " << (size_t) insertion_len << endl;
-//                            cout << "left vertex: " << (size_t) seq_poses[left_vertex_i] << endl;
-                            cout << "V: " << (int) seq_poses[left_vertex_i] << endl;
-                            cout << "J: " << (int) seq_poses[right_vertex_i] << endl;
-                        }
+//                        if (isnan(mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char) * (*_param_vec)[null_insertion + insertion_len])) {
+////                            cout << "nuc prob: " << (mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char)) << endl;
+//                            cout << "sequence: " << sequence << endl;
+//                            cout << "sequence len: " << (int) sequence.size() << endl;
+////                            cout << "last char: " << last_char << endl;
+//                            cout << "ins len: " << (size_t) insertion_len << endl;
+////                            cout << "left vertex: " << (size_t) seq_poses[left_vertex_i] << endl;
+//                            cout << "V: " << (int) seq_poses[left_vertex_i] << endl;
+//                            cout << "J: " << (int) seq_poses[right_vertex_i] << endl;
+//                        }
 
 
                         if (metadata_mode) {

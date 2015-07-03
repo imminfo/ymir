@@ -205,9 +205,7 @@ namespace ymir {
     class NaiveAminoAcidAligner : public AbstractAligner {
     public:
 
-        NaiveAminoAcidAligner() {
-            _codons = CodonTable();
-        }
+        NaiveAminoAcidAligner() { }
 
         virtual seq_len_t align5end(const string& pattern, const string& text) const {
             return -1;
@@ -225,7 +223,7 @@ namespace ymir {
 
     protected:
 
-        CodonTable _codons;
+        const CodonTable _codons;
 
     };
 }

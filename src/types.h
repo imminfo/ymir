@@ -246,7 +246,9 @@ namespace ymir {
 
 
     /**
+     * \struct CodonTable
      *
+     * \brief A struct for representing nucleotide codons for amino acids.
      */
     struct CodonTable {
 

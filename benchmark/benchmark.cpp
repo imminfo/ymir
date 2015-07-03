@@ -72,15 +72,15 @@ int main() {
     //
     ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA");
 
-    EMAlgorithm().statisticalInference(cloneset_vj, vj_model, EMAlgorithm::AlgorithmParameters().set("niter", 20));
+//    EMAlgorithm().statisticalInference(cloneset_vj, vj_model, EMAlgorithm::AlgorithmParameters().set("niter", 20));
 
     tp1 = std::chrono::system_clock::now();
-    vj_model.buildGraphs(cloneset_vj, true);
+    vj_model.buildGraphs(cloneset_vj, SAVE_METADATA);
     tp2 = std::chrono::system_clock::now();
     vj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
     tp1 = std::chrono::system_clock::now();
-    vj_model.computeFullProbabilities(cloneset_vj);
+    vj_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
     tp2 = std::chrono::system_clock::now();
     vj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -91,12 +91,12 @@ int main() {
     ProbabilisticAssemblingModel vdj_model(BENCH_DATA_FOLDER + "../../models/hTRB");
 
     tp1 = std::chrono::system_clock::now();
-    MAAGRepertoire(vdj_model.buildGraphs(cloneset_vdj, true));
+    MAAGRepertoire(vdj_model.buildGraphs(cloneset_vdj, SAVE_METADATA));
     tp2 = std::chrono::system_clock::now();
     vdj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
     tp1 = std::chrono::system_clock::now();
-    vdj_model.computeFullProbabilities(cloneset_vdj);
+    vdj_model.computeFullProbabilities(cloneset_vdj, NO_METADATA);
     tp2 = std::chrono::system_clock::now();
     vdj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 

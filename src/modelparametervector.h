@@ -248,14 +248,16 @@ namespace ymir {
                 }
 
                 if (prob_sum) {
+//                    std::cout << prob_sum << std::endl;
                     for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
                         _vec[j] = (_vec[j] + _laplace[i-1]) / prob_sum;
                     }
-                } else {
-                    for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
-                        _vec[j] = 0;
-                    }
                 }
+//                else {
+//                    for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
+//                        _vec[j] = 0;
+//                    }
+//                }
             }
         }
 

@@ -104,12 +104,15 @@ namespace ymir {
             vector<prob_t> prob_vec;
             prob_vec.resize(maag_rep.size(), 0);
 
+            prob_t prev_ll = 0, cur_ll = 0;
+
             cout << endl << "Initial data summary:" << endl;
             for (size_t i = 0; i < maag_rep.size(); ++i) {
                 prob_vec[i] = maag_rep[i].fullProbability();
                 if (isnan(prob_vec[i])) cout << (size_t) i << endl;
             }
             prob_summary(prob_vec);
+            prev_ll = loglikelihood(prob_vec);
 
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
                 cout << endl << "Iteration:\t" << (size_t) iter << endl;
@@ -145,21 +148,41 @@ namespace ymir {
 //                    if (isnan(prob_vec[i])) cout << (size_t) i << endl;
                 }
 
-//                new_param_vec.familyFill(VJ_VAR_JOI_GEN, 1);  // drops
-                new_param_vec.familyFill(VJ_VAR_DEL, 1);  // drops
-                new_param_vec.familyFill(VJ_VAR_JOI_INS_LEN, 1);  // grows - OK
-                new_param_vec.familyFill(VJ_VAR_JOI_INS_NUC, 1);  // grows - OK
-                new_param_vec.familyFill(VJ_JOI_DEL, 1);  // drops and then grows and the drops again
+//                new_param_vec.familyFill(VJ_VAR_JOI_GEN, 1);
+//                new_param_vec.familyFill(VJ_VAR_DEL, 1);
+//                new_param_vec.familyFill(VJ_VAR_JOI_INS_LEN, 1);
+//                new_param_vec.familyFill(VJ_VAR_JOI_INS_NUC, 1);
+//                new_param_vec.familyFill(VJ_JOI_DEL, 1);
+
+//                new_param_vec.familyFill(VDJ_VAR_GEN, 1);
+//                new_param_vec.familyFill(VDJ_VAR_DEL, 1);
+//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_LEN, 1);
+//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_NUC, 1);
+//                new_param_vec.familyFill(VDJ_DIV_DEL, 1);
+//                new_param_vec.familyFill(VDJ_DIV_JOI_INS_LEN, 1);
+//                new_param_vec.familyFill(VDJ_DIV_JOI_INS_NUC, 1);
+//                new_param_vec.familyFill(VDJ_JOI_DEL, 1);
+
+//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] << endl;
+//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] << endl;
+//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] << endl;
+//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] << endl;
 
                 new_param_vec.normaliseEventFamilies();
 
+//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] << endl;
+//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] << endl;
+//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] << endl;
+//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] << endl;
+
                 model.updateEventProbabilitiesVector(new_param_vec);
-                model.updateEventProbabilities(&maag_rep);
+                model.updateEventProbabilities(&maag_rep);  // maybe the bug is here???
 
                 for (size_t i = 0; i < prob_vec.size(); ++i) {
                     prob_vec[i] = maag_rep[i].fullProbability();
                 }
-                prob_summary(prob_vec);
+                prob_summary(prob_vec, prev_ll);
+                prev_ll = loglikelihood(prob_vec);
             }
 
             return true;

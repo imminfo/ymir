@@ -1541,10 +1541,12 @@ YMIR_TEST_START(test_mmc)
             * mat.matrix(2, 0)
             * mat.matrix(3, 1)
             * mat.matrix(4, 1))(0, 0) - 52.8 < 1e-14)
+
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_maag_vj)
+
     ModelParameterVector mvec = make_test_events_vj();
 
     vector<string> alvec1;
@@ -2217,7 +2219,7 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     alvec2.push_back("Jseg2");
     alvec2.push_back("Jseg3");
     seqvec2.push_back("CCGTTT");
-    seqvec2.push_back("AATT");
+    seqvec2.push_back("CATT");
     seqvec2.push_back("AGGTTT");
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
@@ -2249,15 +2251,15 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
 
     YMIR_ASSERT2(algo.status(), true)
 
-//    while (!algo.is_empty()) {
-//        auto temp = algo.nextEvent();
-//        cout << temp.first << " : " << temp.second << endl;
-//    }
-//
-//    cout << algo.VJ_nuc_probs()[0] << endl;
-//    cout << algo.VJ_nuc_probs()[1] << endl;
-//    cout << algo.VJ_nuc_probs()[2] << endl;
-//    cout << algo.VJ_nuc_probs()[3] << endl;
+    while (!algo.is_empty()) {
+        auto temp = algo.nextEvent();
+        cout << temp.first << " : " << temp.second << endl;
+    }
+
+    cout << algo.VJ_nuc_probs()[0] << endl;
+    cout << algo.VJ_nuc_probs()[1] << endl;
+    cout << algo.VJ_nuc_probs()[2] << endl;
+    cout << algo.VJ_nuc_probs()[3] << endl;
 
     YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 8e-20)
 

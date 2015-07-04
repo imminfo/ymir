@@ -166,34 +166,37 @@ namespace ymir {
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
                         right_pos = right_start_pos + col_i;
 
-                        if (maag.seq_pos(right_pos) - maag.seq_pos(left_pos) - 1 > 0) {
+                        if (maag.position(right_pos) - maag.position(left_pos) - 1 > 0 && maag.event_index(ins_node, 0, row_i, col_i)) {
                             fill(temp_arr, temp_arr + 4, 0);
                             n = 0;
 
-                            for (seq_len_t pos = maag.seq_pos(left_pos) + 1; pos <= maag.seq_pos(right_pos) - 1; ++pos) {
+                            for (seq_len_t pos = maag.position(left_pos) + 1; pos < maag.position(right_pos); ++pos) {
                                 temp_arr[nuc_hash(maag.sequence()[pos - 1])] += 1;
                                 ++n;
                             }
 
-                            scenario_prob = (*_forward_acc)(forw_node, 0, 0, row_i)
-                                            * maag(ins_node, 0, row_i, col_i)
+//                            scenario_prob = (*_forward_acc)(forw_node, 0 /* need to iterate over all matrices */, 0, row_i)
+//                                            * maag(ins_node, 0, row_i, col_i)
+//                                            * (*_backward_acc)(back_node, 0, row_i, col_i);
+
+                            scenario_prob = (*_forward_acc)(ins_node, 0, row_i, col_i)
                                             * (*_backward_acc)(back_node, 0, row_i, col_i);
 
                             for (auto i = 0; i < 4; ++i) {
-                                if (isnan(nuc_arr[i])) {
-                                    cout << "NAN before!!" << endl;
-                                }
+//                                if (isnan(nuc_arr[i])) {
+//                                    cout << "NAN before!!" << endl;
+//                                }
                                 nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
-                                if (isnan(nuc_arr[i])) {
-                                    cout << "NAN" << endl;
-                                    cout << "forw:" << (*_forward_acc)(forw_node, 0, 0, row_i) << endl;
-                                    cout << "maag:" << maag(ins_node, 0, row_i, col_i) << endl;
-                                    cout << "back:" << (*_backward_acc)(back_node, 0, row_i, col_i) << endl;
-                                    cout << "n:" << (size_t) n << endl;
-                                    cout << scenario_prob << endl;
-                                    cout << ((temp_arr[i] * scenario_prob) / n) << endl;
-                                    throw(std::runtime_error("Wrong position boundaries (forward node)!"));
-                                }
+//                                if (isnan(nuc_arr[i])) {
+//                                    cout << "NAN" << endl;
+//                                    cout << "forw:" << (*_forward_acc)(forw_node, 0, 0, row_i) << endl;
+//                                    cout << "maag:" << maag(ins_node, 0, row_i, col_i) << endl;
+//                                    cout << "back:" << (*_backward_acc)(back_node, 0, row_i, col_i) << endl;
+//                                    cout << "n:" << (size_t) n << endl;
+//                                    cout << scenario_prob << endl;
+//                                    cout << ((temp_arr[i] * scenario_prob) / n) << endl;
+//                                    throw(std::runtime_error("Wrong position boundaries (forward node)!"));
+//                                }
                             }
                         }
                     }
@@ -205,12 +208,12 @@ namespace ymir {
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
                         right_pos = right_start_pos + col_i;
 
-                        if (maag.seq_pos(right_pos) - maag.seq_pos(left_pos) - 1 > 0) {
+                        if (maag.position(right_pos) - maag.position(left_pos) - 1 > 0) {
                             fill(temp_arr, temp_arr + 16, 0);
                             n = 0;
 
                             if (left_pos) {
-                                for (seq_len_t pos = maag.seq_pos(left_pos + 1); pos <= maag.seq_pos(right_pos - 1); ++pos) {
+                                for (seq_len_t pos = maag.position(left_pos + 1); pos <= maag.position(right_pos - 1); ++pos) {
                                     temp_arr[4 * nuc_hash(maag.sequence()[pos - 2]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
                                     ++n;
                                 }
@@ -219,7 +222,7 @@ namespace ymir {
                                 temp_arr[4 * nuc_hash('C') + nuc_hash(maag.sequence()[0])] = .25;
                                 temp_arr[4 * nuc_hash('G') + nuc_hash(maag.sequence()[0])] = .25;
                                 temp_arr[4 * nuc_hash('T') + nuc_hash(maag.sequence()[0])] = .25;
-                                for (seq_len_t pos = maag.seq_pos(left_pos + 2); pos <= maag.seq_pos(right_pos - 1); ++pos) {
+                                for (seq_len_t pos = maag.position(left_pos + 2); pos <= maag.position(right_pos - 1); ++pos) {
                                     temp_arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
                                     ++n;
                                 }
@@ -295,6 +298,9 @@ namespace ymir {
         ///@}
 
 
+        /**
+         *
+         */
         void vectorise_pair_map() {
             _nuc_arr1[0] /= _full_prob;
             _nuc_arr1[1] /= _full_prob;

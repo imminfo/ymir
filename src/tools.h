@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include "math.h"
+#include <iomanip>
 
 #include "types.h"
 //#include "repertoire.h"
@@ -73,17 +74,17 @@ namespace ymir {
 
 
     prob_t loglikelihood(const std::vector<prob_t> &vec, prob_t laplace = 1e-80) {
-        prob_t res = 0, vec_sum = laplace * vec.size();
-        for (size_t i = 0; i < vec.size(); ++i) { vec_sum += vec[i]; }
+        prob_t res = 0; /*, vec_sum = laplace * vec.size(); */
+//        for (size_t i = 0; i < vec.size(); ++i) { vec_sum += vec[i]; }
 //        cout << vec_sum << endl;
 //        cout << "min:" << *std::min_element(vec.begin(), vec.end()) << endl;
 //        cout << "max:" << *std::max_element(vec.begin(), vec.end()) << endl;
-        for (size_t i = 0; i < vec.size(); ++i) { res += std::log10((vec[i] + laplace) / vec_sum); } // what to do in case of high precision numbers?
+        for (size_t i = 0; i < vec.size(); ++i) { res += std::log10((vec[i] + laplace)); } // what to do in case of high precision numbers?
         return res;
     }
 
 
-    void prob_summary(const std::vector<prob_t> &prob_vec) {
+    void prob_summary(const std::vector<prob_t> &prob_vec, prob_t prev_ll = 0) {
         size_t zeros = 0, negative = 0, bignums = 0, nans = 0;
 
         for (size_t i = 0; i < prob_vec.size(); ++i) {
@@ -93,7 +94,12 @@ namespace ymir {
             nans += isnan(prob_vec[i]) ? 1 : 0;
         }
 
-        std::cout << "Loglikelihood:\t" << loglikelihood(prob_vec) << std::endl;
+        std::cout << "Loglikelihood:\t" << std::setprecision(9) << loglikelihood(prob_vec);
+        if (prev_ll) {
+            if (loglikelihood(prob_vec) > prev_ll) { cout << " (grows)"; }
+            else { cout << " (drops)"; }
+        }
+        cout << std::endl;
         std::cout << "Error probabilities:\t" << (size_t) (zeros + negative + bignums + nans) << std::endl;
         if (zeros) std::cout << "  Zeros:            \t" << (size_t) zeros << std::endl;
         if (nans) std::cout << "  NaNs:             \t" << (size_t) nans << std::endl;

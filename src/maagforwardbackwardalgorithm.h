@@ -94,6 +94,7 @@ namespace ymir {
         vector<event_pair_t> _pairs;
         size_t _pairs_i;
         unordered_map<eventind_t, prob_t> _pair_map;
+//        map<eventind_t, prob_t> _pair_map;
         prob_t *_nuc_arr1, *_nuc_arr2;
 
 
@@ -135,6 +136,9 @@ namespace ymir {
         }
 
 
+        /**
+         *
+         */
         void fillZero(ProbMMC *mmc, uint start_node = 0) {
             for (uint i = start_node; i < mmc->chainSize(); ++i) {
                 for (uint j = 0; j < mmc->nodeSize(i); ++j) {
@@ -144,15 +148,18 @@ namespace ymir {
         }
 
 
+        /**
+         *
+         */
         void inferInsertionNucleotides(const MAAG &maag, node_ind_t ins_node,
                                        seq_len_t left_start_pos, seq_len_t left_end_pos,
                                        seq_len_t right_start_pos, seq_len_t right_end_pos,
-                                       prob_t *nuc_arr) {
+                                       prob_t *nuc_arr, bool reversed = false) {
             node_ind_t forw_node = ins_node - 1, back_node = ins_node;
             prob_t scenario_prob = 0;
             prob_t *temp_arr = nullptr;
-            int n = 0;
-            seq_len_t left_pos, right_pos;
+            uint n = 0;
+            seq_len_t left_pos, right_pos, start_shift = 0;
 
 //#ifdef YDEBUG
 //            if (left_end_pos - left_start_pos + 1 != maag.nodeRows(forw_node)) { throw(std::runtime_error("Wrong position boundaries (forward node)!")); }
@@ -175,29 +182,17 @@ namespace ymir {
                                 ++n;
                             }
 
-//                            scenario_prob = (*_forward_acc)(forw_node, 0 /* need to iterate over all matrices */, 0, row_i)
-//                                            * maag(ins_node, 0, row_i, col_i)
-//                                            * (*_backward_acc)(back_node, 0, row_i, col_i);
-
                             scenario_prob = (*_forward_acc)(ins_node, 0, row_i, col_i)
                                             * (*_backward_acc)(back_node, 0, row_i, col_i);
 
                             for (auto i = 0; i < 4; ++i) {
-//                                if (isnan(nuc_arr[i])) {
-//                                    cout << "NAN before!!" << endl;
-//                                }
                                 nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
-//                                if (isnan(nuc_arr[i])) {
-//                                    cout << "NAN" << endl;
-//                                    cout << "forw:" << (*_forward_acc)(forw_node, 0, 0, row_i) << endl;
-//                                    cout << "maag:" << maag(ins_node, 0, row_i, col_i) << endl;
-//                                    cout << "back:" << (*_backward_acc)(back_node, 0, row_i, col_i) << endl;
-//                                    cout << "n:" << (size_t) n << endl;
-//                                    cout << scenario_prob << endl;
-//                                    cout << ((temp_arr[i] * scenario_prob) / n) << endl;
-//                                    throw(std::runtime_error("Wrong position boundaries (forward node)!"));
-//                                }
                             }
+
+//                            _nuc_arr1[0] /= _cur_prob;
+//                            _nuc_arr1[1] /= _cur_prob;
+//                            _nuc_arr1[2] /= _cur_prob;
+//                            _nuc_arr1[3] /= _cur_prob;
                         }
                     }
                 }
@@ -212,38 +207,40 @@ namespace ymir {
                             fill(temp_arr, temp_arr + 16, 0);
                             n = 0;
 
-                            if (left_pos) {
-                                for (seq_len_t pos = maag.position(left_pos + 1); pos <= maag.position(right_pos - 1); ++pos) {
+                            if (!reversed) {
+                                if (!maag.position(left_pos)) {
+                                    start_shift = 1;
+                                    temp_arr[4 * nuc_hash('A') + nuc_hash(maag.sequence()[0])] = .25;
+                                    temp_arr[4 * nuc_hash('C') + nuc_hash(maag.sequence()[0])] = .25;
+                                    temp_arr[4 * nuc_hash('G') + nuc_hash(maag.sequence()[0])] = .25;
+                                    temp_arr[4 * nuc_hash('T') + nuc_hash(maag.sequence()[0])] = .25;
+                                }
+                                for (seq_len_t pos = maag.position(left_pos) + start_shift + 1; pos < maag.position(right_pos); ++pos) {
                                     temp_arr[4 * nuc_hash(maag.sequence()[pos - 2]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
                                     ++n;
                                 }
                             } else {
-                                temp_arr[4 * nuc_hash('A') + nuc_hash(maag.sequence()[0])] = .25;
-                                temp_arr[4 * nuc_hash('C') + nuc_hash(maag.sequence()[0])] = .25;
-                                temp_arr[4 * nuc_hash('G') + nuc_hash(maag.sequence()[0])] = .25;
-                                temp_arr[4 * nuc_hash('T') + nuc_hash(maag.sequence()[0])] = .25;
-                                for (seq_len_t pos = maag.position(left_pos + 2); pos <= maag.position(right_pos - 1); ++pos) {
-                                    temp_arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
+                                if (maag.position(right_pos) == maag.sequence().size() + 1) {
+                                    start_shift = 1;
+                                    temp_arr[4 * nuc_hash('A') + nuc_hash(maag.sequence()[maag.sequence().size() - 1])] = .25;
+                                    temp_arr[4 * nuc_hash('C') + nuc_hash(maag.sequence()[maag.sequence().size() - 1])] = .25;
+                                    temp_arr[4 * nuc_hash('G') + nuc_hash(maag.sequence()[maag.sequence().size() - 1])] = .25;
+                                    temp_arr[4 * nuc_hash('T') + nuc_hash(maag.sequence()[maag.sequence().size() - 1])] = .25;
+                                }
+                                for (seq_len_t pos = maag.position(right_pos) - 1 - start_shift; pos >= maag.position(left_pos); --pos) {
+//                                    cout << "pos=" << (pos-1) << ";char=" << (4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 2])) << endl;
+//                                    cout << (char) maag.sequence()[pos - 1] << "->left=" << (int) (4 * nuc_hash(maag.sequence()[pos - 1])) << endl;
+//                                    cout << (char) maag.sequence()[pos - 2] << "->right=" << (int) (nuc_hash(maag.sequence()[pos - 2])) << endl;
+                                    temp_arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 2])] += 1;
                                     ++n;
                                 }
                             }
 
-                            scenario_prob = (*_forward_acc)(forw_node, 0, 0, row_i)
-                                            * maag(ins_node, 0, row_i, col_i)
+                            scenario_prob = (*_forward_acc)(ins_node, 0, row_i, col_i)
                                             * (*_backward_acc)(back_node, 0, row_i, col_i);
 
                             for (auto i = 0; i < 16; ++i) {
                                 nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
-                            }
-
-                            for (dim_t frow_i = 1; frow_i < maag.nodeRows(forw_node); ++frow_i) {
-                                scenario_prob = (*_forward_acc)(forw_node, 0, frow_i, row_i)
-                                                * maag(ins_node, 0, row_i, col_i)
-                                                * (*_backward_acc)(back_node, 0, row_i, col_i);
-
-                                for (auto i = 0; i < 16; ++i) {
-                                    nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
-                                }
                             }
                         }
                     }
@@ -259,7 +256,11 @@ namespace ymir {
          */
         ///@{
         void pushEventValue(eventind_t event_index, prob_t prob_value) {
+//            cout << event_index << " -> " << prob_value;
+//            if (event_index > 100) { throw(std::runtime_error("EVENT INDEX!")); }
             if (prob_value && event_index) {
+//                cout << "\tOK";
+
                 auto elem = _pair_map.find(event_index);
 
                 if (elem == _pair_map.end()) {
@@ -267,6 +268,7 @@ namespace ymir {
                 }
                 _pair_map[event_index] += prob_value;
             }
+//            cout << endl;
         }
 
         void pushEventPair(const MAAG &maag, node_ind_t node_i, matrix_ind_t maag_mat_i, dim_t maag_row_i, dim_t maag_col_i,
@@ -301,16 +303,20 @@ namespace ymir {
         /**
          *
          */
-        void vectorise_pair_map() {
-            _nuc_arr1[0] /= _full_prob;
-            _nuc_arr1[1] /= _full_prob;
-            _nuc_arr1[2] /= _full_prob;
-            _nuc_arr1[3] /= _full_prob;
-
-//            _nuc_arr2[0] /= _full_prob;
-//            _nuc_arr2[1] /= _full_prob;
-//            _nuc_arr2[2] /= _full_prob;
-//            _nuc_arr2[3] /= _full_prob;
+        void vectorise_pair_map(const MAAG &maag) {
+            if (maag.is_vj()) {
+                _nuc_arr1[0] /= _full_prob;
+                _nuc_arr1[1] /= _full_prob;
+                _nuc_arr1[2] /= _full_prob;
+                _nuc_arr1[3] /= _full_prob;
+            } else {
+                for (int i = 0; i < 16; ++i) {
+                    _nuc_arr1[i] /= _full_prob;
+                }
+                for (int i = 0; i < 16; ++i) {
+                    _nuc_arr2[i] /= _full_prob;
+                }
+            }
 
             _pairs.reserve(_pair_map.size() + 40);
             for (auto it = _pair_map.begin(); it != _pair_map.end(); ++it) {
@@ -462,7 +468,7 @@ namespace ymir {
                                                 _nuc_arr1);
             }
 
-            this->vectorise_pair_map();
+            this->vectorise_pair_map(maag);
         }
 
 
@@ -654,18 +660,15 @@ namespace ymir {
                     recompute_d_gen_fi = false;
 
                     // add fi * bi to the accumulator
-                    this->pushEventPairs(maag, VDJ_VAR_DIV_INS_I, 0, 0);
                     for (matrix_ind_t mat_i = 0; mat_i < maag.nVar(); ++mat_i) {
+                        this->pushEventPairs(maag, VDJ_VAR_GEN_I, mat_i, mat_i);
                         this->pushEventPairs(maag, VDJ_VAR_DEL_I, mat_i, mat_i);
                     }
-                    this->pushEventPairs(maag, VDJ_VAR_DIV_INS_I, d_ind, 0);
+                    this->pushEventPairs(maag, VDJ_VAR_DIV_INS_I, 0, 0);
                     this->pushEventPairs(maag, VDJ_DIV_DEL_I, d_ind, 0);
-                    this->pushEventPairs(maag, VDJ_DIV_JOI_INS_I, d_ind, 0);
-                    this->pushEventPairs(maag, VDJ_JOI_DEL_I, j_ind, 0);  // crashes here
+                    this->pushEventPairs(maag, VDJ_DIV_JOI_INS_I, 0, 0);
+                    this->pushEventPairs(maag, VDJ_JOI_DEL_I, j_ind, 0);
                     this->pushEventPair(maag, VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind, 0, 0, 0);
-//                    _pairs.push_back(event_pair_t(
-//                            maag.event_index(VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind),
-//                            (*_forward_acc)(VDJ_JOI_DEL_I, 0, 0, 0) * (*_backward_acc)(VDJ_JOI_DEL_I, 0, 0, 0)));
 
                     seq_len_t v_vertices = maag.nodeColumns(VDJ_VAR_DEL_I),
                             d3_vertices = maag.nodeRows(VDJ_DIV_DEL_I),
@@ -675,17 +678,17 @@ namespace ymir {
                     this->inferInsertionNucleotides(maag, VDJ_VAR_DIV_INS_I,
                                                     0, v_vertices - 1,
                                                     v_vertices, v_vertices + d3_vertices - 1,
-                                                    _nuc_arr1);
+                                                    _nuc_arr1, false);
 
 
                     this->inferInsertionNucleotides(maag, VDJ_DIV_JOI_INS_I,
                                                     v_vertices + d3_vertices, v_vertices + d3_vertices + d5_vertices - 1,
                                                     v_vertices + d3_vertices + d5_vertices, v_vertices + d3_vertices + d5_vertices + j_vertices - 1,
-                                                    _nuc_arr2);
+                                                    _nuc_arr2, true);
                 }
             }
 
-            this->vectorise_pair_map();
+            this->vectorise_pair_map(maag);
         }
 
 

@@ -192,6 +192,7 @@ namespace ymir {
          *
          * \return Probability of the event.
          */
+        ///@{
         prob_t& operator[] (eventind_t gl_event_index) { return _vec[gl_event_index]; }
 
         prob_t operator[] (eventind_t gl_event_index) const { return _vec[gl_event_index]; }
@@ -199,6 +200,7 @@ namespace ymir {
         prob_t operator() (eventind_t event_family, eventind_t loc_event_index) const {
             return _vec[_edges[event_family] + loc_event_index];
         }
+        ///@}
 
         vector<prob_t>::const_iterator get_iterator(eventind_t i) const { return _vec.begin() + i; }
 
@@ -300,6 +302,9 @@ namespace ymir {
 
 
         void familyFill(eventind_t event_family, prob_t val = 0) {
+            if (event_family == VDJ_VAR_DIV_INS_NUC_A_ROW) {
+                std::cout << (_edges[_event_classes[event_family + 1]] - _edges[_event_classes[event_family]]) << std::endl;
+            }
             for (eventind_t i = _edges[_event_classes[event_family]]; i < _edges[_event_classes[event_family + 1]]; ++i) {
                 _vec[i] = val;
             }

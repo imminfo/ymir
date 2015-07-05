@@ -140,7 +140,19 @@ namespace ymir {
                         new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] += fb.VJ_nuc_probs()[2];
                         new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] += fb.VJ_nuc_probs()[3];
                     } else {
+                        int k = 0;
+                        for (auto prev_nuc = 0; prev_nuc < 4; ++prev_nuc) {
+                            for (auto next_nuc = 0; next_nuc < 4; ++next_nuc, ++k) {
+                                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, prev_nuc, next_nuc)] += fb.VD_nuc_probs()[k];
+                            }
+                        }
 
+                        k = 0;
+                        for (auto prev_nuc = 0; prev_nuc < 4; ++prev_nuc) {
+                            for (auto next_nuc = 0; next_nuc < 4; ++next_nuc, ++k) {
+                                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, prev_nuc, next_nuc)] += fb.DJ_nuc_probs()[k];
+                            }
+                        }
                     }
                     prob_vec[i] = fb.fullProbability();
 //                    cout << prob_vec[i] << endl;
@@ -157,26 +169,23 @@ namespace ymir {
 //                new_param_vec.familyFill(VDJ_VAR_GEN, 1);
 //                new_param_vec.familyFill(VDJ_VAR_DEL, 1);
 //                new_param_vec.familyFill(VDJ_VAR_DIV_INS_LEN, 1);
-//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_NUC, 1);
+//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_NUC_A_ROW, 1);
+//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_NUC_C_ROW, 1);
+//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_NUC_G_ROW, 1);
+//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_NUC_T_ROW, 1);
 //                new_param_vec.familyFill(VDJ_DIV_DEL, 1);
 //                new_param_vec.familyFill(VDJ_DIV_JOI_INS_LEN, 1);
-//                new_param_vec.familyFill(VDJ_DIV_JOI_INS_NUC, 1);
+//                new_param_vec.familyFill(VDJ_DIV_JOI_INS_NUC_A_ROW, 1);
+//                new_param_vec.familyFill(VDJ_DIV_JOI_INS_NUC_C_ROW, 1);
+//                new_param_vec.familyFill(VDJ_DIV_JOI_INS_NUC_G_ROW, 1);
+//                new_param_vec.familyFill(VDJ_DIV_JOI_INS_NUC_T_ROW, 1);
 //                new_param_vec.familyFill(VDJ_JOI_DEL, 1);
-
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] << endl;
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] << endl;
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] << endl;
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] << endl;
+//                new_param_vec.familyFill(VDJ_JOI_DIV_GEN, 1);
 
                 new_param_vec.normaliseEventFamilies();
 
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] << endl;
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] << endl;
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] << endl;
-//                cout << new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] << endl;
-
                 model.updateEventProbabilitiesVector(new_param_vec);
-                model.updateEventProbabilities(&maag_rep);  // maybe the bug is here???
+                model.updateEventProbabilities(&maag_rep);
 
                 for (size_t i = 0; i < prob_vec.size(); ++i) {
                     prob_vec[i] = maag_rep[i].fullProbability();

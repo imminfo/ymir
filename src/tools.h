@@ -96,10 +96,10 @@ namespace ymir {
 
         std::cout << "Loglikelihood:\t" << std::setprecision(9) << loglikelihood(prob_vec);
         if (prev_ll) {
-            if (loglikelihood(prob_vec) > prev_ll) { cout << " (grows)"; }
-            else { cout << " (drops)"; }
+            if (loglikelihood(prob_vec) > prev_ll) { std::cout << " (grows)"; }
+            else { std::cout << " (drops)"; }
         }
-        cout << std::endl;
+        std::cout << std::endl;
         std::cout << "Error probabilities:\t" << (size_t) (zeros + negative + bignums + nans) << std::endl;
         if (zeros) std::cout << "  Zeros:            \t" << (size_t) zeros << std::endl;
         if (nans) std::cout << "  NaNs:             \t" << (size_t) nans << std::endl;

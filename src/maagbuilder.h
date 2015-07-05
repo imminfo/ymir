@@ -809,8 +809,6 @@ namespace ymir {
                                       * (*_param_vec)[null_insertion + insertion_len];
                         }
 
-
-
 //                        if (isnan(mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char) * (*_param_vec)[null_insertion + insertion_len])) {
 ////                            cout << "nuc prob: " << (mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char)) << endl;
 //                            cout << "sequence: " << sequence << endl;
@@ -829,9 +827,7 @@ namespace ymir {
                         }
                     } else {
                         probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0;
-                        if (metadata_mode) {
-                            events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0;
-                        }
+                        if (metadata_mode) { events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0; }
                     }
                 }
             }

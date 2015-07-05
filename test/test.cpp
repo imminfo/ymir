@@ -2251,15 +2251,15 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
 
     YMIR_ASSERT2(algo.status(), true)
 
-    while (!algo.is_empty()) {
-        auto temp = algo.nextEvent();
-        cout << temp.first << " : " << temp.second << endl;
-    }
-
-    cout << algo.VJ_nuc_probs()[0] << endl;
-    cout << algo.VJ_nuc_probs()[1] << endl;
-    cout << algo.VJ_nuc_probs()[2] << endl;
-    cout << algo.VJ_nuc_probs()[3] << endl;
+//    while (!algo.is_empty()) {
+//        auto temp = algo.nextEvent();
+//        cout << temp.first << " : " << temp.second << endl;
+//    }
+//
+//    cout << algo.VJ_nuc_probs()[0] << endl;
+//    cout << algo.VJ_nuc_probs()[1] << endl;
+//    cout << algo.VJ_nuc_probs()[2] << endl;
+//    cout << algo.VJ_nuc_probs()[3] << endl;
 
     YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 8e-20)
 
@@ -2336,14 +2336,28 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
 
     MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
 
-    YMIR_ASSERT(false)
-//    MAAGForwardBackwardAlgorithm algo(maag);
-//
-//    YMIR_ASSERT2(algo.status(), true)
-//
-//    YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 6e-20)
-//
-//    YMIR_ASSERT(abs(algo.bfullProbability() - maag.fullProbability()) < 6e-20)
+//    for (int node_i = 0; node_i < maag.chainSize(); ++node_i) {
+//        for (int mat_i = 0; mat_i < maag.nodeSize(node_i); ++mat_i) {
+//            for (int row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
+//                for (int col_i = 0; col_i < maag.nodeColumns(node_i); ++col_i) {
+//                    cout << maag.event_index(node_i, mat_i, row_i, col_i) << endl;
+//                }
+//            }
+//        }
+//    }
+
+    YMIR_ASSERT2(maag.nVar(), 2)
+    YMIR_ASSERT2(maag.nDiv(), 3)
+    YMIR_ASSERT2(maag.nJoi(), 3)
+
+//    YMIR_ASSERT(false)
+    MAAGForwardBackwardAlgorithm algo(maag);
+
+    YMIR_ASSERT2(algo.status(), true)
+
+    YMIR_ASSERT(abs(algo.fullProbability() - maag.fullProbability()) < 6e-20)
+
+    YMIR_ASSERT(abs(algo.bfullProbability() - maag.fullProbability()) < 6e-20)
 
 YMIR_TEST_END
 

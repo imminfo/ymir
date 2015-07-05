@@ -210,7 +210,8 @@ namespace ymir {
                                               v_vertices - 1,
                                               v_vertices,
                                               v_vertices + j_vertices - 1,
-                                              im);
+                                              im,
+                                              false);
 
                     } else if (maag->is_vdj() && node_i == VarDiv_INSERTIONS_MATRIX_INDEX) {
                         InsertionModel im(DI_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
@@ -230,7 +231,8 @@ namespace ymir {
                                               v_vertices - 1,
                                               v_vertices,
                                               v_vertices + d3_vertices - 1,
-                                              im);
+                                              im,
+                                              false);
 
                     } else if (maag->is_vdj() && node_i == DivJoi_INSERTIONS_MATRIX_INDEX) {
                         InsertionModel im(DI_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
@@ -252,7 +254,8 @@ namespace ymir {
                                               v_vertices + d3_vertices + d5_vertices - 1,
                                               v_vertices + d3_vertices + d5_vertices,
                                               v_vertices + d3_vertices + d5_vertices + j_vertices - 1,
-                                              im);
+                                              im,
+                                              true);
 
                     } else {
                         // or just replace all event probabilities with the new ones
@@ -801,25 +804,12 @@ namespace ymir {
                                 last_char = sequence[seq_poses[right_vertex_i] - 1];
                             }
 
-//                            cout << "diff:" << ((sequence.size() - seq_poses[right_vertex_i])) << endl;
                             probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
                                     = mc.nucProbability<std::string::const_reverse_iterator>(sequence.crbegin() + (sequence.size() - seq_poses[right_vertex_i] + 1),
                                                                                              insertion_len,
                                                                                              last_char)
                                       * (*_param_vec)[null_insertion + insertion_len];
                         }
-
-//                        if (isnan(mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char) * (*_param_vec)[null_insertion + insertion_len])) {
-////                            cout << "nuc prob: " << (mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i], insertion_len, last_char)) << endl;
-//                            cout << "sequence: " << sequence << endl;
-//                            cout << "sequence len: " << (int) sequence.size() << endl;
-////                            cout << "last char: " << last_char << endl;
-//                            cout << "ins len: " << (size_t) insertion_len << endl;
-////                            cout << "left vertex: " << (size_t) seq_poses[left_vertex_i] << endl;
-//                            cout << "V: " << (int) seq_poses[left_vertex_i] << endl;
-//                            cout << "J: " << (int) seq_poses[right_vertex_i] << endl;
-//                        }
-
 
                         if (metadata_mode) {
                             events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)

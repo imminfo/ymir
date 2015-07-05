@@ -42,6 +42,7 @@ namespace ymir {
     * \brief Multi-Alignment Assembly Graph - basic class for representing
     * all possible generation scenarios of a nucleotide or amino acid sequence of an immune receptor.
     */
+//    class MAAG : public ProbMMC {
     class MAAG : protected ProbMMC {
 
         friend class MAAGForwardBackwardAlgorithm;  // ):
@@ -226,34 +227,6 @@ namespace ymir {
         prob_t fullProbability(eventind_t v_index, eventind_t d_index, eventind_t j_index) const {
             if (this->is_vdj()) {
                 // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
-//                std::cout << ((matrix(0, v_index))(0, 0)) << "\n";
-//                std::cout << ((matrix(0, v_index) *      // P(Vi)
-//                          matrix(1, v_index))(0, 0)) << "\n";
-//                std::cout << ((matrix(0, v_index) *      // P(Vi)
-//                          matrix(1, v_index) *      // P(#dels | Vi)
-//                          matrix(2, 0))(0, 0)) << "\n";
-//                std::cout << ((matrix(0, v_index) *      // P(Vi)
-//                               matrix(1, v_index) *      // P(#dels | Vi)
-//                               matrix(2, 0) *            // P(V-D3' insertion seq)
-//                               matrix(3, d_index))(0, 0)) << "\n";
-//                std::cout << ((matrix(0, v_index) *      // P(Vi)
-//                               matrix(1, v_index) *      // P(#dels | Vi)
-//                               matrix(2, 0) *            // P(V-D3' insertion seq)
-//                               matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
-//                               matrix(4, 0))(0, 0)) << "\n";
-//                std::cout << ((matrix(0, v_index) *      // P(Vi)
-//                               matrix(1, v_index) *      // P(#dels | Vi)
-//                               matrix(2, 0) *            // P(V-D3' insertion seq)
-//                               matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
-//                               matrix(4, 0) *            // P(D5'-J insertion seq)
-//                               matrix(5, j_index))(0, 0)) << "\n";
-//                std::cout << ((matrix(0, v_index) *      // P(Vi)
-//                               matrix(1, v_index) *      // P(#dels | Vi)
-//                               matrix(2, 0) *            // P(V-D3' insertion seq)
-//                               matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
-//                               matrix(4, 0) *            // P(D5'-J insertion seq)
-//                               matrix(5, j_index) *      // P(#dels | Ji)
-//                               matrix(6, 0)(j_index, d_index))(0, 0)) << "\n";
                 return (matrix(0, v_index) *      // P(Vi)
                         matrix(1, v_index) *      // P(#dels | Vi)
                         matrix(2, 0) *            // P(V-D3' insertion seq)

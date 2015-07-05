@@ -250,16 +250,10 @@ namespace ymir {
                 }
 
                 if (prob_sum) {
-//                    std::cout << prob_sum << std::endl;
                     for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
                         _vec[j] = (_vec[j] + _laplace[i-1]) / prob_sum;
                     }
                 }
-//                else {
-//                    for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
-//                        _vec[j] = 0;
-//                    }
-//                }
             }
         }
 
@@ -292,19 +286,10 @@ namespace ymir {
             for (size_t i = 1; i < _vec.size(); ++i) {
                 _vec[i] = val;
             }
-//            for (eventind_t i = 2; i < _edges.size(); ++i) {
-//                for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
-//                    _vec[j] =  val;
-////                    _vec[j] =  _laplace[i-1];
-//                }
-//            }
         }
 
 
         void familyFill(eventind_t event_family, prob_t val = 0) {
-            if (event_family == VDJ_VAR_DIV_INS_NUC_A_ROW) {
-                std::cout << (_edges[_event_classes[event_family + 1]] - _edges[_event_classes[event_family]]) << std::endl;
-            }
             for (eventind_t i = _edges[_event_classes[event_family]]; i < _edges[_event_classes[event_family + 1]]; ++i) {
                 _vec[i] = val;
             }

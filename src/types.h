@@ -200,7 +200,7 @@ namespace ymir {
         VJ_VAR_JOI_INS_NUC_C_ROW = 6,
         VJ_VAR_JOI_INS_NUC_G_ROW = 7,
         VJ_VAR_JOI_INS_NUC_T_ROW = 8,
-        VJ_HYPMUT = 9,  // <- REMOVE THAT!!
+        VJ_ERROR_RATE = 9,
 
         VDJ_VAR_GEN = 1,
         VDJ_JOI_DIV_GEN = 2,
@@ -219,7 +219,7 @@ namespace ymir {
         VDJ_DIV_JOI_INS_NUC_C_ROW = 13,
         VDJ_DIV_JOI_INS_NUC_G_ROW = 14,
         VDJ_DIV_JOI_INS_NUC_T_ROW = 15,
-        VDJ_HYPMUT = 16 // <- REMOVE THAT!!
+        VDJ_ERROR_RATE = 16
     };
 
 

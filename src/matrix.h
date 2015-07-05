@@ -34,7 +34,7 @@ namespace ymir {
 
 
         Matrix(_Dim rows, _Dim columns, _Scalar val = 0) : _rows(rows), _cols(columns) {
-            _data = new _Scalar[_rows * _cols];
+            _data = new _Scalar[rows * columns];
             this->fill(val);
         }
 

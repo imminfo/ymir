@@ -7,6 +7,8 @@
 
 #define BENCH_DATA_FOLDER string("/Users/vdn/ymir/benchmark/data/")
 
+#define YMIR_BENCHMARK(expr) {}
+
 
 #include <chrono>
 #include <ctime>
@@ -19,7 +21,7 @@ using namespace ymir;
 
 int main() {
     std::chrono::system_clock::time_point tp1, tp2;
-    time_t vj_prob, vj_meta, vdj_prob, vdj_meta;
+    time_t vj_prob, vj_meta, vj_infer, vdj_prob, vdj_meta, vdj_infer;
 
     RepertoireParser parser;
     parser.loadConfig(BENCH_DATA_FOLDER + "../../parsers/mitcrdots.json");
@@ -35,13 +37,13 @@ int main() {
 
     tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vj;
-//    parser.parse(BENCH_DATA_FOLDER + "mitcr.alpha.500k.txt",
-//                 &cloneset_vj,
-//                 vj_genes,
-//                 RepertoireParser::AlignmentColumnOptions()
-//                         .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
-//                         .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
-//                         .setD(RepertoireParser::SKIP));
+    parser.parse(BENCH_DATA_FOLDER + "mitcr.alpha.500k.txt",
+                 &cloneset_vj,
+                 vj_genes,
+                 RepertoireParser::AlignmentColumnOptions()
+                         .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
+                         .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
+                         .setD(RepertoireParser::SKIP));
     tp2 = std::chrono::system_clock::now();
     cout << "Parsing VJ, seconds: " << (std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1)) << endl;
 
@@ -70,26 +72,23 @@ int main() {
     //
     // VJ MAAG
     //
-//    ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA");
-//
-//    tp1 = std::chrono::system_clock::now();
-//    vj_model.buildGraphs(cloneset_vj, SAVE_METADATA);
-//    tp2 = std::chrono::system_clock::now();
-//    vj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
-//
-//    tp1 = std::chrono::system_clock::now();
-//    vj_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
-//    tp2 = std::chrono::system_clock::now();
-//    vj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+    ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA");
+
+    tp1 = std::chrono::system_clock::now();
+    vj_model.buildGraphs(cloneset_vj, SAVE_METADATA);
+    tp2 = std::chrono::system_clock::now();
+    vj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+
+    tp1 = std::chrono::system_clock::now();
+    vj_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
+    tp2 = std::chrono::system_clock::now();
+    vj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
 
     //
     // VDJ MAAG
     //
     ProbabilisticAssemblingModel vdj_model(BENCH_DATA_FOLDER + "../../models/hTRB");
-
-    EMAlgorithm().statisticalInference(cloneset_vdj, vdj_model, EMAlgorithm::AlgorithmParameters().set("niter", 15));
-    return 0;
 
     tp1 = std::chrono::system_clock::now();
     MAAGRepertoire(vdj_model.buildGraphs(cloneset_vdj, SAVE_METADATA));
@@ -101,14 +100,37 @@ int main() {
     tp2 = std::chrono::system_clock::now();
     vdj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
+
+    //
+    // VJ inference
+    //
+    tp1 = std::chrono::system_clock::now();
+    EMAlgorithm().statisticalInference(cloneset_vj, vj_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
+    tp2 = std::chrono::system_clock::now();
+    vj_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+
+
+    //
+    // VDJ inference
+    //
+    tp1 = std::chrono::system_clock::now();
+    EMAlgorithm().statisticalInference(cloneset_vdj, vdj_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
+    tp2 = std::chrono::system_clock::now();
+    vdj_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+
+
     //
     // Results
     //
     cout << "========================" << endl << "Results:" << endl;
+
     cout << "VJ MAAG computing, seconds: " << vj_prob << endl;
     cout << "VJ MAAG metadata, seconds: " << vj_meta << endl;
+    cout << "VJ inference 10 iter, seconds: " << vj_infer << endl;
+
     cout << "VDJ MAAG computing, seconds: " << vdj_prob << endl;
     cout << "VDJ MAAG metadata, seconds: " << vdj_meta << endl;
+    cout << "VDJ inference 10 iter, seconds: " << vdj_infer << endl;
 
 
 //    Cloneset repertoire50K, repertoire200K, repertoire500K;

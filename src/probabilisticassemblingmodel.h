@@ -73,6 +73,7 @@ namespace ymir {
         /**
          * \brief Model constructor from the given folder with a model's parameters.
          */
+        // type of model - new so only gene segments is needed or the old one with probabiltiies.
         ProbabilisticAssemblingModel(const string& folderpath) {
             _model_path = folderpath + "/";
 

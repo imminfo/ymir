@@ -99,7 +99,9 @@ namespace ymir {
 
             cout << "Building MAAGs..." << endl;
             MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, false, false);
-//            maag_rep.erase(maag_rep.begin() + 61877);
+            if (maag_rep[0].is_vj()) {
+                maag_rep.erase(maag_rep.begin() + 61877);
+            }
 
             vector<prob_t> prob_vec;
             prob_vec.resize(maag_rep.size(), 0);
@@ -109,7 +111,6 @@ namespace ymir {
             cout << endl << "Initial data summary:" << endl;
             for (size_t i = 0; i < maag_rep.size(); ++i) {
                 prob_vec[i] = maag_rep[i].fullProbability();
-                if (isnan(prob_vec[i])) cout << (size_t) i << endl;
             }
             prob_summary(prob_vec);
             prev_ll = loglikelihood(prob_vec);
@@ -147,46 +148,9 @@ namespace ymir {
                             }
                         }
                     }
-
-                    prob_vec[i] = fb.fullProbability();
                 }
 
-//                new_param_vec.familyFill(VJ_VAR_JOI_GEN, 1);
-//                new_param_vec.familyFill(VJ_VAR_DEL, 1);
-//                new_param_vec.familyFill(VJ_VAR_JOI_INS_LEN, 1);
-//                new_param_vec.familyFill(VJ_VAR_JOI_INS_NUC, 1);
-//                new_param_vec.familyFill(VJ_JOI_DEL, 1);
-//
-//                new_param_vec.familyFill(VDJ_VAR_GEN, 1);
-//                new_param_vec.familyFill(VDJ_VAR_DEL, 1);
-//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_LEN, 1);
-//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_NUC_A_ROW, 1);
-//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_NUC_C_ROW, 1);
-//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_NUC_G_ROW, 1);
-//                new_param_vec.familyFill(VDJ_VAR_DIV_INS_NUC_T_ROW, 1);
-//                new_param_vec.familyFill(VDJ_DIV_DEL, 1);
-//                new_param_vec.familyFill(VDJ_DIV_JOI_INS_LEN, 1);
-
-                // nuc are dropping
-                new_param_vec.familyFill(VDJ_DIV_JOI_INS_NUC_A_ROW, 1);
-                new_param_vec.familyFill(VDJ_DIV_JOI_INS_NUC_C_ROW, 1);
-                new_param_vec.familyFill(VDJ_DIV_JOI_INS_NUC_G_ROW, 1);
-                new_param_vec.familyFill(VDJ_DIV_JOI_INS_NUC_T_ROW, 1);
-
-                new_param_vec.familyFill(VDJ_JOI_DEL, 1);
-                new_param_vec.familyFill(VDJ_JOI_DIV_GEN, 1);
-
                 new_param_vec.normaliseEventFamilies();
-//
-//                cout << endl;
-//                for (int a = 0; a < 4; ++a) { cout << new_param_vec.event_prob(VDJ_DIV_JOI_INS_NUC_A_ROW, 0, a) << endl; }
-//                cout << endl;
-//                for (int a = 0; a < 4; ++a) { cout << new_param_vec.event_prob(VDJ_DIV_JOI_INS_NUC_C_ROW, 0, a) << endl; }
-//                cout << endl;
-//                for (int a = 0; a < 4; ++a) { cout << new_param_vec.event_prob(VDJ_DIV_JOI_INS_NUC_G_ROW, 0, a) << endl; }
-//                cout << endl;
-//                for (int a = 0; a < 4; ++a) { cout << new_param_vec.event_prob(VDJ_DIV_JOI_INS_NUC_T_ROW, 0, a) << endl; }
-//                cout << endl;
 
                 model.updateEventProbabilitiesVector(new_param_vec);
                 model.updateEventProbabilities(&maag_rep);

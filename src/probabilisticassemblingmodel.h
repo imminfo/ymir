@@ -72,12 +72,19 @@ namespace ymir {
 
         /**
          * \brief Model constructor from the given folder with a model's parameters.
+         *
+         * \param folderpath Path to a folder with a model's parameters.
+         * \param behav Model's behaviour. PREDEFINED means that each probability will stay constant for each input data
+         * unless the model probabilities vector updated with new parameters. RECOMPUTE_GENE_USAGE means that for each input cloneset
+         * gene usage will be recomputed and used for computing assembling probabilities. EMPTY means that the model will load
+         * only gene segments sequences and generate vector of uniformly distributed marginal probabilities. This model could be used
+         * for further the model's parameters inference.
          */
-        // type of model - new so only gene segments is needed or the old one with probabiltiies.
-        ProbabilisticAssemblingModel(const string& folderpath) {
+        ProbabilisticAssemblingModel(const string& folderpath, ModelBehaviour behav = PREDEFINED) {
             _model_path = folderpath + "/";
+            _behaviour = behav;
 
-            _vj_recomb = false;
+            _recomb = UNDEFINED;
             _status = false;
 
             _genes = nullptr;
@@ -221,7 +228,7 @@ namespace ymir {
         *
         * \return True if all ok.
         */
-        bool write(const string& folderpath) const {
+        bool save(const string& folderpath) const {
             // get JSON object and write it to model.json file
             // get all prob tables and write them to files (aggregate those with similar names to matrix.list)
         }
@@ -234,14 +241,16 @@ namespace ymir {
          */
         bool status() const { return _status; }
 
+
         string name() const { return _config.get("name", "Nameless model").asString(); }
 
     protected:
 
         bool _status, _verbose;
+        ModelBehaviour _behaviour;
 
         Json::Value _config;
-        bool _vj_recomb;
+        Recombination _recomb;
         string _model_path;
 
         VDJRecombinationGenes *_genes;
@@ -267,13 +276,19 @@ namespace ymir {
             ifs.open(jsonpath);
             if (ifs.is_open()) {
                 ifs >> _config;
-                _vj_recomb = _config.get("recombination", "VJ").asString() == "VJ";
+                if (_config.get("recombination", "undefined").asString() == "VJ") {
+                    _recomb = VJ_RECOMB;
+                } else if (_config.get("recombination", "undefined").asString() == "VDJ") {
+                    _recomb = VDJ_RECOMB;
+                } else {
+                    _recomb = UNDEFINED;
+                }
                 cout << "Probabilistic assembling model:\n\t" <<
                         _config.get("name", "Nameless model").asString() <<
                         "\n\t(" <<
                         _config.get("comment", "").asString() <<
                         ")\n\t" <<
-                        _config.get("recombination", "VJ").asString() <<
+                        _config.get("recombination", "undefined").asString() <<
                         "-recombination  |  " <<
                         (_config.get("hypermutations", false).asBool() ? "Hypermutations" : "No hypermutations") <<
                         endl << "\tFiles:"<< endl;
@@ -305,10 +320,10 @@ namespace ymir {
 
             bool vok, jok, dok = true;
 
-            if (_vj_recomb) {
+            if (_recomb == VJ_RECOMB) {
                 _genes = new VDJRecombinationGenes("VJ.V", v_path, "VJ.J", j_path, &vok, &jok);
                 /* add P nucleotides */
-            } else {
+            } else if (_recomb == VDJ_RECOMB) {
                 cout << "\tD gene seg.:     ";
                 if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
                     cout << "ERROR: no gene segments file in the model's .json." << endl;
@@ -320,6 +335,8 @@ namespace ymir {
                     /* add P nucleotides */
                     cout << "OK" << endl;
                 }
+            } else {
+                cout << "Undefined recombination type." << endl;
             }
 
             return vok && jok && dok;
@@ -346,7 +363,7 @@ namespace ymir {
                                               pt[element]["laplace"].asDouble(),
                                               err_message);
 
-                    if (_vj_recomb) {
+                    if (_recomb == VJ_RECOMB) {
                         bool check = true;
                         if (element == "v.j") {
                             if (container
@@ -404,7 +421,7 @@ namespace ymir {
                         }
                         else { cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl; }
                     }
-                    else {
+                    else if (_recomb == VDJ_RECOMB) {
                         if (element == "v") {
                             if (container && container->file_exists()) { containers[VDJ_VAR_GEN] = container; }
                             cout << "\tV genes prob.:   " << err_message << endl;
@@ -482,7 +499,7 @@ namespace ymir {
                 vector<seq_len_t> min_D_len_vec;
 
                 bool is_ok = false;
-                if (_vj_recomb) {
+                if (_recomb == VJ_RECOMB) {
                     if (containers[VJ_VAR_JOI_GEN]
                         && containers[VJ_VAR_DEL]
                         && containers[VJ_JOI_DEL]
@@ -536,7 +553,7 @@ namespace ymir {
                         _param_vec = new ModelParameterVector(VJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace);
                         is_ok = true;
                     }
-                } else {
+                } else if (_recomb == VDJ_RECOMB){
                     if (containers[VDJ_VAR_GEN]
                         && containers[VDJ_JOI_DIV_GEN]
                         && containers[VDJ_VAR_DEL]

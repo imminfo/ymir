@@ -68,8 +68,8 @@ namespace ymir {
     *
     * \brief Type of stored probabilities of different events.
     */
-//    typedef double prob_t;
-    typedef long double prob_t;
+    typedef double prob_t;
+//    typedef long double prob_t;
     #endif
 
 
@@ -151,11 +151,22 @@ namespace ymir {
 
 
     /**
-     * \enum MODEL_VECTOR_TYPE
+     * \enum Recombination
      */
     enum Recombination {
+        UNDEFINED,
         VJ_RECOMB,
         VDJ_RECOMB
+    };
+
+
+    /**
+     * \enum ModelBehaviour
+     */
+    enum ModelBehaviour {
+        PREDEFINED,
+        RECOMPUTE_GENE_USAGE,
+        EMPTY
     };
 
 
@@ -169,12 +180,13 @@ namespace ymir {
 
 
     /**
-     * \enum ERROR_MODE
+     * \enum ErrorMode
      */
     enum ErrorMode {
         NO_ERRORS = 0,
         COMPUTE_ERRORS = 1
     };
+
 
     /**
      * \enum SequenceType

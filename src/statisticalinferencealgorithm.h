@@ -83,6 +83,9 @@ namespace ymir {
     class EMAlgorithm : public StatisticalInferenceAlgorithm {
     public:
 
+        /**
+         *
+         */
         virtual bool statisticalInference(const ClonesetView &repertoire,
                                           ProbabilisticAssemblingModel &model,
                                           const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10)) const {
@@ -164,6 +167,13 @@ namespace ymir {
 
             return true;
         }
+
+
+        /**
+         *
+         */
+        void iteration() const
+        {}
 
     };
 

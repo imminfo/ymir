@@ -568,7 +568,7 @@ namespace ymir {
                     container = read_textdata(_model_path + pt[element]["file"].asString(),
                                               pt[element]["type"].asString(),
                                               pt[element].get("skip.first.column", true).asBool(),
-                                              pt[element]["laplace"].asDouble(),
+                                              pt[element].get("laplace", .0).asDouble(),
                                               err_message);
 
                     this->parseDataContainer(element, container, containers);
@@ -579,57 +579,6 @@ namespace ymir {
 
             cerr << "No information about probability events in the model .json file found." << endl;
             return false;
-        }
-
-
-        /**
-         * \brief Create marginal probabilities based on gene segments and make all event probabilities uniform.
-         */
-        bool createEventProbabilitiesFromScratch() {
-            vector<AbstractTDContainer*> containers;
-
-            if (_recomb == VJ_RECOMB) {
-                // V-J
-
-                // V del
-
-                // J del
-
-                // VJ ins
-
-                // VJ nuc
-
-            } else if (_recomb == VDJ_RECOMB) {
-                // V
-
-                // J-D
-
-                // V del
-
-                // J del
-
-                // D del
-
-                // VD ins
-
-                // DJ ins
-
-                // VD nuc
-
-                // DJ nuc
-
-            } else {
-                return false;
-            }
-
-            bool is_ok = this->makeModelParameterVector(containers);
-
-            _param_vec->fill(1);
-            _param_vec->normaliseEventFamilies();
-
-            if (!is_ok) { throw(runtime_error("WRONG EMPTY VECTOR CREATING SUBROUTINE!!!")); }
-
-            return is_ok;
         }
 
 
@@ -769,6 +718,123 @@ namespace ymir {
                 cout << "\tVD/DJ ins. nuc.: " << err_message << endl;
             }
             else { cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl; }
+        }
+
+
+        /**
+         * \brief Create marginal probabilities based on gene segments and make all event probabilities uniform.
+         */
+        bool createEventProbabilitiesFromScratch() {
+            vector<AbstractTDContainer*> containers;
+
+            if (_recomb == VJ_RECOMB) {
+                this->createVJContainers(containers);
+            } else if (_recomb == VDJ_RECOMB) {
+                this->createVDJContainers(containers);
+            } else {
+                return false;
+            }
+
+            bool is_ok = this->makeModelParameterVector(containers);
+
+            _param_vec->fill(1);
+            _param_vec->normaliseEventFamilies();
+
+            if (!is_ok) { throw(runtime_error("WRONG EMPTY VECTOR CREATING SUBROUTINE!!!")); }
+
+            return is_ok;
+        }
+
+
+        /**
+         * \brief Create new marginal probabilities for a VJ recombination generation model.
+         */
+        void createVJContainers(vector<AbstractTDContainer*> &containers) {
+            AbstractTDContainer* container;
+
+            // V-J
+            container = new TDMatrix(true, _config.get("probtables", Json::Value()).get("v.j", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 1; i <= _genes->V().max(); ++i){
+                container->addRowName(_genes->V()[i].allele);
+            }
+            for (auto i = 1; i <= _genes->J().max(); ++i){
+                container->addColumnName(_genes->J()[i].allele);
+            }
+            container->addDataVector(vector<prob_t>(_genes->V().max() * _genes->J().max()));
+            containers.push_back(container);
+
+            // V del
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 1; i <= _genes->V().max(); ++i){
+                container->addColumnName(_genes->V()[i].allele);
+                container->addDataVector(vector<prob_t>(_genes->V()[i].sequence.size() + 1));
+            }
+            containers.push_back(container);
+
+            // J del
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 1; i <= _genes->J().max(); ++i){
+                container->addColumnName(_genes->J()[i].allele);
+                container->addDataVector(vector<prob_t>(_genes->J()[i].sequence.size() + 1));
+            }
+            containers.push_back(container);
+
+            // VJ ins
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("laplace", .0).asDouble());
+            container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", 60).asInt() + 1));
+            containers.push_back(container);
+
+            // VJ nuc
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("laplace", .0).asDouble());
+            container->addColumnName("A");
+            container->addDataVector(vector<prob_t>(4));
+            container->addColumnName("C");
+            container->addDataVector(vector<prob_t>(4));
+            container->addColumnName("G");
+            container->addDataVector(vector<prob_t>(4));
+            container->addColumnName("T");
+            container->addDataVector(vector<prob_t>(4));
+            containers.push_back(container);
+        }
+
+
+        void createVDJContainers(vector<AbstractTDContainer*> &containers) {
+            AbstractTDContainer* container;
+
+            // V
+            container = new TDVector(false, 0);
+
+            containers.push_back(container);
+
+            // J-D
+            container = new TDMatrix(false, 0);
+
+            containers.push_back(container);
+
+            // V del
+            container = new TDVectorList(false, 0);
+
+            containers.push_back(container);
+
+            // J del
+            container = new TDVectorList(false, 0);
+
+            containers.push_back(container);
+
+            // D del
+            container = new TDMatrixList(false, 0);
+
+            containers.push_back(container);
+
+            // VD ins + DJ ins
+            container = new TDVectorList(false, 0);
+
+            containers.push_back(container);
+
+            // VD nuc + DJ nuc
+            container = new TDVectorList(false, 0);
+
+            containers.push_back(container);
         }
 
 

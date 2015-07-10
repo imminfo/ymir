@@ -72,7 +72,7 @@ int main() {
     //
     // VJ MAAG
     //
-    ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA");
+    ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA", EMPTY);
 
     tp1 = std::chrono::system_clock::now();
     vj_model.buildGraphs(cloneset_vj, SAVE_METADATA);
@@ -88,7 +88,7 @@ int main() {
     //
     // VDJ MAAG
     //
-    ProbabilisticAssemblingModel vdj_model(BENCH_DATA_FOLDER + "../../models/hTRB");
+    ProbabilisticAssemblingModel vdj_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
 
     tp1 = std::chrono::system_clock::now();
     MAAGRepertoire(vdj_model.buildGraphs(cloneset_vdj, SAVE_METADATA));

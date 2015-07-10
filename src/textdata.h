@@ -38,6 +38,17 @@ namespace ymir {
         virtual ~AbstractTDContainer() { }
 
 
+        virtual void addDataValue(prob_t value, size_t i = 0) { _data[i].push_back(value + _laplace); }
+
+
+        virtual void addDataVector(const vector<prob_t> &vec) {
+            _data.push_back(vector<prob_t>());
+            for (auto i = 0; i < vec.size(); ++i) {
+                _data[_data.size() - 1].push_back(vec[i] + _laplace);
+            }
+        }
+
+
         prob_t laplace() const { return _laplace; }
 
 
@@ -61,11 +72,15 @@ namespace ymir {
 
         const vector<prob_t>& data(size_t i) const { return _data[i]; }
 
+
         CONTAINER_TYPE type() const { return _type; }
+
 
         bool file_exists() const { return _file_exists; }
 
+
         void addMetadata(seq_len_t data) { _metadata.push_back(data); }
+
 
         seq_len_t metadata(size_t i) const { return _metadata[i]; }
 
@@ -294,6 +309,14 @@ namespace ymir {
         virtual ~TDMatrix() { }
 
 
+        virtual void addDataVector(const vector<prob_t> &vec) {
+            if (!_data.size()) {
+                _data.push_back(vector<prob_t>());
+            }
+            _data[0].insert(_data[0].end(), vec.begin(), vec.end());
+        }
+
+
         bool read(const string& filepath, string &err_message) {
             ifstream ifs;
 
@@ -389,6 +412,9 @@ namespace ymir {
 
 
         virtual ~TDMatrixList() { }
+
+
+        void addMatrix(const vector<prob_t> &vec) { _data.push_back(vec); }
 
 
         bool read(const string& filepath, string &err_message) {

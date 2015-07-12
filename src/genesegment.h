@@ -25,16 +25,10 @@
 #define _GENESEGMENT_H
 
 
-#include "iostream"
 #include "fstream"
 #include "sstream"
-#include "unordered_map"
-#include "vector"
 
 #include "types.h"
-
-
-using namespace std;
 
 
 namespace ymir {
@@ -136,7 +130,7 @@ namespace ymir {
         * \brief Save segment alphabet to the given file as a tab-separated table with 3 columns.
         */
         bool write(const string& filepath) const {
-            ofstream ofs;
+            std::ofstream ofs;
             ofs.open(filepath);
 
             if (ofs.is_open()) {
@@ -157,7 +151,7 @@ namespace ymir {
 
 
         bool read(const string& filepath) {
-            ifstream ifs;
+            std::ifstream ifs;
             ifs.open(filepath);
 
             if (ifs.is_open()) {
@@ -195,9 +189,9 @@ namespace ymir {
 
     protected:
 
-        string _name;
-        unordered_map<string, seg_index_t> _map;
-        vector<GeneSegment> _vec;
+        std::string _name;
+        std::unordered_map<std::string, seg_index_t> _map;
+        std::vector<GeneSegment> _vec;
 
 
         GeneSegmentAlphabet() {}

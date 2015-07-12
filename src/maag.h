@@ -58,7 +58,7 @@ namespace ymir {
             _sequence = nullptr;
             _seq_poses = nullptr;
             _n_poses = 0;
-            _nuc = true;
+            _seq_type = NUCLEOTIDE;
         }
 
         /**
@@ -83,7 +83,7 @@ namespace ymir {
             if (other._sequence) { _sequence = new string(*other._sequence); }
             else { _sequence = nullptr; }
 
-            _nuc = other._nuc;
+            _seq_type = other._seq_type;
         }
 
 
@@ -105,7 +105,7 @@ namespace ymir {
             other._sequence = _sequence;
             _sequence = tmp3;
 
-            _nuc = other._nuc;
+            _seq_type = other._seq_type;
         }
 
 
@@ -125,14 +125,14 @@ namespace ymir {
         /**
          * \brief Special swap constructor for MAAGs that will be used for statistical inference.
          */
-        MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, string sequence, seq_len_t *seq_poses, seq_len_t n_poses, bool nuc) {
+        MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, string sequence, seq_len_t *seq_poses, seq_len_t n_poses, SequenceType seq_type) {
             this->swap(prob_mcc);
             _events = new EventIndMMC();
             _events->swap(eventind_mcc);
             _sequence = new string(sequence);
             _seq_poses = seq_poses;
             _n_poses = n_poses;
-            _nuc = nuc;
+            _seq_type = seq_type;
         }
 
 
@@ -172,7 +172,7 @@ namespace ymir {
             }
             else { _sequence = nullptr; }
 
-            _nuc = other._nuc;
+            _seq_type = other._seq_type;
 
             return *this;
         }
@@ -196,7 +196,7 @@ namespace ymir {
             other._sequence = _sequence;
             _sequence = tmp3;
 
-            _nuc = other._nuc;
+            _seq_type = other._seq_type;
         }
 
 
@@ -371,10 +371,26 @@ namespace ymir {
         bool has_events() const { return _events; }
 
 
-        const string& sequence() const { if (_sequence) { return *_sequence; } else { return ""; }}
+        bool has_dgea() const { return _d_err_alignments; }
 
 
-        bool is_nuc() const { return _nuc; }
+        const DivGeneErrAlignments& dgea() const {
+#ifdef YDEBUG
+            if (!_d_err_alignments) { throw(std::runtime_error("Access to a DGEA object when it's a nullptr!")); }
+#endif
+            return *_d_err_alignments;
+        }
+
+
+        const string& sequence() const {
+#ifdef YDEBUG
+            if (!_sequence) { throw(std::runtime_error("Access to a MAAG sequence when it's a nullptr!")); }
+#endif
+            return *_sequence;
+        }
+
+
+        SequenceType sequence_type() const { return _seq_type; }
 
         dim_t rows(node_ind_t node_i) const { return this->nodeRows(node_i); }
         dim_t cols(node_ind_t node_i) const { return this->nodeColumns(node_i); }
@@ -385,8 +401,11 @@ namespace ymir {
 
         seq_len_t *_seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
         seq_len_t _n_poses;
+
         string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
-        bool _nuc;
+        SequenceType _seq_type;
+
+        DivGeneErrAlignments *_d_err_alignments;
 
     };
 }

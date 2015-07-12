@@ -26,8 +26,10 @@
 
 
 #include <unordered_map>
+#include <vector>
 #include <iostream>
-#include "tuple"
+#include <tuple>
+
 #include "matrix.h"
 
 //#include "Eigen/Dense"
@@ -325,7 +327,7 @@ namespace ymir {
 
 
     /**
-     * \brief Diversity gene alignments with errors.
+     * \brief Diversity gene alignments with errors (mismatches).
      */
     struct DivGeneErrAlignments {
 
@@ -335,12 +337,29 @@ namespace ymir {
          * \brief Tuple for representing an alignment of D gene with errors.
          * Elements are: start position - event indes of #deletions - number of errors in this alignment.
          */
-        typedef std::tuple<seq_len_t, event_ind_t, seq_len_t> d_err_align_t;
+        typedef std::tuple<seq_len_t, event_ind_t, seq_len_t> d_err_alignment_t;
+
+
+        DivGeneErrAlignments() {}
+
+
+        void add(seq_len_t start, event_ind_t event_index, seq_len_t errors_num) {
+            _vec.push_back(d_err_alignment_t(start, event_index, errors_num));
+        }
+
+
+        void finish() {
+            _vec.resize(_vec.size());
+        }
+
+
+        const d_err_alignment_t& operator[](size_t i) const { return _vec[i]; }
 
 
     protected:
 
-//        _start,
+        std::vector<d_err_alignment_t> _vec;
+
     };
 
 

@@ -82,7 +82,7 @@ namespace ymir {
          * \return Newly constructed MAAG.
          */
         ///@{
-        MAAG build(const Clonotype &clonotype, MetadataMode metadata_mode = NO_METADATA, ErrorMode = NO_ERRORS, SequenceType = NUCLEOTIDE) const {
+        MAAG build(const Clonotype &clonotype, MetadataMode metadata_mode = NO_METADATA, ErrorMode error_mode = NO_ERRORS, SequenceType seq_type = NUCLEOTIDE) const {
             ProbMMC probs;
             EventIndMMC events;
             vector<seq_len_t> seq_poses;
@@ -122,7 +122,7 @@ namespace ymir {
 
                 seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
                 copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
-                return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size(), true);
+                return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size(), seq_type);
             } else {
                 return MAAG(probs);
             }

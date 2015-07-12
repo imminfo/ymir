@@ -32,8 +32,6 @@
 
 #define YDEBUG
 
-using namespace std;
-
 
 namespace ymir {
 
@@ -306,8 +304,8 @@ namespace ymir {
 
     protected:
 
-        vector<Node> _chain;
-        vector<_Scalar> _values;
+        std::vector<Node> _chain;
+        std::vector<_Scalar> _values;
 
     };
 

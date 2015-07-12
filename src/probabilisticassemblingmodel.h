@@ -149,7 +149,7 @@ namespace ymir {
          */
         MAAGRepertoire buildGraphs(const ClonesetView &repertoire,
                                    MetadataMode save_metadata = SAVE_METADATA,
-                                   bool aminoacid = false,
+                                   SequenceType sequence_type = NUCLEOTIDE,
                                    bool verbose = true) const {
             return _builder->build(repertoire, save_metadata, verbose);
         }
@@ -229,8 +229,34 @@ namespace ymir {
         * \return True if all ok.
         */
         bool save(const string& folderpath) const {
-            // get JSON object and write it to model.json file
-            // get all prob tables and write them to files (aggregate those with similar names to matrix.list)
+            ofstream ofs;
+            ofs.open(folderpath + "/model.json");
+            if (ofs.is_open()) {
+                // get JSON object and write it to model.json file
+
+                // make names here
+
+                ofs << _config;
+
+                // get all prob tables and write them to files
+                if (_recomb == VJ_RECOMB) {
+//                    this->save_vj(folderpath);
+
+
+                } else if (_recomb == VDJ_RECOMB) {
+//                    this->save_vdj(folderpath);
+
+
+                } else {
+                    cerr << "Can't save a model with an undefined recombination type." << endl;
+                    return false;
+                }
+
+                return true;
+            }
+
+            cerr << "Problem with saving a .json model file: probably there is not such directory: " << folderpath << endl;
+            return false;
         }
 
 
@@ -474,6 +500,7 @@ namespace ymir {
                 if (prob_data.size() > gsa[name_order[j]].sequence.size() + 1) {
                     prob_data.resize(gsa[name_order[j]].sequence.size() + 1);
                 }
+
                 event_probs.insert(event_probs.end(),
                                    prob_data.begin(),
                                    prob_data.end());
@@ -533,9 +560,7 @@ namespace ymir {
             vector<prob_t> prob_data;
             for (size_t i = 0; i < container->n_columns(); ++i) {
                 prob_data = container->data(i);
-                if (max_ins_len) {
-                    prob_data.resize(max_ins_len);
-                }
+                if (max_ins_len) { prob_data.resize(max_ins_len); }
                 event_probs.insert(event_probs.end(),
                                    prob_data.begin(),
                                    prob_data.end());

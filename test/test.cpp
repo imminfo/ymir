@@ -52,8 +52,8 @@ using namespace ymir;
 
 ModelParameterVector make_test_events_vj() {
     vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
+    vector<event_ind_t> v2;  // lens vec
+    vector<event_ind_t> v3;  // event classes
     vector<seq_len_t> v4;  // event family col numbers
 
     // V-J
@@ -120,8 +120,8 @@ ModelParameterVector make_test_events_vj() {
 
 ModelParameterVector make_test_events_vj2() {
     vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
+    vector<event_ind_t> v2;  // lens vec
+    vector<event_ind_t> v3;  // event classes
     vector<seq_len_t> v4;  // event family col numbers
 
     // V-J
@@ -188,8 +188,8 @@ ModelParameterVector make_test_events_vj2() {
 
 ModelParameterVector make_test_events_vdj() {
     vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
+    vector<event_ind_t> v2;  // lens vec
+    vector<event_ind_t> v3;  // event classes
     vector<seq_len_t> v4;  // event family col numbers
 
     // V
@@ -363,8 +363,8 @@ ModelParameterVector make_test_events_vdj() {
 
 ModelParameterVector make_test_events_vdj2() {
     vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
+    vector<event_ind_t> v2;  // lens vec
+    vector<event_ind_t> v3;  // event classes
     vector<seq_len_t> v4;  // event family col numbers
 
     // V
@@ -543,8 +543,8 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_model_param_vec_vj)
     vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
+    vector<event_ind_t> v2;  // lens vec
+    vector<event_ind_t> v3;  // event classes
     vector<seq_len_t> v4;  // event family col numbers
 
     // V-J
@@ -663,8 +663,8 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_model_param_vec_vdj)
     vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
+    vector<event_ind_t> v2;  // lens vec
+    vector<event_ind_t> v3;  // event classes
     vector<seq_len_t> v4;  // event family col numbers
 
     // V
@@ -1015,7 +1015,7 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_clone)
-    segindex_t *segs = new segindex_t[10];
+    seg_index_t *segs = new seg_index_t[10];
     segs[0] = 3;
     segs[1] = 2;
     segs[2] = 2;
@@ -2093,8 +2093,8 @@ YMIR_TEST_END
 YMIR_TEST_START(test_model_vj_maag)
 
     vector<prob_t> v1;  // param vec
-    vector<eventind_t> v2;  // lens vec
-    vector<eventind_t> v3;  // event classes
+    vector<event_ind_t> v2;  // lens vec
+    vector<event_ind_t> v3;  // event classes
     vector<seq_len_t> v4;  // event family col numbers
 
     ModelParameterVector mvec = make_test_events_vj();
@@ -2115,7 +2115,7 @@ YMIR_TEST_START(test_model_vj_maag)
     Cloneset cloneset;
     YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha2.txt", &cloneset, vdj_genes))
 
-    MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, false)[1];
+    MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, NUCLEOTIDE)[1];
 
     YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
     YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))

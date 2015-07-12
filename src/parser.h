@@ -233,7 +233,7 @@ namespace ymir {
 
             int index = 0;
 
-            vector<segindex_t> vseg, jseg, dseg;
+            vector<seg_index_t> vseg, jseg, dseg;
             string temp_str;
 
             ClonotypeBuilder clone_builder;
@@ -352,7 +352,7 @@ namespace ymir {
                         if (do_align_J) {}
 
                         if (do_align_D) {
-                            for (segindex_t seg_i = 1; seg_i <= gene_segments.D().max(); ++seg_i) {
+                            for (seg_index_t seg_i = 1; seg_i <= gene_segments.D().max(); ++seg_i) {
                                 AbstractAligner::LocalAlignmentIndices indices =
                                         aligner.alignLocal(gene_segments.D()[seg_i].sequence,
                                                            sequence,
@@ -401,7 +401,7 @@ namespace ymir {
         }
 
 
-        void parseWordSegment(const string& word, char sep, vector<segindex_t> &segvec, const GeneSegmentAlphabet& gsa) {
+        void parseWordSegment(const string& word, char sep, vector<seg_index_t> &segvec, const GeneSegmentAlphabet& gsa) {
             stringstream word_stream(word);
             if (word_stream.eof()) {
                 segvec.push_back(gsa[word].index);
@@ -415,7 +415,7 @@ namespace ymir {
         }
 
 
-        void parseWordAlignment(const string& word, char sep, vector<segindex_t> &segvec, const GeneSegmentAlphabet& gsa, ClonotypeBuilder &clone_builder, bool based1, char seg) {
+        void parseWordAlignment(const string& word, char sep, vector<seg_index_t> &segvec, const GeneSegmentAlphabet& gsa, ClonotypeBuilder &clone_builder, bool based1, char seg) {
             stringstream word_stream(word);
             int aligned_chars = 0;
             if (word_stream.eof()) {

@@ -55,9 +55,9 @@ namespace ymir {
         struct GeneSegment {
             string allele;
             string sequence;
-            segindex_t index;
+            seg_index_t index;
 
-            GeneSegment(const string& allele_, const string& sequence_, segindex_t index_)
+            GeneSegment(const string& allele_, const string& sequence_, seg_index_t index_)
                     : allele(allele_), sequence(sequence_), index(index_) {
             }
         };
@@ -103,7 +103,7 @@ namespace ymir {
         const string& name() const { return this->_name; }
 
 
-        const GeneSegment& operator[] (segindex_t index) const {
+        const GeneSegment& operator[] (seg_index_t index) const {
             if (index < _vec.size()) { return _vec[index]; }
             return _vec[0];
         }
@@ -114,10 +114,10 @@ namespace ymir {
         }
 
 
-        segindex_t size() const { return this->_vec.size(); }
+        seg_index_t size() const { return this->_vec.size(); }
 
 
-        segindex_t max() const { return this->_vec.size() - 1; }
+        seg_index_t max() const { return this->_vec.size() - 1; }
 
 
         /**
@@ -141,7 +141,7 @@ namespace ymir {
 
             if (ofs.is_open()) {
                 ofs << this->_name << '\t' << "Sequences" << endl;
-                for (segindex_t i = 1; i < this->_vec.size(); ++i) {
+                for (seg_index_t i = 1; i < this->_vec.size(); ++i) {
                     ofs << this->_vec[i].allele << '\t' << this->_vec[i].sequence;
                     if (i != this->_vec.size() - 1) {
                         ofs << endl;
@@ -164,7 +164,7 @@ namespace ymir {
                 stringstream line_stream;
                 string line, gene_name, gene_seq;
                 bool header = false;
-                segindex_t cur_index = 1;
+                seg_index_t cur_index = 1;
                 while (!ifs.eof()) {
                     getline(ifs, line);
                     if (line[0] != '\n' && line.size() > 3) {
@@ -196,14 +196,14 @@ namespace ymir {
     protected:
 
         string _name;
-        unordered_map<string, segindex_t> _map;
+        unordered_map<string, seg_index_t> _map;
         vector<GeneSegment> _vec;
 
 
         GeneSegmentAlphabet() {}
 
 
-        void addGeneSegment(const string& name, const string& seq, segindex_t index) {
+        void addGeneSegment(const string& name, const string& seq, seg_index_t index) {
             this->_map[name] = index;
             this->_vec.push_back(GeneSegment(name, seq, index));
         }

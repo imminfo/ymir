@@ -80,7 +80,7 @@ namespace ymir {
     *
     * \brief Type of stored indices of events in vertices. Zero means no event or some complex event.
     */
-    typedef uint16_t eventind_t;
+    typedef uint16_t event_ind_t;
 
 
     typedef uint16_t seq_len_t;
@@ -95,7 +95,7 @@ namespace ymir {
     typedef Matrix<prob_t, seq_len_t> event_matrix_t;
 
 
-    typedef uint8_t segindex_t;
+    typedef uint8_t seg_index_t;
 
 
     /**
@@ -133,7 +133,7 @@ namespace ymir {
     };
 
 
-    typedef std::pair<eventind_t, prob_t> event_pair_t;
+    typedef std::pair<event_ind_t, prob_t> event_pair_t;
 
 
     /**
@@ -321,6 +321,26 @@ namespace ymir {
 
     protected:
         std::unordered_multimap<char, std::string> _codons;
+    };
+
+
+    /**
+     * \brief Diversity gene alignments with errors.
+     */
+    struct DivGeneErrAlignments {
+
+        /**
+         * \typedef d_err_align_t
+         *
+         * \brief Tuple for representing an alignment of D gene with errors.
+         * Elements are: start position - event indes of #deletions - number of errors in this alignment.
+         */
+        typedef std::tuple<seq_len_t, event_ind_t, seq_len_t> d_err_align_t;
+
+
+    protected:
+
+//        _start,
     };
 
 

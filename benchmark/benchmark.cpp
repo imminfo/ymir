@@ -73,14 +73,23 @@ int main() {
     // VJ MAAG
     //
     ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA", EMPTY);
+    ProbabilisticAssemblingModel vj_model2(BENCH_DATA_FOLDER + "../../models/hTRA");
+    cout << "empty:" << vj_model.event_probabilities().size() << endl;
+    cout << "default:" << vj_model2.event_probabilities().size() << endl;
+    cout << "empty:" << vj_model.event_probabilities().families() << endl;
+    cout << "default:" << vj_model2.event_probabilities().families() << endl;
+    for (auto i = 0; i < std::min(vj_model.event_probabilities().families(), vj_model2.event_probabilities().families()) - 1; ++i) {
+        cout << vj_model.event_probabilities().eventClassSize(i) << ":" << vj_model2.event_probabilities().eventClassSize(i) << endl;
+    }
+//    return 0;
 
     tp1 = std::chrono::system_clock::now();
-    vj_model.buildGraphs(cloneset_vj, SAVE_METADATA);
+//    vj_model.buildGraphs(cloneset_vj, SAVE_METADATA);
     tp2 = std::chrono::system_clock::now();
     vj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
     tp1 = std::chrono::system_clock::now();
-    vj_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
+//    vj_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
     tp2 = std::chrono::system_clock::now();
     vj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -89,6 +98,15 @@ int main() {
     // VDJ MAAG
     //
     ProbabilisticAssemblingModel vdj_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
+    ProbabilisticAssemblingModel vdj_model2(BENCH_DATA_FOLDER + "../../models/hTRB");
+    cout << "empty:" << vdj_model.event_probabilities().size() << endl;
+    cout << "default:" << vdj_model2.event_probabilities().size() << endl;
+    cout << "empty:" << vdj_model.event_probabilities().families() << endl;
+    cout << "default:" << vdj_model2.event_probabilities().families() << endl;
+    for (auto i = 0; i < std::min(vdj_model.event_probabilities().families(), vdj_model2.event_probabilities().families()) - 1; ++i) {
+        cout << vdj_model.event_probabilities().eventClassSize(i) << ":" << vdj_model2.event_probabilities().eventClassSize(i) << endl;
+    }
+    return 0;
 
     tp1 = std::chrono::system_clock::now();
     MAAGRepertoire(vdj_model.buildGraphs(cloneset_vdj, SAVE_METADATA));

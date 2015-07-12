@@ -46,7 +46,7 @@ namespace ymir {
     *
     * \brief Class for storing chain of matrices of indices of scenario events.
     */
-    typedef MultiMatrixChain<eventind_t> EventIndMMC;
+    typedef MultiMatrixChain<event_ind_t> EventIndMMC;
 
 
     /**

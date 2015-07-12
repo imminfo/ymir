@@ -408,8 +408,8 @@ namespace ymir {
         /**
          *
          */
-        vector<segindex_t> arrangeNames(const vector<string> &names, const GeneSegmentAlphabet &gsa) const {
-            vector<segindex_t> res;
+        vector<seg_index_t> arrangeNames(const vector<string> &names, const GeneSegmentAlphabet &gsa) const {
+            vector<seg_index_t> res;
             res.resize(names.size(), 0);
 
             for (size_t i = 0; i < names.size(); ++i) { res[i] = gsa[names[i]].index; }
@@ -421,11 +421,11 @@ namespace ymir {
         void addGenes(AbstractTDContainer *container,
                       const GeneSegmentAlphabet &gsa,
                       vector<prob_t> &event_probs,
-                      vector<eventind_t> &event_lengths,
-                      vector<eventind_t> &event_classes,
+                      vector<event_ind_t> &event_lengths,
+                      vector<event_ind_t> &event_classes,
                       vector<seq_len_t> &event_col_num,
                       vector<prob_t> &laplace) const {
-            vector<segindex_t> name_order = this->arrangeNames(container->row_names(), gsa);
+            vector<seg_index_t> name_order = this->arrangeNames(container->row_names(), gsa);
             vector<prob_t> prob_data;
             prob_data.resize(container->data(0).size(), 0);
             for (size_t i = 0; i < name_order.size(); ++i) {
@@ -446,13 +446,13 @@ namespace ymir {
                       const GeneSegmentAlphabet &gsa_row,
                       const GeneSegmentAlphabet &gsa_column,
                       vector<prob_t> &event_probs,
-                      vector<eventind_t> &event_lengths,
-                      vector<eventind_t> &event_classes,
+                      vector<event_ind_t> &event_lengths,
+                      vector<event_ind_t> &event_classes,
                       vector<seq_len_t> &event_col_num,
                       vector<prob_t> &laplace,
-                      segindex_t prev_class_size) const {
-            vector<segindex_t> name_order_row = this->arrangeNames(container->row_names(), gsa_row);
-            vector<segindex_t> name_order_column = this->arrangeNames(container->column_names(), gsa_column);
+                      seg_index_t prev_class_size) const {
+            vector<seg_index_t> name_order_row = this->arrangeNames(container->row_names(), gsa_row);
+            vector<seg_index_t> name_order_column = this->arrangeNames(container->column_names(), gsa_column);
             vector<prob_t> prob_data = container->data(0), sorted_prob_data;
             sorted_prob_data.resize(prob_data.size(), 0);
             for (size_t i = 0; i < name_order_row.size(); ++i) {
@@ -478,12 +478,12 @@ namespace ymir {
         void addDels(AbstractTDContainer *container,
                      const GeneSegmentAlphabet &gsa,
                      vector<prob_t> &event_probs,
-                     vector<eventind_t> &event_lengths,
-                     vector<eventind_t> &event_classes,
+                     vector<event_ind_t> &event_lengths,
+                     vector<event_ind_t> &event_classes,
                      vector<seq_len_t> &event_col_num,
                      vector<prob_t> &laplace,
-                     segindex_t prev_class_size) const {
-            vector<segindex_t> name_order = this->arrangeNames(container->column_names(), gsa);
+                     seg_index_t prev_class_size) const {
+            vector<seg_index_t> name_order = this->arrangeNames(container->column_names(), gsa);
             vector<prob_t> prob_data;
             for (size_t i = 0; i < name_order.size(); ++i) {
                 // find correct segment for i-th position
@@ -515,12 +515,12 @@ namespace ymir {
         void addDels2D(AbstractTDContainer *container,
                        const GeneSegmentAlphabet &gsa,
                        vector<prob_t> &event_probs,
-                       vector<eventind_t> &event_lengths,
-                       vector<eventind_t> &event_classes,
+                       vector<event_ind_t> &event_lengths,
+                       vector<event_ind_t> &event_classes,
                        vector<seq_len_t> &event_col_num,
                        vector<prob_t> &laplace,
-                       segindex_t prev_class_size) const {
-            vector<segindex_t> name_order = this->arrangeNames(container->row_names(), gsa);
+                       seg_index_t prev_class_size) const {
+            vector<seg_index_t> name_order = this->arrangeNames(container->row_names(), gsa);
             vector<prob_t> prob_data;
             for (size_t i = 0; i < name_order.size(); ++i) {
                 // find correct segment for i-th position
@@ -551,11 +551,11 @@ namespace ymir {
 
         void addIns(AbstractTDContainer *container,
                     vector<prob_t> &event_probs,
-                    vector<eventind_t> &event_lengths,
-                    vector<eventind_t> &event_classes,
+                    vector<event_ind_t> &event_lengths,
+                    vector<event_ind_t> &event_classes,
                     vector<seq_len_t> &event_col_num,
                     vector<prob_t> &laplace,
-                    segindex_t prev_class_size,
+                    seg_index_t prev_class_size,
                     seq_len_t max_ins_len = 0) const {
             vector<prob_t> prob_data;
             for (size_t i = 0; i < container->n_columns(); ++i) {
@@ -907,8 +907,8 @@ namespace ymir {
         bool makeModelParameterVector(vector<AbstractTDContainer*> &containers) {
             // Made ModelParameterVector from input tables if all is ok.
             vector<prob_t> event_probs;  // param vec
-            vector<eventind_t> event_lengths;  // lens vec
-            vector<eventind_t> event_classes;  // event classes
+            vector<event_ind_t> event_lengths;  // lens vec
+            vector<event_ind_t> event_classes;  // event classes
             vector<seq_len_t> event_col_num;  // event family col numbers
             vector<prob_t> laplace;
             vector<seq_len_t> min_D_len_vec;
@@ -933,8 +933,8 @@ namespace ymir {
 
         bool makeVJModelParameterVector(vector<AbstractTDContainer*> &containers,
                                         vector<prob_t> &event_probs,
-                                        vector<eventind_t> &event_lengths,
-                                        vector<eventind_t> &event_classes,
+                                        vector<event_ind_t> &event_lengths,
+                                        vector<event_ind_t> &event_classes,
                                         vector<seq_len_t> &event_col_num,
                                         vector<prob_t> &laplace) {
             bool is_ok = false;
@@ -1000,8 +1000,8 @@ namespace ymir {
 
         bool makeVDJModelParameterVector(vector<AbstractTDContainer*> &containers,
                                          vector<prob_t> &event_probs,
-                                         vector<eventind_t> &event_lengths,
-                                         vector<eventind_t> &event_classes,
+                                         vector<event_ind_t> &event_lengths,
+                                         vector<event_ind_t> &event_classes,
                                          vector<seq_len_t> &event_col_num,
                                          vector<prob_t> &laplace,
                                          vector<seq_len_t> &min_D_len_vec) {
@@ -1077,7 +1077,7 @@ namespace ymir {
                              laplace,
                              1);
 
-                for (segindex_t i = 1; i <= _genes->D().max(); ++i) { min_D_len_vec.push_back(_min_D_len); }
+                for (seg_index_t i = 1; i <= _genes->D().max(); ++i) { min_D_len_vec.push_back(_min_D_len); }
                 _param_vec = new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, true, min_D_len_vec);
                 is_ok = true;
             }

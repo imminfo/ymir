@@ -82,8 +82,8 @@ namespace ymir {
          */
         ModelParameterVector(Recombination vec_type,
                              const vector<prob_t>& param_vec,
-                             const vector<eventind_t>& lens_vec,
-                             const vector<eventind_t>& event_classes,
+                             const vector<event_ind_t>& lens_vec,
+                             const vector<event_ind_t>& event_classes,
                              const vector<seq_len_t>& event_family_col_numbers,
                              const vector<prob_t>& laplace_vec = vector<prob_t>(),
                              bool do_normalise = true,
@@ -93,24 +93,24 @@ namespace ymir {
             _vec.push_back(0);
             _vec.insert(_vec.end(), param_vec.begin(), param_vec.end());
 
-            _event_classes = vector<eventind_t>();
+            _event_classes = vector<event_ind_t>();
             _event_classes.reserve(event_classes.size() + 1);
             _event_classes.push_back(0);
-            for (eventind_t i = 0; i < event_classes.size(); ++i) {
+            for (event_ind_t i = 0; i < event_classes.size(); ++i) {
                 _event_classes.push_back(event_classes[i] + 1);
             }
 
             _event_family_col_numbers = vector<seq_len_t>();
             _event_family_col_numbers.reserve(event_family_col_numbers.size() + 1);
             _event_family_col_numbers.push_back(0);
-            for (eventind_t i = 0; i < event_family_col_numbers.size(); ++i) {
+            for (event_ind_t i = 0; i < event_family_col_numbers.size(); ++i) {
                 _event_family_col_numbers.push_back(event_family_col_numbers[i]);
             }
 
             _edges.reserve(lens_vec.size() + 4);
             _edges.push_back(0);
             _edges.push_back(1);
-            for (eventind_t i = 0; i < lens_vec.size(); ++i) {
+            for (event_ind_t i = 0; i < lens_vec.size(); ++i) {
                 _edges.push_back(_edges[i + 1] + lens_vec[i]);
             }
             _edges.push_back(_vec.size());
@@ -120,7 +120,7 @@ namespace ymir {
             if (laplace_vec.size()) {
                 _laplace.reserve(laplace_vec.size() + 1);
                 _laplace.push_back(0);
-                for (eventind_t i = 0; i < laplace_vec.size(); ++i) {
+                for (event_ind_t i = 0; i < laplace_vec.size(); ++i) {
                     _laplace.push_back(laplace_vec[i]);
                 }
             } else {
@@ -170,15 +170,15 @@ namespace ymir {
         //============= VECTOR INDICES ACCESS =============//
 
 
-        eventind_t eventFamilySize(eventind_t event_family) const {
+        event_ind_t eventFamilySize(event_ind_t event_family) const {
             return _edges[event_family + 1] - _edges[event_family];
         }
 
-        eventind_t eventFamilySize(eventind_t event_class, eventind_t event_family) const {
+        event_ind_t eventFamilySize(event_ind_t event_class, event_ind_t event_family) const {
             return eventFamilySize(_event_classes[event_class] + event_family);
         }
 
-        eventind_t eventClassSize(eventind_t event_class) const {
+        event_ind_t eventClassSize(event_ind_t event_class) const {
             return _edges[_event_classes[event_class + 1]] - _edges[_event_classes[event_class]];
         }
 
@@ -193,23 +193,23 @@ namespace ymir {
          * \return Probability of the event.
          */
         ///@{
-        prob_t& operator[] (eventind_t gl_event_index) { return _vec[gl_event_index]; }
+        prob_t& operator[] (event_ind_t gl_event_index) { return _vec[gl_event_index]; }
 
-        prob_t operator[] (eventind_t gl_event_index) const { return _vec[gl_event_index]; }
+        prob_t operator[] (event_ind_t gl_event_index) const { return _vec[gl_event_index]; }
 
-        prob_t operator() (eventind_t event_family, eventind_t loc_event_index) const {
+        prob_t operator() (event_ind_t event_family, event_ind_t loc_event_index) const {
             return _vec[_edges[event_family] + loc_event_index];
         }
         ///@}
 
-        vector<prob_t>::const_iterator get_iterator(eventind_t i) const { return _vec.begin() + i; }
+        vector<prob_t>::const_iterator get_iterator(event_ind_t i) const { return _vec.begin() + i; }
 
 
         /**
          * 0-based indices for families and events! All segment indices must be passed as (segindex - 1),
          * segment families as (segindex_deletion_index - 1), but deletions and insertions should be passed as it is (#deletions).
          */
-        eventind_t event_index(EventClass event_class, eventind_t event_family, eventind_t event_index) const {
+        event_ind_t event_index(EventClass event_class, event_ind_t event_family, event_ind_t event_index) const {
             if (_edges[_event_classes[event_class] + event_family] + event_index < _edges[_event_classes[event_class] + event_family + 1]) {
                 return _edges[_event_classes[event_class] + event_family] + event_index;
             }
@@ -218,7 +218,7 @@ namespace ymir {
 //            return _edges[_event_classes[event_class] + event_family] + event_index;
         }
 
-        eventind_t event_index(EventClass event_class, eventind_t event_family, eventind_t event_row, eventind_t event_column) const {
+        event_ind_t event_index(EventClass event_class, event_ind_t event_family, event_ind_t event_row, event_ind_t event_column) const {
             if (event_column < _event_family_col_numbers[_event_classes[event_class] + event_family] && _edges[_event_classes[event_class] + event_family]
                 + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column < _edges[_event_classes[event_class] + event_family + 1]) {
                 return _edges[_event_classes[event_class] + event_family]
@@ -230,11 +230,11 @@ namespace ymir {
 //                   + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column;
         }
 
-        prob_t event_prob(EventClass event_class, eventind_t event_family, eventind_t event_index) const {
+        prob_t event_prob(EventClass event_class, event_ind_t event_family, event_ind_t event_index) const {
             return _vec[this->event_index(event_class, event_family, event_index)];
         }
 
-        prob_t event_prob(EventClass event_class, eventind_t event_family, eventind_t event_row, eventind_t event_column) const {
+        prob_t event_prob(EventClass event_class, event_ind_t event_family, event_ind_t event_row, event_ind_t event_column) const {
             return _vec[this->event_index(event_class, event_family, event_row, event_column)];
         }
 
@@ -243,14 +243,14 @@ namespace ymir {
         * \brief Normalise each event family to have sum equal to 1.
         */
         void normaliseEventFamilies() {
-            for (eventind_t i = 2; i < _edges.size(); ++i) {
+            for (event_ind_t i = 2; i < _edges.size(); ++i) {
                 prob_t prob_sum = _laplace[i-1] * (_edges[i] - _edges[i-1]);
-                for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
+                for (event_ind_t j = _edges[i-1]; j < _edges[i]; ++j) {
                     prob_sum += _vec[j];
                 }
 
                 if (prob_sum) {
-                    for (eventind_t j = _edges[i-1]; j < _edges[i]; ++j) {
+                    for (event_ind_t j = _edges[i-1]; j < _edges[i]; ++j) {
                         _vec[j] = (_vec[j] + _laplace[i-1]) / prob_sum;
                     }
                 }
@@ -261,13 +261,13 @@ namespace ymir {
         /**
          *
          */
-        eventind_t max_VJ_ins_len() const {
+        event_ind_t max_VJ_ins_len() const {
             return this->eventFamilySize(VJ_VAR_JOI_INS_LEN, 0) - 1;
         }
-        eventind_t max_VD_ins_len() const {
+        event_ind_t max_VD_ins_len() const {
             return this->eventFamilySize(VDJ_VAR_DIV_INS_LEN, 0) - 1;
         }
-        eventind_t max_DJ_ins_len() const {
+        event_ind_t max_DJ_ins_len() const {
             return this->eventFamilySize(VDJ_DIV_JOI_INS_LEN, 0) - 1;
         }
 
@@ -275,7 +275,7 @@ namespace ymir {
         /**
          *
          */
-        inline seq_len_t D_min_len(eventind_t d_index) const { return _d_genes_min_len[d_index - 1]; }
+        inline seq_len_t D_min_len(event_ind_t d_index) const { return _d_genes_min_len[d_index - 1]; }
 
 
         /**
@@ -289,8 +289,8 @@ namespace ymir {
         }
 
 
-        void familyFill(eventind_t event_family, prob_t val = 0) {
-            for (eventind_t i = _edges[_event_classes[event_family]]; i < _edges[_event_classes[event_family + 1]]; ++i) {
+        void familyFill(event_ind_t event_family, prob_t val = 0) {
+            for (event_ind_t i = _edges[_event_classes[event_family]]; i < _edges[_event_classes[event_family + 1]]; ++i) {
                 _vec[i] = val;
             }
         }
@@ -304,8 +304,8 @@ namespace ymir {
     private:
 
         vector<prob_t> _vec;
-        vector<eventind_t> _edges;  /** Vector with starting indices for each event family. */
-        vector<eventind_t> _event_classes;  /** Vector of indices of event classes in _edges. */
+        vector<event_ind_t> _edges;  /** Vector with starting indices for each event family. */
+        vector<event_ind_t> _event_classes;  /** Vector of indices of event classes in _edges. */
         vector<seq_len_t> _event_family_col_numbers;  /** Vector of the number of rows of each event family. */
         vector<prob_t> _laplace;
         vector<seq_len_t> _d_genes_min_len;

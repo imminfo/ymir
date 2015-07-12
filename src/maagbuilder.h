@@ -314,7 +314,7 @@ namespace ymir {
         {
             // find max V alignment
             seq_len_t len = 0;
-            segindex_t v_num = clonotype.nVar(), j_num = clonotype.nJoi();
+            seg_index_t v_num = clonotype.nVar(), j_num = clonotype.nJoi();
             for (int v_index = 0; v_index < v_num; ++v_index) {
                 if (clonotype.getVend(v_index) > len) {
                     len = clonotype.getVend(v_index);
@@ -323,7 +323,7 @@ namespace ymir {
 
             // compute V deletions
             seq_len_t v_len = 0;
-            segindex_t v_gene = 0;
+            seg_index_t v_gene = 0;
             seq_len_t v_end = 0;
 
             probs.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
@@ -344,14 +344,14 @@ namespace ymir {
             }
 
             EventClass V_DEL = clonotype.is_vj() ? VJ_VAR_DEL : VDJ_VAR_DEL;
-            for (segindex_t v_index = 0; v_index < v_num; ++v_index) {
+            for (seg_index_t v_index = 0; v_index < v_num; ++v_index) {
                 v_gene = clonotype.getVar(v_index);
                 v_len = _genes->V()[v_gene].sequence.size();
                 v_end = clonotype.getVend(v_index);
 
                 if (clonotype.is_vj()) {
                     // probability of choosing this V gene segment
-                    for (segindex_t j_index = 0; j_index < j_num; ++j_index) {
+                    for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
                         probs(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
                                 = _param_vec->event_prob(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
                     }
@@ -372,7 +372,7 @@ namespace ymir {
                 if (metadata_mode) {
                     if (clonotype.is_vj()) {
                         // probability of choosing this V gene segment
-                        for (segindex_t j_index = 0; j_index < j_num; ++j_index) {
+                        for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
                             events(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
                                     = _param_vec->event_index(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
                         }
@@ -416,7 +416,7 @@ namespace ymir {
             }
 
             // find max J alignment
-            segindex_t j_num = clonotype.nJoi();
+            seg_index_t j_num = clonotype.nJoi();
             seq_len_t len = clonotype.sequence().size();
             for (int j_index = 0; j_index < j_num; ++j_index) {
                 if (clonotype.getJstart(j_index) < len) {
@@ -443,17 +443,17 @@ namespace ymir {
 
             // compute J deletions
             seq_len_t j_len = 0;
-            segindex_t j_gene = 0;
+            seg_index_t j_gene = 0;
             seq_len_t j_start = 0;
 
             EventClass J_DEL = clonotype.is_vj() ? VJ_JOI_DEL : VDJ_JOI_DEL;
-            for (segindex_t j_index = 0; j_index < j_num; ++j_index) {
+            for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
                 j_gene = clonotype.getJoi(j_index);
                 j_len = _genes->J()[j_gene].sequence.size();
                 j_start = clonotype.getJstart(j_index);
 
                 if (clonotype.is_vdj()) {
-                    for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                    for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                         probs(J_index_genes, 0, j_index, d_index)
                                 = _param_vec->event_prob(VDJ_JOI_DIV_GEN, 0, j_gene - 1, clonotype.getDiv(d_index) - 1); // probability of choosing this J gene segment with other D genes
                     }
@@ -470,7 +470,7 @@ namespace ymir {
 
                 if (metadata_mode) {
                     if (clonotype.is_vdj()) {
-                        for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                        for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                             events(J_index_genes, 0, j_index, d_index)
                                     = _param_vec->event_index(VDJ_JOI_DIV_GEN, 0, j_gene - 1, clonotype.getDiv(d_index) - 1); // probability of choosing this J gene segment with other D genes
                         }
@@ -517,10 +517,10 @@ namespace ymir {
             seq_len_t *seq_col = new seq_len_t[seq_arr_size];
             std::fill(seq_col, seq_col + seq_arr_size, 0);
 
-            for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+            for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                 seq_len_t min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
 
-                for (segindex_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
+                for (seg_index_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
                     d_alignment = clonotype.getDalignment(d_index, j);
 
                     // yes-yes, I know that it could be done more efficiently. But I don't want to.
@@ -567,16 +567,16 @@ namespace ymir {
             }
 
 
-            segindex_t d_index = 0, d_gene = 0;
+            seg_index_t d_index = 0, d_gene = 0;
             seq_len_t min_D_len = 0, d_len = 0;
 
-            for (segindex_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+            for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                 d_gene = clonotype.getDiv(d_index);
                 d_len = _genes->D()[d_gene].sequence.size();
                 min_D_len = _param_vec->D_min_len(d_gene);
 
                 // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
-                for (segindex_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
+                for (seg_index_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
                     d_alignment = clonotype.getDalignment(d_index, j);
 
                     for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len + 1; ++left_pos) {
@@ -766,7 +766,7 @@ namespace ymir {
                              EventIndMMC &events,
                              const vector<seq_len_t> &seq_poses,
                              ProbMMC::node_ind_t ins_node_index,
-                             eventind_t null_insertion,
+                             event_ind_t null_insertion,
                              seq_len_t max_size,
                              bool metadata_mode,
                              seq_len_t left_vertices_start,

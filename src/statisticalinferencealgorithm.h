@@ -101,7 +101,7 @@ namespace ymir {
             model.updateEventProbabilitiesVector(new_param_vec);
 
             cout << "Building MAAGs..." << endl;
-            MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, false, false);
+            MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, NUCLEOTIDE, false);
 //            if (maag_rep[0].is_vj()) { maag_rep.erase(maag_rep.begin() + 61877); }
 
             vector<prob_t> prob_vec;

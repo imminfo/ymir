@@ -44,7 +44,7 @@ namespace ymir {
 
         Clonotype(const string& sequence,
                   bool nucleotide,
-                  segindex_t *segments,
+                  seg_index_t *segments,
                   seq_len_t *alignments,
                   seq_len_t *n_D_alignments = nullptr)
                 : seq(sequence), nucleotide(nucleotide) {
@@ -59,7 +59,7 @@ namespace ymir {
             seq = other.seq;
             nucleotide = other.nucleotide;
 
-            segments = new segindex_t[3 + other.segments[0] + other.segments[1] + other.segments[2]];
+            segments = new seg_index_t[3 + other.segments[0] + other.segments[1] + other.segments[2]];
             segments[0] = other.segments[0];
             segments[1] = other.segments[1];
             segments[2] = other.segments[2];
@@ -123,27 +123,27 @@ namespace ymir {
 
         ///@{
         /** Get index of aligned gene segment for specific gene. */
-        segindex_t getVar(size_t index) const { return segments[3 + index]; }
-        segindex_t getJoi(size_t index) const { return segments[3 + segments[0] + index]; }
-        segindex_t getDiv(size_t index) const { return segments[3 + segments[0] + segments[1] + index]; }
+        seg_index_t getVar(size_t index) const { return segments[3 + index]; }
+        seg_index_t getJoi(size_t index) const { return segments[3 + segments[0] + index]; }
+        seg_index_t getDiv(size_t index) const { return segments[3 + segments[0] + segments[1] + index]; }
         ///@}
 
 
         ///@{
         /** Get number of alignments for specific gene. */
-        segindex_t nVar() const { return segments[0]; }
-        segindex_t nJoi() const { return segments[1]; }
-        segindex_t nDiv() const { return segments[2]; }
+        seg_index_t nVar() const { return segments[0]; }
+        seg_index_t nJoi() const { return segments[1]; }
+        seg_index_t nDiv() const { return segments[2]; }
         ///@}
 
 
-        seq_len_t getVend(segindex_t index) const { return alignments[index]; }
+        seq_len_t getVend(seg_index_t index) const { return alignments[index]; }
 
 
-        seq_len_t getJstart(segindex_t index) const { return alignments[index + segments[0]]; }
+        seq_len_t getJstart(seg_index_t index) const { return alignments[index + segments[0]]; }
 
 
-        d_alignment_t getDalignment(segindex_t Dseg_index, segindex_t index) const {
+        d_alignment_t getDalignment(seg_index_t Dseg_index, seg_index_t index) const {
             seq_len_t shift = segments[0] + segments[1];
             for (size_t i = 0; i < Dseg_index; ++i) {
                 shift += 4 * n_D_alignments[i];
@@ -151,7 +151,7 @@ namespace ymir {
             return d_alignment_t(alignments + shift + 4*index);
         }
 
-        seq_len_t nDalignments(segindex_t index) const {
+        seq_len_t nDalignments(seg_index_t index) const {
             if (n_D_alignments) {
                 return n_D_alignments[index];
             } else {
@@ -163,7 +163,7 @@ namespace ymir {
 
         string seq; //* CDR3 or full nucleotide or amino acid sequence of a clone. */
         bool nucleotide;
-        segindex_t *segments; /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
+        seg_index_t *segments; /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
                               /// vector of indices of segments, aligned on this clone: V1--V2--V3--J1--J2--D1--D2--...
         seq_len_t *alignments; //* Vector of 1-based alignments for the clone. 1st N elements is V ends, than M elements is J starts, each other are 4-tuples for Ds alignment - (D start, D end, seq start, seq end) */
         seq_len_t *n_D_alignments; //* Number of alignments (i.e., 4-tuples) for each aligned D segment; vector's length == segments[2] */
@@ -196,7 +196,7 @@ namespace ymir {
         */
         Clonotype buildClonotype() {
 //            segindex_t *segments = new segindex_t[3];
-            segments = new segindex_t[3 + _Vseg.size() + _Jseg.size() + _n_Dalign.size()];
+            segments = new seg_index_t[3 + _Vseg.size() + _Jseg.size() + _n_Dalign.size()];
             segments[0] = _Vseg.size();
             segments[1] = _Jseg.size();
             segments[2] = _n_Dalign.size();
@@ -260,17 +260,17 @@ namespace ymir {
 
 
         ///@{
-        ClonotypeBuilder& addValignment(segindex_t vseg, seq_len_t vend) {
+        ClonotypeBuilder& addValignment(seg_index_t vseg, seq_len_t vend) {
             _Vseg.push_back(vseg);
             _Valign.push_back(vend);
             return *this;
         }
-        ClonotypeBuilder& addJalignment(segindex_t jseg, seq_len_t jstart) {
+        ClonotypeBuilder& addJalignment(seg_index_t jseg, seq_len_t jstart) {
             _Jseg.push_back(jseg);
             _Jalign.push_back(jstart);
             return *this;
         }
-        ClonotypeBuilder& addDalignment(segindex_t dseg, seq_len_t dstart, seq_len_t dend, seq_len_t seqstart, seq_len_t seqend) {
+        ClonotypeBuilder& addDalignment(seg_index_t dseg, seq_len_t dstart, seq_len_t dend, seq_len_t seqstart, seq_len_t seqend) {
             if (_Dseg.size() == 0 || dseg != _Dseg[_Dseg.size() - 1]) {
                 _n_Dalign.push_back(0);
             }
@@ -284,7 +284,7 @@ namespace ymir {
             _Dalign.push_back(seqend);
             return *this;
         }
-        ClonotypeBuilder& addDalignment(segindex_t dseg, const d_alignment_t& dalignment) {
+        ClonotypeBuilder& addDalignment(seg_index_t dseg, const d_alignment_t& dalignment) {
             return addDalignment(dseg, dalignment.Dstart, dalignment.Dend, dalignment.seqstart, dalignment.seqend);
         }
         ///@}
@@ -318,9 +318,9 @@ namespace ymir {
 
     protected:
 
-        std::vector<segindex_t> _Vseg, _Jseg, _Dseg; // gene segment aligned
+        std::vector<seg_index_t> _Vseg, _Jseg, _Dseg; // gene segment aligned
         std::vector<seq_len_t> _Valign, _Jalign, _Dalign; // alignments for each gene segment
-        std::vector<segindex_t> _n_Dalign; // number of D alignments
+        std::vector<seg_index_t> _n_Dalign; // number of D alignments
 
     };
 

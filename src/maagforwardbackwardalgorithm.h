@@ -93,7 +93,7 @@ namespace ymir {
 
         vector<event_pair_t> _pairs;
         size_t _pairs_i;
-        unordered_map<eventind_t, prob_t> _pair_map;
+        unordered_map<event_ind_t, prob_t> _pair_map;
 //        map<eventind_t, prob_t> _pair_map;
         prob_t *_nuc_arr1, *_nuc_arr2;
 
@@ -257,7 +257,7 @@ namespace ymir {
          * \brief Access to a hash map which maps event probabilities to event indices.
          */
         ///@{
-        void pushEventValue(eventind_t event_index, prob_t prob_value) {
+        void pushEventValue(event_ind_t event_index, prob_t prob_value) {
             if (prob_value && event_index) {
 
                 auto elem = _pair_map.find(event_index);
@@ -316,7 +316,7 @@ namespace ymir {
         //
 
         // make a matrix chain with forward probabilities for VJ receptors
-        void forward_vj(const MAAG &maag, eventind_t j_ind) {
+        void forward_vj(const MAAG &maag, event_ind_t j_ind) {
             this->fillZero(_forward_acc);
 
             // VJ probabilities for the fixed J
@@ -325,7 +325,7 @@ namespace ymir {
             }
 
             // V deletions
-            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+            for (event_ind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
                     (*_forward_acc)(VJ_VAR_DEL_I, v_ind, 0, col_i) =
                             (*_forward_acc)(VJ_VAR_JOI_GEN_I, 0, v_ind, 0) * maag(VJ_VAR_DEL_I, v_ind, 0, col_i);
@@ -363,7 +363,7 @@ namespace ymir {
 
 
         // make a matrix chain with backward probabilities for VJ receptors
-        void backward_vj(const MAAG &maag, eventind_t j_ind) {
+        void backward_vj(const MAAG &maag, event_ind_t j_ind) {
             this->fillZero(_backward_acc);
 
             // J deletions
@@ -379,7 +379,7 @@ namespace ymir {
             }
 
             // V deletions
-            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+            for (event_ind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
                     for (dim_t ins_col_i = 0; ins_col_i < maag.nodeColumns(VJ_VAR_JOI_INS_I); ++ins_col_i) {
                         (*_backward_acc)(VJ_VAR_DEL_I, v_ind, 0, col_i) +=
@@ -389,14 +389,14 @@ namespace ymir {
             }
 
             // V-J genes
-            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+            for (event_ind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VJ_VAR_DEL_I); ++col_i) {
                     (*_backward_acc)(VJ_VAR_JOI_GEN_I, 0, v_ind, 0) +=
                             (*_backward_acc)(VJ_VAR_DEL_I, v_ind, 0, col_i) * maag(VJ_VAR_DEL_I, v_ind, 0, col_i);
                 }
             }
 
-            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+            for (event_ind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 _back_full_prob +=
                         (*_backward_acc)(VJ_VAR_JOI_GEN_I, 0, v_ind, 0) * maag(VJ_VAR_JOI_GEN_I, 0, v_ind, j_ind);
             }
@@ -428,7 +428,7 @@ namespace ymir {
             _backward_acc->initNode(VJ_JOI_DEL_I, 1, maag.nodeRows(VJ_JOI_DEL_I), 1);
 
             // Compute fi * bi / Pgen for each event.
-            for (eventind_t j_ind = 0; j_ind < maag.nJoi(); ++j_ind) {
+            for (event_ind_t j_ind = 0; j_ind < maag.nJoi(); ++j_ind) {
                 // compute forward and backward probabilities for a specific J gene
                 this->forward_vj(maag, j_ind);
                 this->backward_vj(maag, j_ind);
@@ -458,7 +458,7 @@ namespace ymir {
         //
 
         // make a matrix chain with forward probabilities for VDJ receptors
-        void forward_vdj(const MAAG &maag, eventind_t d_ind, eventind_t j_ind, bool recompute_d_gen_fi) {
+        void forward_vdj(const MAAG &maag, event_ind_t d_ind, event_ind_t j_ind, bool recompute_d_gen_fi) {
             if (recompute_d_gen_fi) {
                 // forward probabilities for (V prob -> V del -> VD ins) are fixed
                 // for all pairs of J-D.
@@ -513,7 +513,7 @@ namespace ymir {
 
 
         // make a matrix chain with backward probabilities for VDJ receptors
-        void backward_vdj(const MAAG &maag, eventind_t d_ind, eventind_t j_ind) {
+        void backward_vdj(const MAAG &maag, event_ind_t d_ind, event_ind_t j_ind) {
             this->fillZero(_backward_acc);
 
             // J-D pairs
@@ -553,7 +553,7 @@ namespace ymir {
             }
 
             // V deletions and V genes
-            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+            for (event_ind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VDJ_VAR_DEL_I); ++col_i) {
                     for (dim_t ins_col_i = 0; ins_col_i < maag.nodeColumns(VDJ_VAR_DIV_INS_I); ++ins_col_i) {
                         (*_backward_acc)(VDJ_VAR_DEL_I, v_ind, 0, col_i) +=
@@ -610,7 +610,7 @@ namespace ymir {
             // pairs of J-D, we compute them here.
             this->fillZero(_forward_acc);
             // V genes and deletions
-            for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+            for (event_ind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 // gene probability
                 (*_forward_acc)(VDJ_VAR_GEN_I, v_ind, 0, 0) = maag(VDJ_VAR_GEN_I, v_ind, 0, 0);
 
@@ -623,7 +623,7 @@ namespace ymir {
             // VD insertions
             for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_VAR_DIV_INS_I); ++row_i) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(VDJ_VAR_DIV_INS_I); ++col_i) {
-                    for (eventind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
+                    for (event_ind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                         (*_forward_acc)(VDJ_VAR_DIV_INS_I, 0, row_i, col_i) +=
                                 (*_forward_acc)(VDJ_VAR_DEL_I, v_ind, 0, row_i) * maag(VDJ_VAR_DIV_INS_I, 0, row_i, col_i);
                     }
@@ -632,9 +632,9 @@ namespace ymir {
 
             // Compute fi * bi / Pgen for each event.
             bool recompute_d_gen_fi = true;
-            for (eventind_t d_ind = 0; d_ind < maag.nDiv(); ++d_ind) {
+            for (event_ind_t d_ind = 0; d_ind < maag.nDiv(); ++d_ind) {
                 recompute_d_gen_fi = true;
-                for (eventind_t j_ind = 0; j_ind < maag.nJoi(); ++j_ind) {
+                for (event_ind_t j_ind = 0; j_ind < maag.nJoi(); ++j_ind) {
                     // compute forward and backward probabilities for a specific J gene
                     this->forward_vdj(maag, d_ind, j_ind, recompute_d_gen_fi);
                     this->backward_vdj(maag, d_ind, j_ind);

@@ -211,7 +211,7 @@ namespace ymir {
          * \return Full assembling probability. Returns 0 if wrong recombination function is used.
          */
         ///@{
-        prob_t fullProbability(eventind_t v_index, eventind_t j_index) const {
+        prob_t fullProbability(event_ind_t v_index, event_ind_t j_index) const {
             if (this->is_vj()) {
                 // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
                 return (matrix(0, 0)(v_index, j_index) *   // P(Vi & Ji)
@@ -224,7 +224,7 @@ namespace ymir {
             }
         }
 
-        prob_t fullProbability(eventind_t v_index, eventind_t d_index, eventind_t j_index) const {
+        prob_t fullProbability(event_ind_t v_index, event_ind_t d_index, event_ind_t j_index) const {
             if (this->is_vdj()) {
                 // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
                 return (matrix(0, v_index) *      // P(Vi)
@@ -244,16 +244,16 @@ namespace ymir {
             if (action == MAX_PROBABILITY) {
                 prob_t max_prob = 0, cur_prob = 0;
                 if (this->is_vj()) {
-                    for (eventind_t v_index = 0; v_index < this->nVar(); ++v_index) {
-                        for (eventind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
+                    for (event_ind_t v_index = 0; v_index < this->nVar(); ++v_index) {
+                        for (event_ind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
                             cur_prob = this->fullProbability(v_index, j_index);
                             if (cur_prob > max_prob) { max_prob = cur_prob; }
                         }
                     }
                 } else {
-                    for (eventind_t v_index = 0; v_index < this->nVar(); ++v_index) {
-                        for (eventind_t d_index = 0; d_index < this->nDiv(); ++d_index) {
-                            for (eventind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
+                    for (event_ind_t v_index = 0; v_index < this->nVar(); ++v_index) {
+                        for (event_ind_t d_index = 0; d_index < this->nDiv(); ++d_index) {
+                            for (event_ind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
                                 cur_prob = this->fullProbability(v_index, d_index, j_index);
                                 if (cur_prob > max_prob) { max_prob = cur_prob; }
                             }
@@ -266,15 +266,15 @@ namespace ymir {
             else {
                 prob_t sum_prob = 0;
                 if (this->is_vj()) {
-                    for (eventind_t v_index = 0; v_index < this->nVar(); ++v_index) {
-                        for (eventind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
+                    for (event_ind_t v_index = 0; v_index < this->nVar(); ++v_index) {
+                        for (event_ind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
                             sum_prob += this->fullProbability(v_index, j_index);
                         }
                     }
                 } else {
-                    for (eventind_t v_index = 0; v_index < this->nVar(); ++v_index) {
-                        for (eventind_t d_index = 0; d_index < this->nDiv(); ++d_index) {
-                            for (eventind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
+                    for (event_ind_t v_index = 0; v_index < this->nVar(); ++v_index) {
+                        for (event_ind_t d_index = 0; d_index < this->nDiv(); ++d_index) {
+                            for (event_ind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
                                 sum_prob += this->fullProbability(v_index, d_index, j_index);
                             }
                         }
@@ -292,9 +292,9 @@ namespace ymir {
          * \return Number of the aligned specific gene segments.
          */
         ///@{
-        eventind_t nVar() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeRows(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_VAR_GEN_I); }
-        eventind_t nJoi() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeColumns(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_JOI_DEL_I); }
-        eventind_t nDiv() const { return (_chain.size() == VJ_CHAIN_SIZE) ? 0 : _chain[VDJ_DIV_DEL_I].size(); }
+        event_ind_t nVar() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeRows(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_VAR_GEN_I); }
+        event_ind_t nJoi() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeColumns(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_JOI_DEL_I); }
+        event_ind_t nDiv() const { return (_chain.size() == VJ_CHAIN_SIZE) ? 0 : _chain[VDJ_DIV_DEL_I].size(); }
         ///@}
 
 
@@ -320,7 +320,7 @@ namespace ymir {
         prob_t event_probability(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
             return (*this)(node_i, mat_i, row, col);
         }
-        eventind_t event_index(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
+        event_ind_t event_index(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
             return _events ? (*_events)(node_i, mat_i, row, col) : 0;
         };
         ///@}

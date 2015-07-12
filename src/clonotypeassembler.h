@@ -35,7 +35,7 @@ namespace ymir {
 
         private:
             std::default_random_engine _rg;
-            std::discrete_distribution<segindex_t> _genes;
+            std::discrete_distribution<seg_index_t> _genes;
 
         };
 

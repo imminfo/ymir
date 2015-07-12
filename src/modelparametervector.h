@@ -296,6 +296,9 @@ namespace ymir {
         }
 
 
+        size_t families() const { return _event_classes.size(); }
+
+
         size_t size() const { return _vec.size(); }
 
     private:

@@ -1,6 +1,7 @@
 {
   "name": "Human T-cell receptor beta chain model",
   "comment": "Insert comments for this model here",
+  "specimen": "human",
   "recombination": "VDJ",
   "hypermutations": false,
   "segments": {

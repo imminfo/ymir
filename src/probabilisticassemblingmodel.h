@@ -303,7 +303,6 @@ namespace ymir {
          * \brief Parse gene segment JSON files and tables.
          */
         bool parseGeneSegments() {
-
             cout << "\tV gene seg.:     ";
             if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
                 cout << "ERROR: no gene segments file in the model's .json." << endl;
@@ -465,6 +464,12 @@ namespace ymir {
                 size_t j = 0;
                 for (; i+1 != name_order[j] ; ++j) {}
                 prob_data = container->data(j);
+
+                // add trailing zeros if distribution is smaller than a gene length
+                if (prob_data.size() < gsa[name_order[j]].sequence.size() + 1) {
+                    prob_data.resize(gsa[name_order[j]].sequence.size() + 1, 0);
+                }
+
                 // remove trailing zeros
                 if (prob_data.size() > gsa[name_order[j]].sequence.size() + 1) {
                     prob_data.resize(gsa[name_order[j]].sequence.size() + 1);
@@ -496,9 +501,15 @@ namespace ymir {
                 for (; i+1 != name_order[j] ; ++j) {}
                 prob_data = container->data(j);
 
-//                if (prob_data.size() > gsa[name_order[j]].sequence.size() + 1) {
-//                    prob_data.resize(gsa[name_order[j]].sequence.size() + 1);
-//                }
+                if (prob_data.size() > gsa[name_order[j]].sequence.size() + 1) {
+                    vector<prob_t> new_prob_data((gsa[name_order[j]].sequence.size() + 1) * (gsa[name_order[j]].sequence.size() + 1));
+                    for (auto row_i = 0; row_i < gsa[name_order[j]].sequence.size() + 1; ++row_i) {
+                        for (auto col_i = 0; col_i < gsa[name_order[j]].sequence.size() + 1; ++col_i) {
+                            new_prob_data[row_i * (gsa[name_order[j]].sequence.size() + 1) + col_i] = prob_data[row_i * (gsa[name_order[j]].sequence.size() + 1) + col_i];
+                        }
+                    }
+                    prob_data = new_prob_data;
+                }
 
                 event_probs.insert(event_probs.end(),
                                    prob_data.begin(),
@@ -517,10 +528,14 @@ namespace ymir {
                     vector<eventind_t> &event_classes,
                     vector<seq_len_t> &event_col_num,
                     vector<prob_t> &laplace,
-                    segindex_t prev_class_size) const {
+                    segindex_t prev_class_size,
+                    seq_len_t max_ins_len = 0) const {
             vector<prob_t> prob_data;
             for (size_t i = 0; i < container->n_columns(); ++i) {
                 prob_data = container->data(i);
+                if (max_ins_len) {
+                    prob_data.resize(max_ins_len);
+                }
                 event_probs.insert(event_probs.end(),
                                    prob_data.begin(),
                                    prob_data.end());
@@ -722,10 +737,11 @@ namespace ymir {
 
 
         /**
-         * \brief Create marginal probabilities based on gene segments and make all event probabilities uniform.
+         * \brief Create marginal probabilities based on gene segments sequences and make all event probabilities uniform.
          */
         bool createEventProbabilitiesFromScratch() {
             vector<AbstractTDContainer*> containers;
+            containers.resize(10, nullptr);
 
             if (_recomb == VJ_RECOMB) {
                 this->createVJContainers(containers);
@@ -761,15 +777,15 @@ namespace ymir {
                 container->addColumnName(_genes->J()[i].allele);
             }
             container->addDataVector(vector<prob_t>(_genes->V().max() * _genes->J().max()));
-            containers.push_back(container);
+            containers[VJ_VAR_JOI_GEN] = container;
 
             // V del
             container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("laplace", .0).asDouble());
-            for (auto i = 1; i <= _genes->V().max(); ++i){
+            for (auto i = 1; i <= _genes->V().max(); ++i) {
                 container->addColumnName(_genes->V()[i].allele);
                 container->addDataVector(vector<prob_t>(_genes->V()[i].sequence.size() + 1));
             }
-            containers.push_back(container);
+            containers[VJ_VAR_DEL] = container;
 
             // J del
             container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("laplace", .0).asDouble());
@@ -777,64 +793,89 @@ namespace ymir {
                 container->addColumnName(_genes->J()[i].allele);
                 container->addDataVector(vector<prob_t>(_genes->J()[i].sequence.size() + 1));
             }
-            containers.push_back(container);
+            containers[VJ_JOI_DEL] = container;
 
             // VJ ins
             container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("laplace", .0).asDouble());
-            container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", 60).asInt() + 1));
-            containers.push_back(container);
+            container->addColumnName("VJ ins len");
+            container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1));
+            containers[VJ_VAR_JOI_INS_LEN] = container;
 
             // VJ nuc
             container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("laplace", .0).asDouble());
-            container->addColumnName("A");
+            container->addColumnName("VJ nucs");
             container->addDataVector(vector<prob_t>(4));
-            container->addColumnName("C");
-            container->addDataVector(vector<prob_t>(4));
-            container->addColumnName("G");
-            container->addDataVector(vector<prob_t>(4));
-            container->addColumnName("T");
-            container->addDataVector(vector<prob_t>(4));
-            containers.push_back(container);
+            containers[VJ_VAR_JOI_INS_NUC] = container;
         }
 
 
+        /**
+         * \brief Create new marginal probabilities for a VDJ recombination generation model.
+         */
         void createVDJContainers(vector<AbstractTDContainer*> &containers) {
             AbstractTDContainer* container;
 
             // V
-            container = new TDVector(false, 0);
-
-            containers.push_back(container);
+            container = new TDVector(true, _config.get("probtables", Json::Value()).get("v", Json::Value()).get("laplace", .0).asDouble());
+            container->addDataVector(vector<prob_t>());
+            for (auto i = 1; i <= _genes->V().max(); ++i) {
+                container->addRowName(_genes->V()[i].allele);
+                container->addDataValue(1);
+            }
+            containers[VDJ_VAR_GEN] = container;
 
             // J-D
-            container = new TDMatrix(false, 0);
-
-            containers.push_back(container);
+            container = new TDMatrix(true, _config.get("probtables", Json::Value()).get("j.d", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 1; i <= _genes->J().max(); ++i) {
+                container->addRowName(_genes->J()[i].allele);
+            }
+            for (auto i = 1; i <= _genes->D().max(); ++i) {
+                container->addColumnName(_genes->D()[i].allele);
+            }
+            container->addDataVector(vector<prob_t>(_genes->D().max() * _genes->J().max()));
+            containers[VDJ_JOI_DIV_GEN] = container;
 
             // V del
-            container = new TDVectorList(false, 0);
-
-            containers.push_back(container);
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 1; i <= _genes->V().max(); ++i) {
+                container->addColumnName(_genes->V()[i].allele);
+                container->addDataVector(vector<prob_t>(_genes->V()[i].sequence.size() + 1));
+            }
+            containers[VDJ_VAR_DEL] = container;
 
             // J del
-            container = new TDVectorList(false, 0);
-
-            containers.push_back(container);
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 1; i <= _genes->J().max(); ++i) {
+                container->addColumnName(_genes->J()[i].allele);
+                container->addDataVector(vector<prob_t>(_genes->J()[i].sequence.size() + 1));
+            }
+            containers[VDJ_JOI_DEL] = container;
 
             // D del
-            container = new TDMatrixList(false, 0);
-
-            containers.push_back(container);
+            container = new TDMatrixList(true, _config.get("probtables", Json::Value()).get("d.del", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 1; i <= _genes->D().max(); ++i) {
+                container->addColumnName(_genes->D()[i].allele);
+                container->addDataVector(vector<prob_t>( (_genes->D()[i].sequence.size() + 1) * (_genes->D()[i].sequence.size() + 1) ));
+                container->addRowName(_genes->D()[i].allele);
+                container->addMetadata(_genes->D()[i].sequence.size() + 1);
+            }
+            containers[VDJ_DIV_DEL] = container;
 
             // VD ins + DJ ins
-            container = new TDVectorList(false, 0);
-
-            containers.push_back(container);
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("laplace", .0).asDouble());
+            container->addColumnName("VD ins");
+            container->addColumnName("DJ ins");
+            container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1));
+            container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1));
+            containers[VDJ_VAR_DIV_INS_LEN] = container;
 
             // VD nuc + DJ nuc
-            container = new TDVectorList(false, 0);
-
-            containers.push_back(container);
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 0; i < 8; ++i) {
+                container->addColumnName("VD/DJ nucs");
+                container->addDataVector(vector<prob_t>(4));
+            }
+            containers[VDJ_VAR_DIV_INS_NUC] = container;
         }
 
 
@@ -913,7 +954,8 @@ namespace ymir {
                              event_classes,
                              event_col_num,
                              laplace,
-                             containers[VJ_JOI_DEL]->n_columns());
+                             containers[VJ_JOI_DEL]->n_columns(),
+                             _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1);
 
                 this->addIns(containers[VJ_VAR_JOI_INS_NUC],
                              event_probs,
@@ -999,7 +1041,8 @@ namespace ymir {
                              event_classes,
                              event_col_num,
                              laplace,
-                             containers[VDJ_DIV_DEL]->row_names().size());
+                             containers[VDJ_DIV_DEL]->row_names().size(),
+                             _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1);
 
                 this->addIns(containers[VDJ_VAR_DIV_INS_NUC],
                              event_probs,

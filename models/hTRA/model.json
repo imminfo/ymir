@@ -1,6 +1,7 @@
 {
   "name": "Human T-cell receptor alpha chain model",
   "comment": "Insert comments for this model here",
+  "specimen": "human",
   "recombination": "VJ",
   "hypermutations": false,
   "segments": {

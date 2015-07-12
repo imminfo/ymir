@@ -414,9 +414,6 @@ namespace ymir {
         virtual ~TDMatrixList() { }
 
 
-        void addMatrix(const vector<prob_t> &vec) { _data.push_back(vec); }
-
-
         bool read(const string& filepath, string &err_message) {
             ifstream ifs;
 

@@ -48,6 +48,8 @@ namespace ymir {
 
     #define NULL_CHAR '_'
 
+    #define DEFAULT_MAX_INS_LENGTH 65
+
     /**
     * \typedef numeric
     *

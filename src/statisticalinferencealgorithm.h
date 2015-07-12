@@ -102,9 +102,7 @@ namespace ymir {
 
             cout << "Building MAAGs..." << endl;
             MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, false, false);
-            if (maag_rep[0].is_vj()) {
-                maag_rep.erase(maag_rep.begin() + 61877);
-            }
+//            if (maag_rep[0].is_vj()) { maag_rep.erase(maag_rep.begin() + 61877); }
 
             vector<prob_t> prob_vec;
             prob_vec.resize(maag_rep.size(), 0);

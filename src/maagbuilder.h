@@ -287,8 +287,8 @@ namespace ymir {
 
     protected:
 
-        ModelParameterVector *_param_vec;
-        VDJRecombinationGenes *_genes;
+        ModelParameterVector *_param_vec;  // or just copy it?
+        VDJRecombinationGenes *_genes; // copy this too?
 
 
         /**

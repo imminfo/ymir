@@ -72,7 +72,7 @@ int main() {
     //
     // VJ MAAG
     //
-    ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA", EMPTY);
+    ProbabilisticAssemblingModel vj_model(BENCH_DATA_FOLDER + "../../models/hTRA"); //, EMPTY);
 //    ProbabilisticAssemblingModel vj_model2(BENCH_DATA_FOLDER + "../../models/hTRA");
 //    cout << "empty:" << vj_model.event_probabilities().size() << endl;
 //    cout << "default:" << vj_model2.event_probabilities().size() << endl;
@@ -84,12 +84,12 @@ int main() {
 //    return 0;
 
     tp1 = std::chrono::system_clock::now();
-    vj_model.buildGraphs(cloneset_vj, SAVE_METADATA);
+//    vj_model.buildGraphs(cloneset_vj, SAVE_METADATA);
     tp2 = std::chrono::system_clock::now();
     vj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
     tp1 = std::chrono::system_clock::now();
-    vj_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
+//    vj_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
     tp2 = std::chrono::system_clock::now();
     vj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -114,7 +114,7 @@ int main() {
     vdj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
     tp1 = std::chrono::system_clock::now();
-    vdj_model.computeFullProbabilities(cloneset_vdj, NO_METADATA);
+//    vdj_model.computeFullProbabilities(cloneset_vdj, NO_METADATA);
     tp2 = std::chrono::system_clock::now();
     vdj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -132,7 +132,7 @@ int main() {
     // VDJ inference
     //
     tp1 = std::chrono::system_clock::now();
-    EMAlgorithm().statisticalInference(cloneset_vdj, vdj_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
+//    EMAlgorithm().statisticalInference(cloneset_vdj, vdj_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
     tp2 = std::chrono::system_clock::now();
     vdj_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 

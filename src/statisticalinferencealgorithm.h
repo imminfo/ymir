@@ -102,17 +102,28 @@ namespace ymir {
 
             cout << "Building MAAGs..." << endl;
             MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, NUCLEOTIDE, false);
-//            if (maag_rep[0].is_vj()) { maag_rep.erase(maag_rep.begin() + 61877); }
 
             vector<prob_t> prob_vec;
             prob_vec.resize(maag_rep.size(), 0);
 
             prob_t prev_ll = 0, cur_ll = 0;
 
-            cout << endl << "Initial data summary:" << endl;
+            cout << "Computing full assembling probabilities..." << endl;
+            vector<bool> good_clonotypes;
+            good_clonotypes.resize(maag_rep.size(), true);
+            int removed = 0;
             for (size_t i = 0; i < maag_rep.size(); ++i) {
                 prob_vec[i] = maag_rep[i].fullProbability();
+                if (isnan(prob_vec[i]) || prob_vec[i] == 0) {
+                    good_clonotypes[i] = false;
+                    ++removed;
+                }
             }
+
+            cout << "Removed " << (int) removed
+                 << " error-probability clonotypes. Check your minimal Diversity gene length to align and other parameters to make sure it won't happen again in the future." << endl;
+
+            cout << endl << "Initial data summary:" << endl;
             prob_summary(prob_vec);
             prev_ll = loglikelihood(prob_vec);
 
@@ -122,30 +133,32 @@ namespace ymir {
                 new_param_vec.fill(0);
 
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
-                    MAAGForwardBackwardAlgorithm fb(maag_rep[i]);
+                    if (good_clonotypes[i]) {
+                        MAAGForwardBackwardAlgorithm fb(maag_rep[i]);
 
-                    while (!fb.is_empty()) {
-                        event_pair_t ep = fb.nextEvent();
-                        new_param_vec[ep.first] += ep.second;
-                    }
-
-                    if (maag_rep[i].is_vj()) {
-                        new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] += fb.VJ_nuc_probs()[0];
-                        new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] += fb.VJ_nuc_probs()[1];
-                        new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] += fb.VJ_nuc_probs()[2];
-                        new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] += fb.VJ_nuc_probs()[3];
-                    } else {
-                        int k = 0;
-                        for (auto prev_nuc = 0; prev_nuc < 4; ++prev_nuc) {
-                            for (auto next_nuc = 0; next_nuc < 4; ++next_nuc, ++k) {
-                                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, prev_nuc, next_nuc)] += fb.VD_nuc_probs()[k];
-                            }
+                        while (!fb.is_empty()) {
+                            event_pair_t ep = fb.nextEvent();
+                            new_param_vec[ep.first] += ep.second;
                         }
 
-                        k = 0;
-                        for (auto prev_nuc = 0; prev_nuc < 4; ++prev_nuc) {
-                            for (auto next_nuc = 0; next_nuc < 4; ++next_nuc, ++k) {
-                                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, prev_nuc, next_nuc)] += fb.DJ_nuc_probs()[k];
+                        if (maag_rep[i].is_vj()) {
+                            new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] += fb.VJ_nuc_probs()[0];
+                            new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] += fb.VJ_nuc_probs()[1];
+                            new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] += fb.VJ_nuc_probs()[2];
+                            new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] += fb.VJ_nuc_probs()[3];
+                        } else {
+                            int k = 0;
+                            for (auto prev_nuc = 0; prev_nuc < 4; ++prev_nuc) {
+                                for (auto next_nuc = 0; next_nuc < 4; ++next_nuc, ++k) {
+                                    new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, prev_nuc, next_nuc)] += fb.VD_nuc_probs()[k];
+                                }
+                            }
+
+                            k = 0;
+                            for (auto prev_nuc = 0; prev_nuc < 4; ++prev_nuc) {
+                                for (auto next_nuc = 0; next_nuc < 4; ++next_nuc, ++k) {
+                                    new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, prev_nuc, next_nuc)] += fb.DJ_nuc_probs()[k];
+                                }
                             }
                         }
                     }
@@ -186,7 +199,7 @@ namespace ymir {
 
         virtual bool statisticalInference(const ClonesetView& repertoire,
                 ProbabilisticAssemblingModel & model,
-                const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10).set("step.size", 2000)) const {
+                const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10).set("block.size", 2000)) const {
 
         }
     };

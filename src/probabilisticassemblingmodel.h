@@ -80,7 +80,7 @@ namespace ymir {
          * only gene segments sequences and generate vector of uniformly distributed marginal probabilities. This model could be used
          * for further the model's parameters inference.
          */
-        ProbabilisticAssemblingModel(const string& folderpath, ModelBehaviour behav = PREDEFINED) {
+        ProbabilisticAssemblingModel(const string& folderpath, ModelBehaviour behav = PREDEFINED, bool empty_model = false) {
             _model_path = folderpath + "/";
             _behaviour = behav;
 
@@ -633,7 +633,7 @@ namespace ymir {
 
 
         void parseVJContainer(const string &element, AbstractTDContainer *container, vector<AbstractTDContainer*> &containers) {
-            string err_message = "";
+            string err_message = "OK";
             if (element == "v.j") {
                 if (container
                     && container->file_exists()
@@ -693,7 +693,7 @@ namespace ymir {
 
 
         void parseVDJContainer(const string &element, AbstractTDContainer *container, vector<AbstractTDContainer*> &containers) {
-            string err_message = "";
+            string err_message = "OK";
             if (element == "v") {
                 if (container && container->file_exists()) { containers[VDJ_VAR_GEN] = container; }
                 cout << "\tV genes prob.:   " << err_message << endl;

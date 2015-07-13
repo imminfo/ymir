@@ -75,12 +75,12 @@ namespace ymir {
 
             if (other._seq_poses) {
                 _seq_poses = new seq_len_t[_n_poses];
-                copy(other._seq_poses, other._seq_poses + _n_poses, _seq_poses);
+                std::copy(other._seq_poses, other._seq_poses + _n_poses, _seq_poses);
             } else {
                 _seq_poses = nullptr;
             }
 
-            if (other._sequence) { _sequence = new string(*other._sequence); }
+            if (other._sequence) { _sequence = new std::string(*other._sequence); }
             else { _sequence = nullptr; }
 
             _seq_type = other._seq_type;
@@ -101,7 +101,7 @@ namespace ymir {
             other._seq_poses = _seq_poses;
             _seq_poses = tmp2;
 
-            string *tmp3 = other._sequence;
+            std::string *tmp3 = other._sequence;
             other._sequence = _sequence;
             _sequence = tmp3;
 
@@ -125,11 +125,11 @@ namespace ymir {
         /**
          * \brief Special swap constructor for MAAGs that will be used for statistical inference.
          */
-        MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, string sequence, seq_len_t *seq_poses, seq_len_t n_poses, SequenceType seq_type) {
+        MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, std::string sequence, seq_len_t *seq_poses, seq_len_t n_poses, SequenceType seq_type) {
             this->swap(prob_mcc);
             _events = new EventIndMMC();
             _events->swap(eventind_mcc);
-            _sequence = new string(sequence);
+            _sequence = new std::string(sequence);
             _seq_poses = seq_poses;
             _n_poses = n_poses;
             _seq_type = seq_type;
@@ -161,14 +161,14 @@ namespace ymir {
             if (other._seq_poses) {
                 if (_seq_poses) { delete _seq_poses; }
                 _seq_poses = new seq_len_t[_n_poses];
-                copy(other._seq_poses, other._seq_poses + _n_poses, _seq_poses);
+                std::copy(other._seq_poses, other._seq_poses + _n_poses, _seq_poses);
             } else {
                 _seq_poses = nullptr;
             }
 
             if (other._sequence) {
                 if (_sequence) { delete _sequence; }
-                _sequence = new string(*other._sequence);
+                _sequence = new std::string(*other._sequence);
             }
             else { _sequence = nullptr; }
 
@@ -192,7 +192,7 @@ namespace ymir {
             other._seq_poses = _seq_poses;
             _seq_poses = tmp2;
 
-            string *tmp3 = other._sequence;
+            std::string *tmp3 = other._sequence;
             other._sequence = _sequence;
             _sequence = tmp3;
 
@@ -336,21 +336,21 @@ namespace ymir {
          * \param stream An output / input stream, from that read the graph or save the graph.
          */
         ///@{
-        bool save(const string &filepath) const {
-            ofstream ofs(filepath);
+        bool save(const std::string &filepath) const {
+            std::ofstream ofs(filepath);
             return this->save(ofs);
         }
 
-        bool save(ostream &stream) const {
+        bool save(std::ostream &stream) const {
             return false;
         }
 
-        bool load(const string &filepath) {
-            ifstream ifs(filepath);
+        bool load(const std::string &filepath) {
+            std::ifstream ifs(filepath);
             return this->load(ifs);
         }
 
-        bool load(istream &stream) {
+        bool load(std::istream &stream) {
             return false;
         }
         ///@}
@@ -374,7 +374,7 @@ namespace ymir {
         bool has_dgea() const { return _d_err_alignments; }
 
 
-        const DivGeneErrAlignments& dgea() const {
+        const AlignmentsWithErrors& dgea() const {
 #ifdef YDEBUG
             if (!_d_err_alignments) { throw(std::runtime_error("Access to a DGEA object when it's a nullptr!")); }
 #endif
@@ -382,7 +382,7 @@ namespace ymir {
         }
 
 
-        const string& sequence() const {
+        const std::string& sequence() const {
 #ifdef YDEBUG
             if (!_sequence) { throw(std::runtime_error("Access to a MAAG sequence when it's a nullptr!")); }
 #endif
@@ -402,10 +402,10 @@ namespace ymir {
         seq_len_t *_seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
         seq_len_t _n_poses;
 
-        string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
+        std::string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
         SequenceType _seq_type;
 
-        DivGeneErrAlignments *_d_err_alignments;
+        AlignmentsWithErrors *_d_err_alignments;
 
     };
 }

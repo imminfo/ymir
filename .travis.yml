@@ -13,7 +13,7 @@ before_install:
  - mv ./dist/jsoncpp.cpp ../src/jsoncpp.cpp
 
 script:
- - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . --target Test
+  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . && cmake --build . --target Test
 
 notifications:
   slack: imminfo:CJCtbSdFOW1w9xMoY0HxSLgY

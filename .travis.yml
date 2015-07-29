@@ -10,6 +10,7 @@ before_install:
  - rm jsoncpp.zip
  - cd jsoncpp-master
  - python amalgamate.py
+ - ls ..
  - mv ./dist/jsoncpp.cpp ../ymir/src/jsoncpp.cpp
 
 script:

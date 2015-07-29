@@ -15,7 +15,10 @@ before_install:
  - cd ..
 
 script:
-  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . && cmake --build . --target Test
+  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build .
+
+after_success
+  - ./build/Test
 
 notifications:
   slack: imminfo:CJCtbSdFOW1w9xMoY0HxSLgY

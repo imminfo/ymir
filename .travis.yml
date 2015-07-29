@@ -10,3 +10,6 @@ before_build:
     - cmake ../test/
 
 script: make
+
+notifications:
+  slack: imminfo:CJCtbSdFOW1w9xMoY0HxSLgY

@@ -330,115 +330,115 @@ namespace ymir {
     #define DEFAULT_AWE_D_RESERVE_SIZE 4000
     #define DEFAULT_AWE_J_RESERVE_SIZE 60
 
-    struct AlignmentsWithErrors {
-    public:
-
-        /**
-         * \struct vj_err_alignment_t
-         */
-        struct vj_err_alignment_t {
-            seq_len_t index;
-            event_ind_t event_index;
-            seq_len_t n_errors;
-
-
-            vj_err_alignment_t(seq_len_t index, event_ind_t event_index, seq_len_t n_errors)
-                    : index(index), event_index(event_index), n_errors(n_errors)
-            { }
-
-        };
-
-
-        /**
-         * \struct d_err_alignment_t
-         */
-        struct d_err_alignment_t {
-            seq_len_t row;
-            seq_len_t column;
-            event_ind_t event_index;
-            seq_len_t n_errors;
-
-
-            d_err_alignment_t(seq_len_t row, seq_len_t column, event_ind_t event_index, seq_len_t n_errors)
-                    : row(row), column(column), event_index(event_index), n_errors(n_errors)
-            { }
-
-        };
-
-
-        /**
-         * \brief Default constructor, nothing interesting.
-         */
-        AlignmentsWithErrors() { }
-
-
-        /**
-         * \brief Constructor which reserves memory for storing future alignments.
-         */
-        AlignmentsWithErrors(Recombination recomb) {
-            _vvec.reserve(DEFAULT_AWE_V_RESERVE_SIZE);
-            _jvec.reserve(DEFAULT_AWE_J_RESERVE_SIZE);
-            if (recomb == VDJ_RECOMB) {
-                _dvec.reserve(DEFAULT_AWE_D_RESERVE_SIZE);
-            }
-        }
-
-
-        /**
-         * \brief Add new alignment with errors to the storage.
-         *
-         */
-        ///@{
-        void addV(seq_len_t index, event_ind_t event_index, seq_len_t errors_num) {
-            _vvec.push_back(vj_err_alignment_t(index, event_index, errors_num));
-        }
-
-        void addJ(seq_len_t index, event_ind_t event_index, seq_len_t errors_num) {
-            _jvec.push_back(vj_err_alignment_t(index, event_index, errors_num));
-        }
-
-        void addD(seq_len_t row, seq_len_t column, event_ind_t event_index, seq_len_t errors_num) {
-            _dvec.push_back(d_err_alignment_t(row, column, event_index, errors_num));
-        }
-        ///@}
-
-
-        void finish() {
-            _vvec.resize(_vvec.size());
-            _jvec.resize(_jvec.size());
-            _dvec.resize(_dvec.size());
-        }
-
-
-        /**
-         * \brief Access to vectors with alignments with errors.
-         *
-         * \param i Index of the alignment.
-         */
-        ///@{
-        const vj_err_alignment_t& getV(size_t i) const { return _vvec[i]; }
-        const vj_err_alignment_t& getJ(size_t i) const { return _jvec[i]; }
-        const d_err_alignment_t& getD(size_t i) const { return _dvec[i]; }
-        ///@}
-
-
-        /**
-         * \brief Size of vectors with alignments.
-         */
-        ///@{
-        size_t sizeV() const { return _vvec.size(); }
-        size_t sizeJ() const { return _jvec.size(); }
-        size_t sizeD() const { return _dvec.size(); }
-        ///@}
-
-
-    protected:
-
-        std::vector<vj_err_alignment_t> _vvec;
-        std::vector<vj_err_alignment_t> _jvec;
-        std::vector<d_err_alignment_t> _dvec;
-
-    };
+//    struct AlignmentsWithErrors {
+//    public:
+//
+//        /**
+//         * \struct vj_err_alignment_t
+//         */
+//        struct vj_err_alignment_t {
+//            seq_len_t index;
+//            event_ind_t event_index;
+//            seq_len_t n_errors;
+//
+//
+//            vj_err_alignment_t(seq_len_t index, event_ind_t event_index, seq_len_t n_errors)
+//                    : index(index), event_index(event_index), n_errors(n_errors)
+//            { }
+//
+//        };
+//
+//
+//        /**
+//         * \struct d_err_alignment_t
+//         */
+//        struct d_err_alignment_t {
+//            seq_len_t row;
+//            seq_len_t column;
+//            event_ind_t event_index;
+//            seq_len_t n_errors;
+//
+//
+//            d_err_alignment_t(seq_len_t row, seq_len_t column, event_ind_t event_index, seq_len_t n_errors)
+//                    : row(row), column(column), event_index(event_index), n_errors(n_errors)
+//            { }
+//
+//        };
+//
+//
+//        /**
+//         * \brief Default constructor, nothing interesting.
+//         */
+//        AlignmentsWithErrors() { }
+//
+//
+//        /**
+//         * \brief Constructor which reserves memory for storing future alignments.
+//         */
+//        AlignmentsWithErrors(Recombination recomb) {
+//            _vvec.reserve(DEFAULT_AWE_V_RESERVE_SIZE);
+//            _jvec.reserve(DEFAULT_AWE_J_RESERVE_SIZE);
+//            if (recomb == VDJ_RECOMB) {
+//                _dvec.reserve(DEFAULT_AWE_D_RESERVE_SIZE);
+//            }
+//        }
+//
+//
+//        /**
+//         * \brief Add new alignment with errors to the storage.
+//         *
+//         */
+//        ///@{
+//        void addV(seq_len_t index, event_ind_t event_index, seq_len_t errors_num) {
+//            _vvec.push_back(vj_err_alignment_t(index, event_index, errors_num));
+//        }
+//
+//        void addJ(seq_len_t index, event_ind_t event_index, seq_len_t errors_num) {
+//            _jvec.push_back(vj_err_alignment_t(index, event_index, errors_num));
+//        }
+//
+//        void addD(seq_len_t row, seq_len_t column, event_ind_t event_index, seq_len_t errors_num) {
+//            _dvec.push_back(d_err_alignment_t(row, column, event_index, errors_num));
+//        }
+//        ///@}
+//
+//
+//        void finish() {
+//            _vvec.resize(_vvec.size());
+//            _jvec.resize(_jvec.size());
+//            _dvec.resize(_dvec.size());
+//        }
+//
+//
+//        /**
+//         * \brief Access to vectors with alignments with errors.
+//         *
+//         * \param i Index of the alignment.
+//         */
+//        ///@{
+//        const vj_err_alignment_t& getV(size_t i) const { return _vvec[i]; }
+//        const vj_err_alignment_t& getJ(size_t i) const { return _jvec[i]; }
+//        const d_err_alignment_t& getD(size_t i) const { return _dvec[i]; }
+//        ///@}
+//
+//
+//        /**
+//         * \brief Size of vectors with alignments.
+//         */
+//        ///@{
+//        size_t sizeV() const { return _vvec.size(); }
+//        size_t sizeJ() const { return _jvec.size(); }
+//        size_t sizeD() const { return _dvec.size(); }
+//        ///@}
+//
+//
+//    protected:
+//
+//        std::vector<vj_err_alignment_t> _vvec;
+//        std::vector<vj_err_alignment_t> _jvec;
+//        std::vector<d_err_alignment_t> _dvec;
+//
+//    };
 
 
     typedef std::pair<std::string*, uint> codons_t;

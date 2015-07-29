@@ -371,15 +371,15 @@ namespace ymir {
         bool has_events() const { return _events; }
 
 
-        bool has_errors() const { return _err_alignments; }
+//        bool has_errors() const { return _err_alignments; }
 
 
-        const AlignmentsWithErrors& dgea() const {
-#ifdef YDEBUG
-            if (!_err_alignments) { throw(std::runtime_error("Access to an alignment with errors object when it's a nullptr!")); }
-#endif
-            return *_err_alignments;
-        }
+//        const AlignmentsWithErrors& dgea() const {
+//#ifdef YDEBUG
+//            if (!_err_alignments) { throw(std::runtime_error("Access to an alignment with errors object when it's a nullptr!")); }
+//#endif
+//            return *_err_alignments;
+//        }
 
 
         const std::string& sequence() const {
@@ -405,7 +405,7 @@ namespace ymir {
         std::string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
         SequenceType _seq_type;
 
-        AlignmentsWithErrors *_err_alignments;
+//        AlignmentsWithErrors *_err_alignments;
 
     };
 }

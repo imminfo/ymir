@@ -114,7 +114,7 @@ namespace ymir {
             int removed = 0;
             for (size_t i = 0; i < maag_rep.size(); ++i) {
                 prob_vec[i] = maag_rep[i].fullProbability();
-                if (isnan(prob_vec[i]) || prob_vec[i] == 0) {
+                if (std::isnan(prob_vec[i]) || prob_vec[i] == 0) {
                     good_clonotypes[i] = false;
                     ++removed;
                 }

@@ -4,8 +4,16 @@ compiler:
  - clang
  - gcc
 
+before_install:
+ - curl -sL https://github.com/open-source-parsers/jsoncpp/archive/master.zip > jsoncpp.zip
+ - unzip jsoncpp.zip
+ - rm jsoncpp.zip
+ - cd jsoncpp-master
+ - python python amalgamate.py
+ - mv ./dist/jsoncpp.cpp ../ymir/src/jsoncpp.cpp
+
 script:
-  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . && cmake --build . --target Test
+ - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . --target Test
 
 notifications:
   slack: imminfo:CJCtbSdFOW1w9xMoY0HxSLgY

@@ -79,7 +79,7 @@ namespace ymir {
 //        cout << vec_sum << endl;
 //        cout << "min:" << *std::min_element(vec.begin(), vec.end()) << endl;
 //        cout << "max:" << *std::max_element(vec.begin(), vec.end()) << endl;
-        for (size_t i = 0; i < vec.size(); ++i) { res += std::log10((vec[i] + laplace)); } // what to do in case of high precision numbers?
+        for (size_t i = 0; i < vec.size(); ++i) { res += log10((vec[i] + laplace)); } // what to do in case of high precision numbers?
         return res;
     }
 

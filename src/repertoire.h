@@ -25,9 +25,6 @@
 #define _REPERTOIRE_H_
 
 
-#include "vector"
-#include "iterator"
-
 #include "aligner.h"
 #include "clonotype.h"
 #include "parser.h"
@@ -39,7 +36,7 @@ namespace ymir {
 
     #define DEFAULT_REPERTOIRE_RESERVE_SIZE 300000
 
-    // AssemblyGraphRepertoire aggregate(*ModelParameterVector) - aggregate and compute parameters (bayesian) (add them to this vector)
+    // AssemblyGraphRepertoire aggregate(*ModelParameterVector) - aggregate and compute parameters (bayesian) (add them to this std::vector)
 
     /*
      [real data] =>
@@ -49,19 +46,19 @@ namespace ymir {
      => (Model::Builder) => [GraphRepertoire]
     */
 
-    typedef vector<MAAG> MAAGRepertoire;
+    typedef std::vector<MAAG> MAAGRepertoire;
 
 
     class ClonesetView {
 
     public:
 
-        ClonesetView() : _source(new vector<Clonotype>()) {
+        ClonesetView() : _source(new std::vector<Clonotype>()) {
             _shifts.resize(0);
         }
 
 
-        ClonesetView(shared_ptr<vector<Clonotype>> pvec, const vector<size_t>& shifts) :
+        ClonesetView(std::shared_ptr<std::vector<Clonotype>> pvec, const std::vector<size_t>& shifts) :
                 _source(pvec), _shifts(shifts) {}
 
 
@@ -74,8 +71,8 @@ namespace ymir {
         const Clonotype& operator[] (size_t index) const {
             return _source->at(_shifts[index]);
         }
-        ClonesetView subvec(const vector<size_t> &indices) const {
-            vector<size_t> shifts;
+        ClonesetView subvec(const std::vector<size_t> &indices) const {
+            std::vector<size_t> shifts;
             shifts.reserve(indices.size());
             for (size_t i = 0; i < indices.size(); ++i) {
                 shifts.push_back(_shifts[indices[i]]);
@@ -88,7 +85,7 @@ namespace ymir {
 
 
         ClonesetView coding() const {
-            vector<size_t> inds;
+            std::vector<size_t> inds;
             inds.reserve(this->size() / 3);
             for (size_t i = 0; i < this->size(); ++i) {
                 if (!is_out_of_frame((*this)[i].sequence()) && !has_end_codon((*this)[i].sequence())) {
@@ -100,7 +97,7 @@ namespace ymir {
 
 
         ClonesetView noncoding(bool out_of_frames_only = false) const {
-            vector<size_t> inds;
+            std::vector<size_t> inds;
             inds.reserve(this->size() / 3);
             for (size_t i = 0; i < this->size(); ++i) {
                 if (is_out_of_frame((*this)[i].sequence()) || (!out_of_frames_only && has_end_codon((*this)[i].sequence()))) {
@@ -112,7 +109,7 @@ namespace ymir {
 
 
         ClonesetView head(size_t size) const {
-            vector<size_t> shifts;
+            std::vector<size_t> shifts;
             shifts.reserve(size);
             for (size_t i = 0; i < size; ++i) {
                 shifts.push_back(i);
@@ -123,7 +120,7 @@ namespace ymir {
 
         ClonesetView slice(size_t start, size_t end) const {
             if (end > start) {
-                vector<size_t> shifts;
+                std::vector<size_t> shifts;
                 shifts.reserve(end - start + 1);
                 for (size_t i = start; i < end; ++i) {
                     shifts.push_back(i);
@@ -138,8 +135,8 @@ namespace ymir {
 
     protected:
 
-        shared_ptr<vector<Clonotype>> _source;
-        vector<size_t> _shifts;
+        std::shared_ptr<std::vector<Clonotype>> _source;
+        std::vector<size_t> _shifts;
 
     };
 
@@ -155,7 +152,7 @@ namespace ymir {
 
 
         // swap constructor
-        Cloneset(vector<Clonotype>& vec) {
+        Cloneset(std::vector<Clonotype>& vec) {
             this->swap(vec);
         }
 
@@ -163,7 +160,7 @@ namespace ymir {
         virtual ~Cloneset() { }
 
 
-        void swap(vector<Clonotype>& vec) {
+        void swap(std::vector<Clonotype>& vec) {
             this->_source->swap(vec);
             this->_shifts.resize(this->_source->size());
             for (size_t i = 0; i < this->_source->size(); ++i) {

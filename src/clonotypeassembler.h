@@ -14,31 +14,6 @@ namespace ymir {
 
     class ClonotypeAssembler {
 
-        struct VJGenerator {
-        public:
-
-            VJGenerator() {
-
-            }
-
-            Clonotype generate(ModelParameterVector param_vec) {
-//                v_del_num = std::discrete_distribution<eventind_t>(param_vec.get_iterator(param_vec.event_index(VJ_VAR_DEL, vgene, 0)),
-//                                                                   param_vec.get_iterator(param_vec.event_index(VJ_VAR_DEL, vgene, 0))
-//                                                                   + param_vec.eventFamilySize(VJ_VAR_DEL, vgene - 1))(_rg);
-//
-//                j_del_num = std::discrete_distribution<eventind_t>(param_vec.get_iterator(param_vec.event_index(VJ_JOI_DEL, jgene, 0)),
-//                                                                   param_vec.get_iterator(param_vec.event_index(VJ_JOI_DEL, jgene, 0))
-//                                                                   + param_vec.eventFamilySize(VJ_JOI_DEL, jgene - 1))(_rg);
-
-
-            }
-
-        private:
-            std::default_random_engine _rg;
-            std::discrete_distribution<seg_index_t> _genes;
-
-        };
-
     public:
 
         /**
@@ -103,6 +78,13 @@ namespace ymir {
 //            std::discrete_distribution<segindex_t> vgenes(_param_vec);
 //            vgenes(rg);
 //            mc_vj.generate(rg);
+//            v_del_num = std::discrete_distribution<eventind_t>(param_vec.get_iterator(param_vec.event_index(VJ_VAR_DEL, vgene, 0)),
+//                                                               param_vec.get_iterator(param_vec.event_index(VJ_VAR_DEL, vgene, 0))
+//                                                               + param_vec.eventFamilySize(VJ_VAR_DEL, vgene - 1))(_rg);
+//
+//            j_del_num = std::discrete_distribution<eventind_t>(param_vec.get_iterator(param_vec.event_index(VJ_JOI_DEL, jgene, 0)),
+//                                                               param_vec.get_iterator(param_vec.event_index(VJ_JOI_DEL, jgene, 0))
+//                                                               + param_vec.eventFamilySize(VJ_JOI_DEL, jgene - 1))(_rg);
 
             return builder.buildClonotype();
         }

@@ -10,8 +10,7 @@ before_install:
  - rm jsoncpp.zip
  - cd jsoncpp-master
  - python amalgamate.py
- - ls ..
- - mv ./dist/jsoncpp.cpp ../ymir/src/jsoncpp.cpp
+ - mv ./dist/jsoncpp.cpp ../src/jsoncpp.cpp
 
 script:
  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . --target Test

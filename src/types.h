@@ -366,9 +366,15 @@ namespace ymir {
         };
 
 
+        /**
+         * \brief Default constructor, nothing interesting.
+         */
         AlignmentsWithErrors() { }
 
 
+        /**
+         * \brief Constructor which reserves memory for storing future alignments.
+         */
         AlignmentsWithErrors(Recombination recomb) {
             _vvec.reserve(DEFAULT_AWE_V_RESERVE_SIZE);
             _jvec.reserve(DEFAULT_AWE_J_RESERVE_SIZE);
@@ -416,9 +422,14 @@ namespace ymir {
         ///@}
 
 
+        /**
+         * \brief Size of vectors with alignments.
+         */
+        ///@{
         size_t sizeV() const { return _vvec.size(); }
         size_t sizeJ() const { return _jvec.size(); }
         size_t sizeD() const { return _dvec.size(); }
+        ///@}
 
 
     protected:

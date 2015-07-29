@@ -371,14 +371,14 @@ namespace ymir {
         bool has_events() const { return _events; }
 
 
-        bool has_dgea() const { return _d_err_alignments; }
+        bool has_errors() const { return _err_alignments; }
 
 
         const AlignmentsWithErrors& dgea() const {
 #ifdef YDEBUG
-            if (!_d_err_alignments) { throw(std::runtime_error("Access to a DGEA object when it's a nullptr!")); }
+            if (!_err_alignments) { throw(std::runtime_error("Access to an alignment with errors object when it's a nullptr!")); }
 #endif
-            return *_d_err_alignments;
+            return *_err_alignments;
         }
 
 
@@ -405,7 +405,7 @@ namespace ymir {
         std::string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
         SequenceType _seq_type;
 
-        AlignmentsWithErrors *_d_err_alignments;
+        AlignmentsWithErrors *_err_alignments;
 
     };
 }

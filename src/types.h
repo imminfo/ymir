@@ -37,8 +37,8 @@
 //#include "tools.h"
 
 //#define MPFR
-#include "gmp.h"
-#include "mpfr.h"
+//#include "gmp.h"
+//#include "mpfr.h"
 //#include <Eigen/unsupported/Eigen/MPRealSupport>
 //using namespace mpfr;
 //using namespace Eigen;

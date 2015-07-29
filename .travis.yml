@@ -13,3 +13,4 @@ script: make
 
 notifications:
   slack: imminfo:CJCtbSdFOW1w9xMoY0HxSLgY
+  email: false

@@ -18,7 +18,7 @@ script:
   - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build .
 
 after_success
-  - ./build/Test
+  - ./build/test/Test
 
 notifications:
   slack: imminfo:CJCtbSdFOW1w9xMoY0HxSLgY

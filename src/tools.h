@@ -91,7 +91,7 @@ namespace ymir {
             zeros += prob_vec[i] ? 0 : 1;
             negative += prob_vec[i] < 0 ? 1 : 0;
             bignums += prob_vec[i] > 1 ? 1 : 0;
-            nans += isnan(prob_vec[i]) ? 1 : 0;
+            nans += std::isnan(prob_vec[i]) ? 1 : 0;
         }
 
         std::cout << "Loglikelihood:\t" << std::setprecision(9) << loglikelihood(prob_vec);

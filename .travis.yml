@@ -9,7 +9,7 @@ before_install:
  - unzip jsoncpp.zip
  - rm jsoncpp.zip
  - cd jsoncpp-master
- - python python amalgamate.py
+ - python amalgamate.py
  - mv ./dist/jsoncpp.cpp ../ymir/src/jsoncpp.cpp
 
 script:

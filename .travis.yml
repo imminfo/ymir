@@ -4,12 +4,8 @@ compiler:
  - clang
  - gcc
 
-before_build:
-    - mkdir build
-    - cd build
-    - cmake ../test/ --target Test
-
-script: make
+script:
+  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . && cmake --build . --target Test
 
 notifications:
   slack: imminfo:CJCtbSdFOW1w9xMoY0HxSLgY

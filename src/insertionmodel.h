@@ -80,7 +80,7 @@ namespace ymir {
                     for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
                         res *= _arr[nuc_hash(*start)];
                     }
-                    if (isnan(res)) {
+                    if (std::isnan(res)) {
                         cout << "NAN res!!" << endl;
                         res = 1;
                         tmp = start;
@@ -97,7 +97,7 @@ namespace ymir {
                     for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
                         res *= (*this)(nuc_hash(*start), nuc_hash(*next));
                     }
-                    if (isnan(res)) {
+                    if (std::isnan(res)) {
                         tmp1 = start;
                         tmp2 = start + 1;
                         cout << "NAN res!!" << endl;

@@ -25,6 +25,8 @@
 #define _REPERTOIRE_H_
 
 
+#include <memory>
+
 #include "aligner.h"
 #include "clonotype.h"
 #include "parser.h"

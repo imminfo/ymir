@@ -29,6 +29,7 @@
 #include <vector>
 #include <iostream>
 #include <tuple>
+#include <cmath>
 
 #include "matrix.h"
 

@@ -34,8 +34,6 @@ take a look at the `Examples / ready-to-use scripts` section where pre-made scri
 
 Dependencies:
 
-- Eigen
-
 - JsonCPP
 
 - MPFR (non-necessary due to license)

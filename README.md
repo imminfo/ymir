@@ -1,5 +1,5 @@
 [![Licence](https://img.shields.io/hexpm/l/plug.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0)
-[![Build](https://travis-ci.org/imminfo/ymir.svg?style=flat-square)](https://travis-ci.org/imminfo/ymir)
+[![Build Status](https://img.shields.io/travis/imminfo/ymir.svg?style=flat-square))](https://travis-ci.org/imminfo/ymir)
 
 
 # Ymir

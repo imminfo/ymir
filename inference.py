@@ -1,0 +1,1 @@
+os.system("./build/inference $1 $2 ...")

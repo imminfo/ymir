@@ -36,33 +36,6 @@
 
 namespace ymir {
 
-    // ymir probs --repertoire twb.txt --model TRB --parser mitcr.json
-    // ymir probs -r twb.txt -m TRB -p mitcr.json
-
-    // ymir inference --repertoire twa.txt --model TRA --n_iter 100 --eps 1e-4 --algorithm online-em --parser mitcr.json
-    // ymir inference -r twa.txt -m TRA -n 100 -e 1e-4 -a online-em -p mitcr.json
-
-    // ymir generate --count 100000 --model TRB --out generated.txt
-    // ymir generate -c 100000 -m TRB -o generated.txt
-
-
-    // parsers:
-    // MiTCR, MiXCR, MiGEC
-    // V.segments / V.end
-    // J.segments / J.start
-    /*
-    column names:
-    --vseg --jseg
-    --vstart --vend
-    --seq
-     */
-
-    // etc.
-
-    // case with a few segments, not only one:
-    // choose best / get all / get parameters for all
-    // i.e., inference w/ or w/o inference of segments usage
-
     /**
     * \class ProbabilisticAssemblingModel
     */
@@ -275,30 +248,23 @@ namespace ymir {
             ofstream ofs;
             ofs.open(folderpath + "/model.json");
             if (ofs.is_open()) {
-                // get JSON object and write it to model.json file
-
-                // make names here
 
                 ofs << _config;
 
-                // get all prob tables and write them to files
                 if (_recomb == VJ_RECOMB) {
-//                    this->save_vj(folderpath);
-
-
+                    this->save_vj(folderpath);
                 } else if (_recomb == VDJ_RECOMB) {
-//                    this->save_vdj(folderpath);
-
-
+                    this->save_vdj(folderpath);
                 } else {
                     cerr << "Can't save a model with an undefined recombination type." << endl;
                     return false;
                 }
 
+                ofs.close();
                 return true;
             }
 
-            cerr << "Problem with saving a .json model file: probably there is not such directory: " << folderpath << endl;
+            cerr << "Problem with saving a .json model file: probably there is no such directory: " << folderpath << endl;
             return false;
         }
 
@@ -720,9 +686,9 @@ namespace ymir {
             }
             else if (element == "ins.nucl") {
                 if (container && container->file_exists()) {
-                    if (container->row_names().size() != 4 || container->column_names().size() != 1) {
+                    if (container->n_rows() != 4 || container->n_columns() != 1) {
                         stringstream ss;
-                        ss << "ERROR: wrong number of columns and rows (expected: 4 X 1, got: " << (int) container->row_names().size() << "X" << (int) container->column_names().size() << ")";
+                        ss << "ERROR: wrong number of columns and rows (expected: 4 X 1, got: " << (int) container->n_rows() << "X" << (int) container->n_columns() << ")";
                         err_message = ss.str();
                     } else {
                         containers[VJ_VAR_JOI_INS_NUC] = container;
@@ -789,9 +755,9 @@ namespace ymir {
             }
             else if (element == "ins.nucl") {
                 if (container && container->file_exists()) {
-                    if (container->row_names().size() != 4 || container->column_names().size() != 8) {
+                    if (container->n_rows() != 4 || container->n_columns() != 8) {
                         stringstream ss;
-                        ss << "ERROR: wrong number of columns and rows (expected: 4 X 8, got: " << (int) container->row_names().size() << "X" << (int) container->column_names().size() << ")";
+                        ss << "ERROR: wrong number of columns and rows (expected: 4 X 8, got: " << (int) container->n_rows() << "X" << (int) container->n_columns() << ")";
                         err_message = ss.str();
                     } else {
                         containers[VDJ_VAR_DIV_INS_NUC] = container;
@@ -1109,7 +1075,7 @@ namespace ymir {
                              event_classes,
                              event_col_num,
                              laplace,
-                             containers[VDJ_DIV_DEL]->row_names().size(),
+                             containers[VDJ_DIV_DEL]->n_rows(),
                              _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1);
 
                 this->addIns(containers[VDJ_VAR_DIV_INS_NUC],
@@ -1126,6 +1092,67 @@ namespace ymir {
             }
 
             return is_ok;
+        }
+
+
+        void save_vj(const string &folderpath) const {
+            AbstractTDContainer* container;
+
+            // V-J
+            container = new TDMatrix(true, _config.get("probtables", Json::Value()).get("v.j", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 1; i <= _genes->V().max(); ++i){
+                container->addRowName(_genes->V()[i].allele);
+            }
+            for (auto i = 1; i <= _genes->J().max(); ++i){
+                container->addColumnName(_genes->J()[i].allele);
+            }
+            container->addDataVector(_param_vec->get_iterator(1),
+                                     _param_vec->get_iterator(_param_vec->eventClassSize(VJ_VAR_JOI_GEN) + 1));
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("v.j", Json::Value()).get("file", .0).asString());
+            delete container;
+
+            // V del
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 1; i <= _genes->V().max(); ++i) {
+                container->addColumnName(_genes->V()[i].allele);
+                container->addDataVector(vector<prob_t>(_genes->V()[i].sequence.size() + 1));
+                container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_DEL, i - 1, 0)),
+                                         _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_DEL, i - 1, 0) + _param_vec->eventFamilySize(VJ_VAR_DEL, i - 1)));
+            }
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("file", .0).asString());
+            delete container;
+
+            // J del
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("laplace", .0).asDouble());
+            for (auto i = 1; i <= _genes->J().max(); ++i){
+                container->addColumnName(_genes->J()[i].allele);
+                container->addDataVector(vector<prob_t>(_genes->J()[i].sequence.size() + 1));
+                container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VJ_JOI_DEL, i - 1, 0)),
+                                         _param_vec->get_iterator(_param_vec->event_index(VJ_JOI_DEL, i - 1, 0) + _param_vec->eventFamilySize(VJ_JOI_DEL, i - 1)));
+            }
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("file", .0).asString());
+            delete container;
+
+            // VJ ins
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("laplace", .0).asDouble());
+            container->addColumnName("VJ ins len");
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0) + _param_vec->eventFamilySize(VJ_VAR_JOI_INS_LEN, 0)));
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("file", .0).asString());
+            delete container;
+
+            // VJ nuc
+            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("laplace", .0).asDouble());
+            container->addColumnName("VJ nucs");
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0) + _param_vec->eventFamilySize(VJ_VAR_JOI_INS_NUC, 0)))
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("file", .0).asString());
+            delete container;
+        }
+
+
+        void save_vdj(const string &folderpath) const {
+            ;
         }
     };
 

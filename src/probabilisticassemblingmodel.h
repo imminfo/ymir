@@ -75,12 +75,11 @@ namespace ymir {
          *
          * \param folderpath Path to a folder with a model's parameters.
          * \param behav Model's behaviour. PREDEFINED means that each probability will stay constant for each input data
-         * unless the model probabilities vector updated with new parameters. RECOMPUTE_GENE_USAGE means that for each input cloneset
-         * gene usage will be recomputed and used for computing assembling probabilities. EMPTY means that the model will load
-         * only gene segments sequences and generate vector of uniformly distributed marginal probabilities. This model could be used
-         * for further the model's parameters inference.
+         * unless the model probabilities vector updated with new parameters (either all parameters or gene usage only). EMPTY means that the model will load
+         * only gene segments sequences and generate vector of uniformly distributed marginal probabilities. This model could be used as an input model
+         * for the statistical inference of the model's parameters.
          */
-        ProbabilisticAssemblingModel(const string& folderpath, ModelBehaviour behav = PREDEFINED, bool empty_model = false) {
+        ProbabilisticAssemblingModel(const string& folderpath, ModelBehaviour behav = PREDEFINED) {
             _model_path = folderpath + "/";
             _behaviour = behav;
 
@@ -209,15 +208,59 @@ namespace ymir {
             *_param_vec = vec;
             this->make_builder();
             this->make_assembler();
+        }
 
-//            if (_param_vec->recombination() == vec.recombination() && _param_vec->size() == vec.size()) {
-//                *_param_vec = vec;
-//                this->make_builder();
-//                this->make_assembler();
-//                return true;
-//            }
-//
-//            return false;
+
+        /**
+         * \brief Given the cloneset, compute its gene usage on out-of-frames and
+         * update the event probability vector with new gene probabilities.
+         */
+        void updateGeneUsage(const ClonesetView &cloneset) {
+            prob_t laplace = 0;
+            ClonesetView nonc = cloneset.noncoding();
+            if (_recomb == VJ_RECOMB) {
+                // Update V-J
+                _param_vec->familyFill(VJ_VAR_JOI_GEN, 0);
+                for (size_t i = 0; i < nonc.size(); ++i) {
+                    uint n_vj = nonc[i].nVar() * nonc[i].nJoi();
+                    for (seg_index_t v_i = 0; v_i < nonc[i].nVar(); ++v_i) {
+                        for (seg_index_t j_i = 0; j_i < nonc[i].nJoi(); ++j_i) {
+                            (*_param_vec)[_param_vec->event_index(VJ_VAR_JOI_GEN,
+                                                                  0,
+                                                                  nonc[i].getVar(v_i) - 1,
+                                                                  nonc[i].getJoi(j_i) - 1)] += 1. / n_vj;
+                        }
+                    }
+                }
+                _param_vec->normaliseEventFamily(VJ_VAR_JOI_GEN);
+
+            } else if (_recomb == VDJ_RECOMB) {
+                // Update V
+                _param_vec->familyFill(VDJ_VAR_GEN, 0);
+                for (size_t i = 0; i < nonc.size(); ++i) {
+                    for (seg_index_t v_i = 0; v_i < nonc[i].nVar(); ++v_i) {
+                        (*_param_vec)[_param_vec->event_index(VDJ_VAR_GEN,
+                                                              0,
+                                                              nonc[i].getVar(v_i) - 1)] += 1. / nonc[i].nVar();
+                    }
+                }
+                _param_vec->normaliseEventFamily(VDJ_VAR_GEN);
+
+                // Update J-D
+                _param_vec->familyFill(VDJ_JOI_DIV_GEN, 0);
+                for (size_t i = 0; i < nonc.size(); ++i) {
+                    uint n_jd = nonc[i].nJoi() * nonc[i].nDiv();
+                    for (seg_index_t j_i = 0; j_i < nonc[i].nJoi(); ++j_i) {
+                        for (seg_index_t d_i = 0; d_i < nonc[i].nDiv(); ++d_i) {
+                            (*_param_vec)[_param_vec->event_index(VDJ_JOI_DIV_GEN,
+                                                                  0,
+                                                                  nonc[i].getJoi(j_i) - 1,
+                                                                  nonc[i].getDiv(d_i) - 1)] += 1. / n_jd;
+                        }
+                    }
+                }
+                _param_vec->normaliseEventFamily(VDJ_JOI_DIV_GEN);
+            }
         }
 
 
@@ -226,7 +269,7 @@ namespace ymir {
         *
         * \param folderpath Path to the model folder.
         *
-        * \return True if all ok.
+        * \return True if all is ok.
         */
         bool save(const string& folderpath) const {
             ofstream ofs;

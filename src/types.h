@@ -53,6 +53,14 @@ namespace ymir {
 
     #define DEFAULT_MAX_INS_LENGTH 65
 
+//    #ifndef DNDEBUG
+    #define YDEBUG
+//    #endif
+
+    #define DEFAULT_AWE_V_RESERVE_SIZE 60
+    #define DEFAULT_AWE_D_RESERVE_SIZE 4000
+    #define DEFAULT_AWE_J_RESERVE_SIZE 60
+
     /**
     * \typedef numeric
     *
@@ -170,7 +178,6 @@ namespace ymir {
      */
     enum ModelBehaviour {
         PREDEFINED,
-        RECOMPUTE_GENE_USAGE,
         EMPTY
     };
 
@@ -326,10 +333,6 @@ namespace ymir {
         std::unordered_multimap<char, std::string> _codons;
     };
 
-
-    #define DEFAULT_AWE_V_RESERVE_SIZE 60
-    #define DEFAULT_AWE_D_RESERVE_SIZE 4000
-    #define DEFAULT_AWE_J_RESERVE_SIZE 60
 
 //    struct AlignmentsWithErrors {
 //    public:

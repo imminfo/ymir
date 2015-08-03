@@ -6,11 +6,8 @@
 #define YMIR_MATRIX_H
 
 
-#include "iostream"
+#include <iostream>
 #include <stdexcept>
-
-
-#define YDEBUG
 
 
 namespace ymir {

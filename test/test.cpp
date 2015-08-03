@@ -2090,6 +2090,34 @@ YMIR_TEST_START(test_model_vdj_file)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_model_vj_save_load)
+
+    ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
+    YMIR_ASSERT(model.status())
+
+    YMIR_ASSERT(model.save(TEST_DATA_FOLDER + "test_vj_model2/"))
+    ProbabilisticAssemblingModel model2(TEST_DATA_FOLDER + "test_vj_model2/");
+    YMIR_ASSERT(model2.status())
+
+    YMIR_ASSERT(model.event_probabilities() == model2.event_probabilities())
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_model_vdj_save_load)
+
+    ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vdj_model/");
+    YMIR_ASSERT(model.status())
+
+    YMIR_ASSERT(model.save(TEST_DATA_FOLDER + "test_vdj_model2/"))
+    ProbabilisticAssemblingModel model2(TEST_DATA_FOLDER + "test_vdj_model2/");
+    YMIR_ASSERT(model2.status())
+
+    YMIR_ASSERT(model.event_probabilities() == model2.event_probabilities())
+
+YMIR_TEST_END
+
+
 YMIR_TEST_START(test_model_vj_maag)
 
     vector<prob_t> v1;  // param vec
@@ -2432,6 +2460,8 @@ int main() {
     // Tests for assembling statistical model (ASM) reading / writing files.
     YMIR_TEST(test_model_vj_file(), "VJ Model constructing from a file")
     YMIR_TEST(test_model_vdj_file(), "VDJ Model constructing from a file")
+    YMIR_TEST(test_model_vj_save_load(), "VJ Model saving to a file")
+    YMIR_TEST(test_model_vdj_save_load(), "VDJ Model to a file")
 //    YMIR_TEST(test_model_vj_maag(), "VJ Model creating MAAGs")
 //    YMIR_TEST(test_model_vdj_maag(), "VDJ Model creating MAAGs")
 

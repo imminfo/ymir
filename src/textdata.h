@@ -55,7 +55,7 @@ namespace ymir {
         
         virtual void addDataVector(std::vector<prob_t>::const_iterator start, std::vector<prob_t>::const_iterator end) {
             _data.push_back(std::vector<prob_t>());
-            _data[_data.size() - 1].insert(_data[_data.size() - 1].cend(), start, end);
+            _data[_data.size() - 1].insert(_data[_data.size() - 1].end(), start, end);
         }
 
 

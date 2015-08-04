@@ -1,6 +1,6 @@
-import json
 import argparse
 import gz
+import json
 import os
 
 
@@ -19,7 +19,7 @@ OUTPUT_GENE_SEP = ","
 
 
 def convert(filename, format_json_path):
-	outfile = filename + ".ymir"
+	outfile = filename + ".ymir.txt"
 
 
 def default_ymir_ap():
@@ -30,9 +30,16 @@ def default_ymir_ap():
     return ap
 
 
+def extract_info(sid):
+    pass
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("algos", help = "List of available algorithms for the statistical inference with their parameters in this Ymir distribution")
-    ap.add_argument("formats", help = "list of possible input formats in this Ymir distribution")
-    ap.add_argument("models", help = "List of available models in this Ymir distribution")
+    ap.add_argument("algos", help = "List of available algorithms for the statistical inference with their parameters in this Ymir distribution", action = "store_true")
+    ap.add_argument("formats", help = "list of possible input formats in this Ymir distribution", action = "store_true")
+    ap.add_argument("models", help = "List of available models in this Ymir distribution", action = "store_true")
     ap.parse_args()
+
+    for arg in ap:
+        extract_info(arg)

@@ -215,7 +215,6 @@ namespace ymir {
             if (ofs.is_open()) {
 
                 for (auto i = 0; i < _data[0].size(); ++i) {
-                    std::cout << _data[0][i] << std::endl;
                     ofs << _rownames[i] << "\t" << _data[0][i] << std::endl;
                 }
 
@@ -330,7 +329,44 @@ namespace ymir {
 
 
         bool write(const std::string& filepath) {
+            ofstream ofs;
 
+            ofs.open(filepath);
+
+            if (ofs.is_open()) {
+                seq_len_t max_len = _data[0].size();
+                for (auto i = 1; i < _data.size(); ++i) { max_len = std::max(max_len, (seq_len_t) _data[i].size()); }
+
+                for (auto i = 0; i < _colnames.size(); ++i) {
+                    ofs << _colnames[i] << "\t";
+                }
+                ofs << std::endl;
+
+                for (auto pos_i = 0; pos_i < max_len; ++pos_i) {
+                    if (pos_i < _rownames.size()) {
+                        ofs << _rownames[pos_i] << '\t';
+                    } else {
+                        ofs << "0" << '\t';
+                    }
+
+                    for (auto vec_i = 0; vec_i < _data.size(); ++vec_i) {
+                        if (pos_i < _data[vec_i].size()) {
+                            ofs << _data[vec_i][pos_i];
+                        } else {
+                            ofs << 0;
+                        }
+                        if (vec_i < _data.size() - 1) { ofs << '\t'; }
+                    }
+                    ofs << std::endl;
+                }
+
+                ofs.close();
+                _file_exists = true;
+                return true;
+            }
+
+            _file_exists = false;
+            return false;
         }
 
     protected:
@@ -564,11 +600,11 @@ namespace ymir {
         err_message = "OK";
         if (filetype == "matrix") {
             container = new TDMatrix(skip_first_column, laplace);
-        } else if (filetype == "std::vector.list") {
+        } else if (filetype == "vector.list") {
             container = new TDVectorList(skip_first_column, laplace);
         } else if (filetype == "matrix.list") {
             container = new TDMatrixList(skip_first_column, laplace);
-        } else if (filetype == "std::vector") {
+        } else if (filetype == "vector") {
             container = new TDVector(skip_first_column, laplace);
         } else {
             if (filetype == "") {

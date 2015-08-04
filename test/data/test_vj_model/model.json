@@ -38,7 +38,8 @@
       "file": "p.ins.len.txt",
       "laplace": 0,
       "type": "vector.list",
-      "skip.first.column": true
+      "skip.first.column": true,
+      "max.len": 6
     },
     "ins.nucl": {
       "file": "p.ins.nucl.txt",

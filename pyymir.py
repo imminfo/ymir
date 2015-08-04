@@ -41,5 +41,5 @@ if __name__ == "__main__":
     ap.add_argument("models", help = "List of available models in this Ymir distribution", action = "store_true")
     ap.parse_args()
 
-    for arg in ap:
-        extract_info(arg)
+    for arg, val in ap:
+        if val: extract_info(arg)

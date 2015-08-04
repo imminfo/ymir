@@ -620,7 +620,6 @@ namespace ymir {
                     }
                     ofs << std::endl;
 
-                    cout << (int) _data[mat_i].size() << endl;
                     for (size_t row_i = 0; row_i < _data[mat_i].size() / _metadata[mat_i]; ++row_i) {
                         ofs << std::to_string(row_i) << '\t';
                         for (auto col_i = 0; col_i < _metadata[mat_i]; ++col_i) {

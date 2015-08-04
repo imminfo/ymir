@@ -314,6 +314,11 @@ namespace ymir {
 
         size_t size() const { return _vec.size(); }
 
+
+        seq_len_t n_columns(EventClass event_class, event_ind_t event_family) const {
+            return _event_family_col_numbers[_event_classes[event_class] + event_family];
+        }
+
     private:
 
         vector<prob_t> _vec;

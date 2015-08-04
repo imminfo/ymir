@@ -25,8 +25,8 @@
 #define _GENESEGMENT_H
 
 
-#include "fstream"
-#include "sstream"
+#include <fstream>
+#include <sstream>
 
 #include "types.h"
 
@@ -186,6 +186,12 @@ namespace ymir {
             return true;
         }
 
+
+        seq_len_t maxLength() const {
+            seq_len_t res = 0;
+            for (auto i = 1; i <= _vec.size(); ++i) { res = std::max(res, (seq_len_t) _vec[i].sequence.size()); }
+            return res;
+        }
 
     protected:
 

@@ -2,6 +2,10 @@
 // Created by Vadim N. on 03/04/2015.
 //
 
+
+// Disclaimer: I doesn't like IO in C++.
+
+
 #ifndef YMIR_TEXTDATA_H
 #define YMIR_TEXTDATA_H
 
@@ -214,8 +218,10 @@ namespace ymir {
 
             if (ofs.is_open()) {
 
+                ofs << _colnames[0] << '\t' << _colnames[1] << std::endl;
+
                 for (auto i = 0; i < _data[0].size(); ++i) {
-                    ofs << _rownames[i] << "\t" << _data[0][i] << std::endl;
+                    ofs << _rownames[i] << '\t' << _data[0][i] << std::endl;
                 }
 
                 ofs.close();
@@ -470,7 +476,32 @@ namespace ymir {
 
 
         bool write(const std::string& filepath) {
+            ofstream ofs;
 
+            ofs.open(filepath);
+
+            if (ofs.is_open()) {
+                for (auto i = 0; i < _colnames.size(); ++i) {
+                    ofs << _colnames[i] << "\t";
+                }
+                ofs << std::endl;
+
+                for (size_t row_i = 0; row_i < _data[0].size() / _metadata[0]; ++row_i) {
+                    ofs << _rownames[row_i] << '\t';
+                    for (auto col_i = 0; col_i < _metadata[0]; ++col_i) {
+                        ofs << _data[0][row_i * _metadata[0] + col_i];
+                        if (col_i < _metadata[0] - 1) { ofs << '\t'; }
+                    }
+                    ofs << std::endl;
+                }
+
+                ofs.close();
+                _file_exists = true;
+                return true;
+            }
+
+            _file_exists = false;
+            return false;
         }
 
     protected:
@@ -576,7 +607,7 @@ namespace ymir {
 
 
         bool write(const std::string& filepath) {
-
+            ;
         }
 
     protected:

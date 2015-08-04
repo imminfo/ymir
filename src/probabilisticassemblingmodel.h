@@ -1102,7 +1102,8 @@ namespace ymir {
                           folderpath + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "jsegments.txt").asString());
 
             // V-J
-            container = new TDMatrix(true, _config.get("probtables", Json::Value()).get("v.j", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDMatrix(true);
+            container->addMetadata(_genes->J().max());
             container->addColumnName("V / J");
             for (auto i = 1; i <= _genes->V().max(); ++i){
                 container->addRowName(_genes->V()[i].allele);
@@ -1116,7 +1117,7 @@ namespace ymir {
             delete container;
 
             // V del
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true);
             for (auto i = 0; i <= _genes->V().maxLength(); ++i) {
                 container->addRowName(std::to_string(i));
             }
@@ -1130,7 +1131,7 @@ namespace ymir {
             delete container;
 
             // J del
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true);
             for (auto i = 0; i <= _genes->J().maxLength(); ++i) {
                 container->addRowName(std::to_string(i));
             }
@@ -1144,7 +1145,7 @@ namespace ymir {
             delete container;
 
             // VJ ins
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true);
             container->addColumnName("VJ ins len");
             container->addColumnName("Probability");
             for (auto i = 0; i < _param_vec->eventClassSize(VJ_VAR_JOI_INS_LEN); ++i) {
@@ -1156,12 +1157,12 @@ namespace ymir {
             delete container;
 
             // VJ nuc
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true);
             container->addColumnName("VJ nucs");
             container->addColumnName("Probability");
             container->addRowName("A"); container->addRowName("C"); container->addRowName("G"); container->addRowName("T");
             container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)),
-                                     _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0) + _param_vec->eventFamilySize(VJ_VAR_JOI_INS_NUC, 0)));
+                                     _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0) + 4));
             container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("file", .0).asString());
             delete container;
         }
@@ -1175,66 +1176,108 @@ namespace ymir {
                           folderpath + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "dsegments.txt").asString());
 
             // V
-//            container = new TDVector(true, _config.get("probtables", Json::Value()).get("v", Json::Value()).get("laplace", .0).asDouble());
-//            container->addDataVector(vector<prob_t>());
-//            for (auto i = 1; i <= _genes->V().max(); ++i) {
-//                container->addRowName(_genes->V()[i].allele);
-//                container->addDataValue(1);
-//            }
-//            delete container;
-//
-//            // J-D
-//            container = new TDMatrix(true, _config.get("probtables", Json::Value()).get("j.d", Json::Value()).get("laplace", .0).asDouble());
-//            for (auto i = 1; i <= _genes->J().max(); ++i) {
-//                container->addRowName(_genes->J()[i].allele);
-//            }
-//            for (auto i = 1; i <= _genes->D().max(); ++i) {
-//                container->addColumnName(_genes->D()[i].allele);
-//            }
-//            container->addDataVector(vector<prob_t>(_genes->D().max() * _genes->J().max()));
-//            delete container;
-//
-//            // V del
-//            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("laplace", .0).asDouble());
-//            for (auto i = 1; i <= _genes->V().max(); ++i) {
-//                container->addColumnName(_genes->V()[i].allele);
-//                container->addDataVector(vector<prob_t>(_genes->V()[i].sequence.size() + 1));
-//            }
-//            delete container;
-//
-//            // J del
-//            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("laplace", .0).asDouble());
-//            for (auto i = 1; i <= _genes->J().max(); ++i) {
-//                container->addColumnName(_genes->J()[i].allele);
-//                container->addDataVector(vector<prob_t>(_genes->J()[i].sequence.size() + 1));
-//            }
-//            delete container;
-//
-//            // D del
-//            container = new TDMatrixList(true, _config.get("probtables", Json::Value()).get("d.del", Json::Value()).get("laplace", .0).asDouble());
-//            for (auto i = 1; i <= _genes->D().max(); ++i) {
-//                container->addColumnName(_genes->D()[i].allele);
-//                container->addDataVector(vector<prob_t>( (_genes->D()[i].sequence.size() + 1) * (_genes->D()[i].sequence.size() + 1) ));
-//                container->addRowName(_genes->D()[i].allele);
-//                container->addMetadata(_genes->D()[i].sequence.size() + 1);
-//            }
-//            delete container;
-//
-//            // VD ins + DJ ins
-//            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("laplace", .0).asDouble());
-//            container->addColumnName("VD ins");
-//            container->addColumnName("DJ ins");
-//            container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1));
-//            container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1));
-//            delete container;
-//
-//            // VD nuc + DJ nuc
-//            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("laplace", .0).asDouble());
-//            for (auto i = 0; i < 8; ++i) {
-//                container->addColumnName("VD/DJ nucs");
-//                container->addDataVector(vector<prob_t>(4));
-//            }
-//            delete container;
+            container = new TDVector(true);
+            container->addColumnName("V");
+            container->addColumnName("Probability");
+            container->addDataVector(vector<prob_t>());
+            for (auto i = 1; i <= _genes->V().max(); ++i) {
+                container->addRowName(_genes->V()[i].allele);
+                container->addDataValue(_param_vec->event_prob(VDJ_VAR_GEN, 0, i - 1));
+            }
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("v", Json::Value()).get("file", .0).asString());
+            delete container;
+
+            // J-D
+            container = new TDMatrix(true);
+            container->addMetadata(_genes->D().max());
+            container->addColumnName("D / J");
+            for (auto i = 1; i <= _genes->J().max(); ++i) {
+                container->addRowName(_genes->J()[i].allele);
+            }
+            for (auto i = 1; i <= _genes->D().max(); ++i) {
+                container->addColumnName(_genes->D()[i].allele);
+            }
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_JOI_DIV_GEN, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->eventClassSize(VDJ_JOI_DIV_GEN) + _param_vec->event_index(VDJ_JOI_DIV_GEN, 0, 0)));
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("j.d", Json::Value()).get("file", .0).asString());
+            delete container;
+
+            // V del
+            container = new TDVectorList(true);
+            for (auto i = 0; i <= _genes->V().maxLength(); ++i) {
+                container->addRowName(std::to_string(i));
+            }
+            container->addColumnName("V deletions");
+            for (auto i = 1; i <= _genes->V().max(); ++i) {
+                container->addColumnName(_genes->V()[i].allele);
+                container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DEL, i - 1, 0)),
+                                         _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DEL, i - 1, 0) + _param_vec->eventFamilySize(VDJ_VAR_DEL, i - 1)));
+            }
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("file", .0).asString());
+            delete container;
+
+            // J del
+            container = new TDVectorList(true);
+            for (auto i = 0; i <= _genes->J().maxLength(); ++i) {
+                container->addRowName(std::to_string(i));
+            }
+            container->addColumnName("J deletions");
+            for (auto i = 1; i <= _genes->J().max(); ++i){
+                container->addColumnName(_genes->J()[i].allele);
+                container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_JOI_DEL, i - 1, 0)),
+                                         _param_vec->get_iterator(_param_vec->event_index(VDJ_JOI_DEL, i - 1, 0) + _param_vec->eventFamilySize(VDJ_JOI_DEL, i - 1)));
+            }
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("file", .0).asString());
+            delete container;
+
+            // D del
+            container = new TDMatrixList(true);
+            for (auto i = 1; i <= _genes->D().max(); ++i) {
+                container->addColumnName(_genes->D()[i].allele);
+                container->addDataVector(vector<prob_t>( (_genes->D()[i].sequence.size() + 1) * (_genes->D()[i].sequence.size() + 1) ));
+                container->addRowName(_genes->D()[i].allele);
+                container->addMetadata(_genes->D()[i].sequence.size() + 1);
+            }
+            delete container;
+
+            // VD ins + DJ ins
+            container = new TDVectorList(true);
+            container->addColumnName("Insertion length");
+            container->addColumnName("VD ins");
+            container->addColumnName("DJ ins");
+            for (auto i = 0; i < _param_vec->eventClassSize(VDJ_VAR_DIV_INS_LEN); ++i) {
+                container->addRowName(std::to_string(i));
+            }
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_LEN, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_LEN, 0, 0) + _param_vec->eventFamilySize(VDJ_VAR_DIV_INS_LEN, 0)));
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_LEN, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_LEN, 0, 0) + _param_vec->eventFamilySize(VDJ_DIV_JOI_INS_LEN, 0)));
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("file", .0).asString());
+            delete container;
+
+            // VD nuc + DJ nuc
+            container = new TDVectorList(true);
+            container->addColumnName("Prev / Next");
+            container->addColumnName("VD.A"); container->addColumnName("VD.C"); container->addColumnName("VD.G"); container->addColumnName("VD.T");
+            container->addColumnName("DJ.A"); container->addColumnName("DJ.C"); container->addColumnName("DJ.G"); container->addColumnName("DJ.T");
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC_A, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC_A, 0, 0) + 4));
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC_C, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC_C, 0, 0) + 4));
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC_G, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC_G, 0, 0) + 4));
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC_T, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC_T, 0, 0) + 4));
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_A, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_A, 0, 0) + 4));
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_C, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_C, 0, 0) + 4));
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_G, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_G, 0, 0) + 4));
+            container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_T, 0, 0)),
+                                     _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_T, 0, 0) + 4));
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("file", .0).asString());
+            delete container;
         }
     };
 

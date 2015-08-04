@@ -1233,11 +1233,12 @@ namespace ymir {
             // D del
             container = new TDMatrixList(true);
             for (auto i = 1; i <= _genes->D().max(); ++i) {
-                container->addColumnName(_genes->D()[i].allele);
-                container->addDataVector(vector<prob_t>( (_genes->D()[i].sequence.size() + 1) * (_genes->D()[i].sequence.size() + 1) ));
                 container->addRowName(_genes->D()[i].allele);
                 container->addMetadata(_genes->D()[i].sequence.size() + 1);
+                container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_DEL, i - 1, 0, 0)),
+                                         _param_vec->get_iterator(_param_vec->eventFamilySize(VDJ_DIV_DEL, i - 1) + _param_vec->event_index(VDJ_DIV_DEL, i - 1, 0, 0)));
             }
+            container->write(folderpath + _config.get("probtables", Json::Value()).get("d.del", Json::Value()).get("file", .0).asString());
             delete container;
 
             // VD ins + DJ ins

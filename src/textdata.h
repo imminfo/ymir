@@ -607,7 +607,39 @@ namespace ymir {
 
 
         bool write(const std::string& filepath) {
-            ;
+            ofstream ofs;
+
+            ofs.open(filepath);
+
+            if (ofs.is_open()) {
+                for (auto mat_i = 0; mat_i < _data.size(); ++mat_i) {
+                    ofs << _rownames[mat_i] << '\t';
+                    for (auto i = 0; i < _metadata[mat_i]; ++i) {
+                        ofs << std::to_string(i);
+                        if (i < _metadata[mat_i] - 1) { ofs << "\t"; }
+                    }
+                    ofs << std::endl;
+
+                    cout << (int) _data[mat_i].size() << endl;
+                    for (size_t row_i = 0; row_i < _data[mat_i].size() / _metadata[mat_i]; ++row_i) {
+                        ofs << std::to_string(row_i) << '\t';
+                        for (auto col_i = 0; col_i < _metadata[mat_i]; ++col_i) {
+                            ofs << _data[mat_i][row_i * _metadata[mat_i] + col_i];
+                            if (col_i < _metadata[mat_i] - 1) { ofs << '\t'; }
+                        }
+                        ofs << std::endl;
+                    }
+
+                    ofs << std::endl;
+                }
+
+                ofs.close();
+                _file_exists = true;
+                return true;
+            }
+
+            _file_exists = false;
+            return false;
         }
 
     protected:

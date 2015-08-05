@@ -7,7 +7,7 @@
     }
   },
   "algos": {
-    "title": "Algorithms and their parameters for the statistical inference in Ymir",
+    "title": "Algorithms and their parameters for the statistical inference in Ymir (values for a parameter '-a' for inference.py)",
     "values": {
       "EM": {
         "alias": "em",
@@ -22,7 +22,7 @@
     }
   },
   "formats": {
-    "title": "Possible input formats for Ymir",
+    "title": "Possible input formats for Ymir (values for a parameter '-f' for compute.py and inference.py)",
     "values": {
       "tcr": {
         "alias": "tcr",
@@ -35,7 +35,7 @@
     }
   },
   "models": {
-    "title": "Available generation models in the current Ymir distribution",
+    "title": "Available generation models in the current Ymir distribution (values for a parameter '-m' for scripts)",
     "values": {
       "hTRA": {
         "comment": "human TCR alpha-chain",

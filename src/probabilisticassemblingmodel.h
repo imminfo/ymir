@@ -154,13 +154,27 @@ namespace ymir {
          *
          * \return Const reference to the gene segments table.
          */
-        const VDJRecombinationGenes& gene_segments() const { return *_genes; }
+        const VDJRecombinationGenes& gene_segments() const {
+#ifdef YDEBUG
+            if (_status) {
+                throw(std::runtime_error("Can't access gene segments in a model due to its failed status!"));
+            }
+#endif
+            return *_genes;
+        }
 
 
         /**
          * \brief Access to vector of probabilities.
          */
-        const ModelParameterVector& event_probabilities() const { return *_param_vec; }
+        const ModelParameterVector& event_probabilities() const {
+#ifdef YDEBUG
+            if (_status) {
+                throw(std::runtime_error("Can't access the event probabilities vector in a model due to its failed status!"));
+            }
+#endif
+            return *_param_vec;
+        }
 
         /**
          * \brief Set a new event probabilities vector to this model.

@@ -7,16 +7,15 @@
     }
   },
   "algos": {
-    "title": "Algorithms for the statistical inference in Ymir",
+    "title": "Algorithms and their parameters for the statistical inference in Ymir",
     "values": {
       "EM": {
-        "alias": "EM-algorithm",
+        "alias": "em",
         "comment": "Classic EM algorithm for the statistical inference of a model's parameters from (Murugan et al., 2012)",
         "parameters": {
           "niter": {
             "alias": "--niter",
-            "value": 20,
-            "comment": "maximum number of iterations to perform"
+            "comment": "maximum number of iterations to perform (default = 20)"
           }
         }
       }

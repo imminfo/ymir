@@ -32,8 +32,11 @@ def default_ymir_ap():
 
 def extract_info(arg, jsdata):
     def _pretty_dict(key, d, shift):
-        if type(d) is dict:
-            for key, val in d.items():
+        if type(d) is list:
+            for key, val in sorted(d):
+                _pretty_dict(key, val, shift + 1)
+        elif type(d) is dict:
+            for key, val in sorted(d.items()):
                 _pretty_dict(key, val, shift + 1)
         else:
             if key == "alias":

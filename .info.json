@@ -46,5 +46,22 @@
         "alias": "htrb"
       }
     }
+  },
+  "scripts": {
+    "title": "Available ready-to-run scripts",
+    "values": {
+      "compute": {
+        "alias": "compute.py",
+        "comment": "A Python 3 script to compute generation probabilities of immune receptors. Run: '$python3 compute.py <parameters>'. To get help: 'run $python3 compute.py -h' to get help"
+      },
+      "inference": {
+        "alias": "inference.py",
+        "comment": "A Python 3 script to perform the statistical inference of marginal probabilities of a generation model. To get help: run '$python3 inference.py <parameters>'. Run '$python3 inference.py -h' to get help"
+      },
+      "generate": {
+        "alias": "generate.py",
+        "comment": "A Python 3 script for generation a pre-selection repertoire of immunce receptors. Run: '$python3 generate.py <parameters>'. To get help: run '$python3 generate.py -h' to get help"
+      }
+    }
   }
 }

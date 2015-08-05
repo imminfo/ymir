@@ -58,6 +58,7 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--algos", help = "List of available algorithms for the statistical inference with their parameters in this Ymir distribution", action = "store_true")
     ap.add_argument("-f", "--formats", help = "list of possible input formats in this Ymir distribution", action = "store_true")
     ap.add_argument("-m", "--models", help = "List of available models in this Ymir distribution", action = "store_true")
+    ap.add_argument("-s", "--scripts", help = "List of available ready-to-use scripts", action = "store_true")
     args = ap.parse_args()
 
     jsdata = None

@@ -1,34 +1,51 @@
 {
+  "ymir": {
+    "title": "Ymir - a tool for working with probabilistic models of immune receptor assembling",
+    "values": {
+      "version": "1.0",
+      "release date": "??-??-2015"
+    }
+  },
   "algos": {
-    "EM": {
-      "name": "EM-algorithm",
-      "comment": "<no comment yet>",
-      "parameters": {
-        "niter": {
-          "value": 20,
-          "comment": "maximum number of iterations to perform"
+    "title": "Algorithms for the statistical inference in Ymir",
+    "values": {
+      "EM": {
+        "alias": "EM-algorithm",
+        "comment": "Classic EM algorithm for the statistical inference of a model's parameters from (Murugan et al., 2012)",
+        "parameters": {
+          "niter": {
+            "alias": "--niter",
+            "value": 20,
+            "comment": "maximum number of iterations to perform"
+          }
         }
       }
     }
   },
   "formats": {
-    "tcr": {
-      "alias": "tcr",
-      "comment": "a format from tcR package"
-    },
-    "mitcr": {
-      "alias": "mitcr",
-      "comment": "a format for the output of MiTCR"
+    "title": "Possible input formats for Ymir",
+    "values": {
+      "tcr": {
+        "alias": "tcr",
+        "comment": "format of data frames from an R package tcR saved with the tcR::repSave() function"
+      },
+      "mitcr": {
+        "alias": "mitcr",
+        "comment": "format for cloneset files outputted by MiTCR"
+      }
     }
   },
   "models": {
-    "hTRA": {
-      "name": "human TCR alpha",
-      "alias": "htra",
-    },
-    "hTRB": {
-      "name": "human TCR beta",
-      "alias": "htrb",
-    },
+    "title": "Available generation models in the current Ymir distribution",
+    "values": {
+      "hTRA": {
+        "comment": "human TCR alpha-chain",
+        "alias": "htra"
+      },
+      "hTRB": {
+        "comment": "human TCR beta-chain",
+        "alias": "htrb"
+      }
+    }
   }
 }

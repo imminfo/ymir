@@ -1,5 +1,5 @@
 import argparse
-import gz
+import gzip
 import json
 import os
 
@@ -30,16 +30,43 @@ def default_ymir_ap():
     return ap
 
 
-def extract_info(sid):
-    pass
+def extract_info(arg, jsdata):
+    def _pretty_dict(key, d, shift):
+        if type(d) is dict:
+            for key, val in d.items():
+                _pretty_dict(key, val, shift + 1)
+        else:
+            if key == "alias":
+                print("  " * shift, '"', d, '" :\t', sep = '', end = '')
+            elif key == "comment":
+                print(d)
+            else:
+                print("  " * shift, key, ": ", d, sep = '')
+
+    print(jsdata[arg]["title"])
+    for val in jsdata[arg]["values"]:
+        _pretty_dict(val, jsdata[arg]["values"][val], 1)
+    print()
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("algos", help = "List of available algorithms for the statistical inference with their parameters in this Ymir distribution", action = "store_true")
-    ap.add_argument("formats", help = "list of possible input formats in this Ymir distribution", action = "store_true")
-    ap.add_argument("models", help = "List of available models in this Ymir distribution", action = "store_true")
-    ap.parse_args()
+    ap.add_argument("-v", "--version", help = "Display an information about the current Ymir distribution", action = "store_true")
+    ap.add_argument("-a", "--algos", help = "List of available algorithms for the statistical inference with their parameters in this Ymir distribution", action = "store_true")
+    ap.add_argument("-f", "--formats", help = "list of possible input formats in this Ymir distribution", action = "store_true")
+    ap.add_argument("-m", "--models", help = "List of available models in this Ymir distribution", action = "store_true")
+    args = ap.parse_args()
 
-    for arg, val in ap:
-        if val: extract_info(arg)
+    jsdata = None
+    with open("./.info.json") as f:
+        jsdata = json.load(f)
+        extract_info("ymir", jsdata)
+        some_true = False
+        for arg, val in vars(args).items():
+            if val and arg != "version":
+                extract_info(arg, jsdata)
+                some_true = True
+        if not some_true:
+            for arg, val in vars(args).items():
+                if arg != "version":
+                    extract_info(arg, jsdata)

@@ -9,14 +9,14 @@ if __name__ == "__main__":
 
     files, input_check = parse_input(args)
     model, model_check = parse_model(args)
-    format, format_check = parse_format(args)
+    converter, format_check = parse_format(args)
     out_files, out_check = parse_output_files(files, args)
 
     if model_check and input_check and format_check and out_check:
-        files, convert_flag = convert_files(files, format)
-        if convert_flag:
-            for inp, out in zip(files, out_files):
-                print(inp, out)
-                os.system("./build/compute $1 $2 ...")
+        for i in range(len(files)):
+            print(i + 1, ":")
+            conv_file, convert_flag = convert(files[i], converter)
+            if convert_flag:
+                print(" ".join(["./build/compute", "-i", conv_file, "-m", model, "-o", out_files[i]]), sep = "")
     else:
         print("Can't process further, too many errors for me! T_T")

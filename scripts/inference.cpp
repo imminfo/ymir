@@ -8,6 +8,7 @@
  * a strict order of input arguments in console:
  * - path to a file with immune receptors
  * - path to a basic model
+ * - path to an output model folder
  * - which algorithm to use
  * - algorithms parameters
  */

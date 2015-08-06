@@ -13,8 +13,9 @@
 /**
  * \brief Main function of a script for computing generation probabitilies. It has
  * a strict order of input arguments in console:
- * - path to a specific file
+ * - path to an input file
  * - path to a model
+ * - path to an output file
  */
 int main() {
     return 0;

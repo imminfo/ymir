@@ -13,8 +13,10 @@ if __name__ == "__main__":
     out_files, out_check = parse_output_files(files, args)
 
     if model_check and input_check and format_check and out_check:
-        for inp, out in zip(files, out_files):
-            print(inp, out)
-            os.system("./build/compute $1 $2 ...")
+        files, convert_flag = convert_files(files, format)
+        if convert_flag:
+            for inp, out in zip(files, out_files):
+                print(inp, out)
+                os.system("./build/compute $1 $2 ...")
     else:
         print("Can't process further, too many errors for me! T_T")

@@ -13,8 +13,10 @@ if __name__ == "__main__":
     out_models, out_check = parse_output_models(files, args)
 
     if model_check and input_check and format_check and out_check:
-        for inp, out in zip(files, out_models):
-            print(inp, out)
-            os.system("./build/inference $1 $2 ...")
+        files, convert_flag = convert_files(files, format)
+        if convert_flag:
+            for inp, out in zip(files, out_models):
+                print(inp, out)
+                os.system("./build/inference $1 $2 ...")
     else:
         print("Can't process further, too many errors for me! T_T")

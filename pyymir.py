@@ -93,6 +93,8 @@ def parse_model(args):
 
 
 def parse_format(args):
+    """
+    """
 
     args_format = args.format
 
@@ -134,7 +136,15 @@ def convert(filepath, format):
     return filepath + ".ymir_in.txt"
 
 
+def convert_files(files, format):
+    return [""], False
+
+
 def extract_info(arg, jsdata):
+    """
+    Extract information from Ymir's general info .json file.
+    """
+
     def _pretty_dict(key, d, shift):
         if type(d) is list:
             for key, val in sorted(d):

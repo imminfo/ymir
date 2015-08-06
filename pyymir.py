@@ -17,51 +17,85 @@ OUTPUT_JSTART = "jstart"
 OUTPUT_COLUMN_SEP = "\t"
 OUTPUT_GENE_SEP = ","
 
-
-def convert(filename, format_json_path):
-	outfile = filename + ".ymir.txt"
+INFO_JSON = "./.info.json"
 
 
 def default_ymir_ap():
     ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--input", help = "input file, list of comma-separated files or a name of a folder with input (text or gzipped text) files", type = str)
+    ap.add_argument("-i", "--input", nargs = "+", help = "input file (text or gzipped) or a folder with input files (of the same format) or a list of space-separated files and/or folders in any combinations", type = str)
     ap.add_argument("-f", "--format", help = "format of input files: tcR, MiTCR, MiGEC, etc. For a list of possible input formats in this Ymir distribution run $python3 pyymir.py formats", type = str)
     ap.add_argument("-m", "--model", help = "either an alias of the one from available models in Ymir or a path to a folder with a model's .json file. For a list of available models in this Ymir distribution run $python3 pyymir.py models", type = str)
     return ap
 
 
-def check_filepath(filepath):
-    # check if there is exist a file in the given filepath
-    pass
+def parse_input(args):
+    """
+    Parse the input argument and return a list of files (possibly found in the input folders).
+    """
+
+    args_input = args.input
+
+    def _get_files_from_folder(folderpath):
+        return [folderpath + "/" + f for f in os.listdir(folderpath) if f[0] != "."]
+
+    res = []
+    flag = True
+    for x in args_input:
+        if os.path.exists(x):
+            if os.path.isdir(x):
+                res.extend(_get_files_from_folder(x))
+            else:
+                res.append(x)
+        else:
+            print('\tERROR: file "', x, '" not found )\':', sep = "")
+            flag = False
+
+    return res, flag
 
 
-def parse_input(args_input, filelist):
-    # parse args.input, check for each file and update the given list of filepaths
-    pass
+def parse_model(args):
+    """
+    Check if the given string is an alias of the one of available models or
+    it is a path to a folder with a model.
+    If it's an alias, than return a path to this model.
+    If it's a path then check for a model.json file in this folder.
+    """
 
+    args_model = args.model
 
-def parse_model(alias_or_path):
-    # check if the given string is an alias of the one of available models
-    # or is a path to a model.
-    # If it's an alias, than return a path to this model.
-    # If it's a path then check for a model.json file in this folder.
-    pass
+    res = ""
+    flag = True
+    cur_models = {}
+
+    with open(INFO_JSON) as f:
+        jsdata = json.load(f)["models"]["values"]
+        cur_models = {jsdata[key]["alias"] : jsdata[key]["path"] for key in jsdata}
+
+    if args_model in cur_models:
+        res = cur_models[args_model]
+    else:
+        if os.path.exists(args_model + "/model.json"):
+            res = args_model
+        else:
+            print('\tERROR: model "', args_model, '" not found o:<', sep = "")
+
+    return res, flag
 
 
 def parse_format(args_input):
-    pass
+    return "", False
 
 
 def parse_output_files(args_input, args_output):
-    pass
+    return "", False
 
 
 def parse_output_models(args_input, args_output):
-    pass
+    return "", False
 
 
-def reformat(filepath, format):
-    pass
+def convert(filepath, format):
+    return filepath + ".ymir_in.txt"
 
 
 def extract_info(arg, jsdata):
@@ -96,7 +130,7 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     jsdata = None
-    with open("./.info.json") as f:
+    with open(INFO_JSON) as f:
         jsdata = json.load(f)
         extract_info("ymir", jsdata)
         some_true = False

@@ -1,6 +1,5 @@
-
-
 from pyymir import *
+
 
 if __name__ == "__main__":
     ap = default_ymir_ap()
@@ -11,6 +10,6 @@ if __name__ == "__main__":
     model, model_check = parse_model(args)
 
     if model_check:
-        pass
-
-os.system("./build/generate $1 $2 ...")
+        os.system("./build/generate $1 $2 ...")
+    else:
+        print("Can't process further, too many errors for me! T_T")

@@ -1,6 +1,5 @@
-
-
 from pyymir import *
+
 
 if __name__ == "__main__":
     ap = default_ymir_ap()
@@ -14,6 +13,6 @@ if __name__ == "__main__":
     out_models, out_check = parse_output_models(args.input, args.output)
 
     if model_check and input_check and format_check and out_check:
-        pass
-
-os.system("./build/inference $1 $2 ...")
+        os.system("./build/inference $1 $2 ...")
+    else:
+        print("Can't process further, too many errors for me! T_T")

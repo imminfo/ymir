@@ -40,12 +40,12 @@
       "hTRA": {
         "comment": "human TCR alpha-chain",
         "alias": "htra",
-        "path": "$YMIR_HOME/models/hTRA"
+        "path": "./models/hTRA"
       },
       "hTRB": {
         "comment": "human TCR beta-chain",
         "alias": "htrb",
-        "path": "$YMIR_HOME/models/hTRB"
+        "path": "./models/hTRB"
       }
     }
   },

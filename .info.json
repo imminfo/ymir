@@ -26,11 +26,13 @@
     "values": {
       "tcr": {
         "alias": "tcr",
-        "comment": "format of data frames from an R package tcR saved with the tcR::repSave() function"
+        "comment": "format of data frames from an R package tcR saved with the tcR::repSave() function",
+        "pyclass": "tcRParser"
       },
       "mitcr": {
         "alias": "mitcr",
-        "comment": "format for cloneset files outputted by MiTCR"
+        "comment": "format for cloneset files outputted by MiTCR",
+        "pyclass": "MiTCRParser"
       }
     }
   },

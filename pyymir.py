@@ -3,6 +3,8 @@ import gzip
 import json
 import os
 
+import parsers
+
 
 # columns name for the Ymir input format
 OUTPUT_NUC = "nuc"
@@ -23,7 +25,7 @@ INFO_JSON = "./.info.json"
 def default_ymir_ap():
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--input", nargs = "+", help = "input file (text or gzipped) or a folder with input files (of the same format) or a list of space-separated files and/or folders in any combinations", type = str, default = "")
-    ap.add_argument("-f", "--format", help = "format of input files: tcR, MiTCR, MiGEC, etc. For a list of possible input formats in this Ymir distribution run $python3 pyymir.py formats", type = str, default = "")
+    ap.add_argument("-f", "--format", help = "format of input files (tcR, MiTCR, MiGEC, etc.) as an alias or as a Python 3 class from your module linked to the '$YMIR_HOME/parsers' package. For a list of possible input formats and their aliases in this Ymir distribution run $python3 pyymir.py formats", type = str, default = "")
     ap.add_argument("-m", "--model", help = "either an alias of the one from available models in Ymir or a path to a folder with a model's .json file. For a list of available models in this Ymir distribution run $python3 pyymir.py models", type = str, default = "")
     return ap
 
@@ -168,11 +170,11 @@ def extract_info(arg, jsdata):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("-v", "--version", help = "Display an information about the current Ymir distribution", action = "store_true", type = str)
-    ap.add_argument("-a", "--algos", help = "List of available algorithms for the statistical inference with their parameters in this Ymir distribution", action = "store_true", type = str)
-    ap.add_argument("-f", "--formats", help = "list of possible input formats in this Ymir distribution", action = "store_true", type = str)
-    ap.add_argument("-m", "--models", help = "List of available models in this Ymir distribution", action = "store_true", type = str)
-    ap.add_argument("-s", "--scripts", help = "List of available ready-to-use scripts", action = "store_true", type = str)
+    ap.add_argument("-v", "--version", help = "Display an information about the current Ymir distribution", action = "store_true")
+    ap.add_argument("-a", "--algos", help = "List of available algorithms for the statistical inference with their parameters in this Ymir distribution", action = "store_true")
+    ap.add_argument("-f", "--formats", help = "list of possible input formats in this Ymir distribution", action = "store_true")
+    ap.add_argument("-m", "--models", help = "List of available models in this Ymir distribution", action = "store_true")
+    ap.add_argument("-s", "--scripts", help = "List of available ready-to-use scripts", action = "store_true")
     args = ap.parse_args()
 
     jsdata = None

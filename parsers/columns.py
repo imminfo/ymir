@@ -1,0 +1,12 @@
+# columns name for the Ymir input format
+OUTPUT_NUC = "nuc"
+OUTPUT_AA = "aa"
+OUTPUT_V = "v"
+OUTPUT_D = "d"
+OUTPUT_J = "j"
+OUTPUT_VEND = "vend"
+OUTPUT_DSTART = "dstart"
+OUTPUT_DEND = "dend"
+OUTPUT_JSTART = "jstart"
+OUTPUT_COLUMN_SEP = "\t"
+OUTPUT_GENE_SEP = ","

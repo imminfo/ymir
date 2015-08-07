@@ -1,16 +1,21 @@
 class RepertoireConverter:
+    """
+    Parent class for all other converters. Just rewrite functions to make them do what you want to.
+    """
+
     def __init__(self):
+        self.ymir_columns = {}  # dict <ymir col name> : <index of related column in the input file>
         self.init_ymir_names()
 
-        self.col_sep = "\t"
-        self.gene_sep = "\t"
-        self.column_i = {"nuc": -1, "aa": -1,
-                         "v": -1, "d": -1, "j": -1,
-                         "vend": -1, "dstart": -1, "dend": -1, "jstart": -1}
+        self.input_columns = {}  # dict <input col name> : <ymir col name>
+        self.init_input_columns()
 
 
     def init_ymir_names(self):
-        # column names
+        """
+        Initialise Ymir's format column names and separator characters.
+        """
+
         self.ymir_nuc = "nuc"
         self.ymir_aa = "aa"
         self.ymir_vgene = "vgene"
@@ -23,6 +28,32 @@ class RepertoireConverter:
         self.ymir_col_sep = "\t"
         self.ymir_gene_sep = ","
 
+        self.ymir_columns = {self.ymir_nuc: -1, self.ymir_aa: -1,
+                         self.ymir_v: -1, self.ymir_d: -1, self.ymir_j: -1,
+                         self.ymir_vend: -1, self.ymir_dstart: -1, self.ymir_dend: -1, self.ymir_jstart: -1}
+
+
+    def init_input_columns(self):
+        """
+        Initialise input files' column names and separator characters.
+        """
+
+        self.input_nuc = ""
+        self.input_aa = ""
+        self.input_vgene = ""
+        self.input_dgene = ""
+        self.input_jgene = ""
+        self.input_vend = ""
+        self.input_dstart = ""
+        self.input_dend = ""
+        self.input_jstart = ""
+        self.input_col_sep = ""
+        self.input_gene_sep = ""
+        
+        self.input_columns = {self.input_nuc: self.ymir_nuc, self.input_aa: self.ymir_aa,
+                              self.input_v: self.ymir_v, self.input_d: self.ymir_d, self.input_j: self.ymir_j,
+                              self.input_vend: self.ymir_vend, self.input_dstart: self.ymir_dstart, self.input_dend: self.ymir_dend, self.input_jstart: self.ymir_jstart}
+
 
     def convert(self, file_in, file_out):
         """
@@ -30,8 +61,8 @@ class RepertoireConverter:
 
         :param file_in: path to the input file
         :param file_out: path to the output file
-        :return:
         """
+
         skip = 0
         with open(file_in) as fin:
             skip = self.compute_skip(fin)
@@ -49,11 +80,27 @@ class RepertoireConverter:
 
 
     def parse_line(self, line):
-        raise NotImplementedError
+        """
+        Parse the input line and return new line in the Ymir format to write
+        to the output file.
+
+        :param line: a line from the input file
+        :return: line in Ymir's format
+        """
+        words = line.strip().split(self.input_col_sep)
+        out_words = []
+
+        for key, val in self.ymir_columns.items():
+            pass
+
+        return self.ymir_col_sep.join(out_words)
 
 
     def parse_header(self, header):
-        pass
+        words = header.strip().split(self.col_sep)
+        for i, w in enumerate(words):
+            if w in self.input_columns:
+                self.ymir_column_i[self.input_columns[w]] = i
 
 
     def write_header(self, fout):

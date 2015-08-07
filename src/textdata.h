@@ -212,7 +212,7 @@ namespace ymir {
 
 
         bool write(const std::string& filepath) {
-            ofstream ofs;
+            std::ofstream ofs;
 
             ofs.open(filepath);
 
@@ -335,7 +335,7 @@ namespace ymir {
 
 
         bool write(const std::string& filepath) {
-            ofstream ofs;
+            std::ofstream ofs;
 
             ofs.open(filepath);
 
@@ -476,7 +476,7 @@ namespace ymir {
 
 
         bool write(const std::string& filepath) {
-            ofstream ofs;
+            std::ofstream ofs;
 
             ofs.open(filepath);
 
@@ -607,7 +607,7 @@ namespace ymir {
 
 
         bool write(const std::string& filepath) {
-            ofstream ofs;
+            std::ofstream ofs;
 
             ofs.open(filepath);
 

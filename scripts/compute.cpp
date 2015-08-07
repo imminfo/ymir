@@ -12,6 +12,7 @@
 
 #include <ostream>
 
+#include "parser.h"
 #include "probabilisticassemblingmodel.h"
 
 

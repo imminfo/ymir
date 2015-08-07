@@ -5,6 +5,7 @@
 
 #include <ostream>
 
+#include "parser.h"
 #include "statisticalinferencealgorithm.h"
 
 

@@ -29,7 +29,6 @@
 
 #include "aligner.h"
 #include "clonotype.h"
-#include "parser.h"
 #include "maag.h"
 #include "tools.h"
 

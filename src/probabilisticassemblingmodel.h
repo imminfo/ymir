@@ -27,6 +27,8 @@
 
 #include <unordered_set>
 
+#include "jsoncpp.cpp"
+
 #include "textdata.h"
 #include "maagbuilder.h"
 #include "repertoire.h"

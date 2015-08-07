@@ -27,7 +27,9 @@ using namespace ymir;
  * argv[4] - 0 if model should use stored gene usage; 1 if model should recompute gene usage from the input file.
  */
 int main(int argc, char* argv[]) {
-    std::string in_file_path(argv[1]), model_path(argv[2]), out_file_path(argv[3]);
+    std::string in_file_path(argv[1]),
+            model_path(argv[2]),
+            out_file_path(argv[3]);
     bool recompute_genes = std::stoi(argv[4]);
 
     ProbabilisticAssemblingModel model(model_path);

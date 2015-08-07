@@ -135,7 +135,7 @@ namespace ymir {
 
 
         bool read(const std::string& filepath, std::string &err_message) {
-            ifstream ifs;
+            std::ifstream ifs;
 
             ifs.open(filepath);
 
@@ -254,7 +254,7 @@ namespace ymir {
 
 
         bool read(const std::string& filepath, std::string &err_message) {
-            ifstream ifs;
+            std::ifstream ifs;
 
             ifs.open(filepath);
 
@@ -400,7 +400,7 @@ namespace ymir {
 
 
         bool read(const std::string& filepath, std::string &err_message) {
-            ifstream ifs;
+            std::ifstream ifs;
 
             ifs.open(filepath);
 
@@ -527,7 +527,7 @@ namespace ymir {
 
 
         bool read(const std::string& filepath, std::string &err_message) {
-            ifstream ifs;
+            std::ifstream ifs;
 
             ifs.open(filepath);
 

@@ -29,8 +29,6 @@
 #include "fstream"
 #include "sstream"
 
-#include "jsoncpp.cpp"
-
 #include "aligner.h"
 #include "repertoire.h"
 #include "genesegment.h"

@@ -33,6 +33,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "jsoncpp.cpp"
+
 #include "matrix.h"
 
 //#include "Eigen/Dense"

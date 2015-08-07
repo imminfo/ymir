@@ -5,6 +5,7 @@
 
 #include <ostream>
 
+#include "writer.h"
 #include "probabilisticassemblingmodel.h"
 
 
@@ -19,30 +20,15 @@ using namespace ymir;
  * argv[3] - path to an output file
  */
 int main(int argc, char* argv[]) {
-    std::string in_file_path(argv[1]), model_path(argv[2]), out_file_path(argv[3]);
-    bool recompute_genes = std::stoi(argv[4]);
+    std::string model_path(argv[1]), out_file_path(argv[3]);
+    size_t count = std::stoi(argv[2]);
 
     ProbabilisticAssemblingModel model(model_path);
 
-    RepertoireParser parser;
-    Cloneset cloneset;
-    parser.parse(in_file_path, &cloneset, model.gene_segments(),
-                 RepertoireParser::AlignmentColumnOptions()
-                         .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
-                         .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
-                         .setD(RepertoireParser::OVERWRITE));
+    Cloneset gen_rep = model.generateSequences(count);
 
-    if (recompute_genes) {
-        model.updateGeneUsage(cloneset);
-    }
-    auto prob_vec = model.computeFullProbabilities(cloneset);
-
-    std::ofstream ofs;
-    ofs.open(out_file_path);
-    for (auto i = 0; i < prob_vec.size(); ++i) {
-        ofs << prob_vec[i] << std::endl;
-    }
-    ofs.close();
+    RepertoireWriter writer;
+    writer.write(out_file_path, gen_rep);
 
     return 0;
 }

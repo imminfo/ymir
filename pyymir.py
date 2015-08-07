@@ -3,7 +3,7 @@ import gzip
 import json
 import os
 
-import parsers
+import converters
 
 
 INFO_JSON = "./.info.json"
@@ -12,8 +12,8 @@ INFO_JSON = "./.info.json"
 def default_ymir_ap():
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--input", nargs = "+", help = "input file (text or gzipped) or a folder with input files (of the same format) or a list of space-separated files and/or folders in any combinations", type = str, default = "")
-    ap.add_argument("-f", "--format", help = "format of input files (tcR, MiTCR, MiGEC, etc.) as an alias or as a Python 3 class from your module linked to the '$YMIR_HOME/parsers' package. For a list of possible input formats and their aliases in this Ymir distribution run $python3 pyymir.py formats", type = str, default = "")
-    ap.add_argument("-m", "--model", help = "either an alias of the one from available models in Ymir or a path to a folder with a model's .json file. For a list of available models in this Ymir distribution run $python3 pyymir.py models", type = str, default = "")
+    ap.add_argument("-f", "--format", help = "format of input files (tcR, MiTCR, MiGEC, etc.) as an alias or as a Python 3 class from your module linked to the '$YMIR_HOME/converters' package. For a list of possible input formats and their aliases in this Ymir distribution run $python3 pyymir.py -f", type = str, default = "")
+    ap.add_argument("-m", "--model", help = "either an alias of the one from available models in Ymir or a path to a folder with a model's .json file. For a list of available models in this Ymir distribution run $python3 pyymir.py -m", type = str, default = "")
     return ap
 
 
@@ -83,15 +83,25 @@ def parse_model(args):
 
 def parse_format(args):
     """
+    Parse format and return a class for convert one repertoire format to Ymir's format.
     """
 
     args_format = args.format
 
-    res = ""
+    res = None
     flag = True
 
     if len(args_format):
-        pass
+        with open(INFO_JSON) as f:
+            jsdata = json.load(f)["formats"]["values"]
+            print(jsdata)
+            if args_format in jsdata:
+                res = jsdata[args_format]["pyclass"]
+            else:
+                # if format is custom than search for it
+                print("\tERROR: unknown format or python converter class o:")
+
+            print(getattr(converters, res))
     else:
         print("\tERROR: please specify a format for input files :3")
         flag = False
@@ -121,12 +131,12 @@ def parse_output_models(infiles, args):
     return [args_out + "/" + x + ".model/" for x in infiles], True
 
 
-def convert(filepath, format):
-    return filepath + ".ymir_in.txt"
-
-
-def convert_files(files, format):
-    return [""], False
+def convert(filepath, converter):
+    out_file = filepath + ".ymir_in.txt'"
+    print("Converting '", filepath, "' to '", out_file, "'", "...", end = "\t", sep = "")
+    converter.convert(filepath, out_file)
+    print("Done.")
+    return out_file, True
 
 
 def extract_info(arg, jsdata):

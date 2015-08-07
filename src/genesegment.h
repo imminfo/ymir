@@ -47,11 +47,11 @@ namespace ymir {
          *
          */
         struct GeneSegment {
-            string allele;
-            string sequence;
+            std::string allele;
+            std::string sequence;
             seg_index_t index;
 
-            GeneSegment(const string& allele_, const string& sequence_, seg_index_t index_)
+            GeneSegment(const std::string& allele_, const std::string& sequence_, seg_index_t index_)
                     : allele(allele_), sequence(sequence_), index(index_) {
             }
         };
@@ -60,7 +60,7 @@ namespace ymir {
         /**
          *
          */
-        GeneSegmentAlphabet(const string& name, const string& filepath, bool *is_ok = nullptr)
+        GeneSegmentAlphabet(const std::string& name, const std::string& filepath, bool *is_ok = nullptr)
                 : _name(name) {
             this->addGeneSegment("other", "", 0);
             bool res = this->read(filepath);
@@ -70,7 +70,7 @@ namespace ymir {
         }
 
 
-        GeneSegmentAlphabet(const string& name, const vector<string>& alleles, const vector<string>& sequences) {
+        GeneSegmentAlphabet(const std::string& name, const std::vector<std::string>& alleles, const std::vector<std::string>& sequences) {
             this->_name = name;
 
             this->_vec.reserve(alleles.size());
@@ -94,7 +94,7 @@ namespace ymir {
         virtual ~GeneSegmentAlphabet() {}
 
 
-        const string& name() const { return this->_name; }
+        const std::string& name() const { return this->_name; }
 
 
         const GeneSegment& operator[] (seg_index_t index) const {
@@ -102,7 +102,7 @@ namespace ymir {
             return _vec[0];
         }
 
-        const GeneSegment& operator[] (const string& name) const {
+        const GeneSegment& operator[] (const std::string& name) const {
             if (_map.find(name) != _map.end()) { return _vec[_map.at(name)]; }
             return _vec[0];
         }
@@ -129,16 +129,16 @@ namespace ymir {
         /**
         * \brief Save segment alphabet to the given file as a tab-separated table with 3 columns.
         */
-        bool write(const string& filepath) const {
+        bool write(const std::string& filepath) const {
             std::ofstream ofs;
             ofs.open(filepath);
 
             if (ofs.is_open()) {
-                ofs << this->_name << '\t' << "Sequences" << endl;
+                ofs << this->_name << '\t' << "Sequences" << std::endl;
                 for (seg_index_t i = 1; i < this->_vec.size(); ++i) {
                     ofs << this->_vec[i].allele << '\t' << this->_vec[i].sequence;
                     if (i != this->_vec.size() - 1) {
-                        ofs << endl;
+                        ofs << std::endl;
                     }
                 }
             } else {
@@ -150,13 +150,13 @@ namespace ymir {
         }
 
 
-        bool read(const string& filepath) {
+        bool read(const std::string& filepath) {
             std::ifstream ifs;
             ifs.open(filepath);
 
             if (ifs.is_open()) {
-                stringstream line_stream;
-                string line, gene_name, gene_seq;
+                std::stringstream line_stream;
+                std::string line, gene_name, gene_seq;
                 bool header = false;
                 seg_index_t cur_index = 1;
                 while (!ifs.eof()) {
@@ -178,7 +178,7 @@ namespace ymir {
                     }
                 }
             } else {
-                cerr << "Gene segment alphabet [" << this->_name << "] error:" << endl << "\tinput file [" << filepath << "] not found" << endl;
+                std::cerr << "Gene segment alphabet [" << this->_name << "] error:" << std::endl << "\tinput file [" << filepath << "] not found" << std::endl;
                 return false;
             }
 
@@ -203,7 +203,7 @@ namespace ymir {
         GeneSegmentAlphabet() {}
 
 
-        void addGeneSegment(const string& name, const string& seq, seg_index_t index) {
+        void addGeneSegment(const std::string& name, const std::string& seq, seg_index_t index) {
             this->_map[name] = index;
             this->_vec.push_back(GeneSegment(name, seq, index));
         }
@@ -217,8 +217,8 @@ namespace ymir {
     class VDJRecombinationGenes {
     public:
 
-        VDJRecombinationGenes(const string& v_segments_name, const string& v_segments_file,
-                const string& j_segments_name, const string& j_segments_file,
+        VDJRecombinationGenes(const std::string& v_segments_name, const std::string& v_segments_file,
+                const std::string& j_segments_name, const std::string& j_segments_file,
                 bool *is_V_ok = nullptr, bool *is_J_ok = nullptr) {
             this->_V = new GeneSegmentAlphabet(v_segments_name, v_segments_file, is_V_ok);
             this->_J = new GeneSegmentAlphabet(j_segments_name, j_segments_file, is_J_ok);
@@ -226,26 +226,26 @@ namespace ymir {
         }
 
 
-        VDJRecombinationGenes(const string& v_segments_name, const string& v_segments_file,
-                const string& j_segments_name, const string& j_segments_file,
-                const string& d_segments_name, const string& d_segments_file,
+        VDJRecombinationGenes(const std::string& v_segments_name, const std::string& v_segments_file,
+                const std::string& j_segments_name, const std::string& j_segments_file,
+                const std::string& d_segments_name, const std::string& d_segments_file,
                 bool *is_V_ok = nullptr, bool *is_J_ok = nullptr, bool *is_D_ok = nullptr) :
                 VDJRecombinationGenes(v_segments_name, v_segments_file, v_segments_name, j_segments_file, is_V_ok, is_J_ok) {
             this->_D = new GeneSegmentAlphabet(d_segments_name, d_segments_file, is_D_ok);
         }
 
 
-        VDJRecombinationGenes(const string& V_name, const vector<string>& V_alleles, const vector<string>& V_sequences,
-                const string& J_name, const vector<string>& J_alleles, const vector<string>& J_sequences) {
+        VDJRecombinationGenes(const std::string& V_name, const std::vector<std::string>& V_alleles, const std::vector<std::string>& V_sequences,
+                const std::string& J_name, const std::vector<std::string>& J_alleles, const std::vector<std::string>& J_sequences) {
             this->_V = new GeneSegmentAlphabet(V_name, V_alleles, V_sequences);
             this->_J = new GeneSegmentAlphabet(J_name, J_alleles, J_sequences);
             this->_D = nullptr;
         }
 
 
-        VDJRecombinationGenes(const string& V_name, const vector<string>& V_alleles, const vector<string>& V_sequences,
-                const string& J_name, const vector<string>& J_alleles, const vector<string>& J_sequences,
-                const string& D_name, const vector<string>& D_alleles, const vector<string>& D_sequences) :
+        VDJRecombinationGenes(const std::string& V_name, const std::vector<std::string>& V_alleles, const std::vector<std::string>& V_sequences,
+                const std::string& J_name, const std::vector<std::string>& J_alleles, const std::vector<std::string>& J_sequences,
+                const std::string& D_name, const std::vector<std::string>& D_alleles, const std::vector<std::string>& D_sequences) :
                 VDJRecombinationGenes(V_name, V_alleles, V_sequences, J_name, J_alleles, J_sequences) {
             this->_D = new GeneSegmentAlphabet(D_name, D_alleles, D_sequences);
         }
@@ -295,9 +295,9 @@ namespace ymir {
         }
 
 
-        bool write(const string& v_segments_file = "vsegments.txt",
-                const string& j_segments_file = "jsegments.txt",
-                const string& d_segments_file = "dsegments.txt") const {
+        bool write(const std::string& v_segments_file = "vsegments.txt",
+                const std::string& j_segments_file = "jsegments.txt",
+                const std::string& d_segments_file = "dsegments.txt") const {
             if (this->_V->write(v_segments_file)) {
                 if (this->_J->write(j_segments_file)) {
                     if (!this->is_vdj()) {

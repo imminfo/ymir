@@ -10,13 +10,39 @@
 //}
 
 
+#include <ostream>
+
+#include "probabilisticassemblingmodel.h"
+
+
+using namespace ymir;
+
 /**
  * \brief Main function of a script for computing generation probabitilies. It has
  * a strict order of input arguments in console:
- * - path to an input file
- * - path to a model
- * - path to an output file
+ * argv[0] - name of the script (default)
+ * argv[1] - path to an input file
+ * argv[2] - path to a model
+ * argv[3] - path to an output file
  */
-int main() {
+int main(int argc, char* argv[]) {
+    std::string in_file_path(argv[1]), model_path(argv[2]), out_file_path(argv[3]);
+
+    ProbabilisticAssemblingModel model(model_path);
+
+    RepertoireParser parser;
+    Cloneset cloneset;
+    parser.parse(in_file_path, &cloneset, model.gene_segments());  // ???
+
+    model.updateGeneUsage(cloneset);
+    auto prob_vec = model.computeFullProbabilities(cloneset);
+
+    std::ofstream ofs;
+    ofs.open(out_file_path);
+    for (auto i = 0; i < prob_vec.size(); ++i) {
+        ofs << prob_vec[i] << std::endl;
+    }
+    ofs.close();
+
     return 0;
 }

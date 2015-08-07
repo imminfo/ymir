@@ -87,6 +87,7 @@ class RepertoireConverter:
         :param line: a line from the input file
         :return: line in Ymir's format
         """
+
         words = line.strip().split(self.input_col_sep)
         out_words = []
 
@@ -118,8 +119,26 @@ class tcRConverter (RepertoireConverter):
         self = RepertoireConverter.__init__()
 
 
-    def parse_line(self):
-        pass
+    def init_input_columns(self):
+        """
+        Initialise input files' column names and separator characters.
+        """
+
+        self.input_nuc = "CDR3.nucleotide.sequence"
+        self.input_aa = "CDR3.amino.acid.sequence"
+        self.input_vgene = "V.gene"
+        self.input_dgene = "D.gene"
+        self.input_jgene = "J.gene"
+        self.input_vend = "V.end"
+        self.input_dstart = "D5.end"
+        self.input_dend = "D3.end"
+        self.input_jstart = "J.start"
+        self.input_col_sep = "\t"
+        self.input_gene_sep = ", "
+
+        self.input_columns = {self.input_nuc: self.ymir_nuc, self.input_aa: self.ymir_aa,
+                              self.input_v: self.ymir_v, self.input_d: self.ymir_d, self.input_j: self.ymir_j,
+                              self.input_vend: self.ymir_vend, self.input_dstart: self.ymir_dstart, self.input_dend: self.ymir_dend, self.input_jstart: self.ymir_jstart}
 
 
 class MiTCRConverter (RepertoireConverter):
@@ -127,8 +146,26 @@ class MiTCRConverter (RepertoireConverter):
         self = RepertoireConverter.__init__()
 
 
-    def parse_line(self):
-        pass
+    def init_input_columns(self):
+        """
+        Initialise input files' column names and separator characters.
+        """
+
+        self.input_nuc = "CDR3 nucleotide sequence"
+        self.input_aa = "CDR3 amino acid sequence"
+        self.input_vgene = "V segments"
+        self.input_dgene = "D segments"
+        self.input_jgene = "J segments"
+        self.input_vend = "V last nucleotide position"
+        self.input_dstart = "D first nucleotide position"
+        self.input_dend = "D last nucleotide position"
+        self.input_jstart = "J first nucleotide position"
+        self.input_col_sep = "\t"
+        self.input_gene_sep = ", "
+
+        self.input_columns = {self.input_nuc: self.ymir_nuc, self.input_aa: self.ymir_aa,
+                              self.input_v: self.ymir_v, self.input_d: self.ymir_d, self.input_j: self.ymir_j,
+                              self.input_vend: self.ymir_vend, self.input_dstart: self.ymir_dstart, self.input_dend: self.ymir_dend, self.input_jstart: self.ymir_jstart}
 
 
     def compute_skip(self, fin):

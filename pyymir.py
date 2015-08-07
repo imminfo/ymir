@@ -134,9 +134,9 @@ def parse_output_models(infiles, args):
 def convert(filepath, converter):
     out_file = filepath + ".ymir_in.txt'"
     print("Converting '", filepath, "' to '", out_file, "'", "...", end = "\t", sep = "")
-    converter.convert(filepath, out_file)
-    print("Done.")
-    return out_file, True
+    flag = converter.convert(filepath, out_file)
+    if flag: print("Done.")
+    return out_file, flag
 
 
 def extract_info(arg, jsdata):

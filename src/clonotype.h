@@ -42,7 +42,7 @@ namespace ymir {
     */
     struct Clonotype {
 
-        Clonotype(const string& sequence,
+        Clonotype(const std::string& sequence,
                   bool nucleotide,
                   seg_index_t *segments,
                   seq_len_t *alignments,
@@ -101,10 +101,10 @@ namespace ymir {
         }
 
 
-        const string& sequence() const { return seq; }
+        const std::string& sequence() const { return seq; }
 
 
-        string::const_iterator seq_iterator(seq_len_t pos) const { return seq.cbegin() + pos; }
+        std::string::const_iterator seq_iterator(seq_len_t pos) const { return seq.cbegin() + pos; }
 
 
         bool is_nucleotide() const { return nucleotide; }
@@ -161,7 +161,7 @@ namespace ymir {
 
     protected:
 
-        string seq; //* CDR3 or full nucleotide or amino acid sequence of a clone. */
+        std::string seq; //* CDR3 or full nucleotide or amino acid sequence of a clone. */
         bool nucleotide;
         seg_index_t *segments; /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
                               /// vector of indices of segments, aligned on this clone: V1--V2--V3--J1--J2--D1--D2--...
@@ -250,7 +250,7 @@ namespace ymir {
         *
         * \param seq Clonotype sequence.
         */
-        ClonotypeBuilder& setSequence(const string& seq) { this->seq = seq; return *this; }
+        ClonotypeBuilder& setSequence(const std::string& seq) { this->seq = seq; return *this; }
 
 
         ///@{

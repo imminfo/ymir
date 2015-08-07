@@ -38,15 +38,6 @@ namespace ymir {
 
     #define DEFAULT_REPERTOIRE_RESERVE_SIZE 300000
 
-    // AssemblyGraphRepertoire aggregate(*ModelParameterVector) - aggregate and compute parameters (bayesian) (add them to this std::vector)
-
-    /*
-     [real data] =>
-     => (AbstractParser) => [SequenceRepertoire] =>
-     => (AbstractAligner + segments tables) => [AlignmentRepertoire] =>
-     => (Model::Indexer) => [IndexedRepertoire] =>
-     => (Model::Builder) => [GraphRepertoire]
-    */
 
     typedef std::vector<MAAG> MAAGRepertoire;
 

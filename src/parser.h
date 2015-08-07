@@ -29,12 +29,11 @@
 #include "fstream"
 #include "sstream"
 
+#include "jsoncpp.cpp"
+
 #include "aligner.h"
-#include "types.h"
 #include "repertoire.h"
 #include "genesegment.h"
-
-#include "jsoncpp.cpp"
 
 
 namespace ymir {

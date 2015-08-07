@@ -37,10 +37,12 @@
 #define DivJoi_INSERTIONS_MATRIX_INDEX 4
 
 
-#include "maag.h"
+#include "clonotype.h"
 #include "genesegment.h"
-#include "modelparametervector.h"
 #include "insertionmodel.h"
+#include "maag.h"
+#include "modelparametervector.h"
+#include "repertoire.h"
 
 
 namespace ymir {

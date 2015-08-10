@@ -95,32 +95,7 @@ namespace ymir {
 
 
         RepertoireParser() {
-            _config_is_loaded = false;
-        }
-
-
-        /**
-        *
-        */
-        RepertoireParser(const string& jsonpath) {
-            this->loadConfig(jsonpath);
-        }
-
-
-        /**
-        *
-        */
-        bool loadConfig(const string& jsonpath) {
-            ifstream ifs;
-            ifs.open(jsonpath);
-            if (ifs.is_open()) {
-                ifs >> _config;
-                _config_is_loaded = true;
-                return true;
-            }
-            cerr << "Repertoire parser error:" << endl << "\t config .json file not found" << endl;
-            _config_is_loaded = false;
-            return false;
+//            _config_is_loaded = false;
         }
 
 
@@ -150,7 +125,7 @@ namespace ymir {
                    const AbstractAligner& aligner = NaiveNucleotideAligner(),
                    bool nuc_sequences = true) {
 
-            if (!_config_is_loaded) { return false; }
+//            if (!_config_is_loaded) { return false; }
 
             vector<Clonotype> clonevec;
             clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
@@ -158,11 +133,11 @@ namespace ymir {
             ifs.open(filepath);
             bool res = false;
             if (ifs.is_open()) {
-                cout << "Repertoire parser " + get_parser_name() + ":" << endl << "\tparsing input file [" << filepath << "]" << endl;
+                std::cout << "Parsing input file:\t" << filepath << endl;
                 res = this->parseRepertoire(ifs, clonevec, gene_segments, aligner, nuc_sequences, opts);
                 if (res) { rep->swap(clonevec); }
             } else {
-                cerr << "Repertoire parser " + get_parser_name() + " error:" << endl << "\tinput file [" << filepath << "] not found" << endl;
+                std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
                 res = false;
             }
 
@@ -174,7 +149,7 @@ namespace ymir {
     protected:
 
         ParserConfig _config;
-        bool _config_is_loaded;
+//        bool _config_is_loaded;
 
 
         virtual bool parseRepertoire(ifstream& ifs,
@@ -186,46 +161,47 @@ namespace ymir {
 
             unordered_map<string, int> columns_id;
 
-            string col_nuc_seq = _config.get("nuc.seq", "CDR3.nucleotide.sequence").asString();
-            columns_id[col_nuc_seq] = -1;
-            int col_nuc_seq_id = -1;
+            string col_nuc_seq = "Nucleotide sequence";
+//            columns_id[col_nuc_seq] = -1;
+            int col_nuc_seq_id = 0;
 
-            string col_aa_seq = _config.get("aa.seq", "CDR3.amino.acid.sequence").asString();
-            columns_id[col_aa_seq] = -1;
-            int col_aa_seq_id = -1;
+            string col_aa_seq = "Amino acid sequence";
+//            columns_id[col_aa_seq] = -1;
+            int col_aa_seq_id = 1;
 
-            string col_v_seg = _config.get("V", "V.segments").asString();
-            columns_id[col_v_seg] = -1;
-            int col_v_seg_id = -1;
+            string col_v_seg = "Variable";
+//            columns_id[col_v_seg] = -1;
+            int col_v_seg_id = 2;
 
-            string col_j_seg = _config.get("J", "J.segments").asString();
-            columns_id[col_j_seg] = -1;
-            int col_j_seg_id = -1;
+            string col_j_seg = "Joining";
+//            columns_id[col_j_seg] = -1;
+            int col_j_seg_id = 4;
 
-            string col_d_seg = _config.get("D", "D.segments").asString();
-            columns_id[col_d_seg] = -1;
-            int col_d_seg_id = -1;
+            string col_d_seg = "Diversity";
+//            columns_id[col_d_seg] = -1;
+            int col_d_seg_id = 3;
 
-            string col_v_end = _config.get("V.end", "Last.V.nucleotide.position").asString();
-            columns_id[col_v_end] = -1;
-            int col_v_end_id = -1;
+            string col_v_end = "V end";
+//            columns_id[col_v_end] = -1;
+            int col_v_end_id = 5;
 
-            string col_j_start = _config.get("J.start", "First.J.nucleotide.position").asString();
-            columns_id[col_j_start] = -1;
-            int col_j_start_id = -1;
+            string col_j_start = "J start";
+//            columns_id[col_j_start] = -1;
+            int col_j_start_id = 8;
 
-            string col_d_als = _config.get("D.alignments", "D.alignments").asString();
-            columns_id[col_d_als] = -1;
-            int col_d_als_id = -1;
+            string col_d_als = "D.alignments";
+//            columns_id[col_d_als] = -1;
+            int col_d_als_id = 6;
 
-            char sep = _config.get("sep", "\t").asString()[0], al_sep = _config.get("alignment.sep", ";").asString()[0];
+            char sep = '\t';
+            char al_sep = ',';
             bool based1 = _config.get("1-based", false).asBool();
 
             bool do_align_V = false, do_align_J = false, do_align_D = false;
 
             stringstream line_stream, word_stream;
             string line, word, sequence;
-            int skip_lines = _config.get("skip.lines", 0).asInt();
+            int skip_lines = 1;
             bool header = true;
 
             int index = 0;
@@ -239,6 +215,7 @@ namespace ymir {
 
             while (!ifs.eof()) {
                 getline(ifs, line);
+//                std::cout << line << std::endl;
                 if (line.size() > 2) {
                     line_stream.str(line);
                     if (skip_lines) {
@@ -249,25 +226,25 @@ namespace ymir {
                     } else if (header) {
 
                         // parse header
-                        int index = 0;
-                        while (!line_stream.eof()) {
-                            getline(line_stream, word, sep);
-                            unordered_map<string, int>::iterator col_it = columns_id.find(word);
-                            if (col_it != columns_id.end()) {
-                                columns_id[word] = index;
-                            }
-                            ++index;
-                        }
-
-                        // set indices of important columns
-                        col_nuc_seq_id = columns_id[col_nuc_seq];
-                        col_aa_seq_id = columns_id[col_aa_seq];
-                        col_v_seg_id = columns_id[col_v_seg];
-                        col_v_end_id = columns_id[col_v_end];
-                        col_j_seg_id = columns_id[col_j_seg];
-                        col_j_start_id = columns_id[col_j_start];
-                        col_d_seg_id = columns_id[col_d_seg];
-                        col_d_als_id = columns_id[col_d_als];
+//                        int index = 0;
+//                        while (!line_stream.eof()) {
+//                            getline(line_stream, word, sep);
+//                            unordered_map<string, int>::iterator col_it = columns_id.find(word);
+//                            if (col_it != columns_id.end()) {
+//                                columns_id[word] = index;
+//                            }
+//                            ++index;
+//                        }
+//
+//                        // set indices of important columns
+//                        col_nuc_seq_id = columns_id[col_nuc_seq];
+//                        col_aa_seq_id = columns_id[col_aa_seq];
+//                        col_v_seg_id = columns_id[col_v_seg];
+//                        col_v_end_id = columns_id[col_v_end];
+//                        col_j_seg_id = columns_id[col_j_seg];
+//                        col_j_start_id = columns_id[col_j_start];
+//                        col_d_seg_id = columns_id[col_d_seg];
+//                        col_d_als_id = columns_id[col_d_als];
 
                         // check main column
                         if (nuc_sequences) {
@@ -289,7 +266,7 @@ namespace ymir {
                         if ((columns_id[col_j_start] == -1 && opts.align_J == MAKE_IF_NOT_FOUND) || opts.align_J == OVERWRITE) {
                             do_align_J = true;
                         }
-                        if ((columns_id[col_d_als] == -1 && opts.align_D == MAKE_IF_NOT_FOUND) || opts.align_D == OVERWRITE) {
+                        if ((gene_segments.is_vdj()) && ((columns_id[col_d_als] == -1 && opts.align_D == MAKE_IF_NOT_FOUND) || opts.align_D == OVERWRITE)) {
                             do_align_D = true;
                         }
 

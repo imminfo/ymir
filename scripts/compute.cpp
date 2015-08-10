@@ -39,30 +39,40 @@ int main(int argc, char* argv[]) {
     std::cout << std::endl;
 
     ProbabilisticAssemblingModel model(model_path);
+    std::cout << std::endl;
 
     if (model.status()) {
         RepertoireParser parser;
         Cloneset cloneset;
-        parser.parse(in_file_path, &cloneset, model.gene_segments(),
+
+        if (parser.parse(in_file_path, &cloneset, model.gene_segments(),
                      RepertoireParser::AlignmentColumnOptions()
                              .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
                              .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
-                             .setD(RepertoireParser::OVERWRITE));
+                             .setD(RepertoireParser::OVERWRITE))) {
+            if (recompute_genes) {
+                model.updateGeneUsage(cloneset);
+            }
 
-        if (recompute_genes) {
-            model.updateGeneUsage(cloneset);
-        }
-        auto prob_vec = model.computeFullProbabilities(cloneset);
+            auto prob_vec = model.computeFullProbabilities(cloneset);
 
-        std::ofstream ofs;
-        ofs.open(out_file_path);
-        if (ofs.is_open()) {
-            for (auto i = 0; i < prob_vec.size(); ++i) {
-                ofs << prob_vec[i] << std::endl;
+            std::ofstream ofs;
+            ofs.open(out_file_path);
+
+            std::cout << std::endl;
+            std::cout << "Generation probabilities statistics:" << std::endl;
+            prob_summary(prob_vec);
+
+            if (ofs.is_open()) {
+                for (auto i = 0; i < prob_vec.size(); ++i) {
+                    ofs << prob_vec[i] << std::endl;
+                }
+            } else {
+                std::cout << "Problems with the output stream. Terminating..." << std::endl;
             }
             ofs.close();
         } else {
-            std::cout << "Problems with the output stream. Terminating..." << std::endl;
+            std::cout << "Problems in parsing the input file. Terminating..." << std::endl;
         }
     } else {
         std::cout << "Problems with the model. Terminating..." << std::endl;

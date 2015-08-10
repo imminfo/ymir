@@ -24,7 +24,7 @@ int main() {
     time_t vj_prob, vj_meta, vj_infer, vdj_prob, vdj_meta, vdj_infer;
 
     RepertoireParser parser;
-    parser.loadConfig(BENCH_DATA_FOLDER + "../../parsers/mitcrdots.json");
+//    parser.loadConfig(BENCH_DATA_FOLDER + "../../parsers/mitcrdots.json");
 
 
     //

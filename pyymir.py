@@ -1,5 +1,4 @@
 import argparse
-import gzip
 import json
 import os
 
@@ -94,14 +93,14 @@ def parse_format(args):
     if len(args_format):
         with open(INFO_JSON) as f:
             jsdata = json.load(f)["formats"]["values"]
-            print(jsdata)
+            # print(jsdata)
             if args_format in jsdata:
                 res = jsdata[args_format]["pyclass"]
             else:
                 # if format is custom than search for it
                 print("\tERROR: unknown format or python converter class o:")
 
-            print(getattr(converters, res))
+            res = getattr(converters, res)
     else:
         print("\tERROR: please specify a format for input files :3")
         flag = False
@@ -132,9 +131,10 @@ def parse_output_models(infiles, args):
 
 
 def convert(filepath, converter):
-    out_file = filepath + ".ymir_in.txt'"
+    out_file = filepath + ".ymir_in.txt"
     print("Converting '", filepath, "' to '", out_file, "'", "...", end = "\t", sep = "")
-    flag = converter.convert(filepath, out_file)
+    c = converter()
+    flag = c.convert(file_in=filepath, file_out=out_file)
     if flag: print("Done.")
     return out_file, flag
 

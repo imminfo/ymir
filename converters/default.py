@@ -74,10 +74,15 @@ class RepertoireConverter:
         """
 
         skip = 0
-        with open(file_in) as fin:
+        self.gzip = False
+        open_fun = lambda x: gzip.open(x) if x.endswith(".gz") else open(x)
+        if (file_in.endswith(".gz")):
+            self.gzip = True
+
+        with open_fun(file_in) as fin:
             skip = self.compute_skip(fin)
 
-        with open(file_in) as fin:
+        with open_fun(file_in) as fin:
             with open(file_out, "w") as fout:
                 if skip:
                     for line in fin:
@@ -88,6 +93,7 @@ class RepertoireConverter:
                 self.write_header(fout)
                 for line in fin:
                     fout.write(self.parse_line(line) + "\n")
+
 
         return True
 
@@ -101,6 +107,8 @@ class RepertoireConverter:
         :return: line in Ymir's format
         """
 
+        if self.gzip: line = line.decode()
+
         words = line.strip().split(self.input_col_sep)
         out_words = ["" for x in range(len(self.ymir_columns))]
 
@@ -111,6 +119,8 @@ class RepertoireConverter:
 
 
     def parse_header(self, header):
+        if self.gzip: header = header.decode()
+
         words = header.strip().split(self.input_col_sep)
         for i, w in enumerate(words):
             if w in self.input_columns:

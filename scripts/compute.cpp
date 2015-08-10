@@ -36,6 +36,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Input file:\t" << in_file_path << std::endl;
     std::cout << "Model path:\t" << model_path << std::endl;
     std::cout << "Output file:\t" << out_file_path << std::endl;
+    std::cout << std::endl;
 
     ProbabilisticAssemblingModel model(model_path);
 

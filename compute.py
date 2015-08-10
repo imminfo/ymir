@@ -12,6 +12,7 @@ if __name__ == "__main__":
     converter, format_check = parse_format(args)
     out_files, out_check = parse_output_files(files, args)
 
+    print()
     if model_check and input_check and format_check and out_check:
         for i in range(len(files)):
             print(i + 1, ":")

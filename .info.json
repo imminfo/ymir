@@ -33,6 +33,16 @@
         "alias": "mitcr",
         "comment": "format for cloneset files outputted by MiTCR",
         "pyclass": "MiTCRConverter"
+      },
+      "migec": {
+        "alias": "migec",
+        "comment": "format for cloneset files outputted by MiGEC",
+        "pyclass": "MiGECConverter"
+      },
+      "vdjtools": {
+        "alias": "vdjtools",
+        "comment": "format for cloneset files outputted by VDJtools",
+        "pyclass": "VDJtoolsConverter"
       }
     }
   },

@@ -171,30 +171,76 @@ class MiTCRConverter (RepertoireConverter):
         Initialise input files' column names and separator characters.
         """
 
-        #self.input_nuc = "CDR3 nucleotide sequence"
-        #self.input_aa = "CDR3 amino acid sequence"
-        #self.input_vgene = "V segments"
-        #self.input_dgene = "D segments"
-        #self.input_jgene = "J segments"
-        #self.input_vend = "Last V nucleotide position"
-        #self.input_dstart = "First D nucleotide position"
-        #self.input_dend = "Last D nucleotide position"
-        #self.input_jstart = "First J nucleotide position"
-        #self.input_col_sep = "\t"
-        #self.input_gene_sep = ", "
-        self.input_nuc = "CDR3.nucleotide.sequence"
-        self.input_aa = "CDR3.amino.acid.sequence"
-        self.input_vgene = "V.segments"
-        self.input_dgene = "D.segments"
-        self.input_jgene = "J.segments"
-        self.input_vend = "Last.V.nucleotide.position"
-        self.input_dstart = "First.D.nucleotide.position"
-        self.input_dend = "Last.D.nucleotide.position"
-        self.input_jstart = "First.J.nucleotide.position"
+        self.input_nuc = "CDR3 nucleotide sequence"
+        self.input_aa = "CDR3 amino acid sequence"
+        self.input_vgene = "V segments"
+        self.input_dgene = "D segments"
+        self.input_jgene = "J segments"
+        self.input_vend = "Last V nucleotide position"
+        self.input_dstart = "First D nucleotide position"
+        self.input_dend = "Last D nucleotide position"
+        self.input_jstart = "First J nucleotide position"
         self.input_col_sep = "\t"
         self.input_gene_sep = ", "
+        # self.input_nuc = "CDR3.nucleotide.sequence"
+        # self.input_aa = "CDR3.amino.acid.sequence"
+        # self.input_vgene = "V.segments"
+        # self.input_dgene = "D.segments"
+        # self.input_jgene = "J.segments"
+        # self.input_vend = "Last.V.nucleotide.position"
+        # self.input_dstart = "First.D.nucleotide.position"
+        # self.input_dend = "Last.D.nucleotide.position"
+        # self.input_jstart = "First.J.nucleotide.position"
+        # self.input_col_sep = "\t"
+        # self.input_gene_sep = ", "
 
 
     # def compute_skip(self, fin):
     #     # check for levels of MiTCR output
     #     pass
+
+
+class MiGECConverter (RepertoireConverter):
+    def __init__(self):
+        RepertoireConverter.__init__(self)
+
+
+    def init_input_column_names(self):
+        """
+        Initialise input files' column names and separator characters.
+        """
+
+        self.input_nuc = "CDR3 nucleotide sequence"
+        self.input_aa = "CDR3 amino acid sequence"
+        self.input_vgene = "V segments"
+        self.input_dgene = "D segments"
+        self.input_jgene = "J segments"
+        self.input_vend = "Last V nucleotide position"
+        self.input_dstart = "First D nucleotide position"
+        self.input_dend = "Last D nucleotide position"
+        self.input_jstart = "First J nucleotide position"
+        self.input_col_sep = "\t"
+        self.input_gene_sep = ","
+
+
+class VDJtoolsConverter (RepertoireConverter):
+    def __init__(self):
+        RepertoireConverter.__init__(self)
+
+
+    def init_input_column_names(self):
+        """
+        Initialise input files' column names and separator characters.
+        """
+
+        self.input_nuc = "cdr3nt"
+        self.input_aa = "cdr3aa"
+        self.input_vgene = "v"
+        self.input_dgene = "d"
+        self.input_jgene = "j"
+        self.input_vend = "VEnd"
+        self.input_dstart = "DStart"
+        self.input_dend = "DEnd"
+        self.input_jstart = "JStart"
+        self.input_col_sep = "\t"
+        self.input_gene_sep = ","

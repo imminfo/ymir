@@ -5,6 +5,7 @@ if __name__ == "__main__":
     ap = default_ymir_ap()
     ap.add_argument("-w", "--workmode", help = "either add computed probabilities to the input file ('add', default), or print them to the separated output file as a vector ('sep')", default = "add", type = str)
     ap.add_argument("-o", "--output", help = "path to the output folder for output files (default is './ymir_genprob/')", type = str, default = "./ymir_genprob/")
+    ap.add_argument("-p", "--predefined", help = "recompute or use predefined model's gene usage (default is to recompute, to change it add '-p' to your script call)", action = "store_true")
     args = ap.parse_args()
 
     files, input_check = parse_input(args)
@@ -18,7 +19,8 @@ if __name__ == "__main__":
             print(i + 1, ":")
             conv_file, convert_flag = convert(files[i], converter)
             if convert_flag:
-                os.system(" ".join(["./build/Compute", conv_file, model, out_files[i], "0"]))
+                print()
+                os.system(" ".join(["./build/Compute", conv_file, model, out_files[i], "0" if args.predefined else "1"]))
             print()
     else:
         print("Can't process further, too many errors for me! T_T")

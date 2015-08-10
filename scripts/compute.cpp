@@ -51,6 +51,8 @@ int main(int argc, char* argv[]) {
                              .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
                              .setD(RepertoireParser::OVERWRITE))) {
             if (recompute_genes) {
+                std::cout << std::endl;
+                std::cout << "Recomputing gene usage on " << (size_t) cloneset.noncoding().size() << " clonotypes." << std::endl;
                 model.updateGeneUsage(cloneset);
             }
 

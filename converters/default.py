@@ -92,7 +92,8 @@ class RepertoireConverter:
                 self.parse_header(fin.readline())
                 self.write_header(fout)
                 for line in fin:
-                    fout.write(self.parse_line(line) + "\n")
+                    if line.strip():
+                        fout.write(self.parse_line(line) + "\n")
 
 
         return True
@@ -170,15 +171,26 @@ class MiTCRConverter (RepertoireConverter):
         Initialise input files' column names and separator characters.
         """
 
-        self.input_nuc = "CDR3 nucleotide sequence"
-        self.input_aa = "CDR3 amino acid sequence"
-        self.input_vgene = "V segments"
-        self.input_dgene = "D segments"
-        self.input_jgene = "J segments"
-        self.input_vend = "V last nucleotide position"
-        self.input_dstart = "D first nucleotide position"
-        self.input_dend = "D last nucleotide position"
-        self.input_jstart = "J first nucleotide position"
+        #self.input_nuc = "CDR3 nucleotide sequence"
+        #self.input_aa = "CDR3 amino acid sequence"
+        #self.input_vgene = "V segments"
+        #self.input_dgene = "D segments"
+        #self.input_jgene = "J segments"
+        #self.input_vend = "Last V nucleotide position"
+        #self.input_dstart = "First D nucleotide position"
+        #self.input_dend = "Last D nucleotide position"
+        #self.input_jstart = "First J nucleotide position"
+        #self.input_col_sep = "\t"
+        #self.input_gene_sep = ", "
+        self.input_nuc = "CDR3.nucleotide.sequence"
+        self.input_aa = "CDR3.amino.acid.sequence"
+        self.input_vgene = "V.segments"
+        self.input_dgene = "D.segments"
+        self.input_jgene = "J.segments"
+        self.input_vend = "Last.V.nucleotide.position"
+        self.input_dstart = "First.D.nucleotide.position"
+        self.input_dend = "Last.D.nucleotide.position"
+        self.input_jstart = "First.J.nucleotide.position"
         self.input_col_sep = "\t"
         self.input_gene_sep = ", "
 

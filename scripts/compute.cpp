@@ -56,6 +56,7 @@ int main(int argc, char* argv[]) {
                 model.updateGeneUsage(cloneset);
             }
 
+            std::cout << std::endl;
             auto prob_vec = model.computeFullProbabilities(cloneset);
 
             std::ofstream ofs;

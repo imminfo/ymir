@@ -171,10 +171,12 @@ namespace ymir {
         vector<prob_t> buildAndCompute(const ClonesetView &cloneset, bool aminoacid = false, MAAGComputeProbAction action = SUM_PROBABILITY) const {
             vector<prob_t> res;
             res.reserve(cloneset.size());
+
+            std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes:" << std::endl;
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 res.push_back(buildAndCompute(cloneset[i], aminoacid, action));
                 if ((i+1) % 50000 == 0) {
-                    cout << "Computed " << (int) (i+1) << " assembling probabilities." << endl;
+                    std::cout << "Computed " << (int) (i+1) << " assembling probabilities." << std::endl;
                 }
             }
             return res;

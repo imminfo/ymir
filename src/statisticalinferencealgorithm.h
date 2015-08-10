@@ -67,6 +67,8 @@ namespace ymir {
         };
 
 
+        virtual ~StatisticalInferenceAlgorithm() { }
+
         virtual bool statisticalInference(const ClonesetView &repertoire,
                                           ProbabilisticAssemblingModel &model,
                                           const AlgorithmParameters &algo_param = AlgorithmParameters()) const =0;

@@ -169,7 +169,7 @@ namespace ymir {
          */
         const ModelParameterVector& event_probabilities() const {
 #ifdef YDEBUG
-            if (_status) {
+            if (!_status) {
                 throw(std::runtime_error("Can't access the event probabilities vector in a model due to its failed status!"));
             }
 #endif

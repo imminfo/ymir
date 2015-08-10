@@ -44,6 +44,7 @@
 #include "tools.h"
 #include "parser.h"
 #include "statisticalinferencealgorithm.h"
+#include "writer.h"
 
 
 using namespace std;
@@ -1200,6 +1201,52 @@ YMIR_TEST_START(test_aa_aligner)
     YMIR_ASSERT2(naa.align3end("AGTAGG", "SR"), 6)
 
     YMIR_ASSERT(naa.alignLocal("TGATGAA", "SR").size() != 0)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_writer)
+
+    RepertoireWriter writer;
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1");
+    alvec1.push_back("Vseg2");
+    alvec1.push_back("Vseg3");
+    seqvec1.push_back("CCCG");
+    seqvec1.push_back("GGG");
+    seqvec1.push_back("CCCGAG");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1");
+    alvec2.push_back("Jseg2");
+    alvec2.push_back("Jseg3");
+    seqvec2.push_back("CCGTTT");
+    seqvec2.push_back("ATTT");
+    seqvec2.push_back("AGGTTT");
+
+    VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
+
+    ClonotypeBuilder cl_builder;
+    // CCCG.AC.GGTTT
+    // poses:
+    // vs: 0-1-2-3-4-5
+    // js: 7-8-9-10-11-12
+    cl_builder.setSequence("CCCGACGGTTT")
+            .setNucleotideSeq()
+            .addValignment(1, 4)
+            .addValignment(3, 5)
+            .addJalignment(1, 8)
+            .addJalignment(2, 9)
+            .addJalignment(3, 7);
+    Clonotype clonotype = cl_builder.buildClonotype();
+    vector<Clonotype> vec;
+    vec.push_back(clonotype);
+    Cloneset cloneset(vec);
+
+    YMIR_TEST(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset, genes));
 
 YMIR_TEST_END
 
@@ -2445,6 +2492,8 @@ int main() {
     // Tests for default naive sequences aligners.
     YMIR_TEST(test_nuc_aligner(), "Naive nucleotide sequence aligner")
     YMIR_TEST(test_aa_aligner(), "Naive amino acid sequence aligner")
+
+    YMIR_TEST(test_writer(), "Writer")
 
     // Test for MiTCR parser.
     YMIR_TEST(test_mitcr_vj(), "MiTCR parser test for alpha chain")

@@ -156,7 +156,7 @@ namespace ymir {
          */
         const VDJRecombinationGenes& gene_segments() const {
 #ifdef YDEBUG
-            if (_status) {
+            if (!_status) {
                 throw(std::runtime_error("Can't access gene segments in a model due to its failed status!"));
             }
 #endif

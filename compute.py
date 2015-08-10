@@ -17,6 +17,7 @@ if __name__ == "__main__":
             print(i + 1, ":")
             conv_file, convert_flag = convert(files[i], converter)
             if convert_flag:
-                os.system(" ".join(["./build/compute", "-i", conv_file, "-m", model, "-o", out_files[i]]))
+                os.system(" ".join(["./build/Compute", conv_file, model, out_files[i], "0"]))
+            print()
     else:
         print("Can't process further, too many errors for me! T_T")

@@ -33,27 +33,39 @@ int main(int argc, char* argv[]) {
             out_file_path(argv[3]);
     bool recompute_genes = std::stoi(argv[4]);
 
+    std::cout << "Input file:\t" << in_file_path << std::endl;
+    std::cout << "Model path:\t" << model_path << std::endl;
+    std::cout << "Output file:\t" << out_file_path << std::endl;
+
     ProbabilisticAssemblingModel model(model_path);
 
-    RepertoireParser parser;
-    Cloneset cloneset;
-    parser.parse(in_file_path, &cloneset, model.gene_segments(),
-                 RepertoireParser::AlignmentColumnOptions()
-                         .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
-                         .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
-                         .setD(RepertoireParser::OVERWRITE));
+    if (model.status()) {
+        RepertoireParser parser;
+        Cloneset cloneset;
+        parser.parse(in_file_path, &cloneset, model.gene_segments(),
+                     RepertoireParser::AlignmentColumnOptions()
+                             .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
+                             .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
+                             .setD(RepertoireParser::OVERWRITE));
 
-    if (recompute_genes) {
-        model.updateGeneUsage(cloneset);
-    }
-    auto prob_vec = model.computeFullProbabilities(cloneset);
+        if (recompute_genes) {
+            model.updateGeneUsage(cloneset);
+        }
+        auto prob_vec = model.computeFullProbabilities(cloneset);
 
-    std::ofstream ofs;
-    ofs.open(out_file_path);
-    for (auto i = 0; i < prob_vec.size(); ++i) {
-        ofs << prob_vec[i] << std::endl;
+        std::ofstream ofs;
+        ofs.open(out_file_path);
+        if (ofs.is_open()) {
+            for (auto i = 0; i < prob_vec.size(); ++i) {
+                ofs << prob_vec[i] << std::endl;
+            }
+            ofs.close();
+        } else {
+            std::cout << "Problems with the output stream. Terminating..." << std::endl;
+        }
+    } else {
+        std::cout << "Problems with the model. Terminating..." << std::endl;
     }
-    ofs.close();
 
     return 0;
 }

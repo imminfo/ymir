@@ -22,7 +22,7 @@ def parse_input(args):
     """
 
     def _get_files_from_folder(folderpath):
-        return [folderpath + "/" + f for f in os.listdir(folderpath) if f[0] != "."]
+        return [folderpath + "/" + f for f in os.listdir(folderpath) if f[0] != "." and "ymir_in" not in f]
 
     args_input = args.input
 
@@ -116,7 +116,7 @@ def parse_output_files(infiles, args):
     args_out = args.output
     if not os.path.exists(args_out):
         os.makedirs(args_out)
-    return [args_out + "/" + x + ".ymir.txt" for x in infiles], True
+    return [args_out + "/" + x[x.rfind("/") + 1:] + ".ymir_out.txt" for x in infiles], True
 
 
 def parse_output_models(infiles, args):
@@ -131,7 +131,7 @@ def parse_output_models(infiles, args):
 
 
 def convert(filepath, converter):
-    out_file = filepath + ".ymir_in.txt"
+    out_file = filepath[:filepath.rfind(".")] + ".ymir_in" + filepath[filepath.rfind("."):]
     print("Converting '", filepath, "' to '", out_file, "'", "...", end = "\t", sep = "")
     c = converter()
     flag = c.convert(file_in=filepath, file_out=out_file)

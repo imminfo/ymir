@@ -12,11 +12,13 @@ if __name__ == "__main__":
     converter, format_check = parse_format(args)
     out_models, out_check = parse_output_models(files, args)
 
+    print()
     if model_check and input_check and format_check and out_check:
         for i in range(len(files)):
             print(i + 1, ":")
             conv_file, convert_flag = convert(files[i], converter)
             if convert_flag:
-                print(" ".join(["./build/inference", "-i", conv_file, "-m", model, "-o", out_models[i]]), sep = "")
+                print()
+                os.system(" ".join(["./build/Inference", conv_file, model, out_models[i], args.algorithm, "--niter", "10"]))
     else:
         print("Can't process further, too many errors for me! T_T")

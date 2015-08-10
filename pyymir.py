@@ -125,9 +125,11 @@ def parse_output_models(infiles, args):
     """
 
     args_out = args.output
-    if not os.path.exists(args_out):
-        os.makedirs(args_out)
-    return [args_out + "/" + x + ".model/" for x in infiles], True
+    for x in infiles:
+        new_x = args_out + "/" + x[x.rfind("/") + 1:] + ".model/"
+        if not os.path.exists(new_x):
+            os.makedirs(new_x)
+    return [args_out + "/" + x[x.rfind("/") + 1:] + ".model/" for x in infiles], True
 
 
 def convert(filepath, converter):

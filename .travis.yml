@@ -22,7 +22,8 @@ before_install:
 
 script:
  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build .
- - python3 ../pyymir.py
+ - cd ..
+ - python3 pyymir.py
 
 after_success:
  - ls ./build

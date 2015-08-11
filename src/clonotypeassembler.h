@@ -49,7 +49,7 @@ namespace ymir {
                     vec.push_back(this->generate_vj(rg));
 
                     if ((clonotype_i + 1) % 50000 == 0) {
-                        cout << "Generated " << (clonotype_i + 1) << " sequences." << endl;
+                        cout << "Generated " << (size_t) (clonotype_i + 1) << "/" << (size_t) count << " sequences." << endl;
                     }
                 }
             }
@@ -63,7 +63,7 @@ namespace ymir {
 //                    vec.push_back(this->generate_vdj(rg));
 
                     if ((clonotype_i + 1) % 50000 == 0) {
-                        cout << "Generated " << (clonotype_i + 1) << " sequences." << endl;
+                        cout << "Generated " << (size_t) (clonotype_i + 1) << "/" << (size_t) count << " sequences." << endl;
                     }
                 }
             } else {

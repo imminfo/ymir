@@ -52,20 +52,19 @@ namespace ymir {
                         cout << "Generated " << (size_t) (clonotype_i + 1) << "/" << (size_t) count << " sequences." << endl;
                     }
                 }
+                cout << "Generated " << (size_t) count << "/" << (size_t) count << " sequences." << endl;
             }
             else if (_param_vec.recombination() == VDJ_RECOMB) {
                 std::cout << "Generating sequences:" << std::endl;
 
-                const InsertionModel mc_vd(DI_NUCLEOTIDE, _param_vec.get_iterator(_param_vec.event_prob(VDJ_VAR_DIV_INS_NUC, 0, 0)));
-                const InsertionModel mc_dj(DI_NUCLEOTIDE, _param_vec.get_iterator(_param_vec.event_prob(VDJ_DIV_JOI_INS_NUC, 0, 0)));
-
                 for (size_t clonotype_i = 0; clonotype_i < count; ++clonotype_i) {
-//                    vec.push_back(this->generate_vdj(rg));
+                    vec.push_back(this->generate_vdj(rg));
 
                     if ((clonotype_i + 1) % 50000 == 0) {
                         cout << "Generated " << (size_t) (clonotype_i + 1) << "/" << (size_t) count << " sequences." << endl;
                     }
                 }
+                cout << "Generated " << (size_t) count << "/" << (size_t) count << " sequences." << endl;
             } else {
                 std::cout << "Unrecognised recombination type of the input model." << std::endl;
             }
@@ -104,32 +103,67 @@ namespace ymir {
             seq_len_t j_del_num = std::discrete_distribution<event_ind_t>(_param_vec.get_iterator(_param_vec.event_index(VJ_JOI_DEL, jgene - 1, 0)),
                                                                          _param_vec.get_iterator(_param_vec.event_index(VJ_JOI_DEL, jgene - 1, 0)
                                                                          + _param_vec.eventFamilySize(VJ_JOI_DEL, jgene - 1)))(rg);
-            builder.addJalignment(jgene, _genes.V()[vgene].sequence.size() - v_del_num + ins_len + 1);
+            builder.addJalignment(jgene, _genes.J()[jgene].sequence.size() - j_del_num + ins_len + 1);
 
-
-//            std::string vgene_del = _genes.V()[vgene].sequence.substr(0, _genes.V()[vgene].sequence.size() - v_del_num);
-//            std::string jgene_del = _genes.J()[jgene].sequence.substr(j_del_num);
-
-//            std::string ins_seq = mc_vj.generate(ins_len, rg);
-//
-//            std::cout << "V+Ji:\t" << (int) v_j << std::endl;
-//            std::cout << "V:\t" << _genes.V()[vgene].sequence << std::endl;
-//            std::cout << "Vi:\t" << (event_ind_t) vgene << std::endl;
-//            std::cout << "#V del:\t" << (int) v_del_num << std::endl;
-//            std::cout << "V+del:\t" << vgene_del << std::endl;
-//            std::cout << "ins len:\t" << ins_len << std::endl;
-//            std::cout << "ins nuc:\t" << ins_seq << std::endl;
-//            std::cout << "J:\t" << _genes.J()[jgene].sequence << std::endl;
-//            std::cout << "Ji:\t" << (event_ind_t) jgene << std::endl;
-//            std::cout << "#J del:\t" << (int) j_del_num << std::endl;
-//            std::cout << "J+del:\t" << jgene_del << std::endl;
-//
-//            std:string seq = vgene_del + "|" + ins_seq + "|" + jgene_del;
-//            std::cout << "seq:\t" << seq << std::endl;
-//            builder.setSequence(seq);
             builder.setSequence(_genes.V()[vgene].sequence.substr(0, _genes.V()[vgene].sequence.size() - v_del_num)
                                   + mc_vj.generate(ins_len, rg)
                                   + _genes.J()[jgene].sequence.substr(j_del_num));
+            builder.setNucleotideSeq();
+            return builder.buildClonotype();
+        }
+
+
+        Clonotype generate_vdj(std::default_random_engine &rg) const {
+            ClonotypeBuilder builder;
+            const InsertionModel mc_vd(DI_NUCLEOTIDE, _param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
+            const InsertionModel mc_dj(DI_NUCLEOTIDE, _param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
+
+            seq_len_t ins_len_vd = std::discrete_distribution<seq_len_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 0)),
+                                                                         _param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 0)
+                                                                                                 + _param_vec.eventClassSize(VDJ_VAR_DIV_INS_LEN)))(rg);
+            seq_len_t ins_len_dj = std::discrete_distribution<seq_len_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 0)),
+                                                                         _param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 0)
+                                                                                                 + _param_vec.eventClassSize(VDJ_DIV_JOI_INS_LEN)))(rg);
+
+            seg_index_t vgene = std::discrete_distribution<event_ind_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_GEN, 0, 0)),
+                                                                        _param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_GEN, 0, 0)
+                                                                                                + _param_vec.eventClassSize(VDJ_VAR_GEN)))(rg) + 1;
+
+            std::discrete_distribution<event_ind_t> jd_genes(_param_vec.get_iterator(_param_vec.event_index(VDJ_JOI_DIV_GEN, 0, 0)),
+                                                             _param_vec.get_iterator(_param_vec.event_index(VDJ_JOI_DIV_GEN, 0, 0)
+                                                                                     + _param_vec.eventClassSize(VDJ_JOI_DIV_GEN)));
+            event_ind_t j_d = jd_genes(rg);
+
+            seg_index_t jgene = j_d / _param_vec.n_columns(VDJ_JOI_DIV_GEN) + 1;
+
+            seg_index_t dgene = j_d - (j_d / _param_vec.n_columns(VDJ_JOI_DIV_GEN)) * (_param_vec.n_columns(VDJ_JOI_DIV_GEN)) + 1;
+
+            seq_len_t v_del_num = std::discrete_distribution<event_ind_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DEL, vgene - 1, 0)),
+                                                                          _param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DEL, vgene - 1, 0)
+                                                                                                  + _param_vec.eventFamilySize(VDJ_VAR_DEL, vgene - 1)))(rg);
+            std::string vgene_del = _genes.V()[vgene].sequence.substr(0, _genes.V()[vgene].sequence.size() - v_del_num);
+            builder.addValignment(vgene, vgene_del.size());
+
+            event_ind_t d_del_index = std::discrete_distribution<event_ind_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_DEL, dgene - 1, 0)),
+                                                                              _param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_DEL, dgene - 1, 0)
+                                                                                                  + _param_vec.eventFamilySize(VDJ_DIV_DEL, dgene - 1)))(rg);
+            seq_len_t d5_del_num = 3;
+            seq_len_t d3_del_num = 1;
+            std::string dgene_del = _genes.D()[dgene].sequence.substr(d5_del_num, _genes.D()[dgene].sequence.size() - d3_del_num - d5_del_num - 1);
+            builder.addDalignment(dgene, );
+
+            seq_len_t j_del_num = std::discrete_distribution<event_ind_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_JOI_DEL, jgene - 1, 0)),
+                                                                          _param_vec.get_iterator(_param_vec.event_index(VDJ_JOI_DEL, jgene - 1, 0)
+                                                                                                  + _param_vec.eventFamilySize(VDJ_JOI_DEL, jgene - 1)))(rg);
+            std::string jgene_del = _genes.J()[jgene].sequence.substr(j_del_num);
+            builder.addJalignment(jgene, _genes.J()[jgene].sequence.size() - j_del_num + ins_len_vd + ins_len_dj + dgene_del.size() + 1);
+            
+            builder.setSequence(vgene_del
+                                + mc_vd.generate(ins_len_vd, rg, vgene_del[vgene_del.size() - 1])
+                                + dgene_del
+                                + mc_dj.generate(ins_len_dj, rg, jgene_del[0], true)
+                                + jgene_del);
+
             builder.setNucleotideSeq();
             return builder.buildClonotype();
         }

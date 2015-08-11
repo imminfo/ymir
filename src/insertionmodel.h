@@ -136,20 +136,37 @@ namespace ymir {
         ///@}
 
 
-        std::string generate(seq_len_t len, std::default_random_engine &rg) const {
-            std::discrete_distribution<int> distr;
-            if (_type == MONO_NUCLEOTIDE) {
-                distr = std::discrete_distribution<int>(_arr, _arr + 4);
-            } else {
-                distr = std::discrete_distribution<int>(_arr, _arr + 16);
-                for (double x:distr.probabilities()) std::cout << x << " ";
+        std::string generate(seq_len_t len, std::default_random_engine &rg, char first_char = NULL_CHAR, bool reverse = false) const {
+            std::string res = "";
+            if (len) {
+                if (_type == MONO_NUCLEOTIDE) {
+                    std::discrete_distribution<int> distr;
+                    distr = std::discrete_distribution<int>(_arr, _arr + 4);
+
+                    for (seq_len_t i = 0; i < len; ++i) {
+                        res += inv_nuc_hash(distr(rg));
+                    }
+                } else {
+                    std::discrete_distribution<int> distrs[] = {
+                            std::discrete_distribution<int>(_arr, _arr + 4),
+                            std::discrete_distribution<int>(_arr + 4, _arr + 8),
+                            std::discrete_distribution<int>(_arr + 8, _arr + 12),
+                            std::discrete_distribution<int>(_arr + 12, _arr + 16)
+                    };
+
+                    if (first_char == NULL_CHAR) {
+                        res = inv_nuc_hash(distrs[std::discrete_distribution<int>{.25, .25, .25, .25}(rg)](rg));
+                    } else {
+                        res = inv_nuc_hash(distrs[nuc_hash(first_char)](rg));
+                    }
+                    for (seq_len_t i = 1; i < len; ++i) {
+                        res += inv_nuc_hash(distrs[nuc_hash(res[i - 1])](rg));
+                    }
+
+                    if (reverse) { std::reverse(res.begin(), res.end()); }
+                }
             }
 
-            std::string res = "";
-            for (seq_len_t i = 0; i < len; ++i) {
-                res += inv_nuc_hash(distr(rg));
-            }
-//            std::cout << res << std::endl;
             return res;
         }
 

@@ -23,12 +23,24 @@ int main(int argc, char* argv[]) {
     std::string model_path(argv[1]), out_file_path(argv[3]);
     size_t count = std::stoi(argv[2]);
 
+    std::cout << "Model path:\t" << model_path << std::endl;
+    std::cout << "Output file:\t" << out_file_path << std::endl;
+    std::cout << "Number of clonotypes:\t" << (size_t) count << std::endl;
+    std::cout << std::endl;
+
     ProbabilisticAssemblingModel model(model_path);
 
-    Cloneset gen_rep = model.generateSequences(count);
+    if (model.status()) {
+        std::cout << std::endl;
+        Cloneset gen_rep = model.generateSequences(count);
 
-    RepertoireWriter writer;
-    writer.write(out_file_path, gen_rep);
+        RepertoireWriter writer;
+        if (!writer.write(out_file_path, gen_rep, model.gene_segments())) {
+            std::cout << "Problems in writing the output file. Terminating..." << std::endl;
+        }
+    } else {
+        std::cout << "Problems with the model. Terminating..." << std::endl;
+    }
 
     return 0;
 }

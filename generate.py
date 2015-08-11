@@ -9,16 +9,12 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     model, model_check = parse_model(args)
-    converter, format_check = parse_format(args)
+    if not os.path.exists(args.output[:args.output.rfind("/")]):
+        os.makedirs(args.output[:args.output.rfind("/")])
 
-    print()
-    if model_check and input_check and format_check and out_check:
-        for i in range(len(files)):
-            print(i + 1, ":")
-            conv_file, convert_flag = convert(files[i], converter)
-            if convert_flag:
-                print()
-                os.system(" ".join(["./build/Compute", conv_file, model, out_files[i], "0" if args.predefined else "1"]))
-            print()
+    if model_check:
+        print()
+        os.system(" ".join(["./build/Generate", model, str(args.count), args.output]))
+        print()
     else:
         print("Can't process further, too many errors for me! T_T")

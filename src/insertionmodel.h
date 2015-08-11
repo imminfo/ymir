@@ -136,18 +136,20 @@ namespace ymir {
         ///@}
 
 
-        std::string generate(seq_len_t len, std::default_random_engine &rg) {
+        std::string generate(seq_len_t len, std::default_random_engine &rg) const {
             std::discrete_distribution<int> distr;
             if (_type == MONO_NUCLEOTIDE) {
                 distr = std::discrete_distribution<int>(_arr, _arr + 4);
             } else {
                 distr = std::discrete_distribution<int>(_arr, _arr + 16);
+                for (double x:distr.probabilities()) std::cout << x << " ";
             }
 
             std::string res = "";
             for (seq_len_t i = 0; i < len; ++i) {
                 res += inv_nuc_hash(distr(rg));
             }
+//            std::cout << res << std::endl;
             return res;
         }
 

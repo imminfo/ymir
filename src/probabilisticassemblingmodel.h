@@ -123,6 +123,11 @@ namespace ymir {
                                    MetadataMode save_metadata = SAVE_METADATA,
                                    SequenceType sequence_type = NUCLEOTIDE,
                                    bool verbose = true) const {
+#ifdef YDEBUG
+            if (!_status) {
+                throw(std::runtime_error("Can't build graphs due to a model's failed status!"));
+            }
+#endif
             return _builder->build(repertoire, save_metadata, verbose);
         }
 
@@ -144,6 +149,11 @@ namespace ymir {
          * \return Artificial repertoire.
          */
         Cloneset generateSequences(size_t count = 1) const {
+#ifdef YDEBUG
+            if (!_status) {
+                throw(std::runtime_error("Can't generate sequences due to a model's failed status!"));
+            }
+#endif
             // generate sequences
             return _generator->generate(count);
         }

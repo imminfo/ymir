@@ -88,6 +88,8 @@ namespace ymir {
                              const vector<prob_t>& laplace_vec = vector<prob_t>(),
                              bool do_normalise = true,
                              const vector<seq_len_t>& d_genes_min_len = vector<seq_len_t>()) {
+            _recomb = vec_type;
+
             _vec = vector<prob_t>();
             _vec.reserve(param_vec.size() + 1);
             _vec.push_back(0);
@@ -144,7 +146,8 @@ namespace ymir {
 
 
         bool operator==(const ModelParameterVector &other) const {
-            if ((_vec.size() != other._vec.size())
+            if ((_recomb != other._recomb)
+                || (_vec.size() != other._vec.size())
                 || (_edges.size() != other._edges.size())
                 || (_event_classes.size() != other._event_classes.size())
                 || (_event_family_col_numbers.size() != other._event_family_col_numbers.size())
@@ -315,7 +318,7 @@ namespace ymir {
         size_t size() const { return _vec.size(); }
 
 
-        seq_len_t n_columns(EventClass event_class, event_ind_t event_family) const {
+        seq_len_t n_columns(EventClass event_class, event_ind_t event_family = 0) const {
             return _event_family_col_numbers[_event_classes[event_class] + event_family];
         }
 

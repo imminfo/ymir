@@ -136,7 +136,7 @@ namespace ymir {
 
             seg_index_t jgene = j_d / _param_vec.n_columns(VDJ_JOI_DIV_GEN) + 1;
 
-            seg_index_t dgene = j_d - (j_d / _param_vec.n_columns(VDJ_JOI_DIV_GEN)) * (_param_vec.n_columns(VDJ_JOI_DIV_GEN)) + 1;
+            seg_index_t dgene = j_d - (j_d / _param_vec.n_columns(VDJ_JOI_DIV_GEN)) * _param_vec.n_columns(VDJ_JOI_DIV_GEN) + 1;
 
             seq_len_t v_del_num = std::discrete_distribution<event_ind_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DEL, vgene - 1, 0)),
                                                                           _param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DEL, vgene - 1, 0)
@@ -147,10 +147,13 @@ namespace ymir {
             event_ind_t d_del_index = std::discrete_distribution<event_ind_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_DEL, dgene - 1, 0)),
                                                                               _param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_DEL, dgene - 1, 0)
                                                                                                   + _param_vec.eventFamilySize(VDJ_DIV_DEL, dgene - 1)))(rg);
-            seq_len_t d5_del_num = 3;
-            seq_len_t d3_del_num = 1;
+            seq_len_t d5_del_num = d_del_index / _param_vec.n_columns(VDJ_DIV_DEL, 0);
+            seq_len_t d3_del_num = d_del_index - (d_del_index / _param_vec.n_columns(VDJ_DIV_DEL, 0)) * _param_vec.n_columns(VDJ_DIV_DEL, 0);
             std::string dgene_del = _genes.D()[dgene].sequence.substr(d5_del_num, _genes.D()[dgene].sequence.size() - d3_del_num - d5_del_num - 1);
-            builder.addDalignment(dgene, );
+            builder.addDalignment(dgene, vgene_del.size() + ins_len_vd + 1,
+                                  vgene_del.size() + ins_len_vd + 1 + dgene_del.size(),
+                                  d3_del_num + 1,
+                                  _genes.D()[dgene].sequence.size() - d3_del_num);
 
             seq_len_t j_del_num = std::discrete_distribution<event_ind_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_JOI_DEL, jgene - 1, 0)),
                                                                           _param_vec.get_iterator(_param_vec.event_index(VDJ_JOI_DEL, jgene - 1, 0)

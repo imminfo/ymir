@@ -12,9 +12,13 @@ if __name__ == "__main__":
     if not os.path.exists(args.output[:args.output.rfind("/")]):
         os.makedirs(args.output[:args.output.rfind("/")])
 
+    out_file = args.output
+    if out_file == "./out.ymir_gen.txt":
+        out_file = "./out.ymir_gen." + args.model + ".txt"
+
     if model_check:
         print()
-        os.system(" ".join(["./build/Generate", model, str(args.count), args.output]))
+        os.system(" ".join(["./build/Generate", model, str(args.count), out_file]))
         print()
     else:
         print("Can't process further, too many errors for me! T_T")

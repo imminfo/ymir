@@ -138,6 +138,15 @@ class RepertoireConverter:
         return 0
 
 
+class YmirConverter:
+    def __init__(self):
+        pass
+
+
+    def convert(self, file_in, file_out):
+        pass
+
+
 class tcRConverter (RepertoireConverter):
     def __init__(self):
         RepertoireConverter.__init__(self)

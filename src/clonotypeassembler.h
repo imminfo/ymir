@@ -149,7 +149,7 @@ namespace ymir {
                                                                                                   + _param_vec.eventFamilySize(VDJ_DIV_DEL, dgene - 1)))(rg);
             seq_len_t d5_del_num = d_del_index / _param_vec.n_columns(VDJ_DIV_DEL, 0);
             seq_len_t d3_del_num = d_del_index - (d_del_index / _param_vec.n_columns(VDJ_DIV_DEL, 0)) * _param_vec.n_columns(VDJ_DIV_DEL, 0);
-            std::string dgene_del = _genes.D()[dgene].sequence.substr(d5_del_num, _genes.D()[dgene].sequence.size() - d3_del_num - d5_del_num - 1);
+            std::string dgene_del = _genes.D()[dgene].sequence.substr(d5_del_num, _genes.D()[dgene].sequence.size() - d3_del_num - d5_del_num);
             builder.addDalignment(dgene, vgene_del.size() + ins_len_vd + 1,
                                   vgene_del.size() + ins_len_vd + 1 + dgene_del.size(),
                                   d3_del_num + 1,

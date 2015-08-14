@@ -14,6 +14,8 @@
 
 namespace ymir {
 
+    #define CELL_FILL(i, limit, ofs, if_letter, else_letter) { if (i < limit - 1) { ofs << if_letter; } else { ofs << else_letter; } }
+
     class RepertoireWriter {
     public:
 
@@ -56,73 +58,45 @@ namespace ymir {
 
                     for (auto seg_i = 0; seg_i < cloneset[i].nVar(); ++seg_i) {
                         ofs << gene_segments.V()[cloneset[i].getVar(seg_i)].allele;
-                        if (seg_i < cloneset[i].nVar() - 1) {
-                            ofs << ',';
-                        } else {
-                            ofs << '\t';
-                        }
+                        CELL_FILL(seg_i, cloneset[i].nVar(), ofs, ',', '\t')
                     }
 
                     if (gene_segments.is_vdj()) {
                         for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
                             ofs << gene_segments.D()[cloneset[i].getDiv(seg_i)].allele;
-                            if (seg_i < cloneset[i].nDiv() - 1) {
-                                ofs << ',';
-                            } else {
-                                ofs << '\t';
-                            }
+                            CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ',', '\t')
+                        }
+                    } else {
+                        ofs << "\t";
+                    }
+
+                    for (auto seg_i = 0; seg_i < cloneset[i].nJoi(); ++seg_i) {
+                        ofs << gene_segments.J()[cloneset[i].getJoi(seg_i)].allele;
+                        CELL_FILL(seg_i, cloneset[i].nJoi(), ofs, ',', '\t')
+                    }
+
+                    for (auto seg_i = 0; seg_i < cloneset[i].nVar(); ++seg_i) {
+                        ofs << cloneset[i].getVend(seg_i);
+                        CELL_FILL(seg_i, cloneset[i].nVar(), ofs, ',', '\t')
+                    }
+
+                    if (gene_segments.is_vdj()) {
+                        for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
+                            ofs << cloneset[i].getDalignment(seg_i, 0).seqstart;
+                            CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ';', '\t')
+                        }
+
+                        for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
+                            ofs << cloneset[i].getDalignment(seg_i, 0).seqend;
+                            CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ';', '\t')
                         }
                     } else {
                         ofs << "\t\t";
                     }
 
                     for (auto seg_i = 0; seg_i < cloneset[i].nJoi(); ++seg_i) {
-                        ofs << gene_segments.J()[cloneset[i].getJoi(seg_i)].allele;
-                        if (seg_i < cloneset[i].nJoi() - 1) {
-                            ofs << ',';
-                        } else {
-                            ofs << '\t';
-                        }
-                    }
-
-                    for (auto seg_i = 0; seg_i < cloneset[i].nVar(); ++seg_i) {
-                        ofs << cloneset[i].getVend(seg_i);
-                        if (seg_i < cloneset[i].nVar() - 1) {
-                            ofs << ',';
-                        }
-                    }
-
-                    if (gene_segments.is_vdj()) {
-                        for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
-                            ofs << cloneset[i].getDalignment(seg_i, 0).seqstart;
-                            if (seg_i < cloneset[i].nDiv() - 1) {
-                                ofs << ";";
-                            } else {
-                                ofs << '\t';
-                            }
-                        }
-
-                        for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
-                            ofs << cloneset[i].getDalignment(seg_i, 0).seqend;
-                            if (seg_i < cloneset[i].nDiv() - 1) {
-                                ofs << ";";
-                            } else {
-                                ofs << '\t';
-                            }
-                        }
-
-                        ofs << "\t";
-                    } else {
-                        ofs << "\t\t\t\t";
-                    }
-
-                    for (auto seg_i = 0; seg_i < cloneset[i].nJoi(); ++seg_i) {
                         ofs << cloneset[i].getJstart(seg_i);
-                        if (seg_i < cloneset[i].nJoi() - 1) {
-                            ofs << ',';
-                        } else {
-                            ofs << std::endl;
-                        }
+                        CELL_FILL(seg_i, cloneset[i].nJoi(), ofs, ',', std::endl)
                     }
                 }
 

@@ -22,7 +22,7 @@
  */
 //#define NCURSES_TERM_H_incl 1
 
-#define YMIR_TEST(res, s) {all_tests += 1; if (res.size() == 0) {tests_passed += 1;} \
+#define YMIR_TEST(res, s) { all_tests += 1; if (res.size() == 0) {tests_passed += 1;} \
                             else { \
                             failed_test_info.push_back(TestInfo(s, res)); \
                             } \

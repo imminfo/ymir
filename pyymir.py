@@ -143,6 +143,7 @@ def convert(filepath, converter):
         flag = True
     else:
         out_file = filepath[:filepath.rfind(".")] + ".ymir_in" + filepath[filepath.rfind("."):]
+        if out_file.endswith('.gz'): out_file = out_file[:-2] + 'txt'
         print("Converting '", filepath, "' to '", out_file, "'", "...", end = "\t", sep = "")
         c = converter()
         flag = c.convert(file_in=filepath, file_out=out_file)

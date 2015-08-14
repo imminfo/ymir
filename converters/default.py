@@ -35,7 +35,7 @@ class RepertoireConverter:
         self.ymir_columns = {self.ymir_nuc: -1, self.ymir_aa: -1,
                              self.ymir_vgene: -1, self.ymir_dgene: -1, self.ymir_jgene: -1,
                              self.ymir_vend: -1, self.ymir_dstart: -1, self.ymir_dend: -1, self.ymir_jstart: -1}
-        
+
         self.ymir_columns_sorted = [self.ymir_nuc, self.ymir_aa,
                                     self.ymir_vgene, self.ymir_dgene, self.ymir_jgene,
                                     self.ymir_vend, self.ymir_dstart, self.ymir_dend, self.ymir_jstart]

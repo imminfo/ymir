@@ -138,7 +138,7 @@ def parse_output_models(infiles, args):
 def convert(filepath, converter):
     out_file = ""
     flag = True
-    if converter is YmirConverter:
+    if converter is converters.YmirConverter:
         out_file = filepath
         flag = True
     else:

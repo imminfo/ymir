@@ -10,7 +10,7 @@ before_install:
  - rm jsoncpp.zip
  - cd jsoncpp-master
  - python amalgamate.py
- - mv ./dist/jsoncpp.cpp ../src/jsoncpp.cpp
+ - mv ./dist/jsoncpp.cpp ../Ymir/src/jsoncpp.cpp
  - mv ./dist/json ../include/json
  - cd ..
  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y

@@ -103,7 +103,7 @@ namespace ymir {
             seq_len_t j_del_num = std::discrete_distribution<event_ind_t>(_param_vec.get_iterator(_param_vec.event_index(VJ_JOI_DEL, jgene - 1, 0)),
                                                                          _param_vec.get_iterator(_param_vec.event_index(VJ_JOI_DEL, jgene - 1, 0)
                                                                          + _param_vec.eventFamilySize(VJ_JOI_DEL, jgene - 1)))(rg);
-            builder.addJalignment(jgene, _genes.J()[jgene].sequence.size() - j_del_num + ins_len + 1);
+            builder.addJalignment(jgene, _genes.V()[vgene].sequence.size() - v_del_num + ins_len + 1);
 
             builder.setSequence(_genes.V()[vgene].sequence.substr(0, _genes.V()[vgene].sequence.size() - v_del_num)
                                   + mc_vj.generate(ins_len, rg)

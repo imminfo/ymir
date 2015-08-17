@@ -65,7 +65,7 @@ namespace ymir {
             _builder = nullptr;
             _generator = nullptr;
 
-            _status = this->parseModelConfig(_model_path + "model.json")
+            _status = this->parseModelConfig(_model_path)
                       && this->parseGeneSegments()
                       && this->makeEventProbabilitiesVector();
 
@@ -331,7 +331,9 @@ namespace ymir {
         /**
          * \brief Parse JSON file with model parameters.
          */
-        bool parseModelConfig(const string& jsonpath) {
+        bool parseModelConfig(const string& folderpath) {
+            string jsonpath = folderpath + "/model.json";
+
             ifstream ifs;
             ifs.open(jsonpath);
             if (ifs.is_open()) {
@@ -348,9 +350,13 @@ namespace ymir {
                         "\n\t(" <<
                         _config.get("comment", "").asString() <<
                         ")\n\t" <<
+                        "Path : " << folderpath <<
+                        "\n\t" <<
+                        "Specimen : " << _config.get("specimen", "hobbit").asString() <<
+                        "\n\t" <<
                         _config.get("recombination", "undefined").asString() <<
                         "-recombination  |  " <<
-                        (_config.get("hypermutations", false).asBool() ? "Hypermutations" : "No hypermutations") <<
+                        (_config.get("hypermutations", false).asBool() ? "With sequence errors" : "No sequence errors") <<
                         endl << "\tFiles:"<< endl;
                 return true;
             }
@@ -635,7 +641,7 @@ namespace ymir {
                 vector<AbstractTDContainer*> containers;
                 containers.resize(10, nullptr);
 
-                // Parser tables with event probabilities
+                // Parse tables with event probabilities.
                 for (Json::ArrayIndex i = 0; i < pt.size(); ++i) {
                     element = pt.getMemberNames()[i];
                     container = read_textdata(_model_path + pt[element]["file"].asString(),
@@ -666,13 +672,15 @@ namespace ymir {
 
 
         void parseVJContainer(const string &element, AbstractTDContainer *container, vector<AbstractTDContainer*> &containers) {
-            string err_message = "OK";
+            string err_message = "NOT FOUND";
             if (element == "v.j") {
                 if (container
                     && container->file_exists()
                     && this->findGenes(container->column_names(), _genes->J(), err_message)
-                    && this->findGenes(container->row_names(), _genes->V(), err_message)) {
+                    && this->findGenes(container->row_names(), _genes->V(), err_message))
+                {
                     containers[VJ_VAR_JOI_GEN] = container;
+                    err_message = "OK";
                 }
 
                 cout << "\tV-J gene pairs:  " << err_message << endl;
@@ -680,8 +688,10 @@ namespace ymir {
             else if (element == "v.del") {
                 if (container
                     && container->file_exists()
-                    && this->findGenes(container->column_names(), _genes->V(), err_message)) {
+                    && this->findGenes(container->column_names(), _genes->V(), err_message))
+                {
                     containers[VJ_VAR_DEL] = container;
+                    err_message = "OK";
                 }
 
                 cout << "\tV delet. num.:   " << err_message << endl;
@@ -689,8 +699,10 @@ namespace ymir {
             else if (element == "j.del") {
                 if (container
                     && container->file_exists()
-                    && this->findGenes(container->column_names(), _genes->J(), err_message)) {
+                    && this->findGenes(container->column_names(), _genes->J(), err_message))
+                {
                     containers[VJ_JOI_DEL] = container;
+                    err_message = "OK";
                 }
 
                 cout << "\tJ delet. num.:   " << err_message << endl;
@@ -703,6 +715,7 @@ namespace ymir {
                         err_message = ss.str();
                     } else {
                         containers[VJ_VAR_JOI_INS_LEN] = container;
+                        err_message = "OK";
                     }
                 }
 
@@ -716,6 +729,7 @@ namespace ymir {
                         err_message = ss.str();
                     } else {
                         containers[VJ_VAR_JOI_INS_NUC] = container;
+                        err_message = "OK";
                     }
                 }
 
@@ -726,17 +740,22 @@ namespace ymir {
 
 
         void parseVDJContainer(const string &element, AbstractTDContainer *container, vector<AbstractTDContainer*> &containers) {
-            string err_message = "OK";
+            string err_message = "NOT FOUND";
             if (element == "v") {
-                if (container && container->file_exists()) { containers[VDJ_VAR_GEN] = container; }
+                if (container && container->file_exists()) {
+                    containers[VDJ_VAR_GEN] = container;
+                    err_message = "OK";
+                }
                 cout << "\tV genes prob.:   " << err_message << endl;
             }
             else if (element == "j.d") {
                 if (container
                     && container->file_exists()
                     && this->findGenes(container->column_names(), _genes->D(), err_message)
-                    && this->findGenes(container->row_names(), _genes->J(), err_message)) {
+                    && this->findGenes(container->row_names(), _genes->J(), err_message))
+                {
                     containers[VDJ_JOI_DIV_GEN] = container;
+                    err_message = "OK";
                 }
 
                 cout << "\tJ-D gene pairs:  " << err_message << endl;
@@ -744,8 +763,10 @@ namespace ymir {
             else if (element == "v.del") {
                 if (container
                     && container->file_exists()
-                    && this->findGenes(container->column_names(), _genes->V(), err_message)) {
+                    && this->findGenes(container->column_names(), _genes->V(), err_message))
+                {
                     containers[VDJ_VAR_DEL] = container;
+                    err_message = "OK";
                 }
 
                 cout << "\tV delet. num.:   " << err_message << endl;;
@@ -753,14 +774,19 @@ namespace ymir {
             else if (element == "j.del") {
                 if (container
                     && container->file_exists()
-                    && this->findGenes(container->column_names(), _genes->J(), err_message)) {
+                    && this->findGenes(container->column_names(), _genes->J(), err_message))
+                {
                     containers[VDJ_JOI_DEL] = container;
+                    err_message = "OK";
                 }
 
                 cout << "\tJ delet. num.:   " << err_message << endl;
             }
             else if (element == "d.del") {
-                if (container && container->file_exists()) { containers[VDJ_DIV_DEL] = container; }
+                if (container && container->file_exists()) {
+                    containers[VDJ_DIV_DEL] = container;
+                    err_message = "OK";
+                }
 
                 cout << "\tD delet. num.:   " << err_message << endl;
             }
@@ -772,6 +798,7 @@ namespace ymir {
                         err_message = ss.str();
                     } else {
                         containers[VDJ_VAR_DIV_INS_LEN] = container;
+                        err_message = "OK";
                     }
                 }
 
@@ -785,12 +812,13 @@ namespace ymir {
                         err_message = ss.str();
                     } else {
                         containers[VDJ_VAR_DIV_INS_NUC] = container;
+                        err_message = "OK";
                     }
                 }
 
                 cout << "\tVD/DJ ins. nuc.: " << err_message << endl;
             }
-            else { cerr << "Unrecognised element in \'probtables\'" << ":\n\t" << element << endl; }
+            else { std::cout << "Unrecognised element in \'probtables\'" << ":\n\t" << element << std::endl; }
         }
 
 

@@ -28,14 +28,23 @@ namespace ymir {
     struct AbstractTDContainer {
     public:
 
-        AbstractTDContainer(CONTAINER_TYPE ctype, bool skip_first_column, prob_t laplace) {
+        AbstractTDContainer(CONTAINER_TYPE ctype, bool skip_first_column, prob_t laplace, const std::string &filepath) {
             _colnames.reserve(40);
             _rownames.reserve(40);
             _data.reserve(40);
             _laplace = laplace;
             _skip_first_column = skip_first_column;
             _type = ctype;
-            _file_exists = false;
+            _filepath = filepath;
+
+            std::ifstream ifs;
+            ifs.open(filepath);
+            if (ifs.good()) {
+                _file_exists = true;
+            } else {
+                _file_exists = false;
+            }
+            ifs.close();
         }
 
 
@@ -86,7 +95,7 @@ namespace ymir {
         seq_len_t metadata(size_t i) const { return _metadata[i]; }
 
 
-        virtual bool read(const std::string& filepath, std::string &err_message) = 0;
+        virtual bool read(std::string &err_message) = 0;
 
 
         virtual bool write(const std::string& filepath) = 0;
@@ -109,6 +118,7 @@ namespace ymir {
         bool _skip_first_column, _file_exists;
         CONTAINER_TYPE _type;
         std::vector<seq_len_t> _metadata;
+        std::string _filepath;
 
 
         AbstractTDContainer() {
@@ -128,16 +138,17 @@ namespace ymir {
     struct TDVector : public AbstractTDContainer {
     public:
 
-        TDVector(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(VECTOR, skip_first_column, laplace) { }
+        TDVector(bool skip_first_column = true, prob_t laplace = 0, const std::string &filepath = "")
+                : AbstractTDContainer(VECTOR, skip_first_column, laplace, filepath) { }
 
 
         virtual ~TDVector() { }
 
 
-        bool read(const std::string& filepath, std::string &err_message) {
+        bool read(std::string &err_message) {
             std::ifstream ifs;
 
-            ifs.open(filepath);
+            ifs.open(_filepath);
 
             if (ifs.is_open()) {
                 std::stringstream line_stream;
@@ -206,7 +217,7 @@ namespace ymir {
             }
 
             _file_exists = false;
-            err_message = "ERROR: can't open file [" + filepath + "]";
+            err_message = "ERROR: can't open file [" + _filepath + "]";
             return false;
         }
 
@@ -247,16 +258,17 @@ namespace ymir {
     struct TDVectorList : public AbstractTDContainer {
     public:
 
-        TDVectorList(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(VECTOR_LIST, skip_first_column, laplace) { }
+        TDVectorList(bool skip_first_column = true, prob_t laplace = 0, const std::string &filepath = "")
+                : AbstractTDContainer(VECTOR_LIST, skip_first_column, laplace, filepath) { }
 
 
         virtual ~TDVectorList() { }
 
 
-        bool read(const std::string& filepath, std::string &err_message) {
+        bool read(std::string &err_message) {
             std::ifstream ifs;
 
-            ifs.open(filepath);
+            ifs.open(_filepath);
 
             if (ifs.is_open()) {
                 std::stringstream line_stream;
@@ -329,7 +341,7 @@ namespace ymir {
             }
 
             _file_exists = false;
-            err_message = "ERROR: can't open file [" + filepath + "]";
+            err_message = "ERROR: can't open file [" + _filepath + "]";
             return false;
         }
 
@@ -385,7 +397,8 @@ namespace ymir {
     struct TDMatrix : public AbstractTDContainer  {
     public:
 
-        TDMatrix(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(MATRIX, skip_first_column, laplace)  { }
+        TDMatrix(bool skip_first_column = true, prob_t laplace = 0, const std::string &filepath = "")
+                : AbstractTDContainer(MATRIX, skip_first_column, laplace, filepath)  { }
 
 
         virtual ~TDMatrix() { }
@@ -399,10 +412,10 @@ namespace ymir {
         }
 
 
-        bool read(const std::string& filepath, std::string &err_message) {
+        bool read(std::string &err_message) {
             std::ifstream ifs;
 
-            ifs.open(filepath);
+            ifs.open(_filepath);
 
             if (ifs.is_open()) {
                 _data.push_back(std::vector<prob_t>());
@@ -470,7 +483,7 @@ namespace ymir {
             }
 
             _file_exists = false;
-            err_message = "ERROR: can't open file [" + filepath + "]";
+            err_message = "ERROR: can't open file [" + _filepath + "]";
             return false;
         }
 
@@ -520,16 +533,17 @@ namespace ymir {
     public:
 
 
-        TDMatrixList(bool skip_first_column = true, prob_t laplace = 0) : AbstractTDContainer(MATRIX_LIST, skip_first_column, laplace)  { }
+        TDMatrixList(bool skip_first_column = true, prob_t laplace = 0, const std::string &filepath = "")
+                : AbstractTDContainer(MATRIX_LIST, skip_first_column, laplace, filepath)  { }
 
 
         virtual ~TDMatrixList() { }
 
 
-        bool read(const std::string& filepath, std::string &err_message) {
+        bool read(std::string &err_message) {
             std::ifstream ifs;
 
-            ifs.open(filepath);
+            ifs.open(_filepath);
 
             if (ifs.is_open()) {
                 std::stringstream line_stream;
@@ -601,7 +615,7 @@ namespace ymir {
             }
 
             _file_exists = false;
-            err_message = "ERROR: can't open file [" + filepath + "]";
+            err_message = "ERROR: can't open file [" + _filepath + "]";
             return false;
         }
 
@@ -661,13 +675,13 @@ namespace ymir {
         AbstractTDContainer* container;
         err_message = "OK";
         if (filetype == "matrix") {
-            container = new TDMatrix(skip_first_column, laplace);
+            container = new TDMatrix(skip_first_column, laplace, filepath);
         } else if (filetype == "vector.list") {
-            container = new TDVectorList(skip_first_column, laplace);
+            container = new TDVectorList(skip_first_column, laplace, filepath);
         } else if (filetype == "matrix.list") {
-            container = new TDMatrixList(skip_first_column, laplace);
+            container = new TDMatrixList(skip_first_column, laplace, filepath);
         } else if (filetype == "vector") {
-            container = new TDVector(skip_first_column, laplace);
+            container = new TDVector(skip_first_column, laplace, filepath);
         } else {
             if (filetype == "") {
                 err_message = "ERROR: no file type for [" + filepath + "]";
@@ -677,8 +691,13 @@ namespace ymir {
             return nullptr;
         }
 
-        container->read(filepath, err_message);
-        return container;
+        if (container->file_exists()) {
+            container->read(err_message);
+            return container;
+        } else {
+            err_message = "ERROR: can't open or read the file [" + filepath + "]";
+            return nullptr;
+        }
     }
 
 }

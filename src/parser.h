@@ -349,13 +349,24 @@ namespace ymir {
 
         void parseWordSegment(const string& word, char sep, vector<seg_index_t> &segvec, const GeneSegmentAlphabet& gsa) {
             stringstream word_stream(word);
+
+            // check if genes are presented in GeneSegmentAlphabet
+
             if (word_stream.eof()) {
-                segvec.push_back(gsa[word].index);
+                if (gsa[word].index != 0) {
+                    segvec.push_back(gsa[word].index);
+                } else {
+                    std::cout << "can't find '" << word << "' among genes" << std::endl;
+                }
             } else {
                 string temp_str = "";
                 while (!word_stream.eof()) {
                     getline(word_stream, temp_str, sep);
-                    segvec.push_back(gsa[temp_str].index);
+                    if (gsa[temp_str].index != 0) {
+                        segvec.push_back(gsa[temp_str].index);
+                    } else {
+                        std::cout << "can't find '" << temp_str << "' among genes" << std::endl;
+                    }
                 }
             }
         }

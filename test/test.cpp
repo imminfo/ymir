@@ -1251,7 +1251,7 @@ YMIR_TEST_START(test_writer)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_mitcr_vj)
+YMIR_TEST_START(test_ymir_vj)
 
     RepertoireParser parser;
 
@@ -1289,7 +1289,7 @@ YMIR_TEST_START(test_mitcr_vj)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_mitcr_vdj_with_d_alignment)
+YMIR_TEST_START(test_ymir_vdj_with_d_alignment)
 
     vector<string> alvec1;
     vector<string> seqvec1;
@@ -2492,9 +2492,9 @@ int main() {
     YMIR_TEST(test_writer(), "Writer")
 
     // Test for MiTCR parser.
-    YMIR_TEST(test_mitcr_vj(), "MiTCR parser test for alpha chain")
-    YMIR_TEST(test_mitcr_vdj_with_d_alignment(), "MiTCR parser test for beta chain with D alignment")
-//    YMIR_TEST(test_mitcr_vdj_wo_d_alignment(), "MiTCR parser test for beta chain without D alignment")
+    YMIR_TEST(test_ymir_vj(), "Ymir parser test for alpha chain")
+    YMIR_TEST(test_ymir_vdj_with_d_alignment(), "Ymir parser test for beta chain with D alignment")
+//    YMIR_TEST(test_ymir_vdj_wo_d_alignment(), "Ymir parser test for beta chain without D alignment")
 
     // Tests for clonal repertoires and clonal repertoire views.
     YMIR_TEST(test_clorep(), "Cloneset / ClonesetView manipulations")

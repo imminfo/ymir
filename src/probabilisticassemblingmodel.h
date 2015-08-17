@@ -356,7 +356,7 @@ namespace ymir {
                         "\n\t" <<
                         _config.get("recombination", "undefined").asString() <<
                         "-recombination  |  " <<
-                        (_config.get("hypermutations", false).asBool() ? "With sequence errors" : "No sequence errors") <<
+                        (_config.get("hypermutations", false).asBool() ? "Sequence error model" : "No sequence error model") <<
                         endl << "\tFiles:"<< endl;
                 return true;
             }
@@ -427,15 +427,15 @@ namespace ymir {
 
             for (size_t i = 0; i < names.size(); ++i) {
                 if (gsa[names[i]].index == 0) {
-                    err_message = "ERROR: can't find " + names[i] + " in gene segments.";
+                    err_message = "ERROR: can't find '" + names[i] + "' in gene segments.";
                     return false;
                 }
                 nameset.insert(names[i]);
             }
 
-            for (size_t i = 1; i < gsa.size(); ++i) {
+            for (size_t i = 1; i <= gsa.max(); ++i) {
                 if (nameset.count(gsa[i].allele) == 0) {
-                    err_message = "ERROR: can't find " + gsa[i].allele + " in this file.";
+                    err_message = "ERROR: can't find '" + gsa[i].allele + "' in this file.";
                     return false;
                 }
             }
@@ -725,7 +725,7 @@ namespace ymir {
                 if (container && container->file_exists()) {
                     if (container->n_rows() != 4 || container->n_columns() != 1) {
                         stringstream ss;
-                        ss << "ERROR: wrong number of columns and rows (expected: 4 X 1, got: " << (int) container->n_rows() << "X" << (int) container->n_columns() << ")";
+                        ss << "ERROR: wrong number of columns and rows (expected: 4 X 1, got: " << (int) container->n_rows() << " X " << (int) container->n_columns() << ")";
                         err_message = ss.str();
                     } else {
                         containers[VJ_VAR_JOI_INS_NUC] = container;
@@ -808,7 +808,7 @@ namespace ymir {
                 if (container && container->file_exists()) {
                     if (container->n_rows() != 4 || container->n_columns() != 8) {
                         stringstream ss;
-                        ss << "ERROR: wrong number of columns and rows (expected: 4 X 8, got: " << (int) container->n_rows() << "X" << (int) container->n_columns() << ")";
+                        ss << "ERROR: wrong number of columns and rows (expected: 4 X 8, got: " << (int) container->n_rows() << " X " << (int) container->n_columns() << ")";
                         err_message = ss.str();
                     } else {
                         containers[VDJ_VAR_DIV_INS_NUC] = container;

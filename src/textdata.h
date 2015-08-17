@@ -356,9 +356,13 @@ namespace ymir {
                 for (auto i = 1; i < _data.size(); ++i) { max_len = std::max(max_len, (seq_len_t) _data[i].size()); }
 
                 for (auto i = 0; i < _colnames.size(); ++i) {
-                    ofs << _colnames[i] << "\t";
+                    ofs << _colnames[i];
+                    if (i < _colnames.size() - 1) {
+                        ofs << "\t";
+                    } else {
+                        ofs << std::endl;
+                    }
                 }
-                ofs << std::endl;
 
                 for (auto pos_i = 0; pos_i < max_len; ++pos_i) {
                     if (pos_i < _rownames.size()) {
@@ -495,9 +499,13 @@ namespace ymir {
 
             if (ofs.is_open()) {
                 for (auto i = 0; i < _colnames.size(); ++i) {
-                    ofs << _colnames[i] << "\t";
+                    ofs << _colnames[i];
+                    if (i < _colnames.size() - 1) {
+                        ofs << "\t";
+                    } else {
+                        ofs << std::endl;
+                    }
                 }
-                ofs << std::endl;
 
                 for (size_t row_i = 0; row_i < _data[0].size() / _metadata[0]; ++row_i) {
                     ofs << _rownames[row_i] << '\t';

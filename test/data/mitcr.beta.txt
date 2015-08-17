@@ -1,2 +1,0 @@
-Read count	Percentage	CDR3 nucleotide sequence	CDR3 nucleotide quality	Min quality	CDR3 amino acid sequence	V alleles	V segments	J alleles	J segments	D alleles	D segments	Last V nucleotide position	First D nucleotide position	Last D nucleotide position	First J nucleotide position	VD insertions	DJ insertions	Total insertions
-1	0.00403771274051375	CCCGACGGTTT	IIIIIIIIIIIIHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII	39	CAASTPLSW~GTSYGKLTF	TRAV13-1*01, TRAV13-1*02	Vseg1	TRAJ52*01	Jseg1			6	-1	-1	5	-1	-1	9

@@ -37,7 +37,7 @@ int main() {
 
     tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vj;
-    parser.parse(BENCH_DATA_FOLDER + "mitcr.alpha.500k.txt",
+    parser.parse(BENCH_DATA_FOLDER + "alpha.500k.txt",
                  &cloneset_vj,
                  vj_genes,
                  RepertoireParser::AlignmentColumnOptions()
@@ -59,7 +59,7 @@ int main() {
 
     tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vdj;
-    parser.parse(BENCH_DATA_FOLDER + "mitcr.beta.500k.txt",
+    parser.parse(BENCH_DATA_FOLDER + "beta.500k.txt",
                  &cloneset_vdj,
                  vdj_genes,
                  RepertoireParser::AlignmentColumnOptions()

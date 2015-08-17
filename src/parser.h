@@ -134,7 +134,7 @@ namespace ymir {
             bool res = false;
             if (ifs.is_open()) {
                 std::cout << "Parsing input file:\t" << filepath << endl;
-                res = this->parseRepertoire(ifs, clonevec, gene_segments, aligner, nuc_sequences, opts);
+                res = this->parseRepertoire(filepath, ifs, clonevec, gene_segments, aligner, nuc_sequences, opts);
                 if (res) { rep->swap(clonevec); }
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
@@ -148,11 +148,12 @@ namespace ymir {
 
     protected:
 
-        ParserConfig _config;
+//        ParserConfig _config;
 //        bool _config_is_loaded;
 
 
-        virtual bool parseRepertoire(ifstream& ifs,
+        virtual bool parseRepertoire(const string &filename,
+                                     ifstream& ifs,
                                      vector<Clonotype>& vec,
                                      const VDJRecombinationGenes& gene_segments,
                                      const AbstractAligner& aligner,
@@ -195,16 +196,15 @@ namespace ymir {
 
             char sep = '\t';
             char al_sep = ',';
-            bool based1 = _config.get("1-based", false).asBool();
+//            bool based1 = _config.get("1-based", false).asBool();
 
             bool do_align_V = false, do_align_J = false, do_align_D = false;
 
             stringstream line_stream, word_stream;
             string line, word, sequence;
-            int skip_lines = 1;
-            bool header = true;
 
             int index = 0;
+            bool header = true;
 
             vector<seg_index_t> vseg, jseg, dseg;
             string temp_str;
@@ -215,46 +215,18 @@ namespace ymir {
 
             while (!ifs.eof()) {
                 getline(ifs, line);
-//                std::cout << line << std::endl;
                 if (line.size() > 2) {
                     line_stream.str(line);
-                    if (skip_lines) {
-
-                        // skip number of lines at the start of the file
-                        --skip_lines;
-
-                    } else if (header) {
-
-                        // parse header
-//                        int index = 0;
-//                        while (!line_stream.eof()) {
-//                            getline(line_stream, word, sep);
-//                            unordered_map<string, int>::iterator col_it = columns_id.find(word);
-//                            if (col_it != columns_id.end()) {
-//                                columns_id[word] = index;
-//                            }
-//                            ++index;
-//                        }
-//
-//                        // set indices of important columns
-//                        col_nuc_seq_id = columns_id[col_nuc_seq];
-//                        col_aa_seq_id = columns_id[col_aa_seq];
-//                        col_v_seg_id = columns_id[col_v_seg];
-//                        col_v_end_id = columns_id[col_v_end];
-//                        col_j_seg_id = columns_id[col_j_seg];
-//                        col_j_start_id = columns_id[col_j_start];
-//                        col_d_seg_id = columns_id[col_d_seg];
-//                        col_d_als_id = columns_id[col_d_als];
-
+                    if (header) {
                         // check main column
                         if (nuc_sequences) {
                             if (columns_id[col_nuc_seq] == -1) {
-                                cerr << "Repertoire parser " + get_parser_name() + " error:" << endl << "\tcolumn with nucleotide sequences not found" << endl;
+                                cout << "Repertoire parser error:" << endl << "\tcolumn with nucleotide sequences not found" << endl;
                                 return false;
                             }
                         } else {
                             if (columns_id[col_aa_seq] == -1) {
-                                cerr << "Repertoire parser " + get_parser_name() + " error:" << endl << "\tcolumn with amino acid sequences not found" << endl;
+                                cout << "Repertoire parser error:" << endl << "\tcolumn with amino acid sequences not found" << endl;
                                 return false;
                             }
                         }
@@ -301,11 +273,11 @@ namespace ymir {
                             } else if (index == col_v_seg_id) {
                                 parseWordSegment(word, al_sep, vseg, gene_segments.V());
                             } else if (index == col_v_end_id) {
-                                parseWordAlignment(word, al_sep, vseg, gene_segments.V(), clone_builder, based1, 'V');
+                                parseWordAlignment(word, al_sep, vseg, gene_segments.V(), clone_builder, 'V');
                             } else if (index == col_j_seg_id) {
                                 parseWordSegment(word, al_sep, jseg, gene_segments.J());
                             } else if (index == col_j_start_id) {
-                                parseWordAlignment(word, al_sep, jseg, gene_segments.J(), clone_builder, based1, 'J');
+                                parseWordAlignment(word, al_sep, jseg, gene_segments.J(), clone_builder, 'J');
                             } else if (index == col_d_seg_id) {
                                 // NOT IMPLEMENTED YET
                                 if (!do_align_D) {
@@ -339,14 +311,14 @@ namespace ymir {
                                 }
                             }
                             if (!align_ok) {
-                                cerr << "Diversity gene could NOT be aligned with the given minimal gene length (min gene length " << (size_t) DEFAULT_DIV_GENE_MIN_LEN << ", line " << (size_t) glob_index << ")" << endl;
+                                cout << "Diversity gene could NOT be aligned with the given minimal gene length (min gene length " << (size_t) DEFAULT_DIV_GENE_MIN_LEN << ", line " << (size_t) glob_index << ")" << endl;
                                 ++bad_index;
                             }
                         }
 
                         ++glob_index;
                         if (glob_index % 50000 == 0) {
-                            cout << get_parser_name() + ": parsed " << glob_index << " lines" << endl;
+                            cout << this->get_prefix(filename) + "parsed " << glob_index << " lines" << endl;
                         }
 
                         //
@@ -361,7 +333,7 @@ namespace ymir {
                 }
             }
 
-            cout << get_parser_name() + ": parsed " <<
+            cout << this->get_prefix(filename) + "parsed " <<
                     glob_index <<
                     " lines (" <<
                     bad_index  <<
@@ -389,13 +361,12 @@ namespace ymir {
         }
 
 
-        void parseWordAlignment(const string& word, char sep, vector<seg_index_t> &segvec, const GeneSegmentAlphabet& gsa, ClonotypeBuilder &clone_builder, bool based1, char seg) {
+        void parseWordAlignment(const string& word, char sep, vector<seg_index_t> &segvec, const GeneSegmentAlphabet& gsa, ClonotypeBuilder &clone_builder, char seg) {
             stringstream word_stream(word);
             int aligned_chars = 0;
             if (word_stream.eof()) {
                 aligned_chars = stoi(word);
                 if (aligned_chars == -1) { aligned_chars = 0; }
-                else { aligned_chars += !based1; }
 
                 if (seg == 'V') {
                     clone_builder.addValignment(segvec[0], aligned_chars);
@@ -409,7 +380,6 @@ namespace ymir {
                     getline(word_stream, temp_str, sep);
                     aligned_chars = stoi(temp_str);
                     if (aligned_chars == -1) { aligned_chars = 0; }
-                    else { aligned_chars += !based1; }
 
                     if (seg == 'V') {
                         clone_builder.addValignment(segvec[seg_index], aligned_chars);
@@ -423,8 +393,8 @@ namespace ymir {
         }
 
 
-        string get_parser_name() const {
-            return "[" + _config.get("name", "nameless parser").asString() + "]";
+        string get_prefix(const string &filename) const {
+            return "[" + filename + "]: ";
         }
 
     };

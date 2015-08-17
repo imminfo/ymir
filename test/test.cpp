@@ -1246,7 +1246,7 @@ YMIR_TEST_START(test_writer)
     vec.push_back(clonotype);
     Cloneset cloneset(vec);
 
-    YMIR_TEST(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset, genes));
+    YMIR_ASSERT(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset, genes))
 
 YMIR_TEST_END
 
@@ -1254,7 +1254,6 @@ YMIR_TEST_END
 YMIR_TEST_START(test_mitcr_vj)
 
     RepertoireParser parser;
-    YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
 
     bool V_err, J_err;
     VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
@@ -1263,7 +1262,7 @@ YMIR_TEST_START(test_mitcr_vj)
     YMIR_ASSERT(J_err)
 
     Cloneset cr;
-    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha.txt",
+    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha.txt",
                              &cr,
                              vdj_genes,
                              RepertoireParser::AlignmentColumnOptions()
@@ -1322,10 +1321,9 @@ YMIR_TEST_START(test_mitcr_vdj_with_d_alignment)
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
     RepertoireParser parser;
-    YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
 
     Cloneset cr;
-    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.beta.txt",
+    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.beta.txt",
                              &cr,
                              genes,
                              RepertoireParser::AlignmentColumnOptions()
@@ -1348,7 +1346,6 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_clorep)
     RepertoireParser parser;
-    YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
 
     bool V_err, J_err;
     VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
@@ -1357,7 +1354,7 @@ YMIR_TEST_START(test_clorep)
     YMIR_ASSERT(J_err)
 
     Cloneset cr;
-    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha.txt",
+    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha.txt",
                              &cr,
                              vdj_genes,
                              RepertoireParser::AlignmentColumnOptions()
@@ -2189,7 +2186,6 @@ YMIR_TEST_START(test_model_vj_maag)
     YMIR_ASSERT(model.status())
 
     RepertoireParser parser;
-    YMIR_ASSERT(parser.loadConfig(TEST_DATA_FOLDER + "../../parsers/mitcr.json"))
 
     bool V_err, J_err;
     VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
@@ -2199,7 +2195,7 @@ YMIR_TEST_START(test_model_vj_maag)
     YMIR_ASSERT(J_err)
 
     Cloneset cloneset;
-    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "mitcr.alpha2.txt", &cloneset, vdj_genes))
+    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha2.txt", &cloneset, vdj_genes))
 
     MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, NUCLEOTIDE)[1];
 

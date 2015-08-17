@@ -119,10 +119,11 @@ class RepertoireConverter:
             out_words[i] = words[self.ymir_columns[key]]
 
         if self._base == 0:
-            out_words[5] = str(int(out_words[5]) + 1)
-            out_words[6] = str(int(out_words[6]) + 1)
-            out_words[7] = str(int(out_words[7]) + 1)
-            out_words[8] = str(int(out_words[8]) + 1)
+
+            out_words[5] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[5].split(self.input_gene_sep))))
+            out_words[6] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[6].split(self.input_gene_sep))))
+            out_words[7] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[7].split(self.input_gene_sep))))
+            out_words[8] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[8].split(self.input_gene_sep))))
 
         return self.ymir_col_sep.join(out_words)
 
@@ -200,28 +201,28 @@ class MiTCRConverter (RepertoireConverter):
         Initialise input files' column names and separator characters.
         """
 
-        # self.input_nuc = "CDR3 nucleotide sequence"
-        # self.input_aa = "CDR3 amino acid sequence"
-        # self.input_vgene = "V segments"
-        # self.input_dgene = "D segments"
-        # self.input_jgene = "J segments"
-        # self.input_vend = "Last V nucleotide position"
-        # self.input_dstart = "First D nucleotide position"
-        # self.input_dend = "Last D nucleotide position"
-        # self.input_jstart = "First J nucleotide position"
-        # self.input_col_sep = "\t"
-        # self.input_gene_sep = ", "
-        self.input_nuc = "CDR3.nucleotide.sequence"
-        self.input_aa = "CDR3.amino.acid.sequence"
-        self.input_vgene = "V.segments"
-        self.input_dgene = "D.segments"
-        self.input_jgene = "J.segments"
-        self.input_vend = "Last.V.nucleotide.position"
-        self.input_dstart = "First.D.nucleotide.position"
-        self.input_dend = "Last.D.nucleotide.position"
-        self.input_jstart = "First.J.nucleotide.position"
+        self.input_nuc = "CDR3 nucleotide sequence"
+        self.input_aa = "CDR3 amino acid sequence"
+        self.input_vgene = "V segments"
+        self.input_dgene = "D segments"
+        self.input_jgene = "J segments"
+        self.input_vend = "Last V nucleotide position"
+        self.input_dstart = "First D nucleotide position"
+        self.input_dend = "Last D nucleotide position"
+        self.input_jstart = "First J nucleotide position"
         self.input_col_sep = "\t"
         self.input_gene_sep = ", "
+        # self.input_nuc = "CDR3.nucleotide.sequence"
+        # self.input_aa = "CDR3.amino.acid.sequence"
+        # self.input_vgene = "V.segments"
+        # self.input_dgene = "D.segments"
+        # self.input_jgene = "J.segments"
+        # self.input_vend = "Last.V.nucleotide.position"
+        # self.input_dstart = "First.D.nucleotide.position"
+        # self.input_dend = "Last.D.nucleotide.position"
+        # self.input_jstart = "First.J.nucleotide.position"
+        # self.input_col_sep = "\t"
+        # self.input_gene_sep = ", "
 
 
     # def compute_skip(self, fin):

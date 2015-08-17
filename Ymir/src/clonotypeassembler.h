@@ -150,16 +150,17 @@ namespace ymir {
             seq_len_t d5_del_num = d_del_index / _param_vec.n_columns(VDJ_DIV_DEL, 0);
             seq_len_t d3_del_num = d_del_index - (d_del_index / _param_vec.n_columns(VDJ_DIV_DEL, 0)) * _param_vec.n_columns(VDJ_DIV_DEL, 0);
             std::string dgene_del = _genes.D()[dgene].sequence.substr(d5_del_num, _genes.D()[dgene].sequence.size() - d3_del_num - d5_del_num);
-            builder.addDalignment(dgene, vgene_del.size() + ins_len_vd + 1,
-                                  vgene_del.size() + ins_len_vd + 1 + dgene_del.size(),
+            builder.addDalignment(dgene,
                                   d3_del_num + 1,
-                                  _genes.D()[dgene].sequence.size() - d3_del_num);
+                                  _genes.D()[dgene].sequence.size() - d3_del_num,
+                                  vgene_del.size() + ins_len_vd + 1,
+                                  vgene_del.size() + ins_len_vd + 1 + dgene_del.size());
 
             seq_len_t j_del_num = std::discrete_distribution<event_ind_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_JOI_DEL, jgene - 1, 0)),
                                                                           _param_vec.get_iterator(_param_vec.event_index(VDJ_JOI_DEL, jgene - 1, 0)
                                                                                                   + _param_vec.eventFamilySize(VDJ_JOI_DEL, jgene - 1)))(rg);
             std::string jgene_del = _genes.J()[jgene].sequence.substr(j_del_num);
-            builder.addJalignment(jgene, _genes.J()[jgene].sequence.size() - j_del_num + ins_len_vd + ins_len_dj + dgene_del.size() + 1);
+            builder.addJalignment(jgene, vgene_del.size() + ins_len_vd + ins_len_dj + dgene_del.size() + 1);
             
             builder.setSequence(vgene_del
                                 + mc_vd.generate(ins_len_vd, rg, vgene_del[vgene_del.size() - 1])

@@ -44,9 +44,13 @@ the Ymir's format and wrapping calls to Ymir C++ scripts.
 
 - [JsonCPP](https://github.com/open-source-parsers/jsoncpp) - JSON files used for storing metadata about models. 
 
+You can load Ymir to [CLion](https://www.jetbrains.com/clion/) and compile with it.
+
 #### Installation on Ubuntu
 
 #### Installation on Mac OS Mavericks
+
+#### Installation on Mac OS Yosemite
 
 Targets: scripts, tests, benchmarking, lib
 

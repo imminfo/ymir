@@ -225,9 +225,13 @@ class MiTCRConverter (RepertoireConverter):
         # self.input_gene_sep = ", "
 
 
-    # def compute_skip(self, fin):
-    #     # check for levels of MiTCR output
-    #     pass
+    def compute_skip(self, fin):
+        # check for levels of MiTCR output
+        line = fin.readline()
+        if line.lower().find("mitcrfullexport") != -1:
+            return 1
+        else:
+            return 0
 
 
     def set_base(self):

@@ -238,7 +238,7 @@ namespace ymir {
                         if ((columns_id[col_j_start] == -1 && opts.align_J == MAKE_IF_NOT_FOUND) || opts.align_J == OVERWRITE) {
                             do_align_J = true;
                         }
-                        if ((gene_segments.is_vdj()) && ((columns_id[col_d_als] == -1 && opts.align_D == MAKE_IF_NOT_FOUND) || opts.align_D == OVERWRITE)) {
+                        if (gene_segments.is_vdj() && ((columns_id[col_d_als] == -1 && opts.align_D == MAKE_IF_NOT_FOUND) || opts.align_D == OVERWRITE)) {
                             do_align_D = true;
                         }
 

@@ -14,6 +14,8 @@ class RepertoireConverter:
         self.init_input_column_names()
         self.init_input_columns()
 
+        self.set_base()
+
 
     def init_ymir_names(self):
         """
@@ -116,6 +118,12 @@ class RepertoireConverter:
         for i, key in enumerate(self.ymir_columns_sorted):
             out_words[i] = words[self.ymir_columns[key]]
 
+        if self._base == 0:
+            out_words[5] = str(int(out_words[5]) + 1)
+            out_words[6] = str(int(out_words[6]) + 1)
+            out_words[7] = str(int(out_words[7]) + 1)
+            out_words[8] = str(int(out_words[8]) + 1)
+
         return self.ymir_col_sep.join(out_words)
 
 
@@ -138,6 +146,10 @@ class RepertoireConverter:
         return 0
 
 
+    def set_base(self):
+        self._base = 0
+
+
 class YmirConverter:
     def __init__(self):
         pass
@@ -145,6 +157,10 @@ class YmirConverter:
 
     def convert(self, file_in, file_out):
         pass
+
+
+    def set_base(self):
+        self._base = 1
 
 
 class tcRConverter (RepertoireConverter):
@@ -168,6 +184,10 @@ class tcRConverter (RepertoireConverter):
         self.input_jstart = "J.start"
         self.input_col_sep = "\t"
         self.input_gene_sep = ", "
+
+
+    def set_base(self):
+        self._base = 0
 
 
 class MiTCRConverter (RepertoireConverter):
@@ -209,6 +229,10 @@ class MiTCRConverter (RepertoireConverter):
     #     pass
 
 
+    def set_base(self):
+        self._base = 0
+
+
 class MiGECConverter (RepertoireConverter):
     def __init__(self):
         RepertoireConverter.__init__(self)
@@ -232,6 +256,10 @@ class MiGECConverter (RepertoireConverter):
         self.input_gene_sep = ","
 
 
+    def set_base(self):
+        self._base = 0
+
+
 class VDJtoolsConverter (RepertoireConverter):
     def __init__(self):
         RepertoireConverter.__init__(self)
@@ -253,3 +281,7 @@ class VDJtoolsConverter (RepertoireConverter):
         self.input_jstart = "JStart"
         self.input_col_sep = "\t"
         self.input_gene_sep = ","
+
+
+    def set_base(self):
+        self._base = 0

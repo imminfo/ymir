@@ -118,12 +118,20 @@ class RepertoireConverter:
         for i, key in enumerate(self.ymir_columns_sorted):
             out_words[i] = words[self.ymir_columns[key]]
 
-        if self._base == 0:
+        out_words[2] = out_words[2].replace(self.input_gene_sep, self.ymir_gene_sep)
+        out_words[3] = out_words[3].replace(self.input_gene_sep, self.ymir_gene_sep)
+        out_words[4] = out_words[4].replace(self.input_gene_sep, self.ymir_gene_sep)
 
+        if self._base == 0:
             out_words[5] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[5].split(self.input_gene_sep))))
             out_words[6] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[6].split(self.input_gene_sep))))
             out_words[7] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[7].split(self.input_gene_sep))))
             out_words[8] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[8].split(self.input_gene_sep))))
+        else:
+            out_words[5] = out_words[5].replace(self.input_gene_sep, self.ymir_gene_sep)
+            out_words[6] = out_words[6].replace(self.input_gene_sep, self.ymir_gene_sep)
+            out_words[7] = out_words[7].replace(self.input_gene_sep, self.ymir_gene_sep)
+            out_words[8] = out_words[8].replace(self.input_gene_sep, self.ymir_gene_sep)
 
         return self.ymir_col_sep.join(out_words)
 
@@ -156,14 +164,6 @@ class YmirConverter:
         pass
 
 
-    def convert(self, file_in, file_out):
-        pass
-
-
-    def set_base(self):
-        self._base = 1
-
-
 class tcRConverter (RepertoireConverter):
     def __init__(self):
         RepertoireConverter.__init__(self)
@@ -188,7 +188,7 @@ class tcRConverter (RepertoireConverter):
 
 
     def set_base(self):
-        self._base = 0
+        self._base = 1
 
 
 class MiTCRConverter (RepertoireConverter):

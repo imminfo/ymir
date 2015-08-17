@@ -172,7 +172,7 @@ namespace ymir {
             vector<prob_t> res;
             res.reserve(cloneset.size());
 
-            std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes:" << std::endl;
+            std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes." << std::endl;
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 res.push_back(buildAndCompute(cloneset[i], aminoacid, action));
                 if ((i+1) % 50000 == 0) {

@@ -211,7 +211,7 @@ namespace ymir {
 
             ClonotypeBuilder clone_builder;
 
-            int glob_index = 0, bad_index = 0;
+            int glob_index = 1, bad_index = 0;
 
             while (!ifs.eof()) {
                 getline(ifs, line);
@@ -271,11 +271,11 @@ namespace ymir {
                                     sequence = word;
                                 }
                             } else if (index == col_v_seg_id) {
-                                parseWordSegment(word, al_sep, vseg, gene_segments.V());
+                                parseWordSegment(word, al_sep, vseg, gene_segments.V(), glob_index);
                             } else if (index == col_v_end_id) {
                                 parseWordAlignment(word, al_sep, vseg, gene_segments.V(), clone_builder, 'V');
                             } else if (index == col_j_seg_id) {
-                                parseWordSegment(word, al_sep, jseg, gene_segments.J());
+                                parseWordSegment(word, al_sep, jseg, gene_segments.J(), glob_index);
                             } else if (index == col_j_start_id) {
                                 parseWordAlignment(word, al_sep, jseg, gene_segments.J(), clone_builder, 'J');
                             } else if (index == col_d_seg_id) {
@@ -316,10 +316,10 @@ namespace ymir {
                             }
                         }
 
-                        ++glob_index;
                         if (glob_index % 50000 == 0) {
-                            cout << this->get_prefix(filename) + "parsed " << glob_index << " lines" << endl;
+                            cout << this->get_prefix(filename) + "parsed " << (size_t) glob_index << " lines" << endl;
                         }
+                        ++glob_index;
 
                         //
                         // remove bad clonotypes here
@@ -333,21 +333,21 @@ namespace ymir {
                 }
             }
 
-            cout << this->get_prefix(filename) + "parsed " <<
-                    glob_index <<
+            std::cout << this->get_prefix(filename) + "parsed " <<
+                    (size_t) glob_index <<
                     " lines (" <<
-                    bad_index  <<
+                    (size_t) bad_index  <<
                     " error clonotypes removed)." <<
-                    endl <<
+                    std::endl <<
                     "Parsing is complete. Resulting cloneset size: " <<
-                    (glob_index - bad_index) <<
-                    endl;
+                    (size_t) vec.size() <<
+                    std::endl;
 
             return true;
         }
 
 
-        void parseWordSegment(const string& word, char sep, vector<seg_index_t> &segvec, const GeneSegmentAlphabet& gsa) {
+        void parseWordSegment(const string& word, char sep, vector<seg_index_t> &segvec, const GeneSegmentAlphabet& gsa, size_t line_num) {
             stringstream word_stream(word);
 
             // check if genes are presented in GeneSegmentAlphabet
@@ -356,7 +356,7 @@ namespace ymir {
                 if (gsa[word].index != 0) {
                     segvec.push_back(gsa[word].index);
                 } else {
-                    std::cout << "can't find '" << word << "' among genes" << std::endl;
+                    std::cout << "can't find '" << word << "' among genes at line " << line_num << std::endl;
                 }
             } else {
                 string temp_str = "";
@@ -365,7 +365,7 @@ namespace ymir {
                     if (gsa[temp_str].index != 0) {
                         segvec.push_back(gsa[temp_str].index);
                     } else {
-                        std::cout << "can't find '" << temp_str << "' among genes" << std::endl;
+                        std::cout << "can't find '" << temp_str << "' among genes at line " << line_num << std::endl;
                     }
                 }
             }

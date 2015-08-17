@@ -43,7 +43,7 @@ namespace ymir {
             std::default_random_engine rg(seed);
 
             if (_param_vec.recombination() == VJ_RECOMB) {
-                std::cout << "Generating sequences:" << std::endl;
+                std::cout << "Generating " << (size_t) count << " sequences." << std::endl;
 
                 for (size_t clonotype_i = 0; clonotype_i < count; ++clonotype_i) {
                     vec.push_back(this->generate_vj(rg));
@@ -55,7 +55,7 @@ namespace ymir {
                 cout << "Generated " << (size_t) count << "/" << (size_t) count << " sequences." << endl;
             }
             else if (_param_vec.recombination() == VDJ_RECOMB) {
-                std::cout << "Generating sequences:" << std::endl;
+                std::cout << "Generating " << (size_t) count << " sequences." << std::endl;
 
                 for (size_t clonotype_i = 0; clonotype_i < count; ++clonotype_i) {
                     vec.push_back(this->generate_vdj(rg));

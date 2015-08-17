@@ -24,39 +24,47 @@ You can use Ymir in two ways:
 
 - as a library in your project or 
 
-- using pre-made scripts for the most common tasks - computation of generation probabilities,
-estimation of parameters of an assembling model from the experimental data or
-generation of pre-selected immune receptor sequences. For this tasks you need to compile
-some source code, but don't worry! It's very easy, just look at the next subsection. After compiling,
-take a look at the `Examples / ready-to-use scripts` section where pre-made scripts are explained in details.
+- using pre-made scripts for the most common tasks - computation of generation probabilities (sometimes I call them "assembling probabilities",
+estimation of parameters of an immune receptor assembling model from the experimental data or
+generation of pre-selection immune receptor sequences.
+For this tasks you need to compile some source code, but don't worry!
+It's very easy, just look at the next subsection.
+After compiling, take a look at the `Examples / ready-to-use scripts` section where pre-made scripts are explained in details.
 
 ### Compiling Ymir
 
 Dependencies:
 
-- [Python 3](https://www.python.org/downloads/)
+- C++ compiler - either [Clang](http://clang.llvm.org/) or [GCC](https://gcc.gnu.org/). On benchmarks Clang is performing better then GCC.
 
-- [JsonCPP](https://github.com/open-source-parsers/jsoncpp)
+- [CMake](http://www.cmake.org/download/) - the build system which used in Ymir.
 
-- [MPFR (non-necessary due to license)]()
+- [Python 3](https://www.python.org/downloads/) - we need it for some useful scripts like converting input files to
+the Ymir's format and wrapping calls to Ymir C++ scripts.
 
-assembling / generation
+- [JsonCPP](https://github.com/open-source-parsers/jsoncpp) - JSON files used for storing metadata about models. 
+
+#### Installation on Ubuntu
+
+#### Installation on Mac OS Mavericks
 
 Targets: scripts, tests, benchmarking, lib
 
 ### Using Ymir as a library
 
-Ymir is a header only library
+Ymir is a header only library, however, you need to put the `jsoncpp.cpp` file to the `Ymir/src` folder.
 
-For using only the core data structure MAAG and MAAGBuilder use:
+Next text is assumed that your include path is setted to `$YMIR_FOLDER/`.
+
+For using only the core data structures MAAG and MAAGBuilder add:
 
     #include <Ymir/Graph>
 
-For computing and generation from files:
+For computing and generation assembling probabilities from files:
 
     #include <Ymir/Model>
 
-For statistical inference of parameters:
+For the statistical inference of marginal parameters of generation models:
 
     #include <Ymir/Inference>
 
@@ -64,7 +72,17 @@ For super secret unimplemented things:
     
     #include <Ymir/Pattern>
 
-wow-wow, easy here. There are not implemented yet.
+Wow-wow, easy here. They are not implemented yet.
+
+---
+
+## Main helper script
+
+    python3 pyymir.py
+
+* `python3 pyymir.py -m` - list all available models and their aliases.
+* `python3 pyymir.py -f` - list all available converters for input formats and their aliases.
+* `python3 pyymir.py -s` - list all available pre-made scripts.
 
 ---
 
@@ -72,16 +90,25 @@ wow-wow, easy here. There are not implemented yet.
 
 After compiling an executable files will appear in the `build` folder.
 
-### Compute generation probabilities of human TCR-alpha data
+You can download sample files with outputs from [tcR](https://imminfo.github.io/tcr/) package and [MiTCR](http://mitcr.milaboratory.com/) software from here [here]().
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs help` - Print this help message.
+### Compute generation probabilities of human TCR-alpha data from tcR output files
 
-### Estimate human TCR-alpha generation model parameters using EM-algorithm
+    python3 compute.py -i ??? -f tcr -m htra
+    
+sdfsdf
+
+### Estimate human TCR-beta generation model parameters using EM-algorithm from MiTCR output files
+
+    python3 inference.py -i ??? -f mitcr -m htrb
+    
+Run `python3 pyymir.py -f` to view all available models and their aliases.
 
 ### Generate artificial human TCR-alpha repertoire before selection
+
+    python3 generate.py -c 500000 -m htra
+
+asdasd
 
 ---
 
@@ -92,6 +119,8 @@ After compiling an executable files will appear in the `build` folder.
 ### Gene segments files
 
 ### Cloneset files
+
+Run `python3 pyymir.py -f` to view all available formats and their aliases.
 
 ---
 

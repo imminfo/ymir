@@ -12,8 +12,7 @@
 
 #include <ostream>
 
-#include "parser.h"
-#include "probabilisticassemblingmodel.h"
+#include "Model"
 
 
 using namespace ymir;

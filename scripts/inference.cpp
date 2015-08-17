@@ -5,8 +5,7 @@
 
 #include <ostream>
 
-#include "parser.h"
-#include "statisticalinferencealgorithm.h"
+#include "Inference"
 
 
 using namespace ymir;

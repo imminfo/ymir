@@ -1,6 +1,6 @@
 add_executable (Test test.cpp)
 
-include_directories(../src)
+include_directories(../Ymir)
 include_directories(../include)
 include_directories(/usr/local/include/)
 

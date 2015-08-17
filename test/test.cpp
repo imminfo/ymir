@@ -41,10 +41,7 @@
 #include <list>
 #include <sstream>
 
-#include "tools.h"
-#include "parser.h"
-#include "statisticalinferencealgorithm.h"
-#include "writer.h"
+#include "Inference"
 
 
 using namespace std;

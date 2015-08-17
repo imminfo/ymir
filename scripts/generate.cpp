@@ -5,8 +5,7 @@
 
 #include <ostream>
 
-#include "writer.h"
-#include "probabilisticassemblingmodel.h"
+#include "Model"
 
 
 using namespace ymir;

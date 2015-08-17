@@ -1,1 +1,3 @@
+#include "src/parser.h"
+#include "src/writer.h"
 #include "src/statisticalinferencealgorithm.h"

@@ -13,8 +13,7 @@
 #include <chrono>
 #include <ctime>
 
-#include "parser.h"
-#include "statisticalinferencealgorithm.h"
+#include "Inference"
 
 using namespace ymir;
 

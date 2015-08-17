@@ -8,7 +8,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Xlang -fopenmp=libiomp5")
 
-set(SOURCE_FILES src/main.cpp)
+set(SOURCE_FILES Ymir/src/main.cpp)
 
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/build")
 #include(CTest)

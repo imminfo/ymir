@@ -161,11 +161,14 @@ namespace ymir {
                                                                                                   + _param_vec.eventFamilySize(VDJ_JOI_DEL, jgene - 1)))(rg);
             std::string jgene_del = _genes.J()[jgene].sequence.substr(j_del_num);
             builder.addJalignment(jgene, vgene_del.size() + ins_len_vd + ins_len_dj + dgene_del.size() + 1);
-            
+
+            char last_v_char = vgene_del.size() ? vgene_del[vgene_del.size() - 1] : NULL_CHAR;
+            char first_j_char = jgene_del.size() ? jgene_del[0]:  NULL_CHAR;
+
             builder.setSequence(vgene_del
-                                + mc_vd.generate(ins_len_vd, rg, vgene_del[vgene_del.size() - 1])
+                                + mc_vd.generate(ins_len_vd, rg, last_v_char)
                                 + dgene_del
-                                + mc_dj.generate(ins_len_dj, rg, jgene_del[0], true)
+                                + mc_dj.generate(ins_len_dj, rg, first_j_char, true)
                                 + jgene_del);
 
             builder.setNucleotideSeq();

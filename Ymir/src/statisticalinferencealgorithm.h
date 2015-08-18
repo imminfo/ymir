@@ -122,8 +122,12 @@ namespace ymir {
                 }
             }
 
-            cout << "Removed " << (int) removed
-                 << " error-probability clonotypes. Check your minimal Diversity gene length to align and other parameters to make sure it won't happen again in the future." << endl;
+            if (removed) {
+                cout << "Removed " << (int) removed
+                     << " error-probability clonotypes. Check your minimal Diversity gene length to align and other parameters to make sure it won't happen again in the future." << endl;
+            } else {
+                cout << "No clonotypes with error probabilities has been found. It's good in case you don't know." << std::endl;
+            }
 
             cout << endl << "Initial data summary:" << endl;
             prob_summary(prob_vec);

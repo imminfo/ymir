@@ -2544,6 +2544,7 @@ int main(int argc, char* argv[]) {
 
 
     //**************  TESTING RESULTS  **************//
+    std::cout << std::endl;
     cout << "Tests passed:\t" << tests_passed << endl;
     cout << "Tests failed:\t" << (all_tests - tests_passed) << endl;
 

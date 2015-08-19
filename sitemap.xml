@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
+    <url>
+     <loc>https://imminfo.github.io/ymir//</loc>
+     <lastmod>2015-08-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>https://imminfo.github.io/ymir//algorithms/</loc>
+     <lastmod>2015-08-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>https://imminfo.github.io/ymir//api/</loc>
+     <lastmod>2015-08-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>https://imminfo.github.io/ymir//rpackage/</loc>
+     <lastmod>2015-08-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>https://imminfo.github.io/ymir//about/</loc>
+     <lastmod>2015-08-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>https://imminfo.github.io/ymir//mainpage/</loc>
+     <lastmod>2015-08-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+</urlset>

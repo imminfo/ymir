@@ -2,13 +2,13 @@ site_name: Ymir
 site_url: https://imminfo.github.io/ymir/
 repo_url: https://github.com/imminfo/ymir/
 site_author: Vadim Nazarov
-copyright: Copyright © 2015, Vadim Nazarov.
+copyright: Copyright © 2015 Vadim Nazarov.
 pages:
-- [index.md, Home]
-- [algorithms.md, Algorithms]
-- [api.md, C++ API]
-- [rpackage.md, R package]
-- [about.md, About]
-- [mainpage.md, Immunoinformatics page]
+- 'Home' : 'index.md'
+- 'Algorithms' : 'algorithms.md'
+- 'C++ Reference' : 'api.md'
+- 'R package' : 'rpackage.md'
+- 'About' : 'about.md'
+- 'Immunoinformatics page' : 'mainpage.md'
 theme: yeti
 #theme: readthedocs

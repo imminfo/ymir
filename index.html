@@ -9,11 +9,11 @@
         <link rel="canonical" href="https://imminfo.github.io/ymir/">
         <link rel="shortcut icon" href="./img/favicon.ico">
 
-        <title>Ymir</title>
+	<title>Ymir</title>
 
         <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="./css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link href="./css/prettify-1.0.css" rel="stylesheet">
+        <link rel="stylesheet" href="./css/highlight.css">
         <link href="./css/base.css" rel="stylesheet">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -21,6 +21,8 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
+
+        
     </head>
 
     <body>
@@ -48,6 +50,12 @@
             <ul class="nav navbar-nav">
             
             
+                <li class="active">
+                    <a href=".">Home</a>
+                </li>
+            
+            
+            
                 <li >
                     <a href="algorithms/">Algorithms</a>
                 </li>
@@ -55,7 +63,7 @@
             
             
                 <li >
-                    <a href="api/">C++ API</a>
+                    <a href="api/">C++ Reference</a>
                 </li>
             
             
@@ -81,7 +89,6 @@
 
             <!-- Search, Navigation and Repo links -->
             <ul class="nav navbar-nav navbar-right">
-                
                 <li class="disabled">
                     <a rel="next" >
                         <i class="fa fa-arrow-left"></i> Previous
@@ -117,19 +124,33 @@
         
             <li><a href="#installing-and-using-ymir">Installing and using Ymir</a></li>
         
+    
+        <li class="main "><a href="#include">include </a></li>
+        
+    
+        <li class="main "><a href="#include_1">include </a></li>
+        
+    
+        <li class="main "><a href="#include_2">include </a></li>
+        
+    
+        <li class="main "><a href="#include_3">include </a></li>
+        
+            <li><a href="#main-helper-script">Main helper script</a></li>
+        
             <li><a href="#examples-ready-to-use-scripts">Examples / ready-to-use scripts</a></li>
         
-            <li><a href="#input-file-formats">Input file formats</a></li>
+            <li><a href="#types-of-input-files-and-their-formats">Types of input files and their formats</a></li>
         
-            <li><a href="#testing">Testing</a></li>
-        
-            <li><a href="#benchmarking">Benchmarking</a></li>
+            <li><a href="#benchmarks">Benchmarks</a></li>
         
     
     </ul>
 </div></div>
             <div class="col-md-9" role="main">
 
+<p><a href="http://www.apache.org/licenses/LICENSE-2.0"><img alt="Licence" src="https://img.shields.io/hexpm/l/plug.svg?style=flat-square" /></a>
+<a href="https://travis-ci.org/imminfo/ymir"><img alt="Build Status" src="https://img.shields.io/travis/imminfo/ymir.svg?style=flat-square" /></a></p>
 <h1 id="ymir">Ymir</h1>
 <p>Probabilistic models of immune receptors assembling</p>
 <hr />
@@ -143,95 +164,181 @@
 <p>You can use Ymir in two ways:</p>
 <ul>
 <li>
-<p>as a library in your project or </p>
+<p>using pre-made scripts for the most common tasks - computation of generation probabilities (sometimes I call them "assembling probabilities",
+estimation of parameters of an immune receptor assembling model from the experimental data or generation of pre-selection immune receptor sequences. 
+For this tasks you need to compile some source code, but don't worry! It's very easy, just look at the next subsection.
+After compiling, take a look at the <code>Examples / ready-to-use scripts</code> section where pre-made scripts are explained in details.</p>
 </li>
 <li>
-<p>using pre-made scripts for the most common tasks - computation of generation probabilities,
-estimation of parameters of an assembling model from the experimental data or
-generation of pre-selected immune receptor sequences. For this tasks you need to compile
-some source code, but don't worry! It's very easy, just look at the next subsection. After compiling,
-take a look at the <code>Examples / ready-to-use scripts</code> section where pre-made scripts are explained in details.</p>
+<p>as an included library in your project. </p>
 </li>
 </ul>
 <h3 id="compiling-ymir">Compiling Ymir</h3>
+<blockquote>
+<p>Note: you can see detailed installation of dependencies in next sections.</p>
+</blockquote>
 <p>Dependencies:</p>
 <ul>
 <li>
-<p>Eigen</p>
+<p>C++ compiler - either <a href="http://clang.llvm.org/">Clang</a> or <a href="https://gcc.gnu.org/">GCC</a>. On benchmarks Clang is performing better then GCC.</p>
 </li>
 <li>
-<p>JsonCPP</p>
+<p><a href="http://www.cmake.org/download/">CMake</a> - the build system which used in Ymir.</p>
 </li>
 <li>
-<p>MPFR (non-necessary due to license)</p>
+<p><a href="https://www.python.org/downloads/">Python 2</a> - the JsonCPP library which Ymir use need this version of Python.</p>
+</li>
+<li>
+<p><a href="https://www.python.org/downloads/">Python 3</a> - we need it for some useful scripts like converting input files to
+the Ymir's format and wrapping calls to Ymir C++ scripts.</p>
+</li>
+<li>
+<p><a href="https://github.com/open-source-parsers/jsoncpp">JsonCPP</a> - JSON files used for storing metadata about models. </p>
 </li>
 </ul>
-<p>assembling / generation</p>
-<p>Targets: scripts, tests, benchmarking, lib</p>
+<h4 id="installation-on-ubuntu">Installation on Ubuntu</h4>
+<p>Open your Terminal.</p>
+<p>Install CMake and Pythons with</p>
+<p>sudo apt-get install cmake
+sudo apt-get install python
+sudo apt-get install python3</p>
+<p>Other installation steps (JsonCPP and compiling) are equal to those for Mac users.</p>
+<h4 id="installation-on-mac-os">Installation on Mac OS</h4>
+<p>Open your Terminal.</p>
+<p>Install <a href="http://brew.sh/">Homebrew</a> by typing this into the Terminal:</p>
+<p>ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"</p>
+<p>After that you need to install CMake and Pythons with the following commands:</p>
+<p>brew install cmake
+brew install python
+brew install python3</p>
+<p>At this point you can either install the JsonCPP library and download benchmark files by yourself (see next paragraphs) or 
+simply go to <a href="https://github.com/imminfo/ymir/releases">Ymir's GitHub</a>, download the latest release source code called <code>Source_code_FULL.zip</code> and unzip it.
+You will see the new folder called <code>ymir</code>. In both ways to compile Ymir you need to make your Terminal point to Ymir's folder.</p>
+<p>To install JsonCPP you should clone the repository and install JsonCPP library by the following commands:</p>
+<p>git clone https://github.com/imminfo/ymir.git
+cd ymir
+curl -sL https://github.com/open-source-parsers/jsoncpp/archive/master.zip &gt; jsoncpp.zip
+unzip jsoncpp.zip
+rm jsoncpp.zip
+cd jsoncpp-master
+python amalgamate.py
+mv ./dist/jsoncpp.cpp ../Ymir/src/jsoncpp.cpp
+mv ./dist/json ../include/json
+cd ..</p>
+<p>And now, finally when you are in Ymir's folder, you can compile Ymir:</p>
+<p>mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . &amp;&amp; cd ..</p>
+<p>It will build a number of Ymir programs to run: tests, benchmarks and ready-to-use scripts.</p>
+<p>You can test Ymir with running</p>
+<p>python3 ytest.py</p>
+<p>For benchmarks you need to download benchmark files (if you haven't download <code>Source_code_FULL.zip</code>):</p>
+<p>curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre3/benchmark-files.zip &gt; benchmark-files.zip 
+unzip benchmark-files.zip
+rm benchmark-files.zip 
+mv benchmark-files/ ./benchmark/data/
+rm -r benchmark-files</p>
+<p>To run benchmarks execute</p>
+<p>python3 ybenchmark.py</p>
+<p>To see how you can use pre-made scripts go to the <code>Examples / ready-to-use scripts</code> section.</p>
 <h3 id="using-ymir-as-a-library">Using Ymir as a library</h3>
-<p>Ymir is a header only library</p>
-<p>For using only the core data structure MAAG and MAAGBuilder use:</p>
-<pre><code>#include &lt;Ymir/Graph&gt;
-</code></pre>
-<p>For computing and generation from files:</p>
-<pre><code>#include &lt;Ymir/Model&gt;
-</code></pre>
-<p>For statistical inference of parameters:</p>
-<pre><code>#include &lt;Ymir/Inference&gt;
-</code></pre>
+<p>Ymir is a header only library, however, you need to put the <code>jsoncpp.cpp</code> file to the <code>Ymir/src</code> folder.</p>
+<p>In your CMakeLists.txt files you should put <code>include_directories(include)</code> if Ymir's folder is in the <code>include</code> directory.</p>
+<p>Next text is assumed that your include path is setted to <code>$YMIR_FOLDER/</code>.</p>
+<p>For using only the core data structures MAAG and MAAGBuilder add:</p>
+<h1 id="include">include <Ymir/Graph></h1>
+<p>For computing and generation assembling probabilities from files:</p>
+<h1 id="include_1">include <Ymir/Model></h1>
+<p>For the statistical inference of marginal parameters of generation models:</p>
+<h1 id="include_2">include <Ymir/Inference></h1>
 <p>For super secret unimplemented things:</p>
-<pre><code>#include &lt;Ymir/Pattern&gt;
-</code></pre>
-<p>wow-wow, easy here. There are not implemented yet.</p>
+<h1 id="include_3">include <Ymir/Pattern></h1>
+<p>Wow-wow, easy here. They are not implemented yet.</p>
+<hr />
+<h2 id="main-helper-script">Main helper script</h2>
+<p>python3 pyymir.py</p>
+<ul>
+<li><code>python3 pyymir.py -v</code> - print the current version of Ymir.</li>
+<li><code>python3 pyymir.py -a</code> - list all available algorithms for the statistical inference of marginal probabilities and their aliases.</li>
+<li><code>python3 pyymir.py -m</code> - list all available models and their aliases.</li>
+<li><code>python3 pyymir.py -f</code> - list all available converters for input formats and their aliases.</li>
+<li><code>python3 pyymir.py -s</code> - list all available pre-made scripts.</li>
+</ul>
 <hr />
 <h2 id="examples-ready-to-use-scripts">Examples / ready-to-use scripts</h2>
 <p>After compiling an executable files will appear in the <code>build</code> folder.</p>
-<h3 id="computation-of-generation-probabilities">Computation of generation probabilities</h3>
-<h4 id="compute-generation-probabilities-of-human-tcr-alpha-data">Compute generation probabilities of human TCR-alpha data</h4>
+<p>You can download sample files with outputs from <a href="https://imminfo.github.io/tcr/">tcR</a> package and <a href="http://mitcr.milaboratory.com/">MiTCR</a> software with</p>
+<p>curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre3/example-files.zip &gt; examples.zip 
+unzip examples.zip </p>
+<h3 id="compute-generation-probabilities-of-human-tcr-alpha-data-from-tcr-output-files">Compute generation probabilities of human TCR-alpha data from tcR output files</h3>
+<p>The most common task with generation probabilities is to compute them. </p>
+<p>python3 compute.py -i <INPUT> -f <FORMAT> -m <MODEL> [-o <OUTPUT>] [-p] [-l]</p>
+<blockquote>
+<p>Note: run <code>python3 compute.py -h</code> to see a help message.</p>
+</blockquote>
 <ul>
-<li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
-<li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocs build</code> - Build the documentation site.</li>
-<li><code>mkdocs help</code> - Print this help message.</li>
+<li><code>&lt;INPUT&gt;</code> - input file (text or gzipped) or a folder with input files (of the same format) or a list of space-separated files and/or folders in any combinations.</li>
+<li><code>&lt;FORMAT&gt;</code> - format of input files (tcR, MiTCR, MiGEC, etc.) as an alias or as a Python 3 class from your module linked to the '$YMIR_HOME/converters' package. For a list of possible input formats and their aliases in this Ymir distribution run <code>$python3 pyymir.py -f</code>.</li>
+<li><code>&lt;MODEL&gt;</code> - either an alias of the one from available models in  Ymir or a path to a folder with a model's .json file. For a list of available models in this Ymir distribution run <code>$python3 pyymir.py -m</code>.</li>
+<li><code>&lt;OUTPUT&gt;</code> - optional path to the output folder for output files (default is <code>./ymir_genprob/</code>).</li>
+<li><code>-p</code> - recompute or use predefined model's gene usage (default is to recompute, to change it add <code>-p</code> to your script call).</li>
+<li><code>-l</code> - add this to leave converted files (default is to remove converted files).</li>
 </ul>
-<h3 id="statistical-inference-of-a-models-parameters">Statistical inference of a model's parameters</h3>
-<h4 id="estimate-human-tcr-alpha-generation-model-parameters-using-em-algorithm">Estimate human TCR-alpha generation model parameters using EM-algorithm</h4>
-<h3 id="generation-of-pre-selection-receptors">Generation of pre-selection receptors</h3>
-<h4 id="generate-artificial-human-tcr-alpha-repertoire-before-selection">Generate artificial human TCR-alpha repertoire before selection</h4>
+<p>Example command to compute generation probabilities from tcR file:</p>
+<p>python3 compute.py -i ./examples/tcr.htra.txt -f tcr -m htra</p>
+<h3 id="estimate-human-tcr-beta-generation-model-parameters-using-em-algorithm-from-mitcr-output-files">Estimate human TCR-beta generation model parameters using EM-algorithm from MiTCR output files</h3>
+<p>python3 inference.py -i ??? -f mitcr -m htrb</p>
+<blockquote>
+<p>Note: run <code>python3 inference.py -h</code> to see a help message.</p>
+</blockquote>
+<p>Example command to perform statistical inference from MiTCR file:</p>
+<p>python3 inference.py -i ./examples/mitcr.htrb.txt -f mitcr -m htrb</p>
+<p>Run <code>python3 pyymir.py -m</code> to view all available models and their aliases.</p>
+<h3 id="generate-artificial-human-tcr-alpha-repertoire-before-selection">Generate artificial human TCR-alpha repertoire before selection</h3>
+<p>python3 generate.py -c 500000 -m htra</p>
+<blockquote>
+<p>Note: run <code>python3 generate.py -h</code> to see a help message.</p>
+</blockquote>
+<p>asdasd</p>
 <hr />
-<h2 id="input-file-formats">Input file formats</h2>
+<h2 id="types-of-input-files-and-their-formats">Types of input files and their formats</h2>
 <h3 id="model-files">Model files</h3>
 <h4 id="main-json-file">Main JSON file</h4>
 <h4 id="gene-segments-files">Gene segments files</h4>
 <h4 id="event-probability-files">Event probability files</h4>
 <h3 id="cloneset-files">Cloneset files</h3>
 <h4 id="available-parsers">Available parsers</h4>
+<blockquote>
+<p>Reminder: run <code>python3 pyymir.py -f</code> to view all available formats and their aliases.</p>
+</blockquote>
 <hr />
-<h2 id="testing">Testing</h2>
-<hr />
-<h2 id="benchmarking">Benchmarking</h2>
+<h2 id="benchmarks">Benchmarks</h2>
 <hr />
 <p>For full documentation visit <a href="http://mkdocs.org">mkdocs.org</a>.</p>
 <ul>
 <li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
 <li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
 <li><code>mkdocs build</code> - Build the documentation site.</li>
-<li>
-<p><code>mkdocs help</code> - Print this help message.</p>
+<li><code>mkdocs help</code> - Print this help message.</li>
+</ul>
 <p>mkdocs.yml    # The configuration file.
 docs/
-    index.md  # The documentation homepage.
-    ...       # Other markdown pages, images and other files.</p>
-</li>
-</ul>
-</div>
+index.md  # The documentation homepage.
+...       # Other markdown pages, images and other files.</p></div>
         </div>
 
-        
+        <footer class="col-md-12">
+            <hr>
+            
+                <center>Copyright © 2015 Vadim Nazarov.</center>
+            
+            <center>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</center>
+        </footer>
 
-        <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="./js/jquery-1.10.2.min.js"></script>
         <script src="./js/bootstrap-3.0.3.min.js"></script>
-        <script src="./js/prettify-1.0.min.js"></script>
+        <script src="./js/highlight.pack.js"></script>
         <script src="./js/base.js"></script>
     </body>
 </html>

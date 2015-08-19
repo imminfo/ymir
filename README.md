@@ -74,7 +74,7 @@ After that you need to install CMake and Pythons with the following commands:
     brew install python3
 
 At this point you can either install the JsonCPP library and download benchmark files by yourself (see next paragraphs) or 
-simply go to [Ymir's GitHub](https://github.com/imminfo/ymir/releases), download the latest release source code called `Source code [FULL]` and unzip it.
+simply go to [Ymir's GitHub](https://github.com/imminfo/ymir/releases), download the latest release source code called `Source_code_FULL.zip` and unzip it.
 You will see the new folder called `ymir`. In both ways to compile Ymir you need to make your Terminal point to Ymir's folder.
 
 To install JsonCPP you should clone the repository and install JsonCPP library by the following commands:
@@ -103,7 +103,7 @@ You can test Ymir with running
     
     python3 ytest.py
 
-For benchmarks you need to download benchmark files (if you haven't download `Source code [FULL]`):
+For benchmarks you need to download benchmark files (if you haven't download `Source_code_FULL.zip`):
 
     curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre3/benchmark-files.zip > benchmark-files.zip 
     unzip benchmark-files.zip

@@ -10,5 +10,6 @@ pages:
 - 'R package' : 'rpackage.md'
 - 'About' : 'about.md'
 - 'Immunoinformatics page' : 'mainpage.md'
-theme: yeti
+theme: cosmo
+#theme: yeti
 #theme: readthedocs

@@ -260,15 +260,17 @@ namespace ymir {
             }
         }
         
-        void normaliseEventFamily(event_ind_t event_family) {
-            prob_t prob_sum = _laplace[event_family-1] * (_edges[event_family] - _edges[event_family-1]);
-            for (event_ind_t j = _edges[event_family-1]; j < _edges[event_family]; ++j) {
+        void normaliseEventClass(EventClass event_class) {
+            event_ind_t event_family = _event_classes[event_class];
+
+            prob_t prob_sum = _laplace[event_family] * (_edges[event_family + 1] - _edges[event_family]);
+            for (event_ind_t j = _edges[event_family]; j < _edges[event_family + 1]; ++j) {
                 prob_sum += _vec[j];
             }
 
             if (prob_sum) {
-                for (event_ind_t j = _edges[event_family-1]; j < _edges[event_family]; ++j) {
-                    _vec[j] = (_vec[j] + _laplace[event_family-1]) / prob_sum;
+                for (event_ind_t j = _edges[event_family]; j < _edges[event_family + 1]; ++j) {
+                    _vec[j] = (_vec[j] + _laplace[event_family]) / prob_sum;
                 }
             }
         }

@@ -50,6 +50,16 @@ You can load Ymir to [CLion](https://www.jetbrains.com/clion/) and compile with 
 
 #### Installation on Ubuntu
 
+Open your Terminal.
+
+Install CMake and Pythons with
+
+    sudo apt-get install cmake
+    sudo apt-get install python
+    sudo apt-get install python3
+
+Other installation steps (JsonCPP and compiling) are equal to those for Mac users.
+
 #### Installation on Mac OS
 
 Open your Terminal.
@@ -64,11 +74,11 @@ After that you need to install CMake and Pythons with the following commands:
     brew install python
     brew install python3
 
-Go to [Ymir's GitHub](https://github.com/imminfo/ymir/releases) and download the latest release source code called `Source code + JSON` and unzip it.
-You will see the new folder called `ymir`. Now you need to go via Terminal to Ymir's folder with `cd <path to ymir's folder here>/ymir`, e.g.
-`cd ./ymir`.
+At this point you can either install the JsonCPP library and download benchmark files by yourself (see next paragraphs) or 
+simply go to [Ymir's GitHub](https://github.com/imminfo/ymir/releases), download the latest release source code called `Source code [FULL]` and unzip it.
+You will see the new folder called `ymir`. In both ways to compile Ymir you need to make your Terminal point to Ymir's folder.
 
-Alternatively you could clone the repository and install JsonCPP library by the following commands:
+To install JsonCPP you should clone the repository and install JsonCPP library by the following commands:
 
     git clone https://github.com/imminfo/ymir.git
     cd ymir
@@ -88,20 +98,23 @@ And now, finally when you are in Ymir's folder, you can compile Ymir:
     cmake -DCMAKE_BUILD_TYPE=Release ..
     cmake --build .
 
-Now it will build a number of programs to run Ymir: tests, benchmarks and pre-made scripts.
+Now it will build a number of Ymir programs to run: tests, benchmarks and ready-to-use scripts.
 
-You can test Ymir with:
+You can test Ymir with running
     
     ./test/Test
 
-And run benchmarks with:
+For benchmarks you need to download benchmark files (if you haven't download `Source code [FULL]`):
 
     curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre2/benchmark-files.zip > benchmark-files.zip 
     unzip benchmark-files.zip
     rm benchmark-files.zip 
     mv benchmark-files/ ./benchmark/
     rm -r benchmark-files
-    ./benchmark/Benchmark    
+    
+To run benchmarks execute
+    
+    ./benchmark/Benchmark
 
 To see how you can use pre-made scripts go to the `Examples / ready-to-use scripts` section.
 

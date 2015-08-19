@@ -216,11 +216,6 @@ namespace ymir {
             prob_t laplace = 0;
             ClonesetView nonc = cloneset.noncoding();
             if (_recomb == VJ_RECOMB) {
-
-                std::cout << (*_param_vec)[1] << std::endl;
-                std::cout << (*_param_vec)[4] << std::endl;
-                std::cout << (*_param_vec)[5] << std::endl;
-                std::cout << (*_param_vec)[11] << std::endl;
                 // Update V-J
                 _param_vec->familyFill(VJ_VAR_JOI_GEN, 0);
                 for (size_t i = 0; i < nonc.size(); ++i) {
@@ -234,13 +229,7 @@ namespace ymir {
                         }
                     }
                 }
-                _param_vec->normaliseEventFamily(VJ_VAR_JOI_GEN);
-
-                std::cout << (*_param_vec)[1] << std::endl;
-                std::cout << (*_param_vec)[4] << std::endl;
-                std::cout << (*_param_vec)[5] << std::endl;
-                std::cout << (*_param_vec)[11] << std::endl;
-
+                _param_vec->normaliseEventClass(VJ_VAR_JOI_GEN);
             } else if (_recomb == VDJ_RECOMB) {
                 // Update V
                 _param_vec->familyFill(VDJ_VAR_GEN, 0);
@@ -251,7 +240,7 @@ namespace ymir {
                                                               nonc[i].getVar(v_i) - 1)] += 1. / nonc[i].nVar();
                     }
                 }
-                _param_vec->normaliseEventFamily(VDJ_VAR_GEN);
+                _param_vec->normaliseEventClass(VDJ_VAR_GEN);
 
                 // Update J-D
                 _param_vec->familyFill(VDJ_JOI_DIV_GEN, 0);
@@ -266,7 +255,7 @@ namespace ymir {
                         }
                     }
                 }
-                _param_vec->normaliseEventFamily(VDJ_JOI_DIV_GEN);
+                _param_vec->normaliseEventClass(VDJ_JOI_DIV_GEN);
             }
         }
 

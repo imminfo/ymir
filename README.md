@@ -149,7 +149,7 @@ Wow-wow, easy here. They are not implemented yet.
 
     python3 pyymir.py
 
-* `python3 pyymir.py -v` - print the version of Ymir.
+* `python3 pyymir.py -v` - print the current version of Ymir.
 * `python3 pyymir.py -a` - list all available algorithms for the statistical inference of marginal probabilities and their aliases.
 * `python3 pyymir.py -m` - list all available models and their aliases.
 * `python3 pyymir.py -f` - list all available converters for input formats and their aliases.
@@ -161,15 +161,18 @@ Wow-wow, easy here. They are not implemented yet.
 
 After compiling an executable files will appear in the `build` folder.
 
-You can download sample files with outputs from [tcR](https://imminfo.github.io/tcr/) package and [MiTCR](http://mitcr.milaboratory.com/) software from here [here]().
+You can download sample files with outputs from [tcR](https://imminfo.github.io/tcr/) package and [MiTCR](http://mitcr.milaboratory.com/) software with
+
+    curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre3/example-files.zip > examples.zip 
+    unzip examples.zip 
 
 ### Compute generation probabilities of human TCR-alpha data from tcR output files
 
-The most common task with generation probabilities is to compute them.
+The most common task with generation probabilities is to compute them. 
 
     python3 compute.py -i <INPUT> -f <FORMAT> -m <MODEL> [-o <OUTPUT>] [-p] [-l]
 
-Run `python3 compute.py -h` to see a help message.
+> Note: run `python3 compute.py -h` to see a help message.
 
 * `<INPUT>` - input file (text or gzipped) or a folder with input files (of the same format) or a list of space-separated files and/or folders in any combinations.
 * `<FORMAT>` - format of input files (tcR, MiTCR, MiGEC, etc.) as an alias or as a Python 3 class from your module linked to the '$YMIR_HOME/converters' package. For a list of possible input formats and their aliases in this Ymir distribution run `$python3 pyymir.py -f`.
@@ -178,18 +181,28 @@ Run `python3 compute.py -h` to see a help message.
 * `-p` - recompute or use predefined model's gene usage (default is to recompute, to change it add `-p` to your script call).
 * `-l` - add this to leave converted files (default is to remove converted files).
 
+Example command to compute generation probabilities from tcR file:
 
+    python3 compute.py -i ./examples/tcr.htra.txt -f tcr -m htra
 
 
 ### Estimate human TCR-beta generation model parameters using EM-algorithm from MiTCR output files
 
     python3 inference.py -i ??? -f mitcr -m htrb
     
-Run `python3 pyymir.py -f` to view all available models and their aliases.
+> Note: run `python3 inference.py -h` to see a help message.
+    
+Example command to perform statistical inference from MiTCR file:
+
+    python3 inference.py -i ./examples/mitcr.htrb.txt -f mitcr -m htrb
+    
+Run `python3 pyymir.py -m` to view all available models and their aliases.
 
 ### Generate artificial human TCR-alpha repertoire before selection
 
     python3 generate.py -c 500000 -m htra
+
+> Note: run `python3 generate.py -h` to see a help message.
 
 asdasd
 

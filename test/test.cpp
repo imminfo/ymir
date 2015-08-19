@@ -33,7 +33,7 @@
 #define YMIR_ASSERT2(expr1, expr2) { if ((expr1) != (expr2)) { std::stringstream ss; ss << #expr1 << " == " << #expr2 << "  (result: " << (expr1) << ", need: " << (expr2) << ")";_failed_cases.push_back(ss.str()); } };
 #define YMIR_TEST_END return _failed_cases; }
 
-#define TEST_DATA_FOLDER string("/Users/vdn/ymir/test/data/")
+//#define TEST_DATA_FOLDER string("/Users/vdn/ymir/test/data/")
 
 #define YMIR_TEST_PRECISION 1e-14
 
@@ -46,6 +46,9 @@
 
 using namespace std;
 using namespace ymir;
+
+
+std::string TEST_DATA_FOLDER;
 
 
 ModelParameterVector make_test_events_vj() {
@@ -2454,7 +2457,9 @@ struct TestInfo {
 };
 
 
-int main() {
+int main(int argc, char* argv[]) {
+
+    TEST_DATA_FOLDER = argv[1];
 
 //    mpreal::set_default_prec(200);
 

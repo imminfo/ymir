@@ -2,7 +2,7 @@
   "ymir": {
     "title": "Ymir - a tool for working with probabilistic models of immune receptor assembling",
     "values": {
-      "version": "1.0",
+      "version": "1.0-pre3",
       "release date": "??-??-2015"
     }
   },

@@ -5,7 +5,6 @@
 #ifndef _BENCHMARK_H_
 #define _BENCHMARK_H_
 
-#define BENCH_DATA_FOLDER string("/Users/vdn/ymir/benchmark/data/")
 
 #define YMIR_BENCHMARK(expr) {}
 
@@ -15,12 +14,14 @@
 
 #include "Inference"
 
+
 using namespace ymir;
 
 
-int main() {
+int main(int argc, char* argv[]) {
     std::chrono::system_clock::time_point tp1, tp2;
     time_t vj_prob, vj_meta, vj_infer, vdj_prob, vdj_meta, vdj_infer;
+    std::string BENCH_DATA_FOLDER = argv[1];
 
     RepertoireParser parser;
 //    parser.loadConfig(BENCH_DATA_FOLDER + "../../parsers/mitcrdots.json");

@@ -46,7 +46,6 @@ the Ymir's format and wrapping calls to Ymir C++ scripts.
 
 - [JsonCPP](https://github.com/open-source-parsers/jsoncpp) - JSON files used for storing metadata about models. 
 
-You can load Ymir to [CLion](https://www.jetbrains.com/clion/) and compile with it.
 
 #### Installation on Ubuntu
 
@@ -102,19 +101,19 @@ Now it will build a number of Ymir programs to run: tests, benchmarks and ready-
 
 You can test Ymir with running
     
-    ./test/Test
+    python3 test.py
 
 For benchmarks you need to download benchmark files (if you haven't download `Source code [FULL]`):
 
     curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre2/benchmark-files.zip > benchmark-files.zip 
     unzip benchmark-files.zip
     rm benchmark-files.zip 
-    mv benchmark-files/ ./benchmark/
+    mv benchmark-files/ ./benchmark/data/
     rm -r benchmark-files
     
 To run benchmarks execute
     
-    ./benchmark/Benchmark
+    python3 benchmark.py
 
 To see how you can use pre-made scripts go to the `Examples / ready-to-use scripts` section.
 
@@ -166,9 +165,21 @@ You can download sample files with outputs from [tcR](https://imminfo.github.io/
 
 ### Compute generation probabilities of human TCR-alpha data from tcR output files
 
-    python3 compute.py -i ??? -f tcr -m htra
-    
-sdfsdf
+The most common task with generation probabilities is to compute them.
+
+    python3 compute.py -i <INPUT> -f <FORMAT> -m <MODEL> [-o <OUTPUT>] [-p] [-l]
+
+Run `python3 compute.py -h` to see a help message.
+
+* `<INPUT>` - input file (text or gzipped) or a folder with input files (of the same format) or a list of space-separated files and/or folders in any combinations.
+* `<FORMAT>` - format of input files (tcR, MiTCR, MiGEC, etc.) as an alias or as a Python 3 class from your module linked to the '$YMIR_HOME/converters' package. For a list of possible input formats and their aliases in this Ymir distribution run `$python3 pyymir.py -f`.
+* `<MODEL>` - either an alias of the one from available models in  Ymir or a path to a folder with a model's .json file. For a list of available models in this Ymir distribution run `$python3 pyymir.py -m`.
+* `<OUTPUT>` - optional path to the output folder for output files (default is `./ymir_genprob/`).
+* `-p` - recompute or use predefined model's gene usage (default is to recompute, to change it add `-p` to your script call).
+* `-l` - add this to leave converted files (default is to remove converted files).
+
+
+
 
 ### Estimate human TCR-beta generation model parameters using EM-algorithm from MiTCR output files
 

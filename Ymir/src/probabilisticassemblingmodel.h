@@ -216,6 +216,11 @@ namespace ymir {
             prob_t laplace = 0;
             ClonesetView nonc = cloneset.noncoding();
             if (_recomb == VJ_RECOMB) {
+
+                std::cout << (*_param_vec)[1] << std::endl;
+                std::cout << (*_param_vec)[4] << std::endl;
+                std::cout << (*_param_vec)[5] << std::endl;
+                std::cout << (*_param_vec)[11] << std::endl;
                 // Update V-J
                 _param_vec->familyFill(VJ_VAR_JOI_GEN, 0);
                 for (size_t i = 0; i < nonc.size(); ++i) {
@@ -230,6 +235,11 @@ namespace ymir {
                     }
                 }
                 _param_vec->normaliseEventFamily(VJ_VAR_JOI_GEN);
+
+                std::cout << (*_param_vec)[1] << std::endl;
+                std::cout << (*_param_vec)[4] << std::endl;
+                std::cout << (*_param_vec)[5] << std::endl;
+                std::cout << (*_param_vec)[11] << std::endl;
 
             } else if (_recomb == VDJ_RECOMB) {
                 // Update V
@@ -372,37 +382,57 @@ namespace ymir {
             cout << "\tV gene seg.:     ";
             if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
                 cout << "ERROR: no gene segments file in the model's .json." << endl;
+
                 return false;
-            } else { cout << "OK" << endl; }
+            } else {
+                cout << "OK" << endl;
+            }
             string v_path = _model_path + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
 
             cout << "\tJ gene seg.:     ";
             if (_config.get("segments", Json::Value("")).get("joining", Json::Value("")).size() == 0) {
                 cout << "ERROR: no gene segments file in the model's .json." << endl;
+
                 return false;
-            } else { cout << "OK" << endl; }
+            } else {
+                cout << "OK" << endl;
+            }
             string j_path = _model_path + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
 
             bool vok, jok, dok = true;
 
             if (_recomb == VJ_RECOMB) {
                 _genes = new VDJRecombinationGenes("VJ.V", v_path, "VJ.J", j_path, &vok, &jok);
-                /* add P nucleotides */
             } else if (_recomb == VDJ_RECOMB) {
                 cout << "\tD gene seg.:     ";
                 if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
                     cout << "ERROR: no gene segments file in the model's .json." << endl;
+
                     return false;
                 } else {
                     string d_path = _model_path + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
                     _genes = new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok);
                     _min_D_len = _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("min.len", DEFAULT_DIV_GENE_MIN_LEN).asUInt();
-                    /* add P nucleotides */
                     cout << "OK" << endl;
                 }
             } else {
                 cout << "Undefined recombination type." << endl;
             }
+
+            if (vok && jok && dok) {
+                _genes->appendPalindromicNucleotides(VARIABLE,
+                                                     _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
+                                                     _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+                _genes->appendPalindromicNucleotides(JOINING,
+                                                     _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
+                                                     _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+                if (_genes->is_vdj()) {
+                    _genes->appendPalindromicNucleotides(DIVERSITY,
+                                                         _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
+                                                         _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+                }
+            }
+
             return vok && jok && dok;
         }
 

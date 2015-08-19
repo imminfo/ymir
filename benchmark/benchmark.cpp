@@ -24,7 +24,6 @@ int main(int argc, char* argv[]) {
     std::string BENCH_DATA_FOLDER = argv[1];
 
     RepertoireParser parser;
-//    parser.loadConfig(BENCH_DATA_FOLDER + "../../parsers/mitcrdots.json");
 
 
     //
@@ -84,12 +83,12 @@ int main(int argc, char* argv[]) {
 //    return 0;
 
     tp1 = std::chrono::system_clock::now();
-//    vj_model.buildGraphs(cloneset_vj, SAVE_METADATA);
+    vj_model.buildGraphs(cloneset_vj, SAVE_METADATA);
     tp2 = std::chrono::system_clock::now();
     vj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
     tp1 = std::chrono::system_clock::now();
-//    vj_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
+    vj_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
     tp2 = std::chrono::system_clock::now();
     vj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -114,7 +113,7 @@ int main(int argc, char* argv[]) {
     vdj_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
     tp1 = std::chrono::system_clock::now();
-//    vdj_model.computeFullProbabilities(cloneset_vdj, NO_METADATA);
+    vdj_model.computeFullProbabilities(cloneset_vdj, NO_METADATA);
     tp2 = std::chrono::system_clock::now();
     vdj_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -132,7 +131,7 @@ int main(int argc, char* argv[]) {
     // VDJ inference
     //
     tp1 = std::chrono::system_clock::now();
-//    EMAlgorithm().statisticalInference(cloneset_vdj, vdj_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
+    EMAlgorithm().statisticalInference(cloneset_vdj, vdj_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
     tp2 = std::chrono::system_clock::now();
     vdj_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 

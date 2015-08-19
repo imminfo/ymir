@@ -22,14 +22,12 @@ Undetailed dependencies. For more information on dependencies see `Installing an
 
 You can use Ymir in two ways:
 
-- as a library in your project or 
-
 - using pre-made scripts for the most common tasks - computation of generation probabilities (sometimes I call them "assembling probabilities",
-estimation of parameters of an immune receptor assembling model from the experimental data or
-generation of pre-selection immune receptor sequences.
-For this tasks you need to compile some source code, but don't worry!
-It's very easy, just look at the next subsection.
+estimation of parameters of an immune receptor assembling model from the experimental data or generation of pre-selection immune receptor sequences. 
+For this tasks you need to compile some source code, but don't worry! It's very easy, just look at the next subsection.
 After compiling, take a look at the `Examples / ready-to-use scripts` section where pre-made scripts are explained in details.
+
+- as an included library in your project. 
 
 ### Compiling Ymir
 
@@ -54,19 +52,26 @@ You can load Ymir to [CLion](https://www.jetbrains.com/clion/) and compile with 
 
 #### Installation on Mac OS
 
-1. Install [Homebrew](http://brew.sh/). 
+Open your Terminal.
 
-2. Open your Terminal and type this:
+Install [Homebrew](http://brew.sh/) by typing this into the Terminal:
+
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+After that you need to install CMake and Pythons with the following commands:
 
     brew install cmake
     brew install python
     brew install python3
 
-This tells Homebrew to install CMake, Python 2 and Python 3.
+Go to [Ymir's GitHub](https://github.com/imminfo/ymir/releases) and download the latest release source code called `Source code + JSON` and unzip it.
+You will see the new folder called `ymir`. Now you need to go via Terminal to Ymir's folder with `cd <path to ymir's folder here>/ymir`, e.g.
+`cd ./ymir`.
 
-3. Install JsonCPP library so Ymir can read and write JSON files:
+Alternatively you could clone the repository and install JsonCPP library by the following commands:
 
-    cd $YMIR_DIR/
+    git clone https://github.com/imminfo/ymir.git
+    cd ymir
     curl -sL https://github.com/open-source-parsers/jsoncpp/archive/master.zip > jsoncpp.zip
     unzip jsoncpp.zip
     rm jsoncpp.zip
@@ -76,7 +81,7 @@ This tells Homebrew to install CMake, Python 2 and Python 3.
     mv ./dist/json ../include/json
     cd ..
 
-4. And, finally, now you can compile Ymir:
+And now, finally when you are in Ymir's folder, you can compile Ymir:
 
     mkdir build
     cd build
@@ -85,17 +90,20 @@ This tells Homebrew to install CMake, Python 2 and Python 3.
 
 Now it will build a number of programs to run Ymir: tests, benchmarks and pre-made scripts.
 
-Now you can test it via:
+You can test Ymir with:
     
     ./test/Test
 
-and run benchmarks like this:
+And run benchmarks with:
 
-    ./benchmarks/Benchmark    
+    curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre2/benchmark-files.zip > benchmark-files.zip 
+    unzip benchmark-files.zip
+    rm benchmark-files.zip 
+    mv benchmark-files/ ./benchmark/
+    rm -r benchmark-files
+    ./benchmark/Benchmark    
 
-To see how can you use pre-made scripts go to the `Examples / ready-to-use scripts` section.
-
-Targets: scripts, tests, benchmarking, lib
+To see how you can use pre-made scripts go to the `Examples / ready-to-use scripts` section.
 
 ### Using Ymir as a library
 

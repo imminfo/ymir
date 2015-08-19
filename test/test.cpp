@@ -871,6 +871,9 @@ YMIR_TEST_START(test_genesegmentalphabet)
     YMIR_ASSERT(gsa[1].sequence == "ACT")
     YMIR_ASSERT(gsa[3].sequence == gsa["Vseg3"].sequence)
 
+    gsa.appendPalindromicNucleotides(0, 0);
+    YMIR_ASSERT2(gsa[1].sequence, "ACT")
+
     gsa.appendPalindromicNucleotides(2, 0);
     YMIR_ASSERT2(gsa[1].orig_sequence, "ACT")
     YMIR_ASSERT2(gsa[1].sequence, "GTACT")

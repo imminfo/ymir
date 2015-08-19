@@ -95,13 +95,13 @@ And now, finally when you are in Ymir's folder, you can compile Ymir:
     mkdir build
     cd build
     cmake -DCMAKE_BUILD_TYPE=Release ..
-    cmake --build .
+    cmake --build . && cd ..
 
-Now it will build a number of Ymir programs to run: tests, benchmarks and ready-to-use scripts.
+It will build a number of Ymir programs to run: tests, benchmarks and ready-to-use scripts.
 
 You can test Ymir with running
     
-    python3 test.py
+    python3 ytest.py
 
 For benchmarks you need to download benchmark files (if you haven't download `Source code [FULL]`):
 
@@ -113,7 +113,7 @@ For benchmarks you need to download benchmark files (if you haven't download `So
     
 To run benchmarks execute
     
-    python3 benchmark.py
+    python3 ybenchmark.py
 
 To see how you can use pre-made scripts go to the `Examples / ready-to-use scripts` section.
 

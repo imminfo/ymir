@@ -54,9 +54,9 @@ You can load Ymir to [CLion](https://www.jetbrains.com/clion/) and compile with 
 
 #### Installation on Mac OS
 
-First you need to install [Homebrew](http://brew.sh/). 
+1. Install [Homebrew](http://brew.sh/). 
 
-Open your Terminal and type this:
+2. Open your Terminal and type this:
 
     brew install cmake
     brew install python
@@ -64,7 +64,7 @@ Open your Terminal and type this:
 
 This tells Homebrew to install CMake, Python 2 and Python 3.
 
-Install JsonCPP library so Ymir can read and write JSON files:
+3. Install JsonCPP library so Ymir can read and write JSON files:
 
     cd $YMIR_DIR/
     curl -sL https://github.com/open-source-parsers/jsoncpp/archive/master.zip > jsoncpp.zip
@@ -76,7 +76,7 @@ Install JsonCPP library so Ymir can read and write JSON files:
     mv ./dist/json ../include/json
     cd ..
 
-And, finally, now you can compile Ymir:
+4. And, finally, now you can compile Ymir:
 
     mkdir build
     cd build

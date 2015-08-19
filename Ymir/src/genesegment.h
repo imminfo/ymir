@@ -49,10 +49,13 @@ namespace ymir {
         struct GeneSegment {
             std::string allele;
             std::string sequence;
+            std::string orig_sequence;
             seg_index_t index;
 
-            GeneSegment(const std::string& allele_, const std::string& sequence_, seg_index_t index_)
-                    : allele(allele_), sequence(sequence_), index(index_) {
+            GeneSegment(const std::string& allele_,
+                        const std::string& sequence_,
+                        seg_index_t index_)
+                    : allele(allele_), sequence(sequence_), orig_sequence(sequence_), index(index_) {
             }
         };
 
@@ -121,8 +124,25 @@ namespace ymir {
         * \param from_5_end Number of P nucleotides to append from the 3' end (i.e., sequences' start).
         * \param from_3_end Number of P nucleotides to append from the 3' end (i.e., sequences' end).
         */
-        void appendPalindromicNucleotides(seq_len_t from_5_end = 4, seq_len_t from_3_end = 4) {
+        void appendPalindromicNucleotides(seq_len_t from_5_end, seq_len_t from_3_end) {
+            string seq_5_end = "", seq_3_end = "";
+            for (auto i = 1; i < _vec.size(); ++i) {
 
+                // checks for _vec sequences' length ?
+
+                seq_5_end = "";
+                for (auto left_i = 0; left_i < from_5_end; ++ left_i) {
+                    seq_5_end = complement(_vec[i].orig_sequence[left_i]) + seq_5_end;
+                }
+
+                seq_3_end = "";
+                for (auto right_i = 0; right_i < from_3_end; ++right_i) {
+                    seq_3_end = seq_3_end + complement(_vec[i].orig_sequence[_vec[i].orig_sequence.size() - 1 - right_i]);
+                }
+
+                _vec[i].sequence.reserve(from_5_end + _vec[i].orig_sequence.size() + from_3_end + 2);
+                _vec[i].sequence = seq_5_end + _vec[i].orig_sequence + seq_3_end;
+            }
         }
 
 
@@ -136,7 +156,7 @@ namespace ymir {
             if (ofs.is_open()) {
                 ofs << this->_name << '\t' << "Sequences" << std::endl;
                 for (seg_index_t i = 1; i < this->_vec.size(); ++i) {
-                    ofs << this->_vec[i].allele << '\t' << this->_vec[i].sequence;
+                    ofs << this->_vec[i].allele << '\t' << this->_vec[i].orig_sequence;
                     if (i != this->_vec.size() - 1) {
                         ofs << std::endl;
                     }

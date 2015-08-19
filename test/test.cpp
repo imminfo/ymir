@@ -872,13 +872,15 @@ YMIR_TEST_START(test_genesegmentalphabet)
     YMIR_ASSERT(gsa[3].sequence == gsa["Vseg3"].sequence)
 
     gsa.appendPalindromicNucleotides(2, 0);
-    YMIR_ASSERT(gsa[1].sequence == "GTACT")
+    YMIR_ASSERT2(gsa[1].orig_sequence, "ACT")
+    YMIR_ASSERT2(gsa[1].sequence, "GTACT")
 
     gsa.appendPalindromicNucleotides(0, 2);
-    YMIR_ASSERT(gsa[1].sequence == "GTACTAG")
+    YMIR_ASSERT2(gsa[1].sequence, "ACTAG")
 
     gsa.appendPalindromicNucleotides(2, 2);
-    YMIR_ASSERT(gsa[1].sequence == "CAGTACTAGCT")
+    YMIR_ASSERT2(gsa[2].orig_sequence, "GGG")
+    YMIR_ASSERT2(gsa[2].sequence, "CCGGGCC")
 YMIR_TEST_END
 
 
@@ -2472,7 +2474,7 @@ int main() {
     YMIR_TEST(test_model_param_vec_vdj(), "ModelParameterVector VDJ access w/o laplace")
 
     // Tests for gene segments classes
-    YMIR_TEST(test_genesegmentalphabet(), "GeneSegmentAlphabet initialisation and access")
+    YMIR_TEST(test_genesegmentalphabet(), "GeneSegmentAlphabet initialisation, access and P nucs")
     YMIR_TEST(test_vdjgenes2(), "VDJRecombinationGenes, 2 gene segments, initialisation and access")
     YMIR_TEST(test_vdjgenes3(), "VDJRecombinationGenes, 3 gene segments, initialisation and access")
     YMIR_TEST(test_genesegmentalphabet_read(), "GeneSegmentAlphabet file reading / writing")

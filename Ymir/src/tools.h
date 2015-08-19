@@ -36,10 +36,6 @@
 
 namespace ymir {
 
-    void write_matrix(const std::string &filepath) {
-
-    }
-
 
     inline uint8_t nuc_hash(char nuc) {
         switch (nuc) {
@@ -63,22 +59,24 @@ namespace ymir {
     }
 
 
+    inline char complement(char nuc) {
+        switch (nuc) {
+            case 'A': return 'T';
+            case 'C': return 'G';
+            case 'G': return 'C';
+            case 'T': return 'A';
+            default : return NULL_CHAR;
+        }
+    }
+
+
     std::string translate(const std::string &nuc_seq) {
         return "nothing";
     }
 
 
-    uint sample(uint vec_size, prob_t *probs) {
-
-    }
-
-
     prob_t loglikelihood(const std::vector<prob_t> &vec, prob_t laplace = 1e-80) {
-        prob_t res = 0; /*, vec_sum = laplace * vec.size(); */
-//        for (size_t i = 0; i < vec.size(); ++i) { vec_sum += vec[i]; }
-//        cout << vec_sum << endl;
-//        cout << "min:" << *std::min_element(vec.begin(), vec.end()) << endl;
-//        cout << "max:" << *std::max_element(vec.begin(), vec.end()) << endl;
+        prob_t res = 0;
         for (size_t i = 0; i < vec.size(); ++i) { res += log10((vec[i] + laplace)); } // what to do in case of high precision numbers?
         return res;
     }
@@ -106,16 +104,6 @@ namespace ymir {
         if (negative) std::cout << "  Negatives:        \t" << (size_t) negative << std::endl;
         if (bignums) std::cout << "  Bigger than one:  \t" << (size_t) bignums << std::endl;
     }
-
-
-//    void prob_summary(const MAAGRepertoire &maag_rep) {
-//        vector<prob_t> prob_vec;
-//        prob_vec.resize(maag_rep.size());
-//        for (size_t i = 0; i < prob_vec.size(); ++i) {
-//            prob_vec[i] = maag_rep[i].fullProbability();
-//        }
-//        prob_summary(prob_vec);
-//    }
 
 
     inline bool is_out_of_frame(const std::string &sequence) {

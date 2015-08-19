@@ -23,7 +23,7 @@ if __name__ == "__main__":
                 print()
                 os.system(" ".join(["./build/Compute", conv_file, model, out_files[i], "0" if args.predefined else "1"]))
 
-                if not args.leave:
+                if not args.leave and args.format != 'ymir':
                     os.remove(conv_file)
             print()
     else:

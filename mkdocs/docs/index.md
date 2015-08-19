@@ -104,15 +104,19 @@ You can test Ymir with running
 
 For benchmarks you need to download benchmark files (if you haven't download `Source_code_FULL.zip`):
 
+``` shell
     curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre3/benchmark-files.zip > benchmark-files.zip 
     unzip benchmark-files.zip
     rm benchmark-files.zip 
     mv benchmark-files/ ./benchmark/data/
     rm -r benchmark-files
+```
 
 To run benchmarks execute
 
+``` shell
     python3 ybenchmark.py
+```
 
 To see how you can use pre-made scripts go to the `Examples / ready-to-use scripts` section.
 
@@ -126,19 +130,27 @@ Next text is assumed that your include path is setted to `$YMIR_FOLDER/`.
 
 For using only the core data structures MAAG and MAAGBuilder add:
 
-#include <Ymir/Graph>
+``` c++
+	#include <Ymir/Graph>
+```
 
 For computing and generation assembling probabilities from files:
 
-#include <Ymir/Model>
+``` c++
+	#include <Ymir/Model>
+```
 
 For the statistical inference of marginal parameters of generation models:
 
-#include <Ymir/Inference>
+``` c++
+	#include <Ymir/Inference>
+```
 
 For super secret unimplemented things:
 
-#include <Ymir/Pattern>
+``` c++
+	#include <Ymir/Pattern>
+```
 
 Wow-wow, easy here. They are not implemented yet.
 

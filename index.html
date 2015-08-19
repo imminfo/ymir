@@ -124,18 +124,6 @@
         
             <li><a href="#installing-and-using-ymir">Installing and using Ymir</a></li>
         
-    
-        <li class="main "><a href="#include">include </a></li>
-        
-    
-        <li class="main "><a href="#include_1">include </a></li>
-        
-    
-        <li class="main "><a href="#include_2">include </a></li>
-        
-    
-        <li class="main "><a href="#include_3">include </a></li>
-        
             <li><a href="#main-helper-script">Main helper script</a></li>
         
             <li><a href="#examples-ready-to-use-scripts">Examples / ready-to-use scripts</a></li>
@@ -239,28 +227,38 @@ cmake --build . &amp;&amp; cd ..
 <pre><code>python3 ytest.py
 </code></pre>
 <p>For benchmarks you need to download benchmark files (if you haven't download <code>Source_code_FULL.zip</code>):</p>
-<pre><code>curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre3/benchmark-files.zip &gt; benchmark-files.zip 
-unzip benchmark-files.zip
-rm benchmark-files.zip 
-mv benchmark-files/ ./benchmark/data/
-rm -r benchmark-files
+<pre><code class="shell">    curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre3/benchmark-files.zip &gt; benchmark-files.zip 
+    unzip benchmark-files.zip
+    rm benchmark-files.zip 
+    mv benchmark-files/ ./benchmark/data/
+    rm -r benchmark-files
 </code></pre>
+
 <p>To run benchmarks execute</p>
-<pre><code>python3 ybenchmark.py
+<pre><code class="shell">    python3 ybenchmark.py
 </code></pre>
+
 <p>To see how you can use pre-made scripts go to the <code>Examples / ready-to-use scripts</code> section.</p>
 <h3 id="using-ymir-as-a-library">Using Ymir as a library</h3>
 <p>Ymir is a header only library, however, you need to put the <code>jsoncpp.cpp</code> file to the <code>Ymir/src</code> folder.</p>
 <p>In your CMakeLists.txt files you should put <code>include_directories(include)</code> if Ymir's folder is in the <code>include</code> directory.</p>
 <p>Next text is assumed that your include path is setted to <code>$YMIR_FOLDER/</code>.</p>
 <p>For using only the core data structures MAAG and MAAGBuilder add:</p>
-<h1 id="include">include <Ymir/Graph></h1>
+<pre><code class="c++">    #include &lt;Ymir/Graph&gt;
+</code></pre>
+
 <p>For computing and generation assembling probabilities from files:</p>
-<h1 id="include_1">include <Ymir/Model></h1>
+<pre><code class="c++">    #include &lt;Ymir/Model&gt;
+</code></pre>
+
 <p>For the statistical inference of marginal parameters of generation models:</p>
-<h1 id="include_2">include <Ymir/Inference></h1>
+<pre><code class="c++">    #include &lt;Ymir/Inference&gt;
+</code></pre>
+
 <p>For super secret unimplemented things:</p>
-<h1 id="include_3">include <Ymir/Pattern></h1>
+<pre><code class="c++">    #include &lt;Ymir/Pattern&gt;
+</code></pre>
+
 <p>Wow-wow, easy here. They are not implemented yet.</p>
 <hr />
 <h2 id="main-helper-script">Main helper script</h2>

@@ -41,8 +41,7 @@ Dependencies:
 
 - [Python 2](https://www.python.org/downloads/) - the JsonCPP library which Ymir use need this version of Python.
 
-- [Python 3](https://www.python.org/downloads/) - we need it for some useful scripts like converting input files to
-the Ymir's format and wrapping calls to Ymir C++ scripts.
+- [Python 3](https://www.python.org/downloads/) - we need it for some useful scripts like converting input files to the Ymir's format and wrapping calls to Ymir C++ scripts.
 
 - [JsonCPP](https://github.com/open-source-parsers/jsoncpp) - JSON files used for storing metadata about models. 
 
@@ -53,9 +52,9 @@ Open your Terminal.
 
 Install CMake and Pythons with
 
-sudo apt-get install cmake
-sudo apt-get install python
-sudo apt-get install python3
+    sudo apt-get install cmake
+    sudo apt-get install python
+    sudo apt-get install python3
 
 Other installation steps (JsonCPP and compiling) are equal to those for Mac users.
 
@@ -65,13 +64,13 @@ Open your Terminal.
 
 Install [Homebrew](http://brew.sh/) by typing this into the Terminal:
 
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 After that you need to install CMake and Pythons with the following commands:
 
-brew install cmake
-brew install python
-brew install python3
+    brew install cmake
+    brew install python
+    brew install python3
 
 At this point you can either install the JsonCPP library and download benchmark files by yourself (see next paragraphs) or 
 simply go to [Ymir's GitHub](https://github.com/imminfo/ymir/releases), download the latest release source code called `Source_code_FULL.zip` and unzip it.
@@ -79,41 +78,41 @@ You will see the new folder called `ymir`. In both ways to compile Ymir you need
 
 To install JsonCPP you should clone the repository and install JsonCPP library by the following commands:
 
-git clone https://github.com/imminfo/ymir.git
-cd ymir
-curl -sL https://github.com/open-source-parsers/jsoncpp/archive/master.zip > jsoncpp.zip
-unzip jsoncpp.zip
-rm jsoncpp.zip
-cd jsoncpp-master
-python amalgamate.py
-mv ./dist/jsoncpp.cpp ../Ymir/src/jsoncpp.cpp
-mv ./dist/json ../include/json
-cd ..
+    git clone https://github.com/imminfo/ymir.git
+    cd ymir
+    curl -sL https://github.com/open-source-parsers/jsoncpp/archive/master.zip > jsoncpp.zip
+    unzip jsoncpp.zip
+    rm jsoncpp.zip
+    cd jsoncpp-master
+    python amalgamate.py
+    mv ./dist/jsoncpp.cpp ../Ymir/src/jsoncpp.cpp
+    mv ./dist/json ../include/json
+    cd ..
 
 And now, finally when you are in Ymir's folder, you can compile Ymir:
 
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-cmake --build . && cd ..
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    cmake --build . && cd ..
 
 It will build a number of Ymir programs to run: tests, benchmarks and ready-to-use scripts.
 
 You can test Ymir with running
 
-python3 ytest.py
+    python3 ytest.py
 
 For benchmarks you need to download benchmark files (if you haven't download `Source_code_FULL.zip`):
 
-curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre3/benchmark-files.zip > benchmark-files.zip 
-unzip benchmark-files.zip
-rm benchmark-files.zip 
-mv benchmark-files/ ./benchmark/data/
-rm -r benchmark-files
+    curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre3/benchmark-files.zip > benchmark-files.zip 
+    unzip benchmark-files.zip
+    rm benchmark-files.zip 
+    mv benchmark-files/ ./benchmark/data/
+    rm -r benchmark-files
 
 To run benchmarks execute
 
-python3 ybenchmark.py
+    python3 ybenchmark.py
 
 To see how you can use pre-made scripts go to the `Examples / ready-to-use scripts` section.
 

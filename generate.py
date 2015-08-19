@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     if model_check:
         print()
-        os.system(" ".join(["./build/Generate", model, str(args.count), out_file]))
+        os.system(" ".join(["./build/scripts/Generate", model, str(args.count), out_file]))
         print()
     else:
         print("Can't process further, too many errors for me! T_T")

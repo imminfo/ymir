@@ -33,11 +33,15 @@ After compiling, take a look at the `Examples / ready-to-use scripts` section wh
 
 ### Compiling Ymir
 
+> Note: you can see detailed installation of dependencies in next sections.
+
 Dependencies:
 
 - C++ compiler - either [Clang](http://clang.llvm.org/) or [GCC](https://gcc.gnu.org/). On benchmarks Clang is performing better then GCC.
 
 - [CMake](http://www.cmake.org/download/) - the build system which used in Ymir.
+
+- [Python 2](https://www.python.org/downloads/) - the JsonCPP library which Ymir use need this version of Python.
 
 - [Python 3](https://www.python.org/downloads/) - we need it for some useful scripts like converting input files to
 the Ymir's format and wrapping calls to Ymir C++ scripts.
@@ -48,15 +52,56 @@ You can load Ymir to [CLion](https://www.jetbrains.com/clion/) and compile with 
 
 #### Installation on Ubuntu
 
-#### Installation on Mac OS Mavericks
+#### Installation on Mac OS
 
-#### Installation on Mac OS Yosemite
+First you need to install [Homebrew](http://brew.sh/). 
+
+Open your Terminal and type this:
+
+    brew install cmake
+    brew install python
+    brew install python3
+
+This tells Homebrew to install CMake, Python 2 and Python 3.
+
+Install JsonCPP library so Ymir can read and write JSON files:
+
+    cd $YMIR_DIR/
+    curl -sL https://github.com/open-source-parsers/jsoncpp/archive/master.zip > jsoncpp.zip
+    unzip jsoncpp.zip
+    rm jsoncpp.zip
+    cd jsoncpp-master
+    python amalgamate.py
+    mv ./dist/jsoncpp.cpp ../Ymir/src/jsoncpp.cpp
+    mv ./dist/json ../include/json
+    cd ..
+
+And, finally, now you can compile Ymir:
+
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    cmake --build .
+
+Now it will build a number of programs to run Ymir: tests, benchmarks and pre-made scripts.
+
+Now you can test it via:
+    
+    ./test/Test
+
+and run benchmarks like this:
+
+    ./benchmarks/Benchmark    
+
+To see how can you use pre-made scripts go to the `Examples / ready-to-use scripts` section.
 
 Targets: scripts, tests, benchmarking, lib
 
 ### Using Ymir as a library
 
 Ymir is a header only library, however, you need to put the `jsoncpp.cpp` file to the `Ymir/src` folder.
+
+In your CMakeLists.txt files you should put `include_directories(include)` if Ymir's folder is in the `include` directory.
 
 Next text is assumed that your include path is setted to `$YMIR_FOLDER/`.
 
@@ -84,6 +129,8 @@ Wow-wow, easy here. They are not implemented yet.
 
     python3 pyymir.py
 
+* `python3 pyymir.py -v` - print the version of Ymir.
+* `python3 pyymir.py -a` - list all available algorithms for the statistical inference of marginal probabilities and their aliases.
 * `python3 pyymir.py -m` - list all available models and their aliases.
 * `python3 pyymir.py -f` - list all available converters for input formats and their aliases.
 * `python3 pyymir.py -s` - list all available pre-made scripts.
@@ -116,7 +163,7 @@ asdasd
 
 ---
 
-## Input file formats
+## Types of input files and their formats
 
 ### Model files
 
@@ -124,15 +171,11 @@ asdasd
 
 ### Cloneset files
 
-Run `python3 pyymir.py -f` to view all available formats and their aliases.
+> Reminder: run `python3 pyymir.py -f` to view all available formats and their aliases.
 
 ---
 
-## Testing
-
----
-
-## Benchmarking
+## Benchmarks
 
 ---
 

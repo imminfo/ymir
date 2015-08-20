@@ -212,9 +212,15 @@ asdasd
 
 ### Model files
 
-### Gene segments files
+#### Main JSON file
+
+#### Gene segments files
+
+#### Event probability files
 
 ### Cloneset files
+
+#### Available parsers
 
 > Reminder: run `python3 pyymir.py -f` to view all available formats and their aliases.
 

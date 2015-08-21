@@ -161,6 +161,7 @@ namespace ymir {
 
 
     enum GeneSegments {
+        UNKNOWN,
         VARIABLE,
         JOINING,
         DIVERSITY

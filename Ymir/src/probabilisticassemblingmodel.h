@@ -56,7 +56,7 @@ namespace ymir {
             _model_path = folderpath + "/";
             _behaviour = behav;
 
-            _recomb = UNDEFINED;
+            _recomb = UNDEF_RECOMB;
             _status = false;
 
             _genes = nullptr;
@@ -342,7 +342,7 @@ namespace ymir {
                 } else if (_config.get("recombination", "undefined").asString() == "VDJ") {
                     _recomb = VDJ_RECOMB;
                 } else {
-                    _recomb = UNDEFINED;
+                    _recomb = UNDEF_RECOMB;
                 }
                 cout << "Probabilistic assembling model:\n\t" <<
                         _config.get("name", "Nameless model").asString() <<

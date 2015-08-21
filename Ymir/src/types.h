@@ -161,7 +161,7 @@ namespace ymir {
 
 
     enum GeneSegments {
-        UNKNOWN,
+        UNDEF_GENE,
         VARIABLE,
         JOINING,
         DIVERSITY
@@ -172,7 +172,7 @@ namespace ymir {
      * \enum Recombination
      */
     enum Recombination {
-        UNDEFINED,
+        UNDEF_RECOMB,
         VJ_RECOMB,
         VDJ_RECOMB
     };

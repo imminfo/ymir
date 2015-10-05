@@ -90,19 +90,19 @@ namespace ymir {
             vector<seq_len_t> seq_poses;
             seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
 
-            if (clonotype.is_vj()) {
+            if (clonotype.recombination() == VJ_RECOMB) {
                 probs.resize(VJ_CHAIN_SIZE);
                 if (metadata_mode) { events.resize(VJ_CHAIN_SIZE); }
-            } else {
+            } else if (clonotype.recombination() == VDJ_RECOMB) {
                 probs.resize(VDJ_CHAIN_SIZE);
                 if (metadata_mode) { events.resize(VDJ_CHAIN_SIZE); }
             }
 
             this->buildVariable(clonotype, probs, events, seq_poses, metadata_mode);
             this->buildJoining(clonotype, probs, events, seq_poses, metadata_mode);
-            if (clonotype.is_vj()) {
+            if (clonotype.recombination() == VJ_RECOMB) {
                 this->buildVJinsertions(clonotype, probs, events, seq_poses, metadata_mode);
-            } else {
+            } else if (clonotype.recombination() == VDJ_RECOMB) {
                 this->buildDiversity(clonotype, probs, events, seq_poses, metadata_mode);
                 this->buildVDinsertions(clonotype, probs, events, seq_poses, metadata_mode);
                 this->buildDJinsertions(clonotype, probs, events, seq_poses, metadata_mode);
@@ -115,10 +115,10 @@ namespace ymir {
 
                 // TODO:
                 // - if the D deletions matrix contains only zeros, then remove this matrix
-                // - if insrtions matrices have columns / rows with only zero (!) events (!), then remove it
+                // - if insertions matrices have columns / rows with only zero (!) events (!), then remove it
                 // and remove the corresponding deletions rows / columns from neighbour matrices.
                 //
-                if (clonotype.is_vdj()) {
+                if (clonotype.recombination() == VDJ_RECOMB) {
 
                 }
 
@@ -335,31 +335,31 @@ namespace ymir {
                 events.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             }
 
-            if (clonotype.is_vj()) {
+            if (clonotype.recombination() == VJ_RECOMB) {
                 probs.initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
                 if (metadata_mode) {
                     events.initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
                 }
-            } else {
+            } else if (clonotype.recombination() == VDJ_RECOMB) {
                 probs.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
                 if (metadata_mode) {
                     events.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
                 }
             }
 
-            EventClass V_DEL = clonotype.is_vj() ? VJ_VAR_DEL : VDJ_VAR_DEL;
+            EventClass V_DEL = clonotype.recombination() == VJ_RECOMB ? VJ_VAR_DEL : VDJ_VAR_DEL;
             for (seg_index_t v_index = 0; v_index < v_num; ++v_index) {
                 v_gene = clonotype.getVar(v_index);
                 v_len = _genes->V()[v_gene].sequence.size();
                 v_end = clonotype.getVend(v_index);
 
-                if (clonotype.is_vj()) {
+                if (clonotype.recombination() == VJ_RECOMB) {
                     // probability of choosing this V gene segment
                     for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
                         probs(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
                                 = _param_vec->event_prob(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
                     }
-                } else {
+                } else if (clonotype.recombination() == VDJ_RECOMB) {
                     probs(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_prob(VDJ_VAR_GEN, 0, v_gene - 1); // probability of choosing this V gene segment
                 }
 
@@ -374,13 +374,13 @@ namespace ymir {
                 }
 
                 if (metadata_mode) {
-                    if (clonotype.is_vj()) {
+                    if (clonotype.recombination() == VJ_RECOMB) {
                         // probability of choosing this V gene segment
                         for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
                             events(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
                                     = _param_vec->event_index(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
                         }
-                    } else {
+                    } else if (clonotype.recombination() == VDJ_RECOMB) {
                         events(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_index(VDJ_VAR_GEN, 0, v_gene - 1);
                     }
 
@@ -415,7 +415,7 @@ namespace ymir {
         {
             int J_index_dels = JOINING_DELETIONS_VJ_MATRIX_INDEX,
                     J_index_genes = JOINING_GENES_VDJ_MATRIX_INDEX;
-            if (clonotype.is_vdj()) {
+            if (clonotype.recombination() == VDJ_RECOMB) {
                 J_index_dels = JOINING_DELETIONS_VDJ_MATRIX_INDEX;
             }
 
@@ -438,7 +438,7 @@ namespace ymir {
             }
 
             // add J or J-D gene nodes
-            if (clonotype.is_vdj()) {
+            if (clonotype.recombination() == VDJ_RECOMB) {
                 probs.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
                 if (metadata_mode) {
                     events.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
@@ -450,13 +450,13 @@ namespace ymir {
             seg_index_t j_gene = 0;
             seq_len_t j_start = 0;
 
-            EventClass J_DEL = clonotype.is_vj() ? VJ_JOI_DEL : VDJ_JOI_DEL;
+            EventClass J_DEL = clonotype.recombination() == VJ_RECOMB ? VJ_JOI_DEL : VDJ_JOI_DEL;
             for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
                 j_gene = clonotype.getJoi(j_index);
                 j_len = _genes->J()[j_gene].sequence.size();
                 j_start = clonotype.getJstart(j_index);
 
-                if (clonotype.is_vdj()) {
+                if (clonotype.recombination() == VDJ_RECOMB) {
                     for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                         probs(J_index_genes, 0, j_index, d_index)
                                 = _param_vec->event_prob(VDJ_JOI_DIV_GEN, 0, j_gene - 1, clonotype.getDiv(d_index) - 1); // probability of choosing this J gene segment with other D genes
@@ -473,7 +473,7 @@ namespace ymir {
                 }
 
                 if (metadata_mode) {
-                    if (clonotype.is_vdj()) {
+                    if (clonotype.recombination() == VDJ_RECOMB) {
                         for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                             events(J_index_genes, 0, j_index, d_index)
                                     = _param_vec->event_index(VDJ_JOI_DIV_GEN, 0, j_gene - 1, clonotype.getDiv(d_index) - 1); // probability of choosing this J gene segment with other D genes
@@ -524,8 +524,8 @@ namespace ymir {
             for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                 seq_len_t min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
 
-                for (seg_index_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
-                    d_alignment = clonotype.getDalignment(d_index, j);
+                for (seg_index_t j = 0; j < clonotype.nDivAlignments(d_index); ++j) {
+                    d_alignment = clonotype.getDivAlignment(d_index, j);
 
                     // yes-yes, I know that it could be done more efficiently. But I don't want to.
                     for (seq_len_t i = d_alignment.seqstart; i <= d_alignment.seqend - min_D_len + 1; ++i) {
@@ -580,8 +580,8 @@ namespace ymir {
                 min_D_len = _param_vec->D_min_len(d_gene);
 
                 // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
-                for (seg_index_t j = 0; j < clonotype.nDalignments(d_index); ++j) {
-                    d_alignment = clonotype.getDalignment(d_index, j);
+                for (seg_index_t j = 0; j < clonotype.nDivAlignments(d_index); ++j) {
+                    d_alignment = clonotype.getDivAlignment(d_index, j);
 
                     for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len + 1; ++left_pos) {
                         for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seqend; ++right_pos) {
@@ -826,6 +826,13 @@ namespace ymir {
                 }
             }
         }
+
+
+        // function for finding max V alignment
+        // function for finding max J alignment
+        // function for shrinking D alignment matrices, find non-zero positions, etc.
+        // build[Mono|Di]NucInsertions <InsertionModel, SequenceType, MetadataMode>
+        // general functions for assigning values (event probs / event inds) to MMC of some type.
 
     };
 }

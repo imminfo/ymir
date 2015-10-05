@@ -48,7 +48,7 @@ namespace ymir {
 
                 // write clonotypes
                 for (auto i = 0; i < cloneset.size(); ++i) {
-                    if (cloneset[i].is_nucleotide()) {
+                    if (cloneset[i].sequence_type() == NUCLEOTIDE) {
                         ofs << cloneset[i].sequence() << '\t';
                         ofs << translate(cloneset[i].sequence()) << '\t';
                     } else {
@@ -82,12 +82,12 @@ namespace ymir {
 
                     if (gene_segments.is_vdj()) {
                         for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
-                            ofs << cloneset[i].getDalignment(seg_i, 0).seqstart;
+                            ofs << cloneset[i].getDivAlignment(seg_i, 0).seqstart;
                             CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ';', '\t')
                         }
 
                         for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
-                            ofs << cloneset[i].getDalignment(seg_i, 0).seqend;
+                            ofs << cloneset[i].getDivAlignment(seg_i, 0).seqend;
                             CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ';', '\t')
                         }
                     } else {

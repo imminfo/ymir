@@ -35,3 +35,6 @@ jsoncpp.cpp
 .idea/.name
 
 *.xml
+ymir_models
+ymir_genprob
+ymir_artif

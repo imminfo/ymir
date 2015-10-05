@@ -149,11 +149,13 @@ namespace ymir {
                 shift += 3 * _n_D_alignments[i];
             }
             return Alignment(_alignments + shift + 3*index);
+
+            return this->getAlignment(Dseg_index, index, _segments[0] + _segments[1]);
         }
 
-        seq_len_t nDivAlignments(seg_index_t index) const {
-            if (_n_D_alignments) {
-                return _n_D_alignments[index];
+        seq_len_t numDivAlignments(seg_index_t index) const {
+            if (_n_alignments) {
+                return _n_alignments[index];
             } else {
                 return 0;
             }
@@ -162,23 +164,36 @@ namespace ymir {
     protected:
 
         Recombination _recomb;
+
         SequenceType _seq_type;
 
         std::string _sequence; //* CDR3 or full nucleotide or amino acid sequence of a clone. */
-        seg_index_t *_segments; /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
-                               /// vector of indices of segments, aligned on this clone: V1--V2--V3--J1--J2--D1--D2--...
-        seq_len_t *_alignments; //* Vector of 1-based alignments for the clone. 1st N elements is V ends, than M elements is J starts, each other are 4-tuples for Ds alignment - (D start, D end, seq start, seq end) */
-        seq_len_t *_n_D_alignments; //* Number of alignments (i.e., 4-tuples) for each aligned D segment; vector's length == segments[2] */
 
-        // Alignment Coordinates for each V,D and J - start and end.
-        /*
+        seg_index_t *_segments; /// Three concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
+                                /// vector of indices of segments, aligned on this clone: V1--V2--V3--J1--J2--D1--D2--...
 
-        seq_len_t *alignments;  /// Vector of 4-tuples (sequence start, sequence end, gene segment start, gene segment end)
-                                /// for alignments for each aligned gene segment.
+        seq_len_t *_alignments;  /// Vector of 3-tuples 1-based alignments (gene segment start, gene segment end, reference sequence start)
+                                 /// for alignments for each aligned gene segment.
 
-        */
+        seq_len_t *_n_alignments; //* Number of alignments (i.e., 3-tuples) for each aligned segment; vector's length == _segments[0] + _segments[1] + _segments[2] */
 
+
+        /**
+         *
+         */
         Clonotype() {}
+
+
+        Alignment getAlignment(seg_index_t gene_index,
+                               seg_index_t alignment_index,
+                               seg_index_t search_start,
+                               seg_index_t search_end) {
+            size_t shift;
+            for (size_t i = 0; i < search_end; ++i) {
+                shift += 3 * _n_alignments[i];
+            }
+            return Alignment(_alignments + shift + 3*alignment_index);
+        }
 
     };
 
@@ -267,32 +282,16 @@ namespace ymir {
 
 
         ///@{
-        ClonotypeBuilder& addVarAlignment(seg_index_t vseg, seq_len_t vend) {
-            _Vseg.push_back(vseg);
-            _Valign.push_back(vend);
-            return *this;
+        ClonotypeBuilder& addVarAlignment(seg_index_t vseg, seq_len_t vstart, seq_len_t vend, seq_len_t seqstart) {
+            return this->addAlignment(_Vseg, _Valign, _n_Valign, vseg, vstart, vend, seqstart);
         }
 
-        ClonotypeBuilder& addJoiAlignment(seg_index_t jseg, seq_len_t jstart) {
-            _Jseg.push_back(jseg);
-            _Jalign.push_back(jstart);
-            return *this;
+        ClonotypeBuilder& addJoiAlignment(seg_index_t jseg, seq_len_t jstart, seq_len_t jend, seq_len_t seqstart) {
+            return this->addAlignment(_Jseg, _Jalign, _n_Jalign, jseg, jstart, jend, seqstart);
         }
 
         ClonotypeBuilder& addDivAlignment(seg_index_t dseg, seq_len_t dstart, seq_len_t dend, seq_len_t seqstart) {
-            // check for recombination type?
-
-            if (_Dseg.size() == 0 || dseg != _Dseg[_Dseg.size() - 1]) {
-                _n_Dalign.push_back(0);
-            }
-
-            _n_Dalign[_n_Dalign.size() - 1] += 1;
-
-            _Dseg.push_back(dseg);
-            _Dalign.push_back(dstart);
-            _Dalign.push_back(dend);
-            _Dalign.push_back(seqstart);
-            return *this;
+            return this->addAlignment(_Dseg, _Dalign, _n_Dalign, dseg, dstart, dend, seqstart);
         }
 
         ClonotypeBuilder& addDivAlignment(seg_index_t dseg, const Alignment& dalignment) {
@@ -314,10 +313,14 @@ namespace ymir {
             _Valign.clear();
             _Valign.reserve(CLONOTYPEBUILDER_VSEG_DEFAULT_RESERVE_SIZE);
 
+            _n_Valign.clear();
+
             _Jseg.clear();
             _Jseg.reserve(CLONOTYPEBUILDER_JSEG_DEFAULT_RESERVE_SIZE);
             _Jalign.clear();
             _Jalign.reserve(CLONOTYPEBUILDER_JSEG_DEFAULT_RESERVE_SIZE);
+
+            _n_Jalign.clear();
 
             _Dseg.clear();
             _Dseg.reserve(CLONOTYPEBUILDER_DSEG_DEFAULT_RESERVE_SIZE);
@@ -331,10 +334,31 @@ namespace ymir {
 
         std::vector<seg_index_t> _Vseg, _Jseg, _Dseg; // gene segment aligned
         std::vector<seq_len_t> _Valign, _Jalign, _Dalign; // alignments for each gene segment
-        std::vector<seg_index_t> _n_Dalign; // number of D alignments
+        std::vector<seg_index_t> _n_Valign, _n_Jalign, _n_Dalign; // number of D alignments
 
 
-//        ClonotypeBuilder& addAlignment(GeneSegments gene, ) { }
+        ClonotypeBuilder& addAlignment(std::vector<seg_index_t> &seg_vec,
+                                       std::vector<seq_len_t> &align_vec,
+                                       std::vector<seg_index_t> n_align_vec,
+                                       seg_index_t gene_index,
+                                       seq_len_t gene_start,
+                                       seq_len_t gene_end,
+                                       seq_len_t seq_start)
+        {
+            // check for recombination type?
+
+            if (seg_vec.size() == 0 || gene_index != seg_vec[seg_vec.size() - 1]) {
+                n_align_vec.push_back(0);
+            }
+
+            n_align_vec[n_align_vec.size() - 1] += 1;
+
+            seg_vec.push_back(gene_index);
+            align_vec.push_back(gene_start);
+            align_vec.push_back(gene_end);
+            align_vec.push_back(seq_start);
+            return *this;
+        }
 
     };
 

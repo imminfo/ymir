@@ -511,7 +511,7 @@ namespace ymir {
                             vector<seq_len_t> &seq_poses,
                             bool metadata_mode) const
         {
-            d_alignment_t d_alignment;
+            Alignment d_alignment;
 
             // vector seq_start -> 0 means no such index in the matrix, 1 otherwise.
             seq_len_t seq_arr_size = clonotype.sequence().size() + 1;
@@ -528,11 +528,11 @@ namespace ymir {
                     d_alignment = clonotype.getDivAlignment(d_index, j);
 
                     // yes-yes, I know that it could be done more efficiently. But I don't want to.
-                    for (seq_len_t i = d_alignment.seqstart; i <= d_alignment.seqend - min_D_len + 1; ++i) {
+                    for (seq_len_t i = d_alignment.seq_start(); i <= d_alignment.seq_end() - min_D_len + 1; ++i) {
                         seq_row[i] = 1;
                     }
 
-                    for (seq_len_t i = d_alignment.seqstart + min_D_len - (seq_len_t) 1; i <= d_alignment.seqend; ++i) {
+                    for (seq_len_t i = d_alignment.seq_start() + min_D_len - (seq_len_t) 1; i <= d_alignment.seq_end(); ++i) {
                         seq_col[i] = 1;
                     }
                 }
@@ -583,19 +583,19 @@ namespace ymir {
                 for (seg_index_t j = 0; j < clonotype.nDivAlignments(d_index); ++j) {
                     d_alignment = clonotype.getDivAlignment(d_index, j);
 
-                    for (seq_len_t left_pos = d_alignment.seqstart; left_pos <= d_alignment.seqend - min_D_len + 1; ++left_pos) {
-                        for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seqend; ++right_pos) {
+                    for (seq_len_t left_pos = d_alignment.seq_start(); left_pos <= d_alignment.seq_end() - min_D_len + 1; ++left_pos) {
+                        for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seq_end(); ++right_pos) {
                             probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                     = _param_vec->event_prob(VDJ_DIV_DEL,
                                                              d_gene - 1,
-                                                             d_alignment.Dstart + left_pos - d_alignment.seqstart - 1,
-                                                             d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
+                                                             d_alignment.gene_start() + left_pos - d_alignment.seq_start() - 1,
+                                                             d_len - (d_alignment.gene_end() - (d_alignment.seq_end() - right_pos)));
                             if (metadata_mode) {
                                 events(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                         = _param_vec->event_index(VDJ_DIV_DEL,
                                                                   d_gene - 1,
-                                                                  d_alignment.Dstart + left_pos - d_alignment.seqstart - 1,
-                                                                  d_len - (d_alignment.Dend - (d_alignment.seqend - right_pos)));
+                                                                  d_alignment.gene_start() + left_pos - d_alignment.seq_start() - 1,
+                                                                  d_len - (d_alignment.gene_end() - (d_alignment.seq_end() - right_pos)));
                             }
                         }
                     }

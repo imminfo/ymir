@@ -82,12 +82,12 @@ namespace ymir {
 
                     if (gene_segments.is_vdj()) {
                         for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
-                            ofs << cloneset[i].getDivAlignment(seg_i, 0).seqstart;
+                            ofs << cloneset[i].getDivAlignment(seg_i, 0).seq_start();
                             CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ';', '\t')
                         }
 
                         for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
-                            ofs << cloneset[i].getDivAlignment(seg_i, 0).seqend;
+                            ofs << cloneset[i].getDivAlignment(seg_i, 0).seq_end();
                             CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ';', '\t')
                         }
                     } else {

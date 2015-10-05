@@ -245,8 +245,8 @@ namespace ymir {
             size_t size() const { return this->n; }
 
 
-            d_alignment_t operator[](size_t index) const {
-                return d_alignment_t(this->alignment + 4*index);
+            Alignment operator[](size_t index) const {
+                return Alignment(this->alignment + 4*index);
             }
         };
 

@@ -22,9 +22,9 @@
  */
 //#define NCURSES_TERM_H_incl 1
 
-#define YMIR_TEST(res, s) { all_tests += 1; if (res.size() == 0) {tests_passed += 1;} \
+#define YMIR_TEST(res) { all_tests += 1; if (res.size() == 0) {tests_passed += 1;} \
                             else { \
-                            failed_test_info.push_back(TestInfo(s, res)); \
+                            failed_test_info.push_back(TestInfo(#res, res)); \
                             } \
                             }
 
@@ -1044,27 +1044,23 @@ YMIR_TEST_START(test_clone)
     // J
     alignments[3] = 8;
     alignments[4] = 7;
-    // 2 X 4tuples for D1
+    // 2 X 3 tuples for D1
     alignments[5] = 1;
     alignments[6] = 2;
     alignments[7] = 3;
-    alignments[8] = 4;
 
-    alignments[9] = 1;
-    alignments[10] = 2;
-    alignments[11] = 6;
-    alignments[12] = 7;
+    alignments[8] = 1;
+    alignments[9] = 2;
+    alignments[10] = 6;
 
     // 2 X 4tuples for D2
-    alignments[13] = 11;
-    alignments[14] = 12;
-    alignments[15] = 13;
-    alignments[16] = 14;
+    alignments[11] = 11;
+    alignments[12] = 12;
+    alignments[13] = 13;
 
-    alignments[17] = 20;
-    alignments[18] = 21;
-    alignments[19] = 22;
-    alignments[20] = 23;
+    alignments[14] = 20;
+    alignments[15] = 21;
+    alignments[16] = 22;
 
     seq_len_t *nd = new seq_len_t[2];
     nd[0] = 2;
@@ -1086,20 +1082,20 @@ YMIR_TEST_START(test_clone)
     YMIR_ASSERT(c.getVend(0) == 15)
     YMIR_ASSERT(c.getVend(2) == 12)
     YMIR_ASSERT(c.getJstart(1) == 7)
-    YMIR_ASSERT(c.getDivAlignment(0, 0).Dstart == 1)
-    YMIR_ASSERT(c.getDivAlignment(0, 0).Dend == 2)
-    YMIR_ASSERT(c.getDivAlignment(0, 0).seqstart == 3)
-    YMIR_ASSERT(c.getDivAlignment(0, 0).seqend == 4)
-    YMIR_ASSERT(c.getDivAlignment(0, 1).seqstart == 6)
-    YMIR_ASSERT(c.getDivAlignment(0, 1).seqend == 7)
-    YMIR_ASSERT(c.getDivAlignment(1, 0).Dstart == 11)
-    YMIR_ASSERT(c.getDivAlignment(1, 0).Dend == 12)
-    YMIR_ASSERT(c.getDivAlignment(1, 0).seqstart == 13)
-    YMIR_ASSERT(c.getDivAlignment(1, 0).seqend == 14)
-    YMIR_ASSERT(c.getDivAlignment(1, 1).Dstart == 20)
-    YMIR_ASSERT(c.getDivAlignment(1, 1).Dend == 21)
-    YMIR_ASSERT(c.getDivAlignment(1, 1).seqstart == 22)
-    YMIR_ASSERT(c.getDivAlignment(1, 1).seqend == 23)
+    YMIR_ASSERT(c.getDivAlignment(0, 0).gene_start() == 1)
+    YMIR_ASSERT(c.getDivAlignment(0, 0).gene_end() == 2)
+    YMIR_ASSERT(c.getDivAlignment(0, 0).seq_start() == 3)
+    YMIR_ASSERT(c.getDivAlignment(0, 0).seq_end() == 4)
+    YMIR_ASSERT(c.getDivAlignment(0, 1).seq_start() == 6)
+    YMIR_ASSERT(c.getDivAlignment(0, 1).seq_end() == 7)
+    YMIR_ASSERT(c.getDivAlignment(1, 0).gene_start() == 11)
+    YMIR_ASSERT(c.getDivAlignment(1, 0).gene_end() == 12)
+    YMIR_ASSERT(c.getDivAlignment(1, 0).seq_start() == 13)
+    YMIR_ASSERT(c.getDivAlignment(1, 0).seq_end() == 14)
+    YMIR_ASSERT(c.getDivAlignment(1, 1).gene_start() == 20)
+    YMIR_ASSERT(c.getDivAlignment(1, 1).gene_end() == 21)
+    YMIR_ASSERT(c.getDivAlignment(1, 1).seq_start() == 22)
+    YMIR_ASSERT(c.getDivAlignment(1, 1).seq_end() == 23)
 YMIR_TEST_END
 
 
@@ -1109,15 +1105,15 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
 
     cb.setNucleotideSeq();
     cb.setSequence("nuclseq");
-    cb.addValignment(10, 15)
-            .addValignment(11, 25)
-            .addValignment(12, 35)
-            .addJalignment(20, 21)
-            .addDalignment(31, 8, 9, 11, 12)
-            .addDalignment(31, 8, 9, 13, 14)
-            .addDalignment(30, 1, 2, 3, 4)
-            .addDalignment(30, 1, 2, 5, 6)
-            .addDalignment(32, 1, 2, 5, 6);
+    cb.addVarAlignment(10, 15)
+            .addVarAlignment(11, 25)
+            .addVarAlignment(12, 35)
+            .addJoiAlignment(20, 21)
+            .addDivAlignment(31, 8, 9, 11)
+            .addDivAlignment(31, 8, 9, 13)
+            .addDivAlignment(30, 1, 2, 3)
+            .addDivAlignment(30, 1, 2, 5)
+            .addDivAlignment(32, 1, 2, 5);
 
     cb.setRecombination(VDJ_RECOMB);
     Clonotype c = cb.buildClonotype();
@@ -1134,13 +1130,13 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
     YMIR_ASSERT(c.getJoi(0) == 20)
     YMIR_ASSERT(c.getJstart(0) == 21)
     YMIR_ASSERT(c.getDiv(0) == 31)
-    YMIR_ASSERT(c.getDivAlignment(0, 0) == d_alignment_t(8,9,11,12))
-    YMIR_ASSERT(c.getDivAlignment(0, 1) == d_alignment_t(8,9,13,14))
+    YMIR_ASSERT(c.getDivAlignment(0, 0) == Alignment(8,9,11))
+    YMIR_ASSERT(c.getDivAlignment(0, 1) == Alignment(8,9,13))
     YMIR_ASSERT(c.getDiv(1) == 30)
-    YMIR_ASSERT(c.getDivAlignment(1, 0) == d_alignment_t(1,2,3,4))
-    YMIR_ASSERT(c.getDivAlignment(1, 1) == d_alignment_t(1,2,5,6))
+    YMIR_ASSERT(c.getDivAlignment(1, 0) == Alignment(1,2,3))
+    YMIR_ASSERT(c.getDivAlignment(1, 1) == Alignment(1,2,5))
     YMIR_ASSERT(c.getDiv(2) == 32)
-    YMIR_ASSERT(c.getDivAlignment(2, 0) == d_alignment_t(1,2,5,6))
+    YMIR_ASSERT(c.getDivAlignment(2, 0) == Alignment(1,2,5))
     YMIR_ASSERT(c.nVar() == 3)
     YMIR_ASSERT(c.nJoi() == 1)
     YMIR_ASSERT(c.nDiv() == 3)
@@ -1166,16 +1162,16 @@ YMIR_TEST_START(test_nuc_aligner)
     YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 3).size(), 0)
 
     YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2).size(), 2)
-    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].Dstart, 1)
-    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].Dend, 2)
-    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].seqstart, 3)
-    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].seqend, 4)
+    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].gene_start(), 1)
+    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].gene_end(), 2)
+    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].seq_start(), 3)
+    YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].seq_end(), 4)
 
     YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2).size(), 3)
-    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].Dstart, 5)
-    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].Dend, 6)
-    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].seqstart, 5)
-    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].seqend, 6)
+    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].gene_start(), 5)
+    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].gene_end(), 6)
+    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].seq_start(), 5)
+    YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].seq_end(), 6)
 
     YMIR_ASSERT2(nna.alignLocal("ACT", "ACTGACGACGGTATCTAC", 2).size(), 5)
 
@@ -1242,11 +1238,11 @@ YMIR_TEST_START(test_writer)
     // js: 7-8-9-10-11-12
     cl_builder.setSequence("CCCGACGGTTT")
             .setNucleotideSeq()
-            .addValignment(1, 4)
-            .addValignment(3, 5)
-            .addJalignment(1, 8)
-            .addJalignment(2, 9)
-            .addJalignment(3, 7);
+            .addVarAlignment(1, 4)
+            .addVarAlignment(3, 5)
+            .addJoiAlignment(1, 8)
+            .addJoiAlignment(2, 9)
+            .addJoiAlignment(3, 7);
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
     vector<Clonotype> vec;
@@ -1629,11 +1625,11 @@ YMIR_TEST_START(test_maag_vj)
     // js: 7-8-9-10-11-12
     cl_builder.setSequence("CCCGACGGTTT")
             .setNucleotideSeq()
-            .addValignment(1, 4)
-            .addValignment(3, 5)
-            .addJalignment(1, 8)
-            .addJalignment(2, 9)
-            .addJalignment(3, 7);
+            .addVarAlignment(1, 4)
+            .addVarAlignment(3, 5)
+            .addJoiAlignment(1, 8)
+            .addJoiAlignment(2, 9)
+            .addJoiAlignment(3, 7);
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
@@ -1751,17 +1747,17 @@ YMIR_TEST_START(test_maag_vdj)
     */
     cl_builder.setSequence("CCCGACGGTTT")
             .setNucleotideSeq()
-            .addValignment(1, 4)
-            .addValignment(3, 5)
-            .addJalignment(1, 8)
-            .addJalignment(2, 9)
-            .addJalignment(3, 7)
-            .addDalignment(2, 2, 4, 2, 4)
-            .addDalignment(2, 3, 6, 6, 9)
-            .addDalignment(3, 5, 7, 4, 6)
-            .addDalignment(3, 1, 4, 1, 4)
-            .addDalignment(3, 3, 5, 6, 8)
-            .addDalignment(1, 1, 4, 8, 11);
+            .addVarAlignment(1, 4)
+            .addVarAlignment(3, 5)
+            .addJoiAlignment(1, 8)
+            .addJoiAlignment(2, 9)
+            .addJoiAlignment(3, 7)
+            .addDivAlignment(2, 2, 4, 2)
+            .addDivAlignment(2, 3, 6, 6)
+            .addDivAlignment(3, 5, 7, 4)
+            .addDivAlignment(3, 1, 4, 1)
+            .addDivAlignment(3, 3, 5, 6)
+            .addDivAlignment(1, 1, 4, 8);
     cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
@@ -1894,11 +1890,11 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
     // js: 7-8-9-10-11
     cl_builder.setSequence("CCCGACGGTTT")
             .setNucleotideSeq()
-            .addValignment(1, 4)
-            .addValignment(3, 5)
-            .addJalignment(1, 8)
-            .addJalignment(2, 9)
-            .addJalignment(3, 7);
+            .addVarAlignment(1, 4)
+            .addVarAlignment(3, 5)
+            .addJoiAlignment(1, 8)
+            .addJoiAlignment(2, 9)
+            .addJoiAlignment(3, 7);
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
@@ -2022,17 +2018,17 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
     */
     cl_builder.setSequence("CCCGACGGTTT")
             .setNucleotideSeq()
-            .addValignment(1, 4)
-            .addValignment(3, 5)
-            .addJalignment(1, 8)
-            .addJalignment(2, 9)
-            .addJalignment(3, 7)
-            .addDalignment(2, 2, 4, 2, 4)
-            .addDalignment(2, 3, 6, 6, 9)
-            .addDalignment(3, 5, 7, 4, 6)
-            .addDalignment(3, 1, 4, 1, 4)
-            .addDalignment(3, 3, 5, 6, 8)
-            .addDalignment(1, 1, 4, 8, 11);
+            .addVarAlignment(1, 4)
+            .addVarAlignment(3, 5)
+            .addJoiAlignment(1, 8)
+            .addJoiAlignment(2, 9)
+            .addJoiAlignment(3, 7)
+            .addDivAlignment(2, 2, 4, 2)
+            .addDivAlignment(2, 3, 6, 6)
+            .addDivAlignment(3, 5, 7, 4)
+            .addDivAlignment(3, 1, 4, 1)
+            .addDivAlignment(3, 3, 5, 6)
+            .addDivAlignment(1, 1, 4, 8);
     cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
@@ -2330,12 +2326,12 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     // js: 7-8-9-10-11
     cl_builder.setSequence("CCCAAAAAAATT")
             .setNucleotideSeq()
-            .addValignment(1, 4)
-//            .addValignment(3, 5)
-//            .addJalignment(1, 8)
-//            .addJalignment(2, 9)
-            .addJalignment(2, 10);
-//            .addJalignment(3, 7);
+            .addVarAlignment(1, 4)
+//            .addVarAlignment(3, 5)
+//            .addJoiAlignment(1, 8)
+//            .addJoiAlignment(2, 9)
+            .addJoiAlignment(2, 10);
+//            .addJoiAlignment(3, 7);
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
@@ -2415,17 +2411,17 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
     */
     cl_builder.setSequence("CCCGACGGTTT")
             .setNucleotideSeq()
-            .addValignment(1, 4)
-            .addValignment(3, 5)
-            .addJalignment(1, 8)
-            .addJalignment(2, 9)
-            .addJalignment(3, 7)
-            .addDalignment(2, 2, 4, 2, 4)
-            .addDalignment(2, 3, 6, 6, 9)
-            .addDalignment(3, 5, 7, 4, 6)
-            .addDalignment(3, 1, 4, 1, 4)
-            .addDalignment(3, 3, 5, 6, 8)
-            .addDalignment(1, 1, 4, 8, 11);
+            .addVarAlignment(1, 4)
+            .addVarAlignment(3, 5)
+            .addJoiAlignment(1, 8)
+            .addJoiAlignment(2, 9)
+            .addJoiAlignment(3, 7)
+            .addDivAlignment(2, 2, 4, 2)
+            .addDivAlignment(2, 3, 6, 6)
+            .addDivAlignment(3, 5, 7, 4)
+            .addDivAlignment(3, 1, 4, 1)
+            .addDivAlignment(3, 3, 5, 6)
+            .addDivAlignment(1, 1, 4, 8);
     cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
@@ -2483,63 +2479,63 @@ int main(int argc, char* argv[]) {
 
 
     //**************  TEST CASES  **************//
-    YMIR_TEST(test_basic(), "basic test")
+    YMIR_TEST(test_basic())
 
     // Tests for ModelParameterVector
-    YMIR_TEST(test_model_param_vec_vj(), "ModelParameterVector VJ access w/o laplace")
-    YMIR_TEST(test_model_param_vec_vdj(), "ModelParameterVector VDJ access w/o laplace")
+    YMIR_TEST(test_model_param_vec_vj())
+    YMIR_TEST(test_model_param_vec_vdj())
 
     // Tests for gene segments classes
-    YMIR_TEST(test_genesegmentalphabet(), "GeneSegmentAlphabet initialisation, access and P nucs")
-    YMIR_TEST(test_vdjgenes2(), "VDJRecombinationGenes, 2 gene segments, initialisation and access")
-    YMIR_TEST(test_vdjgenes3(), "VDJRecombinationGenes, 3 gene segments, initialisation and access")
-    YMIR_TEST(test_genesegmentalphabet_read(), "GeneSegmentAlphabet file reading / writing")
-    YMIR_TEST(test_vdjgenes_read(), "VDJRecombinationGenes file reading / writing")
+    YMIR_TEST(test_genesegmentalphabet())
+    YMIR_TEST(test_vdjgenes2())
+    YMIR_TEST(test_vdjgenes3())
+    YMIR_TEST(test_genesegmentalphabet_read())
+    YMIR_TEST(test_vdjgenes_read())
 
     // Tests for clone, clone alignment and clone builder classes.
-    YMIR_TEST(test_clone(), "Clonotype, constructor / access")
-    YMIR_TEST(test_clonebuilder_clonealign(), "ClonotypeBuilder, Clonotype building")
+    YMIR_TEST(test_clone())
+    YMIR_TEST(test_clonebuilder_clonealign())
 
     // Tests for default naive sequences aligners.
-    YMIR_TEST(test_nuc_aligner(), "Naive nucleotide sequence aligner")
-    YMIR_TEST(test_aa_aligner(), "Naive amino acid sequence aligner")
+    YMIR_TEST(test_nuc_aligner())
+    YMIR_TEST(test_aa_aligner())
 
-    YMIR_TEST(test_writer(), "Writer")
+    YMIR_TEST(test_writer())
 
     // Test for MiTCR parser.
-    YMIR_TEST(test_ymir_vj(), "Ymir parser test for alpha chain")
-    YMIR_TEST(test_ymir_vdj_with_d_alignment(), "Ymir parser test for beta chain with D alignment")
-//    YMIR_TEST(test_ymir_vdj_wo_d_alignment(), "Ymir parser test for beta chain without D alignment")
+    YMIR_TEST(test_ymir_vj())
+    YMIR_TEST(test_ymir_vdj_with_d_alignment())
+//    YMIR_TEST(test_ymir_vdj_wo_d_alignment())
 
     // Tests for clonal repertoires and clonal repertoire views.
-    YMIR_TEST(test_clorep(), "Cloneset / ClonesetView manipulations")
+    YMIR_TEST(test_clorep())
 
     // Tests for markov chain.
-    YMIR_TEST(test_markovchain_nuc_mono(), "Mono-nucleotide insertion model (nucleotide) error")
-    YMIR_TEST(test_markovchain_nuc_di(), "Di-nucleotide insertion model (nucleotide) error")
-    YMIR_TEST(test_markovchain_aa(), "Insertion model (amino acid) error")
+    YMIR_TEST(test_markovchain_nuc_mono())
+    YMIR_TEST(test_markovchain_nuc_di())
+    YMIR_TEST(test_markovchain_aa())
 
     // Test for Multi-Matrix Chains
-    YMIR_TEST(test_mmc(), "Multi-Matrix chain all interface")
+    YMIR_TEST(test_mmc())
 
 //    // Tests for MAAG / MAAG builder
-    YMIR_TEST(test_maag_vj(), "MAAG VJ building and computing")
-    YMIR_TEST(test_maag_vdj(), "MAAG VDJ building and computing")
-    YMIR_TEST(test_maag_builder_replace_vj(), "MAAG Builder replace VJ event probabilities")
-    YMIR_TEST(test_maag_builder_replace_vdj(), "MAAG Builder replace VDJ event probabilities")
+    YMIR_TEST(test_maag_vj())
+    YMIR_TEST(test_maag_vdj())
+    YMIR_TEST(test_maag_builder_replace_vj())
+    YMIR_TEST(test_maag_builder_replace_vdj())
 
     // Tests for assembling statistical model (ASM) reading / writing files.
-    YMIR_TEST(test_model_vj_file(), "VJ Model constructing from a file")
-    YMIR_TEST(test_model_vdj_file(), "VDJ Model constructing from a file")
-    YMIR_TEST(test_model_vj_save_load(), "VJ Model saving to a file")
-    YMIR_TEST(test_model_vdj_save_load(), "VDJ Model saving to a file")
-    YMIR_TEST(test_model_gene_usage(), "Gene usage")
-//    YMIR_TEST(test_model_vj_maag(), "VJ Model creating MAAGs")
-//    YMIR_TEST(test_model_vdj_maag(), "VDJ Model creating MAAGs")
+    YMIR_TEST(test_model_vj_file())
+    YMIR_TEST(test_model_vdj_file())
+    YMIR_TEST(test_model_vj_save_load())
+    YMIR_TEST(test_model_vdj_save_load())
+    YMIR_TEST(test_model_gene_usage())
+//    YMIR_TEST(test_model_vj_maag())
+//    YMIR_TEST(test_model_vdj_maag())
 
     // Tests for forward-backward algorithms
-    YMIR_TEST(test_maag_forward_backward_vj(), "MAAG forward-backward algorithm for VJ")
-    YMIR_TEST(test_maag_forward_backward_vdj(), "MAAG forward-backward algorithm for VDJ")
+    YMIR_TEST(test_maag_forward_backward_vj())
+    YMIR_TEST(test_maag_forward_backward_vdj())
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.
 

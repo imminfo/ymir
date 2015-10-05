@@ -309,7 +309,7 @@ namespace ymir {
                                 if (indices.size()) {
                                     align_ok = true;
                                     for (size_t align_i = 0; align_i < indices.size(); ++align_i) {
-                                        clone_builder.addDalignment(seg_i, indices[align_i]);
+                                        clone_builder.addDivAlignment(seg_i, indices[align_i]);
                                     }
                                 }
                             }
@@ -383,9 +383,9 @@ namespace ymir {
                 if (aligned_chars == -1) { aligned_chars = 0; }
 
                 if (seg == 'V') {
-                    clone_builder.addValignment(segvec[0], aligned_chars);
+                    clone_builder.addVarAlignment(segvec[0], aligned_chars);
                 } else {
-                    clone_builder.addJalignment(segvec[0], aligned_chars);
+                    clone_builder.addJoiAlignment(segvec[0], aligned_chars);
                 }
             } else {
                 string temp_str = "";
@@ -396,9 +396,9 @@ namespace ymir {
                     if (aligned_chars == -1) { aligned_chars = 0; }
 
                     if (seg == 'V') {
-                        clone_builder.addValignment(segvec[seg_index], aligned_chars);
+                        clone_builder.addVarAlignment(segvec[seg_index], aligned_chars);
                     } else {
-                        clone_builder.addJalignment(segvec[seg_index], aligned_chars);
+                        clone_builder.addJoiAlignment(segvec[seg_index], aligned_chars);
                     }
 
                     ++seg_index;

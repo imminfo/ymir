@@ -116,34 +116,54 @@ namespace ymir {
     /**
      * \struct d_alignment_t
      *
-     * \brief 1-based alignemnt of a Diversity gene to a sequence.
+     * \brief 1-based alignment of a gene segment sequence to a reference sequence without indels.
      */
-    struct d_alignment_t {
-        seq_len_t Dstart, Dend, seqstart, seqend;
+    class Alignment {
 
-        d_alignment_t() :
-                Dstart(0), Dend(0), seqstart(0), seqend(0) {}
+    public:
 
-
-        d_alignment_t(seq_len_t Dstart, seq_len_t Dend, seq_len_t seqstart, seq_len_t seqend) :
-                Dstart(Dstart), Dend(Dend), seqstart(seqstart), seqend(seqend) {}
+        Alignment()
+                : _gene_start(0), _seq_start(0), _len(0)
+        { }
 
 
-        d_alignment_t(seq_len_t *p) :
-                Dstart(*p), Dend(*(p + 1)), seqstart(*(p + 2)), seqend(*(p + 3)) {}
+        Alignment(seq_len_t Dstart, seq_len_t Dend, seq_len_t seqstart)
+                : _gene_start(Dstart), _seq_start(seqstart), _len(Dend - Dstart + 1)
+        { }
 
 
-        bool operator==(const d_alignment_t& other) {
-            return this->Dstart == other.Dstart
-                    && this->Dend == other.Dend
-                    && this->seqstart == other.seqstart
-                    && this->seqend == other.seqend;
+        Alignment(seq_len_t *p)
+                : _gene_start(*p), _seq_start(*(p + 2)), _len(*(p + 1) - (*p) + 1)
+        { }
+
+
+        ///@{
+        seq_len_t gene_start() const { return _gene_start; }
+
+        seq_len_t gene_end() const { return _gene_start + _len - 1; }
+
+        seq_len_t seq_start() const { return _seq_start; }
+
+        seq_len_t seq_end() const { return _seq_start + _len - 1; }
+
+        seq_len_t length() const { return _len; }
+        ///@}
+
+
+        bool operator==(const Alignment& other) {
+            return this->_gene_start == other._gene_start
+                   && this->_seq_start == other._seq_start
+                   && this->_len == other._len;
         }
 
 
-        bool operator!=(const d_alignment_t& other) {
+        bool operator!=(const Alignment& other) {
             return !((*this) == other);
         }
+
+    private:
+
+        seq_len_t _gene_start, _seq_start, _len;
 
     };
 
@@ -271,6 +291,14 @@ namespace ymir {
     enum InsertionModelType {
         MONO_NUCLEOTIDE,
         DI_NUCLEOTIDE
+    };
+
+
+    enum AlignmentEvent {
+        MATCH,
+        MISMATCH,
+        INSERTION,
+        DELETION
     };
 
 

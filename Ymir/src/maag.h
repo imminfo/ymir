@@ -405,7 +405,10 @@ namespace ymir {
         std::string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
         SequenceType _seq_type;
 
-//        AlignmentsWithErrors *_err_alignments;
+        NumErrorsMMC *_errors;  /** Matrix of number of errors for each scenario event position. */
+        prob_t _err_prob;  /** Probability of a error. */
+
+//        MAAGMetadata *_metadata;
 
     };
 }

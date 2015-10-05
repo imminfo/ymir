@@ -56,6 +56,14 @@ namespace ymir {
 
 
     /**
+     * \class NumErrorsMMC
+     *
+     * \brief Class for storing a number of errors for each scenario event.
+     */
+    typedef MultiMatrixChain<seq_len_t> NumErrorsMMC;
+
+
+    /**
     * \class MultiMatrixChain
     *
     * \brief Class for storing lists of matrices, where one node in the list (called "chain") could
@@ -111,12 +119,13 @@ namespace ymir {
         struct Node {
         public:
 
-            Node() : _n(0), _start_index(0), _rows(0), _cols(0) {}
+            Node() : _n(0), _start_index(0), _rows(0), _cols(0)
+            { }
 
 
-            Node(size_t start_index, matrix_ind_t n, dim_t rows, dim_t cols) {
-                this->init(start_index, n, rows, cols);
-            }
+            Node(size_t start_index, matrix_ind_t n, dim_t rows, dim_t cols)
+                    : _n(n), _start_index(start_index), _rows(rows), _cols(cols)
+            { }
 
 
             Node(const Node& other) {
@@ -252,7 +261,7 @@ namespace ymir {
 
         node_ind_t addNode(matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
             _chain.push_back(Node());
-            initNode(_chain.size() - 1, n_matrices, rows, cols);
+            this->initNode(_chain.size() - 1, n_matrices, rows, cols);
             return _chain.size() - 1;
         }
         ///@}

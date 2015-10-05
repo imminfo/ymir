@@ -127,13 +127,13 @@ namespace ymir {
         { }
 
 
-        Alignment(seq_len_t Dstart, seq_len_t Dend, seq_len_t seqstart)
-                : _gene_start(Dstart), _seq_start(seqstart), _len(Dend - Dstart + 1)
+        Alignment(seq_len_t gene_start, seq_len_t seq_start, seq_len_t alignment_length)
+                : _gene_start(gene_start), _seq_start(seq_start), _len(alignment_length)
         { }
 
 
         Alignment(seq_len_t *p)
-                : _gene_start(*p), _seq_start(*(p + 2)), _len(*(p + 1) - (*p) + 1)
+                : _gene_start(*p), _seq_start(*(p + 1)), _len(*(p + 2))
         { }
 
 

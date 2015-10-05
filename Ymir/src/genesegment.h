@@ -29,6 +29,7 @@
 #include <sstream>
 
 #include "types.h"
+#include "tools.h"
 
 
 namespace ymir {
@@ -125,7 +126,7 @@ namespace ymir {
         * \param from_3_end Number of P nucleotides to append from the 3' end (i.e., sequences' end).
         */
         void appendPalindromicNucleotides(seq_len_t from_5_end, seq_len_t from_3_end) {
-            string seq_5_end = "", seq_3_end = "";
+            std::string seq_5_end = "", seq_3_end = "";
             for (auto i = 1; i < _vec.size(); ++i) {
 
                 // checks for _vec sequences' length ?

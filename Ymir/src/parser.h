@@ -383,9 +383,13 @@ namespace ymir {
                 if (aligned_chars == -1) { aligned_chars = 0; }
 
                 if (seg == 'V') {
-                    clone_builder.addVarAlignment(segvec[0], aligned_chars);
+                    // FIXME: proper V start-end parsing
+//                    clone_builder.addVarAlignment(segvec[0], aligned_chars);
+                    clone_builder.addVarAlignment(segvec[0], 1, aligned_chars, 1);
                 } else {
-                    clone_builder.addJoiAlignment(segvec[0], aligned_chars);
+                    // FIXME: proper J start-end parsing
+//                    clone_builder.addJoiAlignment(segvec[0], aligned_chars);
+                    clone_builder.addJoiAlignment(segvec[0], 1, aligned_chars, aligned_chars);
                 }
             } else {
                 string temp_str = "";
@@ -396,9 +400,13 @@ namespace ymir {
                     if (aligned_chars == -1) { aligned_chars = 0; }
 
                     if (seg == 'V') {
-                        clone_builder.addVarAlignment(segvec[seg_index], aligned_chars);
+                        // FIXME: proper V start-end parsing #2
+//                        clone_builder.addVarAlignment(segvec[seg_index], aligned_chars);
+                        clone_builder.addVarAlignment(segvec[seg_index], 1, aligned_chars, 1);
                     } else {
-                        clone_builder.addJoiAlignment(segvec[seg_index], aligned_chars);
+                        // FIXME: proper J start-end parsing #2
+//                        clone_builder.addJoiAlignment(segvec[seg_index], aligned_chars);
+                        clone_builder.addJoiAlignment(segvec[seg_index], 1, aligned_chars, aligned_chars);
                     }
 
                     ++seg_index;

@@ -113,7 +113,7 @@ namespace ymir {
 
             if (metadata_mode) {
 
-                // TODO:
+                // TODO: deal with D deletions and insertions null matrices
                 // - if the D deletions matrix contains only zeros, then remove this matrix
                 // - if insertions matrices have columns / rows with only zero (!) events (!), then remove it
                 // and remove the corresponding deletions rows / columns from neighbour matrices.
@@ -320,9 +320,7 @@ namespace ymir {
             seq_len_t len = 0;
             seg_index_t v_num = clonotype.nVar(), j_num = clonotype.nJoi();
             for (int v_index = 0; v_index < v_num; ++v_index) {
-                if (clonotype.getVend(v_index) > len) {
-                    len = clonotype.getVend(v_index);
-                }
+                len = std::max(len, clonotype.getVarAlignment(v_index).length());
             }
 
             // compute V deletions
@@ -351,7 +349,8 @@ namespace ymir {
             for (seg_index_t v_index = 0; v_index < v_num; ++v_index) {
                 v_gene = clonotype.getVar(v_index);
                 v_len = _genes->V()[v_gene].sequence.size();
-                v_end = clonotype.getVend(v_index);
+                // FIXME: v_end AND seq_end to start with
+                v_end = clonotype.getVarAlignment(v_index).gene_end();
 
                 if (clonotype.recombination() == VJ_RECOMB) {
                     // probability of choosing this V gene segment
@@ -367,6 +366,7 @@ namespace ymir {
                     if (v_len - i >= 0 && i <= v_end) {
                         probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, v_len - i); // probability of deletions
                     } else {
+                        // TODO: remove this assignment because all initialised to zeros and check the speed
                         probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0; // if exceeds length of V gene segment
                     }
                     // probs(1, v_index, 0, i) = (v_len - i >= 0) ? _param_vec->prob_V_del(v_gene, v_len - i) : 0;
@@ -388,6 +388,7 @@ namespace ymir {
                         if (v_len - i >= 0 && i <= v_end) {
                             events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_index(V_DEL, v_gene - 1, v_len - i);
                         } else {
+                            // TODO: remove this assignment because all initialised to zeros and check the speed
                             events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0;
                         }
                     }
@@ -423,9 +424,7 @@ namespace ymir {
             seg_index_t j_num = clonotype.nJoi();
             seq_len_t len = clonotype.sequence().size();
             for (int j_index = 0; j_index < j_num; ++j_index) {
-                if (clonotype.getJstart(j_index) < len) {
-                    len = clonotype.getJstart(j_index);
-                }
+                len = std::max(len, clonotype.getJoiAlignment(j_index).length());
             }
             len = clonotype.sequence().size() - len + 1;
 //            cout << "len = " << len << endl;
@@ -454,7 +453,8 @@ namespace ymir {
             for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
                 j_gene = clonotype.getJoi(j_index);
                 j_len = _genes->J()[j_gene].sequence.size();
-                j_start = clonotype.getJstart(j_index);
+                // FIXME: j_start AND gene_start
+                j_start = clonotype.getJoiAlignment(j_index).seq_start();
 
                 if (clonotype.recombination() == VDJ_RECOMB) {
                     for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
@@ -467,6 +467,7 @@ namespace ymir {
                     if (j_len - len + i >= 0 && len - i <= clonotype.sequence().size() - j_start + 1) {
                         probs(J_index_dels, j_index, i, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_len - len + i); // probability of deletions
                     } else {
+                        // TODO: remove this assignment because all initialised to zeros and check the speed
                         probs(J_index_dels, j_index, i, 0) = 0; // if exceeds length of J gene segment
                     }
 
@@ -484,6 +485,7 @@ namespace ymir {
                         if (j_len - len + i >= 0 && len - i <= clonotype.sequence().size() - j_start + 1) {
                             events(J_index_dels, j_index, i, 0) = _param_vec->event_index(J_DEL, j_gene - 1, j_len - len + i);
                         } else {
+                            // TODO: remove this assignment because all initialised to zeros and check the speed
                             events(J_index_dels, j_index, i, 0) = 0;
                         }
                     }
@@ -524,7 +526,7 @@ namespace ymir {
             for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                 seq_len_t min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
 
-                for (seg_index_t j = 0; j < clonotype.nDivAlignments(d_index); ++j) {
+                for (seg_index_t j = 0; j < clonotype.numDivAlignments(d_index); ++j) {
                     d_alignment = clonotype.getDivAlignment(d_index, j);
 
                     // yes-yes, I know that it could be done more efficiently. But I don't want to.
@@ -580,7 +582,7 @@ namespace ymir {
                 min_D_len = _param_vec->D_min_len(d_gene);
 
                 // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
-                for (seg_index_t j = 0; j < clonotype.nDivAlignments(d_index); ++j) {
+                for (seg_index_t j = 0; j < clonotype.numDivAlignments(d_index); ++j) {
                     d_alignment = clonotype.getDivAlignment(d_index, j);
 
                     for (seq_len_t left_pos = d_alignment.seq_start(); left_pos <= d_alignment.seq_end() - min_D_len + 1; ++left_pos) {
@@ -820,6 +822,7 @@ namespace ymir {
                                     = null_insertion + insertion_len;
                         }
                     } else {
+                        // TODO: remove this assignments because all initialised to zeros and check the speed
                         probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0;
                         if (metadata_mode) { events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0; }
                     }
@@ -833,6 +836,13 @@ namespace ymir {
         // function for shrinking D alignment matrices, find non-zero positions, etc.
         // build[Mono|Di]NucInsertions <InsertionModel, SequenceType, MetadataMode>
         // general functions for assigning values (event probs / event inds) to MMC of some type.
+
+        /*
+            buildVarGenesAndDels
+            buildDivDels
+            buildJoiDels
+            buildJoiDivGenes
+        */
 
     };
 }

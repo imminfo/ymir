@@ -213,7 +213,7 @@ namespace ymir {
 //            LocalAlignmentIndices(_Output *alignment_, size_t n_) : n(n_ / 4) {
             LocalAlignmentIndices(const vector<seq_len_t> vec) {
                 if (vec.size()) {
-                    this->n = vec.size() / 4;
+                    this->n = vec.size() / 3;
                     this->alignment = new seq_len_t[this->n * 3];
                     for (int i = 0; i < this->n * 3; ++i) {
                         this->alignment[i] = vec[i];
@@ -308,10 +308,13 @@ namespace ymir {
                         }
                     } else if (open_match) {
                         if ((pattern_i + i - p_start) >= match_min_len) {
-                            vec.push_back(p_start);
+//                            vec.push_back(p_start);
+//                            vec.push_back(pattern_i + i - 1);
+//                            vec.push_back(t_start);
+//                            vec.push_back(i - 1);
+                            vec.push_back(p_start + 1);
+                            vec.push_back(t_start + 1);
                             vec.push_back(pattern_i + i - 1);
-                            vec.push_back(t_start);
-                            vec.push_back(i - 1);
                         }
                         open_match = false;
                     }
@@ -321,8 +324,8 @@ namespace ymir {
 //                    vec.push_back(pattern_i + min_subsize - 1);
 //                    vec.push_back(t_start);
 //                    vec.push_back(min_subsize - 1);
-                    vec.push_back(p_start);
-                    vec.push_back(t_start);
+                    vec.push_back(p_start + 1);
+                    vec.push_back(t_start + 1);
                     vec.push_back(pattern_i + min_subsize - p_start);
                 }
             }
@@ -339,10 +342,13 @@ namespace ymir {
                         }
                     } else if (open_match) {
                         if ((i - p_start) >= match_min_len) {
-                            vec.push_back(p_start);
+//                            vec.push_back(p_start);
+//                            vec.push_back(i - 1);
+//                            vec.push_back(t_start);
+//                            vec.push_back(text_i + i - 1);
+                            vec.push_back(p_start + 1);
+                            vec.push_back(t_start + 1);
                             vec.push_back(i - 1);
-                            vec.push_back(t_start);
-                            vec.push_back(text_i + i - 1);
                         }
                         open_match = false;
                     }
@@ -352,13 +358,13 @@ namespace ymir {
 //                    vec.push_back(min_subsize - 1);
 //                    vec.push_back(t_start);
 //                    vec.push_back(text_i + min_subsize - 1);
-                    vec.push_back(p_start);
-                    vec.push_back(t_start);
+                    vec.push_back(p_start + 1);
+                    vec.push_back(t_start + 1);
                     vec.push_back(min_subsize - p_start);
                 }
             }
 
-            for (size_t i = 0; i < vec.size(); ++i) { ++vec[i]; }
+//            for (size_t i = 0; i < vec.size(); ++i) { ++vec[i]; }
             return LocalAlignmentIndices(vec);
         }
 

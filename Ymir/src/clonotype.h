@@ -89,8 +89,10 @@ namespace ymir {
             }
         }
 
+        // Clonotype& operator=
 
-        ~Clonotype() {
+
+        virtual ~Clonotype() {
             if (_segments) {
                 delete [] _segments;
             }
@@ -192,7 +194,8 @@ namespace ymir {
         }
 
 
-        ~ClonotypeBuilder() {
+        virtual ~ClonotypeBuilder() {
+
         }
 
 
@@ -250,17 +253,16 @@ namespace ymir {
 
 
         /**
-        * \brief Set a sequence for building a clonotype.
-        *
-        * \param seq Clonotype sequence.
-        */
+         *
+         */
+        ///@{
         ClonotypeBuilder& setSequence(const std::string& seq) { this->_sequence = seq; return *this; }
 
-
-        ///@{
         ClonotypeBuilder& setNucleotideSeq() { _seq_type = NUCLEOTIDE; return *this; }
 
         ClonotypeBuilder& setAminoAcidSeq() { _seq_type = AMINOACID; return *this; }
+
+        ClonotypeBuilder& setRecombination(Recombination recomb) { _recomb = recomb; return *this; }
         ///@}
 
 
@@ -278,6 +280,8 @@ namespace ymir {
         }
 
         ClonotypeBuilder& addDalignment(seg_index_t dseg, seq_len_t dstart, seq_len_t dend, seq_len_t seqstart, seq_len_t seqend) {
+            // check for recombination type?
+
             if (_Dseg.size() == 0 || dseg != _Dseg[_Dseg.size() - 1]) {
                 _n_Dalign.push_back(0);
             }

@@ -1119,6 +1119,7 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
             .addDalignment(30, 1, 2, 5, 6)
             .addDalignment(32, 1, 2, 5, 6);
 
+    cb.setRecombination(VDJ_RECOMB);
     Clonotype c = cb.buildClonotype();
 
     YMIR_ASSERT(c.sequence() == "nuclseq")
@@ -1246,6 +1247,7 @@ YMIR_TEST_START(test_writer)
             .addJalignment(1, 8)
             .addJalignment(2, 9)
             .addJalignment(3, 7);
+    cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
     vector<Clonotype> vec;
     vec.push_back(clonotype);
@@ -1632,6 +1634,7 @@ YMIR_TEST_START(test_maag_vj)
             .addJalignment(1, 8)
             .addJalignment(2, 9)
             .addJalignment(3, 7);
+    cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
 //    cout << "here" << endl;
@@ -1759,6 +1762,7 @@ YMIR_TEST_START(test_maag_vdj)
             .addDalignment(3, 1, 4, 1, 4)
             .addDalignment(3, 3, 5, 6, 8)
             .addDalignment(1, 1, 4, 8, 11);
+    cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
     MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
@@ -1895,6 +1899,7 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
             .addJalignment(1, 8)
             .addJalignment(2, 9)
             .addJalignment(3, 7);
+    cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
     MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
@@ -2028,6 +2033,7 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
             .addDalignment(3, 1, 4, 1, 4)
             .addDalignment(3, 3, 5, 6, 8)
             .addDalignment(1, 1, 4, 8, 11);
+    cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
     MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
@@ -2330,6 +2336,7 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
 //            .addJalignment(2, 9)
             .addJalignment(2, 10);
 //            .addJalignment(3, 7);
+    cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
     MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
@@ -2419,6 +2426,7 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
             .addDalignment(3, 1, 4, 1, 4)
             .addDalignment(3, 3, 5, 6, 8)
             .addDalignment(1, 1, 4, 8, 11);
+    cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
     MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);

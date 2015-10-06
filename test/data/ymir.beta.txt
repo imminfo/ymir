@@ -1,2 +1,2 @@
-Nucleotide sequence	Amino acid sequence	Variable	Diversity	Joining	V end	D start	D end	J start
-CCCGACGGTTT	CAASTPLSW~GTSYGKLTF	Vseg1		Jseg1	7	0	0	6
+Nucleotide sequence	Amino acid sequence	Variable	Diversity	Joining	V alignment	D alignment	J alignment
+CCCGACGGTTT	CAASTPLSW~GTSYGKLTF	Vseg1		Jseg1	1|1|7		0|6|6

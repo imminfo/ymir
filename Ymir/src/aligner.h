@@ -239,7 +239,7 @@ namespace ymir {
             }
 
 
-            size_t array_size() const { return this->n * 4; }
+            size_t array_size() const { return this->n * 3; }
 
 
             size_t size() const { return this->n; }

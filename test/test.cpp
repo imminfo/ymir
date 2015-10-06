@@ -28,10 +28,10 @@
                             } \
                             }
 
-#define YMIR_TEST_START(funname) vector<string> funname() { vector<string> _failed_cases;
+#define YMIR_TEST_START(funname) vector<string> funname() { std::cout << " --- " << (#funname) << std::endl; vector<string> _failed_cases;
 #define YMIR_ASSERT(expr) { if (!(expr)) { _failed_cases.push_back(#expr); } };
 #define YMIR_ASSERT2(expr1, expr2) { if ((expr1) != (expr2)) { std::stringstream ss; ss << #expr1 << " == " << #expr2 << "  (result: " << (expr1) << ", need: " << (expr2) << ")";_failed_cases.push_back(ss.str()); } };
-#define YMIR_TEST_END return _failed_cases; }
+#define YMIR_TEST_END std::cout << std::endl; return _failed_cases; }
 
 #define YMIR_TEST_PRECISION 1e-14
 
@@ -864,7 +864,7 @@ YMIR_TEST_START(test_genesegmentalphabet)
     seqvec1.push_back("GGG");
     seqvec1.push_back("CCC");
 
-    GeneSegmentAlphabet gsa("testseg", alvec1, seqvec1);
+    GeneSegmentAlphabet gsa(VARIABLE, "testseg", alvec1, seqvec1);
 
     YMIR_ASSERT(gsa.name() == "testseg")
     YMIR_ASSERT(gsa.size() == 4)
@@ -960,9 +960,9 @@ YMIR_TEST_END
 YMIR_TEST_START(test_genesegmentalphabet_read)
     // assert read
     bool ok;
-    GeneSegmentAlphabet gsa_n("testseg", TEST_DATA_FOLDER + "RANDOM_FILE.txt", &ok);
+    GeneSegmentAlphabet gsa_n(VARIABLE, "testseg", TEST_DATA_FOLDER + "RANDOM_FILE.txt", &ok);
     YMIR_ASSERT(!ok)
-    GeneSegmentAlphabet gsa("testseg", TEST_DATA_FOLDER + "vgene.txt", &ok);
+    GeneSegmentAlphabet gsa(VARIABLE, "testseg", TEST_DATA_FOLDER + "vgene.txt", &ok);
     YMIR_ASSERT(ok)
 
     YMIR_ASSERT(gsa.name() == "testseg")
@@ -975,7 +975,7 @@ YMIR_TEST_START(test_genesegmentalphabet_read)
     // assert write and than read again
     YMIR_ASSERT(gsa.write(TEST_DATA_FOLDER + "vgene_towrite.txt"))
 
-    GeneSegmentAlphabet gsa1("testseg", TEST_DATA_FOLDER + "vgene_towrite.txt");
+    GeneSegmentAlphabet gsa1(VARIABLE, "testseg", TEST_DATA_FOLDER + "vgene_towrite.txt");
 
     YMIR_ASSERT(gsa1.name() == "testseg")
     YMIR_ASSERT(gsa1.size() == 4)
@@ -1136,8 +1136,6 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
 
     ClonotypeBuilder cb;
 
-    std::cout << "TEST STARTED BITCHERS" << std::endl;
-
     cb.setNucleotideSeq();
     cb.setSequence("nuclseq");
     cb.addVarAlignment(10, 1, 3, 15)
@@ -1293,7 +1291,7 @@ YMIR_TEST_START(test_writer)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_ymir_vj)
+YMIR_TEST_START(test_parser_vj)
 
     RepertoireParser parser;
 
@@ -1307,14 +1305,16 @@ YMIR_TEST_START(test_ymir_vj)
     YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha.txt",
                              &cr,
                              vdj_genes,
+                             NUCLEOTIDE,
+                             VJ_RECOMB,
                              RepertoireParser::AlignmentColumnOptions()
-                                     .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
-                                     .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
-                                     .setD(RepertoireParser::SKIP)))
+                                     .setV(RepertoireParser::USE_PROVIDED)
+                                     .setJ(RepertoireParser::USE_PROVIDED),
+                             NaiveNucleotideAligner()))
 
     YMIR_ASSERT(cr.size() == 30)
     YMIR_ASSERT(cr[0].sequence() == "TGTGCAGCAAGTACCCCCTTAAGCTGGTGGTACTAGCTATGGAAAGCTGACATTT")
-    YMIR_ASSERT(cr[0].recombination() != VDJ_RECOMB)
+    YMIR_ASSERT(cr[0].recombination() == VJ_RECOMB)
     YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(0)].allele == "TRAV13-1")
     YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(1)].allele == "TRAV13-2")
     YMIR_ASSERT(cr[0].nVar() == 2)
@@ -1331,7 +1331,7 @@ YMIR_TEST_START(test_ymir_vj)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_ymir_vdj_with_d_alignment)
+YMIR_TEST_START(test_parser_vdj_with_d_alignment)
 
     vector<string> alvec1;
     vector<string> seqvec1;
@@ -1368,9 +1368,11 @@ YMIR_TEST_START(test_ymir_vdj_with_d_alignment)
     YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.beta.txt",
                              &cr,
                              genes,
+                             NUCLEOTIDE,
+                             VDJ_RECOMB,
                              RepertoireParser::AlignmentColumnOptions()
-                                     .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
-                                     .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
+                                     .setV(RepertoireParser::USE_PROVIDED)
+                                     .setJ(RepertoireParser::USE_PROVIDED)
                                      .setD(RepertoireParser::OVERWRITE)))
 
     YMIR_ASSERT2(cr.size(), 1)
@@ -1399,10 +1401,11 @@ YMIR_TEST_START(test_clorep)
     YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha.txt",
                              &cr,
                              vdj_genes,
+                             NUCLEOTIDE,
+                             VJ_RECOMB,
                              RepertoireParser::AlignmentColumnOptions()
-                                     .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
-                                     .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
-                                     .setD(RepertoireParser::SKIP)))
+                                     .setV(RepertoireParser::USE_PROVIDED)
+                                     .setJ(RepertoireParser::USE_PROVIDED)))
 
     YMIR_ASSERT(!has_end_codon(cr[3].sequence()))
     YMIR_ASSERT(is_out_of_frame(cr[3].sequence()))
@@ -2480,7 +2483,6 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
     YMIR_ASSERT2(maag.nDiv(), 3)
     YMIR_ASSERT2(maag.nJoi(), 3)
 
-//    YMIR_ASSERT(false)
     MAAGForwardBackwardAlgorithm algo(maag);
 
     YMIR_ASSERT2(algo.status(), true)
@@ -2502,7 +2504,7 @@ struct TestInfo {
 
 int main(int argc, char* argv[]) {
 
-    TEST_DATA_FOLDER = argv[1];
+    TEST_DATA_FOLDER = string(argv[1]) + string("/");
 
 //    mpreal::set_default_prec(200);
 
@@ -2539,12 +2541,11 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_nuc_aligner())
     YMIR_TEST(test_aa_aligner())
 
-    YMIR_TEST(test_writer())
-
-    // Test for MiTCR parser.
-    YMIR_TEST(test_ymir_vj())
-    YMIR_TEST(test_ymir_vdj_with_d_alignment())
+    // Test for the repertoire parser and writer
+    YMIR_TEST(test_parser_vj())
+    YMIR_TEST(test_parser_vdj_with_d_alignment())
 //    YMIR_TEST(test_ymir_vdj_wo_d_alignment())
+    YMIR_TEST(test_writer())
 
     // Tests for clonal repertoires and clonal repertoire views.
     YMIR_TEST(test_clorep())

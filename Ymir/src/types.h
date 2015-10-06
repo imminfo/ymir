@@ -57,9 +57,9 @@ namespace ymir {
 
     #define DEFAULT_MAX_INS_LENGTH 65
 
-//    #ifndef DNDEBUG
+    #ifndef DNDEBUG
     #define YDEBUG
-//    #endif
+    #endif
 
     #define DEFAULT_AWE_V_RESERVE_SIZE 60
     #define DEFAULT_AWE_D_RESERVE_SIZE 4000

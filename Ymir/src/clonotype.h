@@ -261,6 +261,8 @@ namespace ymir {
         ///@{
         ClonotypeBuilder& setSequence(const std::string& seq) { this->_sequence = seq; return *this; }
 
+        ClonotypeBuilder& setSequenceType(SequenceType seq_type) { _seq_type = seq_type; return *this; }
+
         ClonotypeBuilder& setNucleotideSeq() { _seq_type = NUCLEOTIDE; return *this; }
 
         ClonotypeBuilder& setAminoAcidSeq() { _seq_type = AMINOACID; return *this; }
@@ -304,6 +306,29 @@ namespace ymir {
 
         ClonotypeBuilder& addDivAlignment(seg_index_t dseg, const Alignment& dalignment) {
             return addDivAlignment(dseg, dalignment.gene_start(), dalignment.seq_start(), dalignment.length());
+        }
+
+
+        ClonotypeBuilder& addAlignment(GeneSegments gene_segment, seg_index_t seg, seq_len_t gene_start, seq_len_t seq_start, seq_len_t alignment_len) {
+            switch (gene_segment) {
+
+                case VARIABLE: {
+                    this->addVarAlignment(seg, gene_start, seq_start, alignment_len);
+                    break;
+                }
+
+                case DIVERSITY: {
+                    this->addDivAlignment(seg, gene_start, seq_start, alignment_len);
+                    break;
+                }
+
+                case JOINING: {
+                    this->addJoiAlignment(seg, gene_start, seq_start, alignment_len);
+                    break;
+                }
+
+                default: {}
+            }
         }
         ///@}
 

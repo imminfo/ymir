@@ -36,9 +36,6 @@
 
 namespace ymir {
 
-    #define DEFAULT_BUFFER_SIZE 100000
-
-
     /**
     * \class RepertoireParser
     *
@@ -47,19 +44,19 @@ namespace ymir {
     * "parseRepertoire".
     */
     class RepertoireParser {
+
     public:
 
         /**
         * \enum ALIGNMENT_COLUMN_ACTION
         *
         * \brief Specify an action to perform with an alignment column:
-        * either overwrite found alignments (OVERWRITE), make alignments (MAKE_IF_NOT_FOUND) of clones if no such column found
-        * or skip (SKIP) this alignments (e.g., D(iversity) gene segment for TCR alpha-chains).
+        * either overwrite found alignments (OVERWRITE)
+        * or use found (USE_PROVIDED) alignments in the input file.
         */
         enum ALIGNMENT_COLUMN_ACTION {
             OVERWRITE,
-            MAKE_IF_NOT_FOUND,
-            SKIP
+            USE_PROVIDED
         };
 
 
@@ -121,11 +118,15 @@ namespace ymir {
         bool parse(const string& filepath,
                    Cloneset *rep,
                    const VDJRecombinationGenes& gene_segments,
-                   AlignmentColumnOptions opts = AlignmentColumnOptions().setV(MAKE_IF_NOT_FOUND).setJ(MAKE_IF_NOT_FOUND).setD(MAKE_IF_NOT_FOUND),
-                   const AbstractAligner& aligner = NaiveNucleotideAligner(),
-                   bool nuc_sequences = true) {
+                   SequenceType seq_type = NUCLEOTIDE,
+                   Recombination recomb = UNDEF_RECOMB,
+                   AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE),
+                   const AbstractAligner& aligner = NaiveNucleotideAligner()) {
 
-//            if (!_config_is_loaded) { return false; }
+            if (recomb == UNDEF_RECOMB) {
+                std::cout << "Repertoire parser error:" << "\tno recombination type for [" << filepath << "]" << endl;
+                return false;
+            }
 
             vector<Clonotype> clonevec;
             clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
@@ -134,7 +135,7 @@ namespace ymir {
             bool res = false;
             if (ifs.is_open()) {
                 std::cout << "Parsing input file:\t" << filepath << endl;
-                res = this->parseRepertoire(filepath, ifs, clonevec, gene_segments, aligner, nuc_sequences, opts);
+                res = this->parseRepertoire(filepath, ifs, clonevec, gene_segments, aligner, seq_type, opts, recomb);
                 if (res) { rep->swap(clonevec); }
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
@@ -157,54 +158,25 @@ namespace ymir {
                                      vector<Clonotype>& vec,
                                      const VDJRecombinationGenes& gene_segments,
                                      const AbstractAligner& aligner,
-                                     bool nuc_sequences,
-                                     AlignmentColumnOptions opts) {
+                                     SequenceType seq_type,
+                                     AlignmentColumnOptions opts,
+                                     Recombination recomb)
+        {
+            char column_sep ='\t',
+                 segment_sep = ',',
+                 internal_sep = '|',
+                 alignment_sep = ';',
+                 start_bracket = '(',
+                 end_bracket = ')';
 
-            unordered_map<string, int> columns_id;
+            bool do_align_V = opts.align_V == OVERWRITE,
+                 do_align_J = opts.align_J == OVERWRITE,
+                 do_align_D = opts.align_D == OVERWRITE;
 
-            string col_nuc_seq = "Nucleotide sequence";
-//            columns_id[col_nuc_seq] = -1;
-            int col_nuc_seq_id = 0;
-
-            string col_aa_seq = "Amino acid sequence";
-//            columns_id[col_aa_seq] = -1;
-            int col_aa_seq_id = 1;
-
-            string col_v_seg = "Variable";
-//            columns_id[col_v_seg] = -1;
-            int col_v_seg_id = 2;
-
-            string col_j_seg = "Joining";
-//            columns_id[col_j_seg] = -1;
-            int col_j_seg_id = 4;
-
-            string col_d_seg = "Diversity";
-//            columns_id[col_d_seg] = -1;
-            int col_d_seg_id = 3;
-
-            string col_v_end = "V end";
-//            columns_id[col_v_end] = -1;
-            int col_v_end_id = 5;
-
-            string col_j_start = "J start";
-//            columns_id[col_j_start] = -1;
-            int col_j_start_id = 8;
-
-            string col_d_als = "D.alignments";
-//            columns_id[col_d_als] = -1;
-            int col_d_als_id = 6;
-
-            char sep = '\t';
-            char al_sep = ',';
-//            bool based1 = _config.get("1-based", false).asBool();
-
-            bool do_align_V = false, do_align_J = false, do_align_D = false;
-
-            stringstream line_stream, word_stream;
-            string line, word, sequence;
+            stringstream column_stream, symbol_stream, temp_stream;
+            string line, segment_word, sequence;
 
             int index = 0;
-            bool header = true;
 
             vector<seg_index_t> vseg, jseg, dseg;
             string temp_str;
@@ -213,94 +185,89 @@ namespace ymir {
 
             int glob_index = 1, bad_index = 0;
 
+            // Skip header
+            getline(ifs, line);
             while (!ifs.eof()) {
+                // Start processing clonotypes
                 getline(ifs, line);
                 if (line.size() > 2) {
-                    line_stream.str(line);
-                    if (header) {
-                        // check main column
-                        if (nuc_sequences) {
-                            if (columns_id[col_nuc_seq] == -1) {
-                                cout << "Repertoire parser error:" << endl << "\tcolumn with nucleotide sequences not found" << endl;
-                                return false;
-                            }
-                        } else {
-                            if (columns_id[col_aa_seq] == -1) {
-                                cout << "Repertoire parser error:" << endl << "\tcolumn with amino acid sequences not found" << endl;
-                                return false;
-                            }
-                        }
+                    // parse body and build clonotypes from each line
+                    vseg.clear();
+                    jseg.clear();
+                    dseg.clear();
 
-                        // check for alignments
-                        if ((columns_id[col_v_end] == -1 && opts.align_V == MAKE_IF_NOT_FOUND) || opts.align_V == OVERWRITE) {
-                            do_align_V = true;
-                        }
-                        if ((columns_id[col_j_start] == -1 && opts.align_J == MAKE_IF_NOT_FOUND) || opts.align_J == OVERWRITE) {
-                            do_align_J = true;
-                        }
-                        if (gene_segments.is_vdj() && ((columns_id[col_d_als] == -1 && opts.align_D == MAKE_IF_NOT_FOUND) || opts.align_D == OVERWRITE)) {
-                            do_align_D = true;
-                        }
+                    column_stream.clear();
+                    column_stream.str(line);
 
-                        header = false;
+                    clone_builder.setRecombination(recomb);
 
+                    // Get nucleotide or amino acid sequence
+                    if (seq_type == NUCLEOTIDE) {
+                        getline(column_stream, sequence, column_sep);
+                        column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
+                        column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
+                        getline(column_stream, sequence, column_sep);
+                    }
 
-                        // parse body and build clones from each line
+                    clone_builder.setSequence(sequence);
+                    clone_builder.setSequenceType(seq_type);
 
-                        index = 0;
 
-                        vseg.clear();
-                        jseg.clear();
-                        dseg.clear();
+                    // Parse Variable genes
+                    if (do_align_V) {
+                        column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
+                    } else {
+                        getline(column_stream, segment_word, column_sep);
+                        this->parseSegment(symbol_stream, segment_word, vseg, gene_segments.V(), clone_builder, glob_index, segment_sep, temp_str);
+                    }
 
-                        while (!line_stream.eof()) {
-
-                            getline(line_stream, word, sep);
-
-                            if (index == col_nuc_seq_id) {
-                                if (nuc_sequences) {
-                                    clone_builder.setSequence(word);
-                                    clone_builder.setNucleotideSeq();
-                                    sequence = word;
-                                }
-                            } else if (index == col_aa_seq_id) {
-                                if (!nuc_sequences) {
-                                    clone_builder.setSequence(word);
-                                    clone_builder.setAminoAcidSeq();
-                                    sequence = word;
-                                }
-                            } else if (index == col_v_seg_id) {
-                                parseWordSegment(word, al_sep, vseg, gene_segments.V(), glob_index);
-                            } else if (index == col_v_end_id) {
-                                parseWordAlignment(word, al_sep, vseg, gene_segments.V(), clone_builder, 'V');
-                            } else if (index == col_j_seg_id) {
-                                parseWordSegment(word, al_sep, jseg, gene_segments.J(), glob_index);
-                            } else if (index == col_j_start_id) {
-                                parseWordAlignment(word, al_sep, jseg, gene_segments.J(), clone_builder, 'J');
-                            } else if (index == col_d_seg_id) {
-                                // NOT IMPLEMENTED YET
-                                if (!do_align_D) {
-                                    // error if VDJ recombination, no D alignment and D genes column is bad
-                                }
-                            } else if (index == col_d_als_id) {
-                                if (!do_align_D) {
-                                    // error if VDJ recombination and D alignment columns is bad
-                                }
-                            }
-
-                            ++index;
-                        }
-
-                        clone_builder.setRecombination(VJ_RECOMB);
-
-                        bool align_ok = false;
-                        if (do_align_V) {}
-
-                        if (do_align_J) {}
-
+                    // Parse Diversity genes
+                    if (recomb == VJ_RECOMB) {
+                        column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
+                    } else {
                         if (do_align_D) {
-                            clone_builder.setRecombination(VDJ_RECOMB);
+                            column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
+                        } else {
+                            getline(column_stream, segment_word, column_sep);
+                            this->parseSegment(symbol_stream, segment_word, dseg, gene_segments.D(), clone_builder, glob_index, segment_sep, temp_str);
+                        }
+                    }
+
+                    // Parse Joining genes
+                    if (do_align_J) {
+                        column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
+                    } else {
+                        getline(column_stream, segment_word, column_sep);
+                        this->parseSegment(symbol_stream, segment_word, jseg, gene_segments.J(), clone_builder, glob_index, segment_sep, temp_str);
+                    }
+
+
+                    // Parse Variable alignments
+                    if (do_align_V) {
+                        column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
+
+                        //
+                        // alignment here
+                        //
+                        // TODO: implement V alignment in parser
+                    } else {
+                        getline(column_stream, segment_word, column_sep);
+                        this->parseAlignment(symbol_stream, segment_word, vseg, gene_segments.V(), clone_builder, glob_index, segment_sep, internal_sep, temp_str, temp_stream);
+                    }
+
+                    // Parse Diversity alignments
+                    if (recomb == VJ_RECOMB) {
+                        column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
+                    } else {
+                        if (do_align_D) {
+                            column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
+
+                            //
+                            // alignment here
+                            //
+                            // TODO: implement D alignment in parser
+                            bool align_ok = false;
                             for (seg_index_t seg_i = 1; seg_i <= gene_segments.D().max(); ++seg_i) {
                                 AbstractAligner::LocalAlignmentIndices indices =
                                         aligner.alignLocal(gene_segments.D()[seg_i].sequence,
@@ -317,22 +284,40 @@ namespace ymir {
                                 cout << "Diversity gene could NOT be aligned with the given minimal gene length (min gene length " << (size_t) DEFAULT_DIV_GENE_MIN_LEN << ", line " << (size_t) glob_index << ")" << endl;
                                 ++bad_index;
                             }
+                        } else {
+                            getline(column_stream, segment_word, column_sep);
+                            this->parseAlignment(symbol_stream, segment_word, dseg, gene_segments.D(), clone_builder, glob_index, segment_sep, internal_sep, temp_str, temp_stream);
                         }
-
-                        if (glob_index % 50000 == 0) {
-                            cout << this->get_prefix(filename) + "parsed " << (size_t) glob_index << " lines" << endl;
-                        }
-                        ++glob_index;
-
-                        //
-                        // remove bad clonotypes here
-                        //
-
-//                        if (align_ok) {
-                        vec.push_back(clone_builder.buildClonotype());
-//                        }
                     }
-                    line_stream.clear();
+
+                    // Parse Joining alignments
+                    if (do_align_J) {
+                        column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
+
+                        //
+                        // alignment here
+                        //
+                        // TODO: implement J alignment in parser
+                    } else {
+                        getline(column_stream, segment_word, column_sep);
+                        this->parseAlignment(symbol_stream, segment_word, jseg, gene_segments.J(), clone_builder, glob_index, segment_sep, internal_sep, temp_str, temp_stream);
+                    }
+
+                    ++index;
+
+                    if (glob_index % 50000 == 0) {
+                        cout << this->get_prefix(filename) + "parsed " << (size_t) glob_index << " lines" << endl;
+                    }
+                    ++glob_index;
+
+                    //
+                    // remove bad clonotypes here ???
+                    //
+//                    if (align_ok) {
+//                        vec.push_back(clone_builder.buildClonotype());
+//                    }
+
+                    vec.push_back(clone_builder.buildClonotype());
                 }
             }
 
@@ -350,21 +335,27 @@ namespace ymir {
         }
 
 
-        void parseWordSegment(const string& word, char sep, vector<seg_index_t> &segvec, const GeneSegmentAlphabet& gsa, size_t line_num) {
-            stringstream word_stream(word);
+        void parseSegment(stringstream &symbol_stream,
+                          const string &segment_word,
+                          vector<seg_index_t> &segvec,
+                          const GeneSegmentAlphabet &gsa,
+                          ClonotypeBuilder &clone_builder,
+                          size_t line_num,
+                          char segment_sep,
+                          string &temp_str)
+        {
+            symbol_stream.clear();
+            symbol_stream.str(segment_word);
 
-            // check if genes are presented in GeneSegmentAlphabet
-
-            if (word_stream.eof()) {
-                if (gsa[word].index != 0) {
-                    segvec.push_back(gsa[word].index);
+            if (symbol_stream.eof()) {
+                if (gsa[segment_word].index != 0) {
+                    segvec.push_back(gsa[segment_word].index);
                 } else {
-                    std::cout << "can't find '" << word << "' among genes at line " << line_num << std::endl;
+                    std::cout << "can't find '" << segment_word << "' among gene segments at the line " << (size_t) line_num << std::endl;
                 }
             } else {
-                string temp_str = "";
-                while (!word_stream.eof()) {
-                    getline(word_stream, temp_str, sep);
+                while (!symbol_stream.eof()) {
+                    getline(symbol_stream, temp_str, segment_sep);
                     if (gsa[temp_str].index != 0) {
                         segvec.push_back(gsa[temp_str].index);
                     } else {
@@ -375,41 +366,63 @@ namespace ymir {
         }
 
 
-        void parseWordAlignment(const string& word, char sep, vector<seg_index_t> &segvec, const GeneSegmentAlphabet& gsa, ClonotypeBuilder &clone_builder, char seg) {
-            stringstream word_stream(word);
-            int aligned_chars = 0;
-            if (word_stream.eof()) {
-                aligned_chars = stoi(word);
-                if (aligned_chars == -1) { aligned_chars = 0; }
+        void parseAlignment(stringstream &symbol_stream,
+                            const string &segment_word,
+                            const vector<seg_index_t> &segvec,
+                            const GeneSegmentAlphabet &gsa,
+                            ClonotypeBuilder &clone_builder,
+                            size_t line_num,
+                            char segment_sep,
+                            char internal_sep,
+                            string &temp_str,
+                            stringstream &temp_stream)
+        {
+            symbol_stream.clear();
+            symbol_stream.str(segment_word);
 
-                if (seg == 'V') {
-                    // FIXME: proper V start-end parsing
-//                    clone_builder.addVarAlignment(segvec[0], aligned_chars);
-                    clone_builder.addVarAlignment(segvec[0], 1, aligned_chars, 1);
-                } else {
-                    // FIXME: proper J start-end parsing
-//                    clone_builder.addJoiAlignment(segvec[0], aligned_chars);
-                    clone_builder.addJoiAlignment(segvec[0], 1, aligned_chars, aligned_chars);
-                }
+            int gene_start, seq_start, alignment_len;
+            seg_index_t seg_order = 0;
+
+            if (symbol_stream.eof()) {
+                getline(symbol_stream, temp_str, segment_sep);
+
+                temp_stream.clear();
+                temp_stream.str(temp_str);
+
+                getline(temp_stream, temp_str, internal_sep);
+                gene_start = std::atoi(temp_str.c_str());
+                getline(temp_stream, temp_str, internal_sep);
+                seq_start = std::atoi(temp_str.c_str());
+                getline(temp_stream, temp_str, internal_sep);
+                alignment_len = std::atoi(temp_str.c_str());
+
+                clone_builder.addAlignment(gsa.gene_segment(), segvec[0], gene_start, seq_start, alignment_len);
+
             } else {
-                string temp_str = "";
-                int seg_index = 0;
-                while (!word_stream.eof()) {
-                    getline(word_stream, temp_str, sep);
-                    aligned_chars = stoi(temp_str);
-                    if (aligned_chars == -1) { aligned_chars = 0; }
+                while (!symbol_stream.eof()) {
+                    getline(symbol_stream, temp_str, segment_sep);
 
-                    if (seg == 'V') {
-                        // FIXME: proper V start-end parsing #2
-//                        clone_builder.addVarAlignment(segvec[seg_index], aligned_chars);
-                        clone_builder.addVarAlignment(segvec[seg_index], 1, aligned_chars, 1);
-                    } else {
-                        // FIXME: proper J start-end parsing #2
-//                        clone_builder.addJoiAlignment(segvec[seg_index], aligned_chars);
-                        clone_builder.addJoiAlignment(segvec[seg_index], 1, aligned_chars, aligned_chars);
+                    temp_stream.clear();
+                    temp_stream.str(temp_str);
+
+                    getline(temp_stream, temp_str, internal_sep);
+                    gene_start = std::atoi(temp_str.c_str());
+
+                    getline(temp_stream, temp_str, internal_sep);
+                    seq_start = std::atoi(temp_str.c_str());
+
+                    getline(temp_stream, temp_str, internal_sep);
+                    alignment_len = std::atoi(temp_str.c_str());
+                    // "0" in gene_start means that there is no information from what letter
+                    // the J gene segment was started, so Ymir by default will compute it
+                    // assuming that J segment is aligned at the very end of the input sequence.
+                    if (gene_start == 0) {
+                        gene_start = gsa[segvec[seg_order]].sequence.size() - alignment_len + 1;
                     }
 
-                    ++seg_index;
+                    clone_builder.addAlignment(gsa.gene_segment(), segvec[seg_order], gene_start, seq_start, alignment_len);
+
+                    ++seg_order;
                 }
             }
         }

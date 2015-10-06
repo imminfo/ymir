@@ -69,7 +69,7 @@ namespace ymir {
                 _segments[i + 3] = other._segments[i + 3];
             }
 
-            int sum_align = _segments[0] + _segments[1];
+            int sum_align = 3*_segments[0] + 3*_segments[1];
             if (_segments[2]) {
                 _n_D_alignments = new seq_len_t[_segments[2]];
                 for  (int i = 0; i < _segments[2]; ++i) {
@@ -89,7 +89,38 @@ namespace ymir {
             }
         }
 
-        // Clonotype& operator=
+
+        Clonotype& operator=(const Clonotype &other) {
+            _sequence = other._sequence;
+            _recomb = other._recomb;
+
+            _segments = new seg_index_t[3 + other._segments[0] + other._segments[1] + other._segments[2]];
+            _segments[0] = other._segments[0];
+            _segments[1] = other._segments[1];
+            _segments[2] = other._segments[2];
+            for (int i = 0; i < _segments[0] + _segments[1] + _segments[2]; ++i) {
+                _segments[i + 3] = other._segments[i + 3];
+            }
+
+            int sum_align = 3*_segments[0] + 3*_segments[1];
+            if (_segments[2]) {
+                _n_D_alignments = new seq_len_t[_segments[2]];
+                for  (int i = 0; i < _segments[2]; ++i) {
+                    _n_D_alignments[i] = other._n_D_alignments[i];
+                }
+                for  (int i = 0; i < _segments[2]; ++i) {
+                    sum_align += _n_D_alignments[i] * 3;
+                }
+
+            } else {
+                _n_D_alignments = nullptr;
+            }
+
+            _alignments = new seq_len_t[sum_align];
+            for (int i = 0; i < sum_align; ++i) {
+                _alignments[i] = other._alignments[i];
+            }
+        }
 
 
         virtual ~Clonotype() {

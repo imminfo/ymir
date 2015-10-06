@@ -41,10 +41,9 @@ namespace ymir {
                         "Variable" << '\t' <<
                         "Diversity" << '\t' <<
                         "Joining" << '\t' <<
-                        "V end" << '\t' <<
-                        "D start" << '\t' <<
-                        "D end" << '\t' <<
-                        "J start" << std::endl;
+                        "V alignment" << '\t' <<
+                        "D alignment" << '\t' <<
+                        "J alignment" << std::endl;
 
                 // write clonotypes
                 for (auto i = 0; i < cloneset.size(); ++i) {
@@ -76,19 +75,17 @@ namespace ymir {
                     }
 
                     for (auto seg_i = 0; seg_i < cloneset[i].nVar(); ++seg_i) {
-                        // FIXME: write gene start, sequence start and the alignment length
-                        ofs << cloneset[i].getVarAlignment(seg_i).seq_end();
+                        ofs << cloneset[i].getVarAlignment(seg_i).gene_start() << "|";
+                        ofs << cloneset[i].getVarAlignment(seg_i).seq_start() << "|";
+                        ofs << cloneset[i].getVarAlignment(seg_i).length();
                         CELL_FILL(seg_i, cloneset[i].nVar(), ofs, ',', '\t')
                     }
 
                     if (gene_segments.is_vdj()) {
                         for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
-                            ofs << cloneset[i].getDivAlignment(seg_i, 0).seq_start();
-                            CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ';', '\t')
-                        }
-
-                        for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
-                            ofs << cloneset[i].getDivAlignment(seg_i, 0).seq_end();
+                            ofs << cloneset[i].getDivAlignment(seg_i, 0).gene_start() << "|";
+                            ofs << cloneset[i].getDivAlignment(seg_i, 0).seq_start() << "|";
+                            ofs << cloneset[i].getDivAlignment(seg_i, 0).length();
                             CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ';', '\t')
                         }
                     } else {
@@ -96,8 +93,9 @@ namespace ymir {
                     }
 
                     for (auto seg_i = 0; seg_i < cloneset[i].nJoi(); ++seg_i) {
-                        // FIXME: write gene start, sequence start and the alignment length #2
-                        ofs << cloneset[i].getJoiAlignment(seg_i).seq_start();
+                        ofs << cloneset[i].getJoiAlignment(seg_i).gene_start() << "|";
+                        ofs << cloneset[i].getJoiAlignment(seg_i).seq_start() << "|";
+                        ofs << cloneset[i].getJoiAlignment(seg_i).length();
                         CELL_FILL(seg_i, cloneset[i].nJoi(), ofs, ',', std::endl)
                     }
                 }

@@ -2558,24 +2558,24 @@ int main(int argc, char* argv[]) {
     // Test for Multi-Matrix Chains
     YMIR_TEST(test_mmc())
 
-//    // Tests for MAAG / MAAG builder
-//    YMIR_TEST(test_maag_vj())
-//    YMIR_TEST(test_maag_vdj())
-//    YMIR_TEST(test_maag_builder_replace_vj())
-//    YMIR_TEST(test_maag_builder_replace_vdj())
-//
-//    // Tests for assembling statistical model (ASM) reading / writing files.
-//    YMIR_TEST(test_model_vj_file())
-//    YMIR_TEST(test_model_vdj_file())
-//    YMIR_TEST(test_model_vj_save_load())
-//    YMIR_TEST(test_model_vdj_save_load())
-//    YMIR_TEST(test_model_gene_usage())
-////    YMIR_TEST(test_model_vj_maag())
-////    YMIR_TEST(test_model_vdj_maag())
-//
-//    // Tests for forward-backward algorithms
-//    YMIR_TEST(test_maag_forward_backward_vj())
-//    YMIR_TEST(test_maag_forward_backward_vdj())
+    // Tests for MAAG / MAAG builder
+    YMIR_TEST(test_maag_vj())
+    YMIR_TEST(test_maag_vdj())
+    YMIR_TEST(test_maag_builder_replace_vj())
+    YMIR_TEST(test_maag_builder_replace_vdj())
+
+    // Tests for assembling statistical model (ASM) reading / writing files.
+    YMIR_TEST(test_model_vj_file())
+    YMIR_TEST(test_model_vdj_file())
+    YMIR_TEST(test_model_vj_save_load())
+    YMIR_TEST(test_model_vdj_save_load())
+    YMIR_TEST(test_model_gene_usage())
+//    YMIR_TEST(test_model_vj_maag())
+//    YMIR_TEST(test_model_vdj_maag())
+
+    // Tests for forward-backward algorithms
+    YMIR_TEST(test_maag_forward_backward_vj())
+    YMIR_TEST(test_maag_forward_backward_vdj())
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.
 

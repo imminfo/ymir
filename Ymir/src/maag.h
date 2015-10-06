@@ -293,7 +293,9 @@ namespace ymir {
          */
         ///@{
         event_ind_t nVar() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeRows(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_VAR_GEN_I); }
+
         event_ind_t nJoi() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeColumns(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_JOI_DEL_I); }
+
         event_ind_t nDiv() const { return (_chain.size() == VJ_CHAIN_SIZE) ? 0 : _chain[VDJ_DIV_DEL_I].size(); }
         ///@}
 
@@ -320,6 +322,7 @@ namespace ymir {
         prob_t event_probability(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
             return (*this)(node_i, mat_i, row, col);
         }
+
         event_ind_t event_index(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
             return _events ? (*_events)(node_i, mat_i, row, col) : 0;
         };
@@ -361,6 +364,7 @@ namespace ymir {
          */
         ///@{
         bool is_vj() const { return _chain.size() == VJ_CHAIN_SIZE; }
+
         bool is_vdj() const { return _chain.size() == VDJ_CHAIN_SIZE; }
         ///@}
 
@@ -393,6 +397,7 @@ namespace ymir {
         SequenceType sequence_type() const { return _seq_type; }
 
         dim_t rows(node_ind_t node_i) const { return this->nodeRows(node_i); }
+
         dim_t cols(node_ind_t node_i) const { return this->nodeColumns(node_i); }
 
     protected:

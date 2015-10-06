@@ -422,11 +422,11 @@ namespace ymir {
 
             // find max J alignment
             seg_index_t j_num = clonotype.nJoi();
-            seq_len_t len = clonotype.sequence().size();
+            seq_len_t len = 0;
             for (int j_index = 0; j_index < j_num; ++j_index) {
                 len = std::max(len, clonotype.getJoiAlignment(j_index).length());
             }
-            len = clonotype.sequence().size() - len + 1;
+//            len = clonotype.sequence().size() - len + 1;
 //            cout << "len = " << len << endl;
 
 

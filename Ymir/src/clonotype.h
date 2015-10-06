@@ -302,6 +302,9 @@ namespace ymir {
         ///@}
 
 
+        /**
+         * \brief Interface to add alignments to the builder.
+         */
         ///@{
         ClonotypeBuilder& addVarAlignment(seg_index_t vseg, seq_len_t vstart, seq_len_t seqstart, seq_len_t alignment_len) {
             _Vseg.push_back(vseg);

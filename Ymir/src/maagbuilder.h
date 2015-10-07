@@ -132,13 +132,14 @@ namespace ymir {
 
         MAAGRepertoire build(const ClonesetView &cloneset, MetadataMode metadata_mode = NO_METADATA, bool verbose = true) const {
             MAAGRepertoire res;
-//            res.reserve(cloneset.size());
-            res.resize(cloneset.size());
+            res.reserve(cloneset.size());
+//            res.resize(cloneset.size());
             MAAG tmp;
             for (size_t i = 0; i < cloneset.size(); ++i) {
 //                res.push_back(MAAG(&(this->build(cloneset[i], metadata_mode))));
+                res.push_back(this->build(cloneset[i], metadata_mode));
 
-                res[i] = this->build(cloneset[i], metadata_mode);
+//                res[i] = this->build(cloneset[i], metadata_mode);
 
 //                tmp = this->build(cloneset[i], metadata_mode);
 //                res[i].swap_maag(this->build(cloneset[i], metadata_mode));

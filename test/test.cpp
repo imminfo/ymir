@@ -2224,11 +2224,6 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_model_vj_maag)
 
-    vector<prob_t> v1;  // param vec
-    vector<event_ind_t> v2;  // lens vec
-    vector<event_ind_t> v3;  // event classes
-    vector<seq_len_t> v4;  // event family col numbers
-
     ModelParameterVector mvec = make_test_events_vj();
 
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
@@ -2237,14 +2232,14 @@ YMIR_TEST_START(test_model_vj_maag)
     RepertoireParser parser;
 
     bool V_err, J_err;
-    VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
+    VDJRecombinationGenes vj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
                                     "Jgene", TEST_DATA_FOLDER + "jgene.real.txt",
                                     &V_err, &J_err);
     YMIR_ASSERT(V_err)
     YMIR_ASSERT(J_err)
 
     Cloneset cloneset;
-    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha2.txt", &cloneset, vdj_genes))
+    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha2.txt", &cloneset, vj_genes, NUCLEOTIDE, VJ_RECOMB))
 
     MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, NUCLEOTIDE)[1];
 

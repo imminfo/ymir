@@ -53,13 +53,13 @@ namespace ymir {
         /**
          * \brief Default constructor.
          */
-        MAAG() {
-            _events = nullptr;
-            _sequence = nullptr;
-            _seq_poses = nullptr;
-            _n_poses = 0;
-            _seq_type = NUCLEOTIDE;
-        }
+        MAAG()
+                : _events(nullptr),
+                  _sequence(nullptr),
+                  _seq_poses(nullptr),
+                  _n_poses(0),
+                  _seq_type(NUCLEOTIDE)
+        { }
 
         /**
          *
@@ -113,26 +113,29 @@ namespace ymir {
          * \brief Special swap constructor for MAAGs that will be used only for computation of
          * the full probability.
          */
-        MAAG(ProbMMC &prob_mmc) {
+        MAAG(ProbMMC &prob_mmc)
+                : _events(nullptr),
+                  _sequence(nullptr),
+                  _seq_poses(nullptr),
+                  _n_poses(0),
+                  _seq_type(NUCLEOTIDE)
+        {
             this->swap(prob_mmc);
-            _events = nullptr;
-            _sequence = nullptr;
-            _seq_poses = nullptr;
-            _n_poses = 0;
         }
 
 
         /**
          * \brief Special swap constructor for MAAGs that will be used for statistical inference.
          */
-        MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, std::string sequence, seq_len_t *seq_poses, seq_len_t n_poses, SequenceType seq_type) {
+        MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, const std::string &sequence, seq_len_t *seq_poses, seq_len_t n_poses, SequenceType seq_type)
+                : _seq_poses(seq_poses),
+                  _n_poses(n_poses),
+                  _seq_type(seq_type)
+        {
             this->swap(prob_mcc);
             _events = new EventIndMMC();
             _events->swap(eventind_mcc);
             _sequence = new std::string(sequence);
-            _seq_poses = seq_poses;
-            _n_poses = n_poses;
-            _seq_type = seq_type;
         }
 
 
@@ -146,7 +149,7 @@ namespace ymir {
         }
 
 
-        MAAG& operator= (const MAAG& other) {
+        MAAG& operator= (const MAAG &other) {
             _chain = other._chain;
             _values = other._values;
 
@@ -410,8 +413,8 @@ namespace ymir {
         std::string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
         SequenceType _seq_type;
 
-        NumErrorsMMC *_errors;  /** Matrix of number of errors for each scenario event position. */
-        prob_t _err_prob;  /** Probability of a error. */
+//        NumErrorsMMC *_errors;  /** Matrix of number of errors for each scenario event position. */
+//        prob_t _err_prob;  /** Probability of a error. */
 
 //        MAAGMetadata *_metadata;
 

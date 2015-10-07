@@ -118,8 +118,8 @@ namespace ymir {
         bool parse(const string& filepath,
                    Cloneset *rep,
                    const VDJRecombinationGenes& gene_segments,
-                   SequenceType seq_type = NUCLEOTIDE,
-                   Recombination recomb = UNDEF_RECOMB,
+                   SequenceType seq_type,
+                   Recombination recomb,
                    AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE),
                    const AbstractAligner& aligner = NaiveNucleotideAligner()) {
 
@@ -256,6 +256,7 @@ namespace ymir {
                         this->parseAlignment(symbol_stream, segment_word, vseg, gene_segments.V(), clone_builder, glob_index, segment_sep, internal_sep, temp_str, temp_stream);
                     }
 
+                    bool align_ok = true;
                     // Parse Diversity alignments
                     if (recomb == VJ_RECOMB) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
@@ -267,7 +268,7 @@ namespace ymir {
                             // alignment here
                             //
                             // TODO: implement D alignment in parser
-                            bool align_ok = false;
+                            align_ok = false;
                             for (seg_index_t seg_i = 1; seg_i <= gene_segments.D().max(); ++seg_i) {
                                 AbstractAligner::LocalAlignmentIndices indices =
                                         aligner.alignLocal(gene_segments.D()[seg_i].sequence,
@@ -313,11 +314,11 @@ namespace ymir {
                     //
                     // remove bad clonotypes here ???
                     //
-//                    if (align_ok) {
-//                        vec.push_back(clone_builder.buildClonotype());
-//                    }
+                    if (align_ok) {
+                        vec.push_back(clone_builder.buildClonotype());
+                    }
 
-                    vec.push_back(clone_builder.buildClonotype());
+//                    vec.push_back(clone_builder.buildClonotype());
                 }
             }
 

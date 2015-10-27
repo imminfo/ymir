@@ -246,6 +246,10 @@ namespace ymir {
     class VDJRecombinationGenes {
     public:
 
+
+        VDJRecombinationGenes() {}
+
+
         VDJRecombinationGenes(const std::string& v_segments_name, const std::string& v_segments_file,
                               const std::string& j_segments_name, const std::string& j_segments_file,
                               bool *is_V_ok = nullptr, bool *is_J_ok = nullptr)
@@ -351,8 +355,6 @@ namespace ymir {
     protected:
 
         GeneSegmentAlphabet *_V, *_J, *_D;
-
-        VDJRecombinationGenes() {}
 
     };
 }

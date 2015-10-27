@@ -41,61 +41,60 @@ namespace ymir {
 
 
     /**
+     * \typedef alignment_score_t
+     *
+     * \brief Type for scores of gene segments alignments to input sequences.
+     */
+    typedef int16_t alignment_score_t;
+
+
+    /**
+     * \struct Alignment
+     *
+     */
+    struct SegmentAlignment {
+
+        seg_index_t segment;
+        seq_len_t start, end;
+        alignment_score_t score;
+        std::vector<AlignmentEvent> events;
+
+
+        SegmentAlignment()
+                : segment(0), start(0), end(0), score(0)
+        { }
+
+
+        SegmentAlignment(seg_index_t segment_, seq_len_t start_, seq_len_t end_, alignment_score_t score_, const std::vector<AlignmentEvent>& events_)
+                : segment(segment_), start(start_), end(end_), score(score_), events(events_)
+        { }
+
+    };
+
+
+    /**
      * \class AbstractVDJAligner
      */
+    template <typename V_Aligner, typename D_Aligner, typename J_Aligner>
     class AbstractVDJAligner {
     public:
 
         /**
-         * \typedef alignment_score_t
-         *
-         * \brief Type for scores of gene segments alignments to input sequences.
+         * \struct VDJAlignment
          */
-        typedef int16_t alignment_score_t;
+        struct VDJAlignment {
 
-
-        /**
-         * \struct Alignment
-         *
-         */
-        struct Alignment {
-
-            seg_index_t segment;
-            seq_len_t start, end;
-            alignment_score_t score;
-            std::vector<AlignmentEvent> events;
-
-
-            Alignment()
-                    : segment(0), start(0), end(0), score(0)
-            { }
-
-
-            Alignment(seg_index_t segment_, seq_len_t start_, seq_len_t end_, alignment_score_t score_, const std::vector<AlignmentEvent>& events_)
-                    : segment(segment_), start(start_), end(end_), score(score_), events(events_)
-            { }
-
-        };
-
-
-        /**
-         * \struct GeneSegmentsAlignment
-         */
-        struct GeneSegmentsAlignment {
-
-            GeneSegmentsAlignment()
+            VDJAlignment()
                     : _gene(UNDEF_GENE), _n_alignments(0), _alignments(nullptr)
             { }
 
-
-            GeneSegmentsAlignment(GeneSegments gene, seg_index_t n_alignments, Alignment *alignments)
+            VDJAlignment(GeneSegments gene, seg_index_t n_alignments, SegmentAlignment *alignments)
                     : _gene(gene), _n_alignments(n_alignments), _alignments(alignments)
             { }
 
 
-            virtual ~GeneSegmentsAlignment() {
-//                delete [] _alignments;
-//                delete [] _n_alignments;
+            virtual ~VDJAlignment() {
+                delete [] _alignments;
             }
 
 
@@ -105,12 +104,12 @@ namespace ymir {
             size_t size() const { return _n_alignments; }
 
 
-            const Alignment& getAlignment(seg_index_t i) const { return _alignments[i]; }
+            const SegmentAlignment& getAlignment(seg_index_t i) const { return _alignments[i]; }
 
         protected:
 
             GeneSegments _gene;
-            Alignment *_alignments;
+            SegmentAlignment *_alignments;
             seg_index_t _n_alignments;
 
         };
@@ -119,13 +118,13 @@ namespace ymir {
         /**
          *
          */
-        AbstractVDJAligner(const VDJRecombinationGenes &genes, alignment_score_t threshold) : _threshold(threshold) {
-            _genes = new VDJRecombinationGenes(genes);
+        AbstractVDJAligner(const VDJRecombinationGenes &genes, alignment_score_t threshold)
+                : _genes(genes), _threshold(threshold)
+        {
         }
 
 
-        virtual ~AbstractVDJAligner() {
-            if (_genes) { delete _genes; }
+        ~AbstractVDJAligner() {
         }
 
 
@@ -136,11 +135,17 @@ namespace ymir {
          * \param seg_index Index of the target gene segment.
          */
         ///@{
-        virtual Alignment alignVar(const std::string& sequence, seg_index_t seg_index) = 0;
+        SegmentAlignment alignVar(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+            this->alignOneSegment<V_Aligner>(sequence, seg_index, segment_seq);
+        }
 
-        virtual Alignment alignDiv(const std::string& sequence, seg_index_t seg_index) = 0;
+        SegmentAlignment alignDiv(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+            this->alignOneSegment<D_Aligner>(sequence, seg_index, segment_seq);
+        }
 
-        virtual Alignment alignJoi(const std::string& sequence, seg_index_t seg_index) = 0;
+        virtual SegmentAlignment alignJoi(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+            this->alignOneSegment<J_Aligner>(sequence, seg_index, segment_seq);
+        }
         ///@}
 
 
@@ -150,24 +155,17 @@ namespace ymir {
          * \param sequence Pattern sequence.
          */
         ///@{
-        virtual void alignVar(const std::string& sequence) {
-            std::vector<Alignment> vec;
-            vec.reserve(_genes->V().size() / 2 + 2);
-            Alignment tmp;
-            for (seg_index_t i = 1; i <= _genes->V().max(); ++i) {
-//                tmp = this->alignVar(sequence);
-//                if (tmp.score >= _threshold) {
-//                    vec.push_back(tmp);
-//                }
-            }
-
-            // ???
-
+        void alignVar(const std::string& sequence) {
+            this->alignGeneSegments<V_Aligner>(sequence, _genes.V(), _last_v_alignment);
         }
 
-        virtual void alignDiv(const std::string &sequence) = 0;
+        void alignDiv(const std::string &sequence) {
+            this->alignGeneSegments<D_Aligner>(sequence, _genes.D(), _last_d_alignment);
+        }
 
-        virtual void alignJoi(const std::string &sequence) = 0;
+        void alignJoi(const std::string &sequence) {
+            this->alignGeneSegments<J_Aligner>(sequence, _genes.J(), _last_j_alignment);
+        }
         ///@}
 
 
@@ -175,22 +173,42 @@ namespace ymir {
          * \brief Access the latest alignment results.
          */
         ///@{
-        const GeneSegmentsAlignment& lastVarAlignment() const { return _last_v_alignment; }
+        const VDJAlignment& lastVarAlignment() const { return _last_v_alignment; }
 
-        const GeneSegmentsAlignment& lastDivAlignment() const { return _last_d_alignment; }
+        const VDJAlignment& lastDivAlignment() const { return _last_d_alignment; }
 
-        const GeneSegmentsAlignment& lastJoiAlignment() const { return _last_j_alignment; }
+        const VDJAlignment& lastJoiAlignment() const { return _last_j_alignment; }
         ///@}
 
     protected:
 
         alignment_score_t _threshold;
-        VDJRecombinationGenes *_genes;
-        GeneSegmentsAlignment _last_v_alignment, _last_d_alignment, _last_j_alignment;
+        VDJRecombinationGenes _genes;
+        VDJAlignment _last_v_alignment, _last_d_alignment, _last_j_alignment;
 
 
-        AbstractVDJAligner() {
-            _genes = nullptr;
+        AbstractVDJAligner() { }
+
+
+        template <typename F_Aligner>
+        SegmentAlignment alignOneSegment(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+            return F_Aligner(sequence, seg_index, segment_seq);
+        }
+
+
+        template <typename F_Aligner>
+        void alignGeneSegments(const std::string& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
+            std::vector<SegmentAlignment> vec;
+            vec.reserve(gsa.size() / 2 + 2);
+            SegmentAlignment tmp;
+            for (seg_index_t i = 1; i <= gsa.max(); ++i) {
+                tmp = F_Aligner(sequence, i, gsa[i].sequence);
+                if (tmp.score >= _threshold) {
+                    vec.push_back(tmp);
+                }
+            }
+            SegmentAlignment *arr = new SegmentAlignment[vec.size()];
+            gs_alignment = VDJAlignment(gsa.gene_segment(), vec.size(), arr);
         }
 
     };

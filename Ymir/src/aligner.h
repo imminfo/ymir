@@ -57,7 +57,7 @@ namespace ymir {
         seg_index_t segment;
         seq_len_t start, end;
         alignment_score_t score;
-        std::vector<AlignmentEvent> events;
+        AlignmentEventVector events;
 
 
         SegmentAlignment()
@@ -65,11 +65,14 @@ namespace ymir {
         { }
 
 
-        SegmentAlignment(seg_index_t segment_, seq_len_t start_, seq_len_t end_, alignment_score_t score_, const std::vector<AlignmentEvent>& events_)
+        SegmentAlignment(seg_index_t segment_, seq_len_t start_, seq_len_t end_, alignment_score_t score_, const AlignmentEventVector &events_)
                 : segment(segment_), start(start_), end(end_), score(score_), events(events_)
         { }
 
     };
+
+
+    typedef std::vector<SegmentAlignment> SegmentAlignmentVector;
 
 
     /**
@@ -99,7 +102,7 @@ namespace ymir {
                     : _gene(other._gene), _n_alignments(other._n_alignments)
             {
                 _alignments = new SegmentAlignment[other._n_alignments];
-                std::copy(_alignments, other._alignments, other._alignments + other._n_alignments);
+                std::copy(other._alignments, other._alignments + other._n_alignments, _alignments);
             }
 
 
@@ -112,7 +115,7 @@ namespace ymir {
                 _gene = other._gene;
                 _n_alignments = other._n_alignments;
                 _alignments = new SegmentAlignment[other._n_alignments];
-                std::copy(_alignments, other._alignments, other._alignments + other._n_alignments);
+                std::copy(other._alignments, other._alignments + other._n_alignments, _alignments);
             }
 
 
@@ -164,7 +167,7 @@ namespace ymir {
             this->alignOneSegment<V_Aligner>(sequence, seg_index, segment_seq);
         }
 
-        SegmentAlignment alignDiv(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignmentVector alignDiv(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
             this->alignManySegments<D_Aligner>(sequence, seg_index, segment_seq);
         }
 
@@ -220,7 +223,7 @@ namespace ymir {
 
         template <typename F_Aligner>
         void alignGeneSegments(const std::string& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
-            std::vector<SegmentAlignment> vec;
+            SegmentAlignmentVector vec;
             vec.reserve(gsa.size() / 2 + 2);
             SegmentAlignment tmp;
             for (seg_index_t i = 1; i <= gsa.max(); ++i) {
@@ -235,7 +238,7 @@ namespace ymir {
 
         template <typename F_Aligner>
         void alignManySegments(const std::string& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
-            std::vector<SegmentAlignment> vec, tmp;
+            SegmentAlignmentVector vec, tmp;
             vec.reserve(gsa.size() * 4);
             for (seg_index_t i = 1; i <= gsa.max(); ++i) {
                 tmp = F_Aligner(sequence, i, gsa[i].sequence);
@@ -512,29 +515,80 @@ namespace ymir {
     };
 
 
+    /**
+     * \class AlignmentMatrix
+     */
+    class AlignmentMatrix {
+    public:
+
+
+        AlignmentMatrix(seq_len_t nrow, seq_len_t ncol)
+                : _nrow(nrow), _ncol(ncol), _events((nrow+1) * (ncol + 1))
+        {
+            _starts = new bool[nrow * ncol];
+            std::fill(_starts, _starts + nrow * ncol, false);
+        }
+
+
+        ~AlignmentMatrix() {
+            delete [] _starts;
+        }
+
+
+        alignment_event_t getEvent(seq_len_t row, seq_len_t col) const { return _events[row * _nrow + col]; }
+
+
+        void setEvent(seq_len_t row, seq_len_t col, const alignment_event_t &event) { _events.setEvent(row * _nrow + col, event); }
+
+
+        bool is_start(seq_len_t row, seq_len_t col) const { return _starts[row * _nrow + col]; }
+
+
+    private:
+
+        seq_len_t _nrow, _ncol;
+        AlignmentEventVector _events;
+        bool *_starts;
+
+    };
+
+
     //
     // Classic Smith-Waterman (i.e, without errors)
     //
 
+    /**
+     * \brief
+     */
+    ///@{
     struct SWAlignerFunctor_VJ {
         SegmentAlignment operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
-
+            return SegmentAlignment();
         }
     };
 
     struct SWAlignerFunctor_D {
-        std::vector<SegmentAlignment> operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignmentVector operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
 
         }
     };
+    ///@}
 
+
+    /**
+     * \typedef
+     */
     typedef AbstractVDJAligner<SWAlignerFunctor_VJ, SWAlignerFunctor_D, SWAlignerFunctor_VJ> SmithWatermanAligner;
 
 
     //
-    // Smith-Waterman with no gaps, with errors
+    // Smith-Waterman with indels, with errors
     //
 
+    /**
+     * \brief
+     */
+    ///@{
     struct SWNGAlignerFunctor_VJ {
         SegmentAlignment operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
 
@@ -542,11 +596,16 @@ namespace ymir {
     };
 
     struct SWNGAlignerFunctor_D {
-        std::vector<SegmentAlignment> operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignmentVector operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
 
         }
     };
+    ///@}
 
+
+    /**
+     * \typedef
+     */
     typedef AbstractVDJAligner<SWNGAlignerFunctor_VJ, SWNGAlignerFunctor_D, SWNGAlignerFunctor_VJ> SmithWatermanNoGapAligner;
 
 }

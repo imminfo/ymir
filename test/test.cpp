@@ -1182,6 +1182,13 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_alignment_vector)
+
+    YMIR_ASSERT(false)
+
+YMIR_TEST_END
+
+
 YMIR_TEST_START(test_nuc_aligner)
 
     NaiveNucleotideAligner nna;
@@ -1241,6 +1248,27 @@ YMIR_TEST_START(test_aa_aligner)
     YMIR_ASSERT2(naa.align3end("AGTAGG", "SR"), 6)
 
     YMIR_ASSERT(naa.alignLocal("TGATGAA", "SR").size() != 0)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_sw_aligner)
+
+    YMIR_ASSERT(false)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_swng_aligner)
+
+    YMIR_ASSERT(false)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_errcorr_aligner)
+
+    YMIR_ASSERT(false)
 
 YMIR_TEST_END
 
@@ -2224,6 +2252,8 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_model_vj_maag)
 
+    // TGTGCTCTTGGGGAACTTTCGGAGTGGCTCTAGCAACACAGGCAAACTAATCTTT	CALGELSEW~SSNTGKLIF	TRAV13-2		TRAJ37	1|1|5		0|25|31
+
     ModelParameterVector mvec = make_test_events_vj();
 
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
@@ -2532,9 +2562,17 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_clone())
     YMIR_TEST(test_clonebuilder_clonealign())
 
-    // Tests for default naive sequences aligners.
+    // AlignmentEventVector vector
+    YMIR_TEST(test_alignment_vector())
+
+    // Tests for sequences aligners.
     YMIR_TEST(test_nuc_aligner())
     YMIR_TEST(test_aa_aligner())
+    YMIR_TEST(test_sw_aligner())
+    YMIR_TEST(test_swng_aligner())
+
+    // Error corrector test
+    YMIR_TEST(test_errcorr_aligner())
 
     // Test for the repertoire parser and writer
     YMIR_TEST(test_parser_vj())

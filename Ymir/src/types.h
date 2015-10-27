@@ -25,6 +25,7 @@
 #define _TYPES_H
 
 
+#include <bitset>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -294,14 +295,6 @@ namespace ymir {
     };
 
 
-    enum AlignmentEvent {
-        MATCH,
-        MISMATCH,
-        INSERTION,
-        DELETION
-    };
-
-
     /**
      * \struct CodonTable
      *
@@ -373,6 +366,65 @@ namespace ymir {
             default: return codons_t(nullptr, 0);
         }
     }
+
+
+    struct AlignmentEventScore {
+        float match, mismatch, ins, del;
+
+        AlignmentEventScore()
+                : match(1), mismatch(-1), ins(-1), del(-1)
+        {}
+
+        AlignmentEventScore(float match_, float mismatch_, float ins_, float del_)
+                : match(match_), mismatch(mismatch_), ins(ins_), del(del_)
+        {}
+    };
+
+
+    /**
+     * \brief Events in alignments match, mismatch, indels represented as sets of bits.
+     */
+    ///@{
+    typedef std::bitset<2> alignment_event_t;
+
+    const alignment_event_t MATCH = alignment_event_t(0);
+
+    const alignment_event_t MISMATCH = alignment_event_t(1);
+
+    const alignment_event_t INSERTION = alignment_event_t(2);
+
+    const alignment_event_t DELETION = alignment_event_t(3);
+    ///@}
+
+
+    /**
+     * \class AlignmentEventVector
+     */
+    class AlignmentEventVector {
+    public:
+
+        typedef std::vector<bool> storage_t;
+
+
+        AlignmentEventVector() {}
+
+
+        void addEvent(const alignment_event_t &event) {
+            _vec.push_back(event[0]);
+            _vec.push_back(event[1]);
+        }
+
+
+        alignment_event_t operator[](size_t index) const {
+            return alignment_event_t(2*_vec[index*2] + _vec[index*2 + 1]);
+        }
+
+    private:
+
+        storage_t _vec;
+
+    };
+
 }
 
 #endif

@@ -128,18 +128,18 @@ namespace ymir {
             { }
 
 
-            Node(const Node& other) {
-                _n = other._n;
-                _rows = other._rows;
-                _cols = other._cols;
-                _start_index = other._start_index;
-            }
+            Node(const Node &other)
+                    : _n(other._n),
+                      _rows(other._rows),
+                      _cols(other._cols),
+                      _start_index(other._start_index)
+            { }
 
 
             ~Node() { }
 
 
-            Node& operator= (const Node& other) {
+            Node& operator= (const Node &other) {
                 _n = other._n;
                 _rows = other._rows;
                 _cols = other._cols;
@@ -184,16 +184,14 @@ namespace ymir {
     public:
 
         MultiMatrixChain() {
-            _chain.clear();
-            _values.clear();
             _values.reserve(5000);
         }
 
 
-        MultiMatrixChain(const MultiMatrixChain &other) {
-            _chain = other._chain;
-            _values = other._values;
-        }
+        MultiMatrixChain(const MultiMatrixChain &other)
+                : _chain(other._chain),
+                  _values(other._values)
+        { }
 
 
         MultiMatrixChain(MultiMatrixChain &&other) {
@@ -308,6 +306,7 @@ namespace ymir {
 
 
         _Scalar operator[](size_t index) const { return _values[index]; }
+
 
         size_t values_size() const { return _values.size(); }
 

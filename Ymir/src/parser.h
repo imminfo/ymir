@@ -30,6 +30,7 @@
 #include "sstream"
 
 #include "aligner.h"
+#include "errcorr.h"
 #include "repertoire.h"
 #include "genesegment.h"
 

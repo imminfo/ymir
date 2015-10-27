@@ -65,9 +65,6 @@ namespace ymir {
          *
          */
         MAAG(const MAAG &other) : ProbMMC(other) {
-//            _chain = other._chain;
-//            _values = other._values;
-
             if (other._events) { _events = new EventIndMMC(*other._events); }
             else { _events = nullptr; }
 
@@ -143,9 +140,9 @@ namespace ymir {
          *
          */
         virtual ~MAAG() {
-            if (_events) { delete _events; }
-            if (_seq_poses) { delete [] _seq_poses; }
-            if (_sequence) { delete _sequence; }
+            delete _events;
+            delete [] _seq_poses;
+            delete _sequence;
         }
 
 
@@ -153,24 +150,24 @@ namespace ymir {
             _chain = other._chain;
             _values = other._values;
 
+            delete _events;
             if (other._events) {
-                if (_events) { delete _events; }
                 _events = new EventIndMMC(*other._events);
             }
             else { _events = nullptr; }
 
             _n_poses = other._n_poses;
 
+            delete _seq_poses;
             if (other._seq_poses) {
-                if (_seq_poses) { delete _seq_poses; }
                 _seq_poses = new seq_len_t[_n_poses];
                 std::copy(other._seq_poses, other._seq_poses + _n_poses, _seq_poses);
             } else {
                 _seq_poses = nullptr;
             }
 
+            delete _sequence;
             if (other._sequence) {
-                if (_sequence) { delete _sequence; }
                 _sequence = new std::string(*other._sequence);
             }
             else { _sequence = nullptr; }

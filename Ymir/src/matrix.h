@@ -56,7 +56,7 @@ namespace ymir {
 
         // dest
         virtual ~Matrix() {
-            if (_data) { delete [] _data; }
+            delete [] _data;
         }
 
 

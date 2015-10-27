@@ -821,7 +821,7 @@ namespace ymir {
                     }
                 }
 
-                cout << "\tVD/DJ ins. len.: " << err_message << endl;;
+                cout << "\tVD/DJ ins. len.: " << err_message << endl;
             }
             else if (element == "ins.nucl") {
                 if (container && container->file_exists()) {
@@ -928,6 +928,7 @@ namespace ymir {
                 container->addDataValue(1);
             }
             containers[VDJ_VAR_GEN] = container;
+            cout << "\tV genes prob.:   " << "CREATED" << endl;
 
             // J-D
             container = new TDMatrix(true, _config.get("probtables", Json::Value()).get("j.d", Json::Value()).get("laplace", .0).asDouble());
@@ -939,6 +940,7 @@ namespace ymir {
             }
             container->addDataVector(vector<prob_t>(_genes->D().max() * _genes->J().max()));
             containers[VDJ_JOI_DIV_GEN] = container;
+            cout << "\tJ-D gene pairs:  " << "CREATED" << endl;
 
             // V del
             container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("laplace", .0).asDouble());
@@ -947,6 +949,7 @@ namespace ymir {
                 container->addDataVector(vector<prob_t>(_genes->V()[i].sequence.size() + 1));
             }
             containers[VDJ_VAR_DEL] = container;
+            cout << "\tV delet. num.:   " << "CREATED" << endl;;
 
             // J del
             container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("laplace", .0).asDouble());
@@ -955,6 +958,7 @@ namespace ymir {
                 container->addDataVector(vector<prob_t>(_genes->J()[i].sequence.size() + 1));
             }
             containers[VDJ_JOI_DEL] = container;
+            cout << "\tJ delet. num.:   " << "CREATED" << endl;
 
             // D del
             container = new TDMatrixList(true, _config.get("probtables", Json::Value()).get("d.del", Json::Value()).get("laplace", .0).asDouble());
@@ -965,6 +969,7 @@ namespace ymir {
                 container->addMetadata(_genes->D()[i].sequence.size() + 1);
             }
             containers[VDJ_DIV_DEL] = container;
+            cout << "\tD delet. num.:   " << "CREATED" << endl;
 
             // VD ins + DJ ins
             container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("laplace", .0).asDouble());
@@ -973,6 +978,7 @@ namespace ymir {
             container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1));
             container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1));
             containers[VDJ_VAR_DIV_INS_LEN] = container;
+            cout << "\tVD/DJ ins. len.: " << "CREATED" << endl;
 
             // VD nuc + DJ nuc
             container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("laplace", .0).asDouble());
@@ -981,6 +987,7 @@ namespace ymir {
                 container->addDataVector(vector<prob_t>(4));
             }
             containers[VDJ_VAR_DIV_INS_NUC] = container;
+            cout << "\tVD/DJ ins. nuc.: " << "CREATED" << endl;
         }
 
 

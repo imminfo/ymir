@@ -368,6 +368,9 @@ namespace ymir {
     }
 
 
+    /**
+     * \class AlignmentEventScore
+     */
     struct AlignmentEventScore {
         float match, mismatch, ins, del;
 
@@ -406,12 +409,27 @@ namespace ymir {
         typedef std::vector<bool> storage_t;
 
 
-        AlignmentEventVector() {}
+        AlignmentEventVector() { }
+
+
+        AlignmentEventVector(size_t n)
+                : _vec(2*n)
+        {
+        }
+
+
+        void resize(size_t n) { _vec.resize(2*n); }
 
 
         void addEvent(const alignment_event_t &event) {
             _vec.push_back(event[0]);
             _vec.push_back(event[1]);
+        }
+
+
+        void setEvent(size_t index, const alignment_event_t &event) {
+            _vec[index*2] = event[0];
+            _vec[index*2 + 1] = event[1];
         }
 
 

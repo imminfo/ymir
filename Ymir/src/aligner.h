@@ -84,17 +84,35 @@ namespace ymir {
          */
         struct VDJAlignment {
 
+
             VDJAlignment()
                     : _gene(UNDEF_GENE), _n_alignments(0), _alignments(nullptr)
             { }
+
 
             VDJAlignment(GeneSegments gene, seg_index_t n_alignments, SegmentAlignment *alignments)
                     : _gene(gene), _n_alignments(n_alignments), _alignments(alignments)
             { }
 
 
-            virtual ~VDJAlignment() {
+            VDJAlignment(const VDJAlignment &other)
+                    : _gene(other._gene), _n_alignments(other._n_alignments)
+            {
+                _alignments = new SegmentAlignment[other._n_alignments];
+                std::copy(_alignments, other._alignments, other._alignments + other._n_alignments);
+            }
+
+
+            ~VDJAlignment() {
                 delete [] _alignments;
+            }
+
+
+            VDJAlignment& operator=(const VDJAlignment &other) {
+                _gene = other._gene;
+                _n_alignments = other._n_alignments;
+                _alignments = new SegmentAlignment[other._n_alignments];
+                std::copy(_alignments, other._alignments, other._alignments + other._n_alignments);
             }
 
 
@@ -115,10 +133,17 @@ namespace ymir {
         };
 
 
+        AbstractVDJAligner() { }
+
+
         /**
          *
          */
-        AbstractVDJAligner(const VDJRecombinationGenes &genes, alignment_score_t threshold)
+        AbstractVDJAligner(const VDJRecombinationGenes &genes,
+                           alignment_score_t threshold,
+                           const AlignmentEventScore &v_score = AlignmentEventScore(1, -1, -1, -1),
+                           const AlignmentEventScore &d_score = AlignmentEventScore(1, -1, -1, -1),
+                           const AlignmentEventScore &j_score = AlignmentEventScore(1, -1, -1, -1))
                 : _genes(genes), _threshold(threshold)
         {
         }
@@ -140,10 +165,10 @@ namespace ymir {
         }
 
         SegmentAlignment alignDiv(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
-            this->alignOneSegment<D_Aligner>(sequence, seg_index, segment_seq);
+            this->alignManySegments<D_Aligner>(sequence, seg_index, segment_seq);
         }
 
-        virtual SegmentAlignment alignJoi(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignment alignJoi(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
             this->alignOneSegment<J_Aligner>(sequence, seg_index, segment_seq);
         }
         ///@}
@@ -187,9 +212,6 @@ namespace ymir {
         VDJAlignment _last_v_alignment, _last_d_alignment, _last_j_alignment;
 
 
-        AbstractVDJAligner() { }
-
-
         template <typename F_Aligner>
         SegmentAlignment alignOneSegment(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
             return F_Aligner(sequence, seg_index, segment_seq);
@@ -206,6 +228,18 @@ namespace ymir {
                 if (tmp.score >= _threshold) {
                     vec.push_back(tmp);
                 }
+            }
+            SegmentAlignment *arr = new SegmentAlignment[vec.size()];
+            gs_alignment = VDJAlignment(gsa.gene_segment(), vec.size(), arr);
+        }
+
+        template <typename F_Aligner>
+        void alignManySegments(const std::string& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
+            std::vector<SegmentAlignment> vec, tmp;
+            vec.reserve(gsa.size() * 4);
+            for (seg_index_t i = 1; i <= gsa.max(); ++i) {
+                tmp = F_Aligner(sequence, i, gsa[i].sequence);
+                vec.insert(vec.end(), tmp.begin(), tmp.end());
             }
             SegmentAlignment *arr = new SegmentAlignment[vec.size()];
             gs_alignment = VDJAlignment(gsa.gene_segment(), vec.size(), arr);
@@ -478,9 +512,43 @@ namespace ymir {
     };
 
 
-//    class NoGapNucleotideAligner : public AbstractVDJAligner {
-//
-//    };
+    //
+    // Classic Smith-Waterman (i.e, without errors)
+    //
+
+    struct SWAlignerFunctor_VJ {
+        SegmentAlignment operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+
+        }
+    };
+
+    struct SWAlignerFunctor_D {
+        std::vector<SegmentAlignment> operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+
+        }
+    };
+
+    typedef AbstractVDJAligner<SWAlignerFunctor_VJ, SWAlignerFunctor_D, SWAlignerFunctor_VJ> SmithWatermanAligner;
+
+
+    //
+    // Smith-Waterman with no gaps, with errors
+    //
+
+    struct SWNGAlignerFunctor_VJ {
+        SegmentAlignment operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+
+        }
+    };
+
+    struct SWNGAlignerFunctor_D {
+        std::vector<SegmentAlignment> operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+
+        }
+    };
+
+    typedef AbstractVDJAligner<SWNGAlignerFunctor_VJ, SWNGAlignerFunctor_D, SWNGAlignerFunctor_VJ> SmithWatermanNoGapAligner;
+
 }
 
 #endif

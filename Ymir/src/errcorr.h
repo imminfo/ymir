@@ -18,24 +18,8 @@ namespace ymir {
     public:
 
 
-        struct Score {
-            float match, mismatch, ins, del;
-
-            Score()
-                    : match(1), mismatch(-1), ins(-1), del(-1)
-            {}
-
-            Score(float match_, float mismatch_, float ins_, float del_)
-                    : match(match_), mismatch(mismatch_), ins(ins_), del(del_)
-            {}
-        };
-
-
-        ErrorCorrector(const VDJRecombinationGenes &genes,
-                       const Score &v_score = Score(1, -1, -1, -1),
-                       const Score &d_score = Score(1, -1, -1, -1),
-                       const Score &j_score = Score(1, -1, -1, -1))
-                : _genes(genes), _v_score(v_score), _d_score(d_score), _j_score(j_score)
+        ErrorCorrector(const VDJRecombinationGenes &genes, const SmithWatermanAligner &swa, const SmithWatermanNoGapAligner &swnga)
+                : _genes(genes), _swa(swa), _swnga(swnga)
         {
 
         }
@@ -43,8 +27,11 @@ namespace ymir {
 
         Clonotype correctAndBuild(const std::string &sequence) const {
             // Smith-Waterman on all alleles of V and J
+            SmithWatermanAligner swa();
             // Correct indel errors basing on the max alignment
             // Re-align with Smith-Waterman without indels
+            SmithWatermanNoGapAligner swnga();
+
             // Remove alignments with less than threshold of the max alignment
             // Build clonotype
         }
@@ -54,7 +41,9 @@ namespace ymir {
 
         VDJRecombinationGenes _genes;
         float _threshold;
-        Score _v_score, _d_score, _j_score;
+        AlignmentEventScore _v_score, _d_score, _j_score;
+        SmithWatermanAligner _swa;
+        SmithWatermanNoGapAligner _swnga;
 
 
         ErrorCorrector() {}

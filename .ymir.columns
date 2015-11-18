@@ -1,11 +1,13 @@
 {
-  "nuc" : "~",
-  "aa" : "~",
-  "v" : "~",
-  "d" : "~",
-  "j" : "~",
-  "vend" : "~",
-  "dstart" : "~",
-  "dend" : "~",
-  "jstart" : "~"
+  "nuc" : "Nucleotide sequence",
+  "aa" : "Amino acid sequence",
+  "v" : "Variable",
+  "d" : "Diversity",
+  "j" : "Joining",
+  "v.align" : "V alignment",
+  "d.align" : "D alignment",
+  "j.align" : "J alignment",
+  "column.sep" : "\t",
+  "segment.sep" : ",",
+  "interal.sep" : "|"
 }

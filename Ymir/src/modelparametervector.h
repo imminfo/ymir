@@ -174,14 +174,32 @@ namespace ymir {
 
 
         event_ind_t eventFamilySize(event_ind_t event_family) const {
+#ifndef DNDEBUG
+            if (event_family >= _edges.size() || event_family + 1 >= _edges.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+#endif
             return _edges[event_family + 1] - _edges[event_family];
         }
 
         event_ind_t eventFamilySize(event_ind_t event_class, event_ind_t event_family) const {
+#ifndef DNDEBUG
+            if (event_class >= _event_classes.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+#endif
             return eventFamilySize(_event_classes[event_class] + event_family);
         }
 
         event_ind_t eventClassSize(event_ind_t event_class) const {
+#ifndef DNDEBUG
+            if (event_class + 1 >= _event_classes.size()
+                || _event_classes[event_class + 1] >= _edges.size()
+                || event_class >= _event_classes.size()
+                || _event_classes[event_class] >= _edges.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+#endif
             return _edges[_event_classes[event_class + 1]] - _edges[_event_classes[event_class]];
         }
 
@@ -196,16 +214,40 @@ namespace ymir {
          * \return Probability of the event.
          */
         ///@{
-        prob_t& operator[] (event_ind_t gl_event_index) { return _vec[gl_event_index]; }
+        prob_t& operator[] (event_ind_t gl_event_index) {
+#ifndef DNDEBUG
+            if (gl_event_index >= _vec.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+#endif
+            return _vec[gl_event_index];
+        }
 
-        prob_t operator[] (event_ind_t gl_event_index) const { return _vec[gl_event_index]; }
+        prob_t operator[] (event_ind_t gl_event_index) const {
+#ifndef DNDEBUG
+            if (gl_event_index >= _vec.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+#endif
+            return _vec[gl_event_index];
+        }
 
         prob_t operator() (event_ind_t event_family, event_ind_t loc_event_index) const {
+#ifndef DNDEBUG
+            if (event_family >= _edges.size() || (_edges[event_family] + loc_event_index) >= _vec.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+#endif
             return _vec[_edges[event_family] + loc_event_index];
         }
         ///@}
 
-        vector<prob_t>::const_iterator get_iterator(event_ind_t i) const { return _vec.begin() + i; }
+        vector<prob_t>::const_iterator get_iterator(event_ind_t i) const {
+#ifndef DNDEBUG
+            if (i > _vec.size()) { throw(std::runtime_error("Index is out of bounds.")); }
+#endif
+            return _vec.begin() + i;
+        }
 
 
         /**
@@ -213,31 +255,53 @@ namespace ymir {
          * segment families as (segindex_deletion_index - 1), but deletions and insertions should be passed as it is (#deletions).
          */
         event_ind_t event_index(EventClass event_class, event_ind_t event_family, event_ind_t event_index) const {
-            if (_edges[_event_classes[event_class] + event_family] + event_index < _edges[_event_classes[event_class] + event_family + 1]) {
-                return _edges[_event_classes[event_class] + event_family] + event_index;
-            }
-            return 0;
+#ifndef DNDEBUG
+            if (!(_edges[_event_classes[event_class] + event_family] + event_index < _edges[_event_classes[event_class] + event_family + 1])) {
+                throw(std::runtime_error("Index is out of bounds."));
 
-//            return _edges[_event_classes[event_class] + event_family] + event_index;
+            }
+#endif
+            return _edges[_event_classes[event_class] + event_family] + event_index;
         }
 
         event_ind_t event_index(EventClass event_class, event_ind_t event_family, event_ind_t event_row, event_ind_t event_column) const {
-            if (event_column < _event_family_col_numbers[_event_classes[event_class] + event_family] && _edges[_event_classes[event_class] + event_family]
-                + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column < _edges[_event_classes[event_class] + event_family + 1]) {
-                return _edges[_event_classes[event_class] + event_family]
-                       + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column;
+#ifndef DNDEBUG
+            if (event_class >= _event_classes.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
             }
-            return 0;
 
-//            return _edges[_event_classes[event_class] + event_family]
-//                   + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column;
+            if (_event_classes[event_class] + event_family >= _edges.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+
+            if (_event_classes[event_class] + event_family >= _event_family_col_numbers.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+
+            if ((_edges[_event_classes[event_class] + event_family]
+                 + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column) >= _vec.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+#endif
+            return _edges[_event_classes[event_class] + event_family]
+                   + event_row * _event_family_col_numbers[_event_classes[event_class] + event_family] + event_column;
         }
 
         prob_t event_prob(EventClass event_class, event_ind_t event_family, event_ind_t event_index) const {
+#ifndef DNDEBUG
+            if (this->event_index(event_class, event_family, event_index) >= _vec.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+#endif
             return _vec[this->event_index(event_class, event_family, event_index)];
         }
 
         prob_t event_prob(EventClass event_class, event_ind_t event_family, event_ind_t event_row, event_ind_t event_column) const {
+#ifndef DNDEBUG
+            if (this->event_index(event_class, event_family, event_row, event_column) >= _vec.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+#endif
             return _vec[this->event_index(event_class, event_family, event_row, event_column)];
         }
 
@@ -321,6 +385,12 @@ namespace ymir {
 
 
         seq_len_t n_columns(EventClass event_class, event_ind_t event_family = 0) const {
+#ifndef DNDEBUG
+            if (event_class >= _event_classes.size()
+                || (_event_classes[event_class] + event_family) >= _event_family_col_numbers.size()) {
+                throw(std::runtime_error("Index is out of bounds."));
+            }
+#endif
             return _event_family_col_numbers[_event_classes[event_class] + event_family];
         }
 

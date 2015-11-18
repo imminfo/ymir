@@ -7,6 +7,7 @@ if __name__ == "__main__":
     ap.add_argument("-o", "--output", help = "path to the output folder for output files (default is './ymir_genprob/')", type = str, default = "./ymir_genprob/")
     ap.add_argument("-p", "--predefined", help = "recompute or use predefined model's gene usage (default is to recompute, to change it add '-p' to your script call)", action = "store_true")
     ap.add_argument("-l", "--leave", help = "add this to leave converted files (default is to remove converted files)", action = "store_true")
+    ap = add_prealign(ap)
     args = ap.parse_args()
 
     files, input_check = parse_input(args)

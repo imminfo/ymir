@@ -6,6 +6,8 @@ if __name__ == "__main__":
     ap.add_argument("-a", "--algorithm", help = "name of the algorithm for the statistical inference (default is 'em'). For a list of available algorithms with their parameters in this Ymir distribution run $python3 pyymir.py -a", default = "em", type = str)
     ap.add_argument("-o", "--output", help = "path to the folder for output model folders (default is './ymir_models/')", type = str, default = "./ymir_models/")
     ap.add_argument("-p", "--parameters", help = "statistical inference algorithm parameters in form '<param>=<value>;<param>=<value>'", default = "niter=10", type = str)
+    ap.add_argument("-w", "--workmode", help = "[NOT IMPLEMENTED YET] either build a vector of graphs once and recompute their parameters at each step ('-w time', faster execution time), or rebuild graphs at each step ('-w mem', slow execution time, but consumes almost no RAM)", default = "time", type = str)
+    ap = add_prealign(ap)
     args = ap.parse_args()
 
     files, input_check = parse_input(args)

@@ -8,6 +8,13 @@ import converters
 INFO_JSON = "./.info.json"
 
 
+def make_workpath(script_run_path):
+    if script_run_path.rfind('/') != -1:
+        return script_run_path[:script_run_path.rfind('/') + 1]
+    else:
+        return './'
+
+
 def default_ymir_ap():
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--input", nargs = "+", help = "input file (text or gzipped) or a folder with input files (of the same format) or a list of space-separated files and/or folders in any combinations", type = str, default = "")
@@ -84,6 +91,8 @@ def parse_model(args):
 def parse_format(args):
     """
     Parse format and return a class for convert one repertoire format to Ymir's format.
+
+    !!! // TODO: Also checks if all ok with number of related pairs of genes-alignments !!!
     """
 
     args_format = args.format
@@ -182,6 +191,15 @@ def extract_info(arg, jsdata):
     for val in jsdata[arg]["values"]:
         _pretty_dict(val, jsdata[arg]["values"][val], 1)
     print()
+
+
+def add_prealign(ap):
+    ap.add_argument("--prealign", help = "[NOT IMPLEMENTED YET] if supplied then pre-align all gene segments for each input sequence", action = "store_true")
+    ap.add_argument("--threshold", help = "[NOT IMPLEMENTED YET] if '--pre-align' is supplied then this is a minimal alignment score for each gene class to align in form '--threshold=<Vscore>:<Dscore>:<Jscore>' (default = 10:5:10)", type = str)
+    ap.add_argument("--scoreV", help = "[NOT IMPLEMENTED YET] if '--pre-align' is supplied then this is a score for each operation in V alignment in form '--scoreV=match:mismatch:ins:del' (default = 1:-1:-3:-3)", type = str)
+    ap.add_argument("--scoreD", help = "[NOT IMPLEMENTED YET] if '--pre-align' is supplied then this is a score for each operation in D alignment in form '--scoreD=match:mismatch:ins:del' (default = 1:-2:-4:-4)", type = str)
+    ap.add_argument("--scoreJ", help = "[NOT IMPLEMENTED YET] if '--pre-align' is supplied then this is a score for each operation in J alignment in form '--scoreJ=match:mismatch:ins:del' (default = 1:-1:-3:-3)", type = str)
+    return ap
 
 
 if __name__ == "__main__":

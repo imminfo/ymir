@@ -12,9 +12,13 @@ if __name__ == "__main__":
     if not os.path.exists(args.output[:args.output.rfind("/")]):
         os.makedirs(args.output[:args.output.rfind("/")])
 
+    if args.model[-1] == '/':
+        args.model = args.model[:-1]
+    args.model = args.model[args.model.rfind('/') + 1:]
+
     out_file = args.output
     if out_file == "./ymir_artif/out.ymir_gen.txt":
-        out_file = "./ymir_artif//out.ymir_gen." + args.model + ".txt"
+        out_file = "./ymir_artif/out.ymir_gen." + args.model + ".txt"
 
     if model_check:
         print()

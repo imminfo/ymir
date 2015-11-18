@@ -39,22 +39,23 @@ int main(int argc, char* argv[]) {
     //
     // TCR alpha chain repertoire - VJ recombination
     //
-    VDJRecombinationGenes vj_single_genes("Vgene",
-                                   BENCH_DATA_FOLDER + "trav.txt",
-                                   "Jgene",
-                                   BENCH_DATA_FOLDER + "traj.txt");
-
-    tp1 = std::chrono::system_clock::now();
-    Cloneset cloneset_vj;
-    parser.parse(BENCH_DATA_FOLDER + "alpha.500k.txt",
-                 &cloneset_vj,
-                 vj_single_genes,
-                 RepertoireParser::AlignmentColumnOptions()
-                         .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
-                         .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
-                         .setD(RepertoireParser::SKIP));
-    tp2 = std::chrono::system_clock::now();
-    vj_single_parse = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+//    VDJRecombinationGenes vj_single_genes("Vgene",
+//                                   BENCH_DATA_FOLDER + "trav.txt",
+//                                   "Jgene",
+//                                   BENCH_DATA_FOLDER + "traj.txt");
+//
+//    tp1 = std::chrono::system_clock::now();
+//    Cloneset cloneset_vj;
+//    parser.parse(BENCH_DATA_FOLDER + "alpha.500k.new.txt",
+//                 &cloneset_vj,
+//                 vj_single_genes,
+//                 NUCLEOTIDE,
+//                 VJ_RECOMB,
+//                 RepertoireParser::AlignmentColumnOptions()
+//                         .setV(RepertoireParser::USE_PROVIDED)
+//                         .setJ(RepertoireParser::USE_PROVIDED));
+//    tp2 = std::chrono::system_clock::now();
+//    vj_single_parse = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
     //
     // TCR beta chain repertoire - VDJ recombination
@@ -68,12 +69,14 @@ int main(int argc, char* argv[]) {
 
     tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vdj;
-    parser.parse(BENCH_DATA_FOLDER + "beta.500k.txt",
+    parser.parse(BENCH_DATA_FOLDER + "beta.500k.new.txt",
                  &cloneset_vdj,
                  vdj_single_genes,
+                 NUCLEOTIDE,
+                 VDJ_RECOMB,
                  RepertoireParser::AlignmentColumnOptions()
-                         .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
-                         .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
+                         .setV(RepertoireParser::USE_PROVIDED)
+                         .setJ(RepertoireParser::USE_PROVIDED)
                          .setD(RepertoireParser::OVERWRITE));
     tp2 = std::chrono::system_clock::now();
     vdj_single_parse = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
@@ -81,44 +84,27 @@ int main(int argc, char* argv[]) {
     //
     // VJ MAAG
     //
-    ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA"); //, EMPTY);
-//    ProbabilisticAssemblingModel vj_single_model2(BENCH_DATA_FOLDER + "../../models/hTRA");
-//    cout << "empty:" << vj_single_model.event_probabilities().size() << endl;
-//    cout << "default:" << vj_single_model2.event_probabilities().size() << endl;
-//    cout << "empty:" << vj_single_model.event_probabilities().families() << endl;
-//    cout << "default:" << vj_single_model2.event_probabilities().families() << endl;
-//    for (auto i = 0; i < std::min(vj_single_model.event_probabilities().families(), vj_single_model2.event_probabilities().families()) - 1; ++i) {
-//        cout << vj_single_model.event_probabilities().eventClassSize(i) << ":" << vj_single_model2.event_probabilities().eventClassSize(i) << endl;
-//    }
-//    return 0;
-
-    tp1 = std::chrono::system_clock::now();
-    vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA);
-    tp2 = std::chrono::system_clock::now();
-    vj_single_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
-
-    tp1 = std::chrono::system_clock::now();
-    vj_single_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
-    tp2 = std::chrono::system_clock::now();
-    vj_single_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+//    ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA"); //, EMPTY);
+//
+//    tp1 = std::chrono::system_clock::now();
+//    vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA);
+//    tp2 = std::chrono::system_clock::now();
+//    vj_single_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+//
+//    tp1 = std::chrono::system_clock::now();
+//    vj_single_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
+//    tp2 = std::chrono::system_clock::now();
+//    vj_single_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
 
     //
     // VDJ MAAG
     //
     ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
-//    ProbabilisticAssemblingModel vdj_single_model2(BENCH_DATA_FOLDER + "../../models/hTRB");
-//    cout << "empty:" << vdj_single_model.event_probabilities().size() << endl;
-//    cout << "default:" << vdj_single_model2.event_probabilities().size() << endl;
-//    cout << "empty:" << vdj_single_model.event_probabilities().families() << endl;
-//    cout << "default:" << vdj_single_model2.event_probabilities().families() << endl;
-//    for (auto i = 0; i < std::min(vdj_single_model.event_probabilities().families(), vdj_single_model2.event_probabilities().families()) - 1; ++i) {
-//        cout << vdj_single_model.event_probabilities().eventClassSize(i) << ":" << vdj_single_model2.event_probabilities().eventClassSize(i) << endl;
-//    }
-//    return 0;
 
     tp1 = std::chrono::system_clock::now();
-    MAAGRepertoire(vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA));
+//    MAAGRepertoire(vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA));
+    vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA);
     tp2 = std::chrono::system_clock::now();
     vdj_single_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -131,10 +117,10 @@ int main(int argc, char* argv[]) {
     //
     // VJ inference
     //
-    tp1 = std::chrono::system_clock::now();
-    EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
-    tp2 = std::chrono::system_clock::now();
-    vj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+//    tp1 = std::chrono::system_clock::now();
+//    EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
+//    tp2 = std::chrono::system_clock::now();
+//    vj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
 
     //

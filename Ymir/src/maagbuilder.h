@@ -132,14 +132,34 @@ namespace ymir {
 
         MAAGRepertoire build(const ClonesetView &cloneset, MetadataMode metadata_mode = NO_METADATA, bool verbose = true) const {
             MAAGRepertoire res;
-            res.reserve(cloneset.size());
-//            res.resize(cloneset.size());
+//            res.reserve(cloneset.size());
+            res.resize(cloneset.size());
             MAAG tmp;
             for (size_t i = 0; i < cloneset.size(); ++i) {
+//                if (i != 1080 && i != 3586) {
+//                    continue;
+//                }
+//                std::cout << (int) i << std::endl;
 //                res.push_back(MAAG(&(this->build(cloneset[i], metadata_mode))));
-                res.push_back(this->build(cloneset[i], metadata_mode));
+//                res.push_back(this->build(cloneset[i], metadata_mode));
+//                if (i == 3586 || i == 1080) {
+//                    std::cout << (int) i << std::endl;
+//                    std::cout << cloneset[i].sequence() << std::endl;
+//                    std::cout << (int) cloneset[i].nVar()<< std::endl;
+//                    std::cout << (int) cloneset[i].nDiv()<< std::endl;
+//                    std::cout << (int) cloneset[i].nJoi()<< std::endl;
+//                    std::cout << (int) cloneset[i].getVarAlignment(0).gene_start() << std::endl;
+//                    std::cout << (int) cloneset[i].getVarAlignment(0).seq_start() << std::endl;
+//                    std::cout << (int) cloneset[i].getVarAlignment(0).length() << std::endl;
+//                    std::cout << (int) cloneset[i].getJoiAlignment(0).gene_start() << std::endl;
+//                    std::cout << (int) cloneset[i].getJoiAlignment(0).seq_start() << std::endl;
+//                    std::cout << (int) cloneset[i].getJoiAlignment(0).length() << std::endl;
+//                    std::cout << (int) cloneset[i].numDivAlignments(0) << std::endl;
+//                    std::cout << (int) cloneset[i].numDivAlignments(1) << std::endl;
+//                }
 
-//                res[i] = this->build(cloneset[i], metadata_mode);
+                res[i] = this->build(cloneset[i], metadata_mode);
+//                this->build(cloneset[i], metadata_mode);
 
 //                tmp = this->build(cloneset[i], metadata_mode);
 //                res[i].swap_maag(this->build(cloneset[i], metadata_mode));
@@ -518,11 +538,12 @@ namespace ymir {
 
             // vector seq_start -> 0 means no such index in the matrix, 1 otherwise.
             seq_len_t seq_arr_size = clonotype.sequence().size() + 1;
-            seq_len_t *seq_row = new seq_len_t[seq_arr_size];
-            std::fill(seq_row, seq_row + seq_arr_size, 0);
+            unique_ptr<seq_len_t[]> seq_row(new seq_len_t[seq_arr_size]);
+            std::fill(seq_row.get(), seq_row.get() + seq_arr_size, 0);
+
             // vector seq_end -> 0 means no such index in the matrix, 1 otherwise.
-            seq_len_t *seq_col = new seq_len_t[seq_arr_size];
-            std::fill(seq_col, seq_col + seq_arr_size, 0);
+            unique_ptr<seq_len_t[]> seq_col(new seq_len_t[seq_arr_size]);
+            std::fill(seq_col.get(), seq_col.get() + seq_arr_size, 0);
 
             for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                 seq_len_t min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
@@ -611,8 +632,8 @@ namespace ymir {
             for (seq_len_t i = 1; i < seq_arr_size; ++i) { if (seq_row[i]) { D35_poses.push_back(i); } }
             for (seq_len_t i = 1; i < seq_arr_size; ++i) { if (seq_col[i]) { D35_poses.push_back(i); } }
 
-            delete [] seq_row;
-            delete [] seq_col;
+//            delete [] seq_row;
+//            delete [] seq_col;
 
             // Note! insert diversity gene seq poses BEFORE joining gene seq poses
             seq_poses.reserve(seq_poses.size() + D35_poses.size() + 2);  // +2 -> just in case (:

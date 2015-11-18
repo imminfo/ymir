@@ -369,7 +369,7 @@ namespace ymir {
 //                            vec.push_back(i - 1);
                             vec.push_back(p_start + 1);
                             vec.push_back(t_start + 1);
-                            vec.push_back(pattern_i + i - 1);
+                            vec.push_back(pattern_i + i - p_start);
                         }
                         open_match = false;
                     }
@@ -403,7 +403,7 @@ namespace ymir {
 //                            vec.push_back(text_i + i - 1);
                             vec.push_back(p_start + 1);
                             vec.push_back(t_start + 1);
-                            vec.push_back(i - 1);
+                            vec.push_back(i - p_start);
                         }
                         open_match = false;
                     }

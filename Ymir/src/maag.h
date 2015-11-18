@@ -65,19 +65,18 @@ namespace ymir {
          *
          */
         MAAG(const MAAG &other) : ProbMMC(other) {
-            if (other._events) { _events = new EventIndMMC(*other._events); }
-            else { _events = nullptr; }
+            if (other._events) { _events.reset(new EventIndMMC(*other._events)); }
 
             _n_poses = other._n_poses;
 
             if (other._seq_poses) {
-                _seq_poses = new seq_len_t[_n_poses];
-                std::copy(other._seq_poses, other._seq_poses + _n_poses, _seq_poses);
+                _seq_poses.reset(new seq_len_t[_n_poses]);
+                std::copy(other._seq_poses.get(), other._seq_poses.get() + _n_poses, _seq_poses.get());
             } else {
                 _seq_poses = nullptr;
             }
 
-            if (other._sequence) { _sequence = new std::string(*other._sequence); }
+            if (other._sequence) { _sequence.reset(new std::string(*other._sequence)); }
             else { _sequence = nullptr; }
 
             _seq_type = other._seq_type;
@@ -88,21 +87,15 @@ namespace ymir {
             _chain.swap(other._chain);
             _values.swap(other._values);
 
-            EventIndMMC *tmp = other._events;
-            other._events = _events;
-            _events = tmp;
+            _events.swap(other._events);
 
-            _n_poses = other._n_poses;
+            std::swap(_n_poses, other._n_poses);
 
-            seq_len_t *tmp2 = other._seq_poses;
-            other._seq_poses = _seq_poses;
-            _seq_poses = tmp2;
+            _seq_poses.swap(other._seq_poses);
 
-            std::string *tmp3 = other._sequence;
-            other._sequence = _sequence;
-            _sequence = tmp3;
+            _sequence.swap(other._sequence);
 
-            _seq_type = other._seq_type;
+            std::swap(_seq_type, other._seq_type);
         }
 
 
@@ -124,51 +117,52 @@ namespace ymir {
         /**
          * \brief Special swap constructor for MAAGs that will be used for statistical inference.
          */
-        MAAG(ProbMMC &prob_mcc, EventIndMMC &eventind_mcc, const std::string &sequence, seq_len_t *seq_poses, seq_len_t n_poses, SequenceType seq_type)
-                : _seq_poses(seq_poses),
-                  _n_poses(n_poses),
+        MAAG(ProbMMC &prob_mcc,
+             EventIndMMC &eventind_mcc,
+             const std::string &sequence,
+             unique_ptr<seq_len_t[]> &seq_poses,
+             seq_len_t n_poses,
+             SequenceType seq_type)
+                : _n_poses(n_poses),
                   _seq_type(seq_type)
         {
             this->swap(prob_mcc);
-            _events = new EventIndMMC();
-            _events->swap(eventind_mcc);
-            _sequence = new std::string(sequence);
+
+            _events.reset(new EventIndMMC());
+            _events.get()->swap(eventind_mcc);
+
+            _sequence.reset(new std::string(sequence));
+
+            _seq_poses.swap(seq_poses);
         }
 
 
         /**
          *
          */
-        virtual ~MAAG() {
-            delete _events;
-            delete [] _seq_poses;
-            delete _sequence;
-        }
+        virtual ~MAAG() { }
 
 
         MAAG& operator= (const MAAG &other) {
             _chain = other._chain;
             _values = other._values;
 
-            delete _events;
             if (other._events) {
-                _events = new EventIndMMC(*other._events);
+                _events.reset(new EventIndMMC(*other._events));
             }
             else { _events = nullptr; }
 
             _n_poses = other._n_poses;
 
-            delete _seq_poses;
             if (other._seq_poses) {
-                _seq_poses = new seq_len_t[_n_poses];
-                std::copy(other._seq_poses, other._seq_poses + _n_poses, _seq_poses);
+                _seq_poses.reset(new seq_len_t[_n_poses]);
+                std::copy(other._seq_poses.get(), other._seq_poses.get() + _n_poses, _seq_poses.get());
             } else {
                 _seq_poses = nullptr;
             }
 
-            delete _sequence;
             if (other._sequence) {
-                _sequence = new std::string(*other._sequence);
+                _sequence.reset(new std::string(*other._sequence));
             }
             else { _sequence = nullptr; }
 
@@ -178,26 +172,26 @@ namespace ymir {
         }
 
 
-        void swap_maag(MAAG &other) {
-            _chain.swap(other._chain);
-            _values.swap(other._values);
-
-            EventIndMMC *tmp = other._events;
-            other._events = _events;
-            _events = tmp;
-
-            _n_poses = other._n_poses;
-
-            seq_len_t *tmp2 = other._seq_poses;
-            other._seq_poses = _seq_poses;
-            _seq_poses = tmp2;
-
-            std::string *tmp3 = other._sequence;
-            other._sequence = _sequence;
-            _sequence = tmp3;
-
-            _seq_type = other._seq_type;
-        }
+//        void swap_maag(MAAG &other) {
+//            _chain.swap(other._chain);
+//            _values.swap(other._values);
+//
+//            EventIndMMC *tmp = other._events;
+//            other._events = _events;
+//            _events = tmp;
+//
+//            _n_poses = other._n_poses;
+//
+//            seq_len_t *tmp2 = other._seq_poses;
+//            other._seq_poses = _seq_poses;
+//            _seq_poses = tmp2;
+//
+//            std::string *tmp3 = other._sequence;
+//            other._sequence = _sequence;
+//            _sequence = tmp3;
+//
+//            _seq_type = other._seq_type;
+//        }
 
 
         /**
@@ -372,7 +366,7 @@ namespace ymir {
         Recombination recombination() const { return _chain.size() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB; }
 
 
-        bool has_events() const { return _events; }
+        bool has_events() const { return (bool) _events; }
 
 
 //        bool has_errors() const { return _err_alignments; }
@@ -387,7 +381,7 @@ namespace ymir {
 
 
         const std::string& sequence() const {
-#ifdef YDEBUG
+#ifndef DNDEBUG
             if (!_sequence) { throw(std::runtime_error("Access to a MAAG sequence when it's a nullptr!")); }
 #endif
             return *_sequence;
@@ -402,12 +396,12 @@ namespace ymir {
 
     protected:
 
-        EventIndMMC *_events;  /** Matrix of indices of events for each edge. */
+        pEventIndMMC _events;  /** Matrix of indices of events for each edge. */
 
-        seq_len_t *_seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
+        unique_ptr<seq_len_t[]> _seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
         seq_len_t _n_poses;
 
-        std::string *_sequence;  /** Nucleotide or amino acid CDR3 sequence. */
+        unique_ptr<std::string> _sequence;  /** Nucleotide or amino acid CDR3 sequence. */
         SequenceType _seq_type;
 
 //        NumErrorsMMC *_errors;  /** Matrix of number of errors for each scenario event position. */
@@ -417,5 +411,22 @@ namespace ymir {
 
     };
 }
+
+
+//typedef MAAG<VJ_RECOMB, NO_METADATA, NO_ERRORS> MAAG_VJ_NM_NE;
+//
+//typedef MAAG<VJ_RECOMB, NO_METADATA, COMPUTE_ERRORS> MAAG_VJ_NM_ER;
+//
+//typedef MAAG<VJ_RECOMB, SAVE_METADATA, NO_ERRORS> MAAG_VJ_MD_NE;
+//
+//typedef MAAG<VJ_RECOMB, SAVE_METADATA, COMPUTE_ERRORS> MAAG_VJ_MD_ER;
+//
+//typedef MAAG<VDJ_RECOMB, NO_METADATA, NO_ERRORS> MAAG_VDJ_NM_NE;
+//
+//typedef MAAG<VDJ_RECOMB, NO_METADATA, COMPUTE_ERRORS> MAAG_VDJ_NM_ER;
+//
+//typedef MAAG<VDJ_RECOMB, SAVE_METADATA, NO_ERRORS> MAAG_VDJ_MD_NE;
+//
+//typedef MAAG<VDJ_RECOMB, SAVE_METADATA, COMPUTE_ERRORS> MAAG_VDJ_MD_ER;
 
 #endif

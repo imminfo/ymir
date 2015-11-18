@@ -114,6 +114,9 @@ namespace ymir {
     typedef uint8_t seg_index_t;
 
 
+    using std::unique_ptr;
+
+
     /**
      * \struct d_alignment_t
      *

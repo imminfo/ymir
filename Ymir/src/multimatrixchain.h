@@ -46,6 +46,8 @@ namespace ymir {
     */
     typedef MultiMatrixChain<event_ind_t> EventIndMMC;
 
+    typedef unique_ptr<EventIndMMC> pEventIndMMC;
+
 
     /**
     * \class ProbMatrixChain
@@ -54,6 +56,8 @@ namespace ymir {
     */
     typedef MultiMatrixChain<prob_t> ProbMMC;
 
+    typedef unique_ptr<ProbMMC> pProbMMC;
+
 
     /**
      * \class NumErrorsMMC
@@ -61,6 +65,8 @@ namespace ymir {
      * \brief Class for storing a number of errors for each scenario event.
      */
     typedef MultiMatrixChain<seq_len_t> NumErrorsMMC;
+
+    typedef unique_ptr<NumErrorsMMC> pNumErrorsMMC;
 
 
     /**

@@ -122,8 +122,8 @@ namespace ymir {
 
                 }
 
-                seq_len_t *seq_poses_arr = new seq_len_t[seq_poses.size()];
-                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr);
+                unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
+                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
                 return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size(), seq_type);
             } else {
                 return MAAG(probs);
@@ -214,7 +214,7 @@ namespace ymir {
         ///@{
         void updateEventProbabilities(MAAG *maag) const {
             if (maag->has_events()) {
-                vector<seq_len_t> seq_poses_vec(maag->_seq_poses, maag->_seq_poses + maag->_n_poses);
+                vector<seq_len_t> seq_poses_vec(maag->_seq_poses.get(), maag->_seq_poses.get() + maag->_n_poses);
                 for (int node_i = 0; node_i < maag->chainSize(); ++node_i) {
                     // either rebuild all insertions
                     if (maag->is_vj() && node_i == VarJoi_INSERTIONS_MATRIX_INDEX) {

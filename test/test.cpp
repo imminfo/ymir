@@ -1870,19 +1870,19 @@ YMIR_TEST_START(test_maag_vdj)
     YMIR_ASSERT2(maag.event_index(2, 0, 2, 2), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 1))
 
     // rows 1 2 3 4 5 | cols 3 4 5 6 7
+    // TODO: check D deletions indices
     YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
     YMIR_ASSERT2(maag.event_index(3, 0, 0, 1), 0)
     YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), 0)
-    YMIR_ASSERT2(maag.event_index(3, 0, 1, 1), mvec.event_index(VDJ_DIV_DEL, 1, 1, 2))
+    YMIR_ASSERT2(maag.event_index(3, 0, 1, 1), mvec.event_index(VDJ_DIV_DEL, 1, 2, 2))
     YMIR_ASSERT2(maag.event_index(3, 0, 2, 2), 0)
-    YMIR_ASSERT2(maag.event_index(3, 0, 3, 3), mvec.event_index(VDJ_DIV_DEL, 1, 2, 1))
-    YMIR_ASSERT2(maag.event_index(3, 0, 3, 4), mvec.event_index(VDJ_DIV_DEL, 1, 2, 0))
-    YMIR_ASSERT2(maag.event_index(3, 0, 4, 4), mvec.event_index(VDJ_DIV_DEL, 1, 3, 0))
+    YMIR_ASSERT2(maag.event_index(3, 0, 3, 3), mvec.event_index(VDJ_DIV_DEL, 1, 3, 1))
+    YMIR_ASSERT2(maag.event_index(3, 0, 3, 4), mvec.event_index(VDJ_DIV_DEL, 1, 3, 0))
+    YMIR_ASSERT2(maag.event_index(3, 0, 4, 4), mvec.event_index(VDJ_DIV_DEL, 1, 4, 0))
 
-    YMIR_ASSERT2(maag.event_index(3, 2, 5, 5), mvec.event_index(VDJ_DIV_DEL, 0, 0, 1))
-    YMIR_ASSERT2(maag.event_index(3, 2, 5, 6), mvec.event_index(VDJ_DIV_DEL, 0, 0, 0))
+    YMIR_ASSERT2(maag.event_index(3, 2, 5, 5), mvec.event_index(VDJ_DIV_DEL, 0, 0, 3))
     YMIR_ASSERT2(maag.event_index(3, 2, 6, 5), 0)
-    YMIR_ASSERT2(maag.event_index(3, 2, 6, 6), mvec.event_index(VDJ_DIV_DEL, 0, 1, 0))
+    YMIR_ASSERT2(maag.event_index(3, 2, 5, 6), mvec.event_index(VDJ_DIV_DEL, 0, 1, 0))
 
     // row: 3 4 6 7 8 10 11
     // col: 7 8 9 10 11 [12]
@@ -2140,19 +2140,19 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
     YMIR_ASSERT2(maag.event_index(2, 0, 2, 2), mvec2.event_index(VDJ_VAR_DIV_INS_LEN, 0, 1))
 
     // rows 1 2 3 4 5 | cols 3 4 5 6 7
+    // TODO: check D deletions indices
     YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
     YMIR_ASSERT2(maag.event_index(3, 0, 0, 1), 0)
     YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), 0)
-    YMIR_ASSERT2(maag.event_index(3, 0, 1, 1), mvec2.event_index(VDJ_DIV_DEL, 1, 1, 2))
+    YMIR_ASSERT2(maag.event_index(3, 0, 1, 1), mvec.event_index(VDJ_DIV_DEL, 1, 2, 2))
     YMIR_ASSERT2(maag.event_index(3, 0, 2, 2), 0)
-    YMIR_ASSERT2(maag.event_index(3, 0, 3, 3), mvec2.event_index(VDJ_DIV_DEL, 1, 2, 1))
-    YMIR_ASSERT2(maag.event_index(3, 0, 3, 4), mvec2.event_index(VDJ_DIV_DEL, 1, 2, 0))
-    YMIR_ASSERT2(maag.event_index(3, 0, 4, 4), mvec2.event_index(VDJ_DIV_DEL, 1, 3, 0))
+    YMIR_ASSERT2(maag.event_index(3, 0, 3, 3), mvec.event_index(VDJ_DIV_DEL, 1, 3, 1))
+    YMIR_ASSERT2(maag.event_index(3, 0, 3, 4), mvec.event_index(VDJ_DIV_DEL, 1, 3, 0))
+    YMIR_ASSERT2(maag.event_index(3, 0, 4, 4), mvec.event_index(VDJ_DIV_DEL, 1, 4, 0))
 
-    YMIR_ASSERT2(maag.event_index(3, 2, 5, 5), mvec2.event_index(VDJ_DIV_DEL, 0, 0, 1))
-    YMIR_ASSERT2(maag.event_index(3, 2, 5, 6), mvec2.event_index(VDJ_DIV_DEL, 0, 0, 0))
+    YMIR_ASSERT2(maag.event_index(3, 2, 5, 5), mvec.event_index(VDJ_DIV_DEL, 0, 0, 3))
     YMIR_ASSERT2(maag.event_index(3, 2, 6, 5), 0)
-    YMIR_ASSERT2(maag.event_index(3, 2, 6, 6), mvec2.event_index(VDJ_DIV_DEL, 0, 1, 0))
+    YMIR_ASSERT2(maag.event_index(3, 2, 5, 6), mvec.event_index(VDJ_DIV_DEL, 0, 1, 0))
 
     // row: 3 4 6 7 8 10 11
     // col: 7 8 9 10 11 [12]

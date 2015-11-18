@@ -612,13 +612,13 @@ namespace ymir {
                             probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                     = _param_vec->event_prob(VDJ_DIV_DEL,
                                                              d_gene - 1,
-                                                             d_alignment.gene_start() + left_pos - d_alignment.seq_start() - 1,
+                                                             d_alignment.gene_start() + left_pos - d_alignment.seq_start(),
                                                              d_len - (d_alignment.gene_end() - (d_alignment.seq_end() - right_pos)));
                             if (metadata_mode) {
                                 events(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                         = _param_vec->event_index(VDJ_DIV_DEL,
                                                                   d_gene - 1,
-                                                                  d_alignment.gene_start() + left_pos - d_alignment.seq_start() - 1,
+                                                                  d_alignment.gene_start() + left_pos - d_alignment.seq_start(),
                                                                   d_len - (d_alignment.gene_end() - (d_alignment.seq_end() - right_pos)));
                             }
                         }
@@ -631,9 +631,6 @@ namespace ymir {
             D35_poses.reserve(seq_row_nonzeros + seq_col_nonzeros + 2);
             for (seq_len_t i = 1; i < seq_arr_size; ++i) { if (seq_row[i]) { D35_poses.push_back(i); } }
             for (seq_len_t i = 1; i < seq_arr_size; ++i) { if (seq_col[i]) { D35_poses.push_back(i); } }
-
-//            delete [] seq_row;
-//            delete [] seq_col;
 
             // Note! insert diversity gene seq poses BEFORE joining gene seq poses
             seq_poses.reserve(seq_poses.size() + D35_poses.size() + 2);  // +2 -> just in case (:

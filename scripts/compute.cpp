@@ -44,11 +44,15 @@ int main(int argc, char* argv[]) {
         RepertoireParser parser;
         Cloneset cloneset;
 
-        if (parser.parse(in_file_path, &cloneset, model.gene_segments(),
-                     RepertoireParser::AlignmentColumnOptions()
-                             .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
-                             .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
-                             .setD(RepertoireParser::OVERWRITE))) {
+        if (parser.parse(in_file_path,
+                         &cloneset,
+                         model.gene_segments(),
+                         NUCLEOTIDE,
+                         model.recombination(),
+                         RepertoireParser::AlignmentColumnOptions()
+                                 .setV(RepertoireParser::USE_PROVIDED)
+                                 .setJ(RepertoireParser::USE_PROVIDED)
+                                 .setD(RepertoireParser::OVERWRITE))) {
             if (recompute_genes) {
                 std::cout << std::endl;
                 std::cout << "Recomputing gene usage on " << (size_t) cloneset.noncoding().size() << " clonotypes." << std::endl;

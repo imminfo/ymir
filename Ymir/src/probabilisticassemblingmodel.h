@@ -301,6 +301,9 @@ namespace ymir {
         bool status() const { return _status; }
 
 
+        Recombination recombination() const { return _recomb; }
+
+
         string name() const { return _config.get("name", "Nameless model").asString(); }
 
     protected:

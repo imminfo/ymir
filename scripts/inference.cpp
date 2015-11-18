@@ -47,10 +47,14 @@ int main(int argc, char* argv[]) {
         RepertoireParser parser;
         Cloneset cloneset;
 
-        if (parser.parse(in_file_path, &cloneset, model.gene_segments(),
+        if (parser.parse(in_file_path,
+                         &cloneset,
+                         model.gene_segments(),
+                         NUCLEOTIDE,
+                         model.recombination(),
                          RepertoireParser::AlignmentColumnOptions()
-                                 .setV(RepertoireParser::MAKE_IF_NOT_FOUND)
-                                 .setJ(RepertoireParser::MAKE_IF_NOT_FOUND)
+                                 .setV(RepertoireParser::USE_PROVIDED)
+                                 .setJ(RepertoireParser::USE_PROVIDED)
                                  .setD(RepertoireParser::OVERWRITE))) {
 
             std::cout << std::endl;

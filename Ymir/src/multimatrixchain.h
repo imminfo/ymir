@@ -163,7 +163,7 @@ namespace ymir {
 
 
             size_t operator() (matrix_ind_t mat, dim_t row, dim_t column) const {
-#ifdef YDEBUG
+#ifndef DNDEBUG
                 if (!(row >= 0 && row < _rows && column >= 0 && column < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
 #endif
                 return _start_index + mat * (_rows * _cols) + row * _cols + column;
@@ -245,10 +245,16 @@ namespace ymir {
         */
         ///@{
         _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) {
+#ifndef DNDEBUG
+            if (node_i >= _chain.size()) { throw(std::runtime_error("Number of the Node is out of bounds."));}
+#endif
             return _values[_chain[node_i](mat_i, row, col)];
         }
 
         const _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
+#ifndef DNDEBUG
+            if (node_i >= _chain.size()) { throw(std::runtime_error("Number of the Node is out of bounds."));}
+#endif
             return _values[_chain[node_i](mat_i, row, col)];
         }
         ///@}

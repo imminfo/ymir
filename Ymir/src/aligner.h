@@ -554,7 +554,7 @@ namespace ymir {
 
 
     //
-    // Classic Smith-Waterman (i.e, without errors)
+    // Classic Smith-Waterman
     //
 
     /**
@@ -576,13 +576,15 @@ namespace ymir {
 
 
     /**
-     * \typedef
+     * \typedef SmithWatermanAligner
+     *
+     * \brief Smith-Waterman aligner for finding maximal matches with gaps. Don't takes into account errors.
      */
     typedef AbstractVDJAligner<SWAlignerFunctor_VJ, SWAlignerFunctor_D, SWAlignerFunctor_VJ> SmithWatermanAligner;
 
 
     //
-    // Smith-Waterman with indels, with errors
+    // Smith-Waterman with no gap allowed, but with errors
     //
 
     /**
@@ -604,7 +606,9 @@ namespace ymir {
 
 
     /**
-     * \typedef
+     * \typedef SmithWatermanNoGapAligner
+     *
+     * \brief Smith-Waterman aligner without gaps, returns maximal matches with information about mismatch errors.
      */
     typedef AbstractVDJAligner<SWNGAlignerFunctor_VJ, SWNGAlignerFunctor_D, SWNGAlignerFunctor_VJ> SmithWatermanNoGapAligner;
 

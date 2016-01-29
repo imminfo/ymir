@@ -48,6 +48,33 @@ namespace ymir {
     typedef int16_t alignment_score_t;
 
 
+    struct NoGapAlignment {
+
+        typedef std::vector<bool> Mismatches;
+
+    private:
+
+        seq_len_t _pattern_start, _text_start, _len;
+        Mismatches _errors;
+
+    };
+
+
+    struct AlignmentEvents {
+
+    };
+
+
+    struct GappedAlignment {
+
+    private:
+
+        seq_len_t _pattern_start, _text_start, _len;
+        AlignmentEvents _events;
+
+    };
+
+
     /**
      * \struct Alignment
      *

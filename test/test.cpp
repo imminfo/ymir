@@ -1359,6 +1359,48 @@ YMIR_TEST_START(test_parser_vj)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_parser_vj_stream)
+
+    RepertoireParser parser;
+
+    bool V_err, J_err;
+    VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
+            , "Jgene", TEST_DATA_FOLDER + "jgene.real.txt", &V_err, &J_err);
+    YMIR_ASSERT(V_err)
+    YMIR_ASSERT(J_err)
+
+    Cloneset cr;
+    YMIR_ASSERT(parser.stream(TEST_DATA_FOLDER + "ymir.alpha.txt",
+                             vdj_genes,
+                             NUCLEOTIDE,
+                             VJ_RECOMB,
+                             RepertoireParser::AlignmentColumnOptions()
+                                     .setV(RepertoireParser::USE_PROVIDED)
+                                     .setJ(RepertoireParser::USE_PROVIDED),
+                             NaiveNucleotideAligner()))
+
+    parser.nextBlock(&cr, 2);
+    YMIR_ASSERT(cr.size() == 2)
+    YMIR_ASSERT(cr[0].sequence() == "TGTGCAGCAAGTACCCCCTTAAGCTGGTGGTACTAGCTATGGAAAGCTGACATTT")
+    YMIR_ASSERT(cr[0].recombination() == VJ_RECOMB)
+    YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(0)].allele == "TRAV13-1")
+    YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(1)].allele == "TRAV13-2")
+    YMIR_ASSERT(cr[0].nVar() == 2)
+    YMIR_ASSERT(vdj_genes.J()[cr[0].getJoi(0)].allele == "TRAJ52")
+    YMIR_ASSERT(cr[0].nJoi() == 1)
+
+    parser.nextBlock(&cr, 5);
+    YMIR_ASSERT(cr.size() == 5)
+    YMIR_ASSERT(cr[0].sequence() == "TGTGCAACTCTTAGCAGGGATGAACACAGGCTTTCAGAAACTTGTATTT")
+    YMIR_ASSERT(cr[0].recombination() != VDJ_RECOMB)
+    YMIR_ASSERT(vdj_genes.V()[cr[2].getVar(0)].allele == "TRAV12-3")
+    YMIR_ASSERT(cr[0].nVar() == 1)
+    YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(0)].allele == "TRAJ8")
+    YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(1)].allele == "TRAJ18")
+    YMIR_ASSERT(cr[0].nJoi() == 2)
+YMIR_TEST_END
+
+
 YMIR_TEST_START(test_parser_vdj_with_d_alignment)
 
     vector<string> alvec1;
@@ -1404,9 +1446,9 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
                                      .setD(RepertoireParser::OVERWRITE)))
 
     YMIR_ASSERT2(cr.size(), 1)
-    YMIR_ASSERT2(cr[0].sequence() == "CCCGACGGTTT")
-    YMIR_ASSERT2(genes.V()[cr[0].getJoi(0)].allele == "Vseg1")
-    YMIR_ASSERT2(genes.J()[cr[0].getJoi(0)].allele == "Jseg1")
+    YMIR_ASSERT2(cr[0].sequence(), "CCCGACGGTTT")
+    YMIR_ASSERT2(genes.V()[cr[0].getJoi(0)].allele, "Vseg1")
+    YMIR_ASSERT2(genes.J()[cr[0].getJoi(0)].allele, "Jseg1")
     YMIR_ASSERT2( (int) cr[0].nDiv(), 3)
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 1)
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 2)
@@ -2579,6 +2621,7 @@ int main(int argc, char* argv[]) {
 
     // Test for the repertoire parser and writer
     YMIR_TEST(test_parser_vj())
+    YMIR_TEST(test_parser_vj_stream())
     YMIR_TEST(test_parser_vdj_with_d_alignment())
 //    YMIR_TEST(test_ymir_vdj_wo_d_alignment())
     YMIR_TEST(test_writer())

@@ -140,8 +140,7 @@ namespace ymir {
             bool res = false;
             if (ifs.is_open()) {
                 std::cout << "Parsing input file:\t" << filepath << endl;
-                res = this->parseRepertoire(filepath, 
-                                            ifs, 
+                res = this->parseRepertoire(ifs, 
                                             clonevec, 
                                             gene_segments, 
                                             aligner, 
@@ -179,6 +178,11 @@ namespace ymir {
             _stream.open(filepath);
             if (_stream.is_open()) {
                 std::cout << "Open the stream to the input file:\t" << filepath << endl;
+                _genes = gene_segments;
+                _aligner = aligner;
+                _recomb = recomb;
+                _opts = opts;
+                _seq_type = seq_type;
                 return true;
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
@@ -195,15 +199,14 @@ namespace ymir {
                 ClonotypeVector clonevec;
                 clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
 
-                bool res = this->parseRepertoire(filepath, 
-                                                ifs, 
-                                                clonevec, 
-                                                gene_segments, 
-                                                aligner, 
-                                                seq_type, 
-                                                opts, 
-                                                recomb, 
-                                                block_size);
+                bool res = this->parseRepertoire(_stream, 
+                                                 clonevec, 
+                                                 _genes, 
+                                                 _aligner, 
+                                                 _seq_type, 
+                                                 _opts, 
+                                                 _recomb, 
+                                                 block_size);
                 if (res) {
                     rep->swap(clonevec);
                 }
@@ -212,7 +215,7 @@ namespace ymir {
             }
 
             if (_stream.eof()) { 
-                _stream.close()
+                _stream.close();
             }
         }
 
@@ -222,10 +225,14 @@ namespace ymir {
 //        ParserConfig _config;
 //        bool _config_is_loaded;
         std::ifstream _stream;
+        VDJRecombinationGenes _genes;
+        AbstractAligner _aligner;
+        Recombination _recomb;
+        AlignmentColumnOptions _opts;
+        SequenceType _seq_type;
 
 
-        virtual bool parseRepertoire(const string &filename,
-                                     ifstream& ifs,
+        virtual bool parseRepertoire(ifstream& ifs,
                                      ClonotypeVector& vec,
                                      const VDJRecombinationGenes& gene_segments,
                                      const AbstractAligner& aligner,
@@ -379,7 +386,7 @@ namespace ymir {
                     ++index;
 
                     if (glob_index % 50000 == 0) {
-                        cout << this->get_prefix(filename) + "parsed " << (size_t) glob_index << " lines" << endl;
+                        cout << "Parsed " << (size_t) glob_index << " lines" << endl;
                     }
                     ++glob_index;
 

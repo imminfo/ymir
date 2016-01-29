@@ -202,7 +202,7 @@ namespace ymir {
                 bool res = this->parseRepertoire(_stream, 
                                                  clonevec, 
                                                  _genes, 
-                                                 _aligner, 
+                                                 *_aligner, 
                                                  _seq_type, 
                                                  _opts, 
                                                  _recomb, 
@@ -211,10 +211,11 @@ namespace ymir {
                     rep->swap(clonevec);
                 }
             } else {
-                std::cout << "Repertoire parser error: bad / closed stream to [" << filepath << "]" << endl;
+                std::cout << "Repertoire parser error: bad / closed stream" << endl;
             }
 
-            if (_stream.eof()) { 
+            if (_stream.eof()) {
+                delete _aligner; 
                 _stream.close();
             }
         }
@@ -226,7 +227,7 @@ namespace ymir {
 //        bool _config_is_loaded;
         std::ifstream _stream;
         VDJRecombinationGenes _genes;
-        AbstractAligner _aligner;
+        AbstractAligner *_aligner;
         Recombination _recomb;
         AlignmentColumnOptions _opts;
         SequenceType _seq_type;
@@ -401,7 +402,7 @@ namespace ymir {
                 }
             }
 
-            std::cout << this->get_prefix(filename) + "parsed " <<
+            std::cout << "Parsed " <<
                     (size_t) glob_index <<
                     " lines (" <<
                     (size_t) bad_index  <<

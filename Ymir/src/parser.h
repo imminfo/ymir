@@ -48,6 +48,9 @@ namespace ymir {
 
     public:
 
+        const size_t default_block_size = 100000
+
+
         /**
         * \enum ALIGNMENT_COLUMN_ACTION
         *
@@ -116,7 +119,7 @@ namespace ymir {
         *
         * \return True if found has been successfully processed, false otherwise.
         */
-        bool parse(const string& filepath,
+        bool parse(const std::string& filepath,
                    Cloneset *rep,
                    const VDJRecombinationGenes& gene_segments,
                    SequenceType seq_type,
@@ -131,19 +134,28 @@ namespace ymir {
 
             ClonotypeVector clonevec;
             clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
+
             ifstream ifs;
             ifs.open(filepath);
             bool res = false;
             if (ifs.is_open()) {
                 std::cout << "Parsing input file:\t" << filepath << endl;
-                res = this->parseRepertoire(filepath, ifs, clonevec, gene_segments, aligner, seq_type, opts, recomb);
-                if (res) { rep->swap(clonevec); }
+                res = this->parseRepertoire(filepath, 
+                                            ifs, 
+                                            clonevec, 
+                                            gene_segments, 
+                                            aligner, 
+                                            seq_type, 
+                                            opts, 
+                                            recomb);
+                if (res) { 
+                    rep->swap(clonevec);
+                }
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
                 res = false;
             }
 
-            ifs.close();
             return res;
         }
 
@@ -152,7 +164,7 @@ namespace ymir {
          * \brief Open the parser in the stream mode - iteratively parse an
          * input repertoire by blocks and return each block.
          */
-        bool stream(const string& filepath, 
+        bool stream(const std::string& filepath, 
                     const VDJRecombinationGenes& gene_segments,
                     SequenceType seq_type,
                     Recombination recomb,
@@ -164,15 +176,44 @@ namespace ymir {
                 return false;
             }
 
-            
+            _stream.open(filepath);
+            if (_stream.is_open()) {
+                std::cout << "Open the stream to the input file:\t" << filepath << endl;
+                return true;
+            } else {
+                std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
+                return false;
+            }
         }
 
 
         /**
          * \brief Get the next Block from the parser stream.
          */
-        void nextBlock(Cloneset *rep) {
+        void nextBlock(Cloneset *rep, size_t block_size = default_block_size) {
+            if (_stream.good()) {
+                ClonotypeVector clonevec;
+                clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
 
+                bool res = this->parseRepertoire(filepath, 
+                                                ifs, 
+                                                clonevec, 
+                                                gene_segments, 
+                                                aligner, 
+                                                seq_type, 
+                                                opts, 
+                                                recomb, 
+                                                block_size);
+                if (res) {
+                    rep->swap(clonevec);
+                }
+            } else {
+                std::cout << "Repertoire parser error: bad / closed stream to [" << filepath << "]" << endl;
+            }
+
+            if (_stream.eof()) { 
+                _stream.close()
+            }
         }
 
 
@@ -180,6 +221,7 @@ namespace ymir {
 
 //        ParserConfig _config;
 //        bool _config_is_loaded;
+        std::ifstream _stream;
 
 
         virtual bool parseRepertoire(const string &filename,
@@ -189,7 +231,8 @@ namespace ymir {
                                      const AbstractAligner& aligner,
                                      SequenceType seq_type,
                                      AlignmentColumnOptions opts,
-                                     Recombination recomb)
+                                     Recombination recomb, 
+                                     size_t clonotype_count = (size_t)-1)
         {
             char column_sep ='\t',
                  segment_sep = ',',
@@ -216,7 +259,7 @@ namespace ymir {
 
             // Skip header
             getline(ifs, line);
-            while (!ifs.eof()) {
+            while (!ifs.eof() && glob_index < clonotype_count) {
                 // Start processing clonotypes
                 getline(ifs, line);
                 if (line.size() > 2) {

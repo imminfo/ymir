@@ -37,7 +37,12 @@ namespace ymir {
     #define CLONOTYPEBUILDER_DSEG_DEFAULT_RESERVE_SIZE 30
 
 
+    struct Clonotype;
+    
 
+    /**
+     * \typedef ClonotypePtr
+     */
     typedef unique_ptr<Clonotype> ClonotypePtr;
 
 

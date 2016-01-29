@@ -48,7 +48,7 @@ namespace ymir {
 
     public:
 
-        const size_t default_block_size = 100000;
+        static const size_t default_block_size = 100000;
 
 
         /**

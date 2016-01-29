@@ -42,7 +42,7 @@ namespace ymir {
 
 
     // typedef std::vector<ClonotypePtr> ClonotypeVector;
-    typedef std::vector<ClonotypePtr> ClonotypeVector;
+    typedef std::vector<Clonotype> ClonotypeVector;
 
 
     typedef std::shared_ptr<ClonotypeVector> SharedClonotypeVectorPtr;

@@ -308,7 +308,7 @@ namespace ymir {
          *
          * \return Pointer to the newly created ClonotypeAlignment object.
         */
-        Clonotype buildClonotype() {
+        ClonotypePtr buildClonotype() {
             _segments = new seg_index_t[3 + _Vseg.size() + _Jseg.size() + _n_Dalign.size()];
             _segments[0] = _Vseg.size();
             _segments[1] = _Jseg.size();
@@ -351,9 +351,9 @@ namespace ymir {
                 _n_D_alignments = nullptr;
             }
 
-            Clonotype cla = Clonotype(_sequence, _seq_type, _recomb, _segments, _alignments, _n_D_alignments);
+            ClonotypePtr cla(new Clonotype(_sequence, _seq_type, _recomb, _segments, _alignments, _n_D_alignments);
             reset();
-            return cla;
+            return std::move(cla);
         }
 
 

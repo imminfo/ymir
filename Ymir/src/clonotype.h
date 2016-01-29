@@ -38,7 +38,7 @@ namespace ymir {
 
 
     struct Clonotype;
-    
+
 
     /**
      * \typedef ClonotypePtr
@@ -356,7 +356,7 @@ namespace ymir {
                 _n_D_alignments = nullptr;
             }
 
-            ClonotypePtr cla(new Clonotype(_sequence, _seq_type, _recomb, _segments, _alignments, _n_D_alignments);
+            ClonotypePtr cla(new Clonotype(_sequence, _seq_type, _recomb, _segments, _alignments, _n_D_alignments));
             reset();
             return std::move(cla);
         }

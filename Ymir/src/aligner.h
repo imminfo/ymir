@@ -25,10 +25,7 @@
 #define _ALIGNER_H_
 
 
-#include <string>
-#include <vector>
-
-#include "types.h"
+#include "alignment.h"
 #include "genesegment.h"
 
 
@@ -36,70 +33,6 @@ using namespace std;
 
 
 namespace ymir {
-
-    #define DEFAULT_LOCAL_ALIGNMENT_RESERVE 160
-
-
-    /**
-     * \typedef alignment_score_t
-     *
-     * \brief Type for scores of gene segments alignments to input sequences.
-     */
-    typedef int16_t alignment_score_t;
-
-
-    struct NoGapAlignment {
-
-        typedef std::vector<bool> Mismatches;
-
-    private:
-
-        seq_len_t _pattern_start, _text_start, _len;
-        Mismatches _errors;
-
-    };
-
-
-    struct AlignmentEvents {
-
-    };
-
-
-    struct GappedAlignment {
-
-    private:
-
-        seq_len_t _pattern_start, _text_start, _len;
-        AlignmentEvents _events;
-
-    };
-
-
-    /**
-     * \struct Alignment
-     *
-     */
-    struct SegmentAlignment {
-
-        seg_index_t segment;
-        seq_len_t start, end;
-        alignment_score_t score;
-        AlignmentEventVector events;
-
-
-        SegmentAlignment()
-                : segment(0), start(0), end(0), score(0)
-        { }
-
-
-        SegmentAlignment(seg_index_t segment_, seq_len_t start_, seq_len_t end_, alignment_score_t score_, const AlignmentEventVector &events_)
-                : segment(segment_), start(start_), end(end_), score(score_), events(events_)
-        { }
-
-    };
-
-
-    typedef std::vector<SegmentAlignment> SegmentAlignmentVector;
 
 
     /**

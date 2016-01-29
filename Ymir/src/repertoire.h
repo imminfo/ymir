@@ -42,7 +42,7 @@ namespace ymir {
 
 
     // typedef std::vector<ClonotypePtr> ClonotypeVector;
-    typedef std::vector<Clonotype> ClonotypeVector;
+    typedef std::vector<ClonotypePtr> ClonotypeVector;
 
 
     typedef std::shared_ptr<ClonotypeVector> SharedClonotypeVectorPtr;
@@ -52,7 +52,7 @@ namespace ymir {
 
     public:
 
-        ClonesetView() : _source(new std::vector<Clonotype>()) {
+        ClonesetView() : _source(new std::ClonotypeVector()) {
             _shifts.resize(0);
         }
 
@@ -160,7 +160,7 @@ namespace ymir {
 
 
         // swap constructor
-        Cloneset(std::vector<Clonotype>& vec) {
+        Cloneset(std::ClonotypeVector& vec) {
             this->swap(vec);
         }
 
@@ -168,7 +168,7 @@ namespace ymir {
         virtual ~Cloneset() { }
 
 
-        void swap(std::vector<Clonotype>& vec) {
+        void swap(std::ClonotypeVector& vec) {
             this->_source->swap(vec);
             this->_shifts.resize(this->_source->size());
             for (size_t i = 0; i < this->_source->size(); ++i) {

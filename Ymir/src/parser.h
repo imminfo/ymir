@@ -129,7 +129,7 @@ namespace ymir {
                 return false;
             }
 
-            vector<Clonotype> clonevec;
+            ClonotypeVector clonevec;
             clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
             ifstream ifs;
             ifs.open(filepath);
@@ -148,6 +148,34 @@ namespace ymir {
         }
 
 
+        /**
+         * \brief Open the parser in the stream mode - iteratively parse an
+         * input repertoire by blocks and return each block.
+         */
+        bool stream(const string& filepath, 
+                    const VDJRecombinationGenes& gene_segments,
+                    SequenceType seq_type,
+                    Recombination recomb,
+                    AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE),
+                    const AbstractAligner& aligner = NaiveNucleotideAligner())
+        {
+            if (recomb == UNDEF_RECOMB) {
+                std::cout << "Repertoire parser error:" << "\tno recombination type for [" << filepath << "]" << endl;
+                return false;
+            }
+
+            
+        }
+
+
+        /**
+         * \brief Get the next Block from the parser stream.
+         */
+        void nextBlock(Cloneset *rep) {
+
+        }
+
+
     protected:
 
 //        ParserConfig _config;
@@ -156,7 +184,7 @@ namespace ymir {
 
         virtual bool parseRepertoire(const string &filename,
                                      ifstream& ifs,
-                                     vector<Clonotype>& vec,
+                                     ClonotypeVector& vec,
                                      const VDJRecombinationGenes& gene_segments,
                                      const AbstractAligner& aligner,
                                      SequenceType seq_type,

@@ -41,6 +41,13 @@ namespace ymir {
     typedef std::vector<MAAG> MAAGRepertoire;
 
 
+    // typedef std::vector<ClonotypePtr> ClonotypeVector;
+    typedef std::vector<Clonotype> ClonotypeVector;
+
+
+    typedef std::shared_ptr<ClonotypeVector> SharedClonotypeVectorPtr;
+
+
     class ClonesetView {
 
     public:
@@ -50,19 +57,27 @@ namespace ymir {
         }
 
 
-        ClonesetView(std::shared_ptr<std::vector<Clonotype>> pvec, const std::vector<size_t>& shifts) :
-                _source(pvec), _shifts(shifts) {}
+        ClonesetView(SharedClonotypeVectorPtr pvec, 
+                     const std::vector<size_t>& shifts) 
+            : _source(pvec), _shifts(shifts) 
+        {
+        }
 
 
-        ClonesetView(const ClonesetView& other) : _source(other._source), _shifts(other._shifts) {}
+        ClonesetView(const ClonesetView& other) 
+            : _source(other._source), _shifts(other._shifts)
+        {
+        }
 
 
         virtual ~ClonesetView() { }
 
 
+        ///@{
         const Clonotype& operator[] (size_t index) const {
             return _source->at(_shifts[index]);
         }
+
         ClonesetView subvec(const std::vector<size_t> &indices) const {
             std::vector<size_t> shifts;
             shifts.reserve(indices.size());
@@ -71,6 +86,7 @@ namespace ymir {
             }
             return ClonesetView(_source, shifts);
         };
+        ///@}
 
 
         size_t size() const { return _shifts.size(); }
@@ -127,7 +143,7 @@ namespace ymir {
 
     protected:
 
-        std::shared_ptr<std::vector<Clonotype>> _source;
+        SharedClonotypeVectorPtr _source;
         std::vector<size_t> _shifts;
 
     };
@@ -139,7 +155,7 @@ namespace ymir {
 
 
         Cloneset() : ClonesetView() {
-            _shifts.resize(0);
+            _shifts.resize(0);  // TODO: error here? how do we access elements then?
         }
 
 

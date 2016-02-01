@@ -69,7 +69,7 @@ namespace ymir {
         seq_len_t pattern_start() const { return _pattern_start; }
 
 
-        seq_len_t _text_start() const { return _text_start; }
+        seq_len_t text_start() const { return _text_start; }
 
 
         seq_len_t len() const { return _len; }
@@ -120,7 +120,7 @@ namespace ymir {
         seq_len_t pattern_start() const { return _pattern_start; }
 
 
-        seq_len_t _text_start() const { return _text_start; }
+        seq_len_t text_start() const { return _text_start; }
 
 
         ///@{

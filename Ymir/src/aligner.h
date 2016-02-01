@@ -124,15 +124,15 @@ namespace ymir {
          * \param seg_index Index of the target gene segment.
          */
         ///@{
-        SegmentAlignment alignVar(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignment alignVar(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
             this->alignOneSegment<V_Aligner>(sequence, seg_index, segment_seq);
         }
 
-        SegmentAlignmentVector alignDiv(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignmentVector alignDiv(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
             this->alignManySegments<D_Aligner>(sequence, seg_index, segment_seq);
         }
 
-        SegmentAlignment alignJoi(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignment alignJoi(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
             this->alignOneSegment<J_Aligner>(sequence, seg_index, segment_seq);
         }
         ///@}
@@ -144,15 +144,15 @@ namespace ymir {
          * \param sequence Pattern sequence.
          */
         ///@{
-        void alignVar(const std::string& sequence) {
+        void alignVar(const sequence_t& sequence) {
             this->alignGeneSegments<V_Aligner>(sequence, _genes.V(), _last_v_alignment);
         }
 
-        void alignDiv(const std::string &sequence) {
+        void alignDiv(const sequence_t &sequence) {
             this->alignGeneSegments<D_Aligner>(sequence, _genes.D(), _last_d_alignment);
         }
 
-        void alignJoi(const std::string &sequence) {
+        void alignJoi(const sequence_t &sequence) {
             this->alignGeneSegments<J_Aligner>(sequence, _genes.J(), _last_j_alignment);
         }
         ///@}
@@ -177,13 +177,13 @@ namespace ymir {
 
 
         template <typename F_Aligner>
-        SegmentAlignment alignOneSegment(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignment alignOneSegment(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
             return F_Aligner(sequence, seg_index, segment_seq);
         }
 
 
         template <typename F_Aligner>
-        void alignGeneSegments(const std::string& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
+        void alignGeneSegments(const sequence_t& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
             SegmentAlignmentVector vec;
             vec.reserve(gsa.size() / 2 + 2);
             SegmentAlignment tmp;
@@ -198,7 +198,7 @@ namespace ymir {
         }
 
         template <typename F_Aligner>
-        void alignManySegments(const std::string& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
+        void alignManySegments(const sequence_t& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
             SegmentAlignmentVector vec, tmp;
             vec.reserve(gsa.size() * 4);
             for (seg_index_t i = 1; i <= gsa.max(); ++i) {
@@ -285,22 +285,22 @@ namespace ymir {
     public:
 
         virtual seq_len_t align5end(const string& pattern, const string& text) const {
-            seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
-            for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
-                if (pattern[i] != text[i]) { break; }
-                matches += 1;
-            }
-            return matches;
+            // seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
+            // for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
+            //     if (pattern[i] != text[i]) { break; }
+            //     matches += 1;
+            // }
+            // return matches;
         }
 
 
         virtual seq_len_t align3end(const string& pattern, const string& text) const {
-            seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
-            for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
-                if (pattern[p_size - i - 1] != text[t_size - i - 1]) { break; }
-                matches += 1;
-            }
-            return matches;
+            // seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
+            // for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
+            //     if (pattern[p_size - i - 1] != text[t_size - i - 1]) { break; }
+            //     matches += 1;
+            // }
+            // return matches;
         }
 
 
@@ -617,13 +617,13 @@ namespace ymir {
      */
     ///@{
     struct SWAlignerFunctor_VJ {
-        SegmentAlignment operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignment operator()(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
             return SegmentAlignment();
         }
     };
 
     struct SWAlignerFunctor_D {
-        SegmentAlignmentVector operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignmentVector operator()(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
 
         }
     };
@@ -647,13 +647,13 @@ namespace ymir {
      */
     ///@{
     struct SWNGAlignerFunctor_VJ {
-        SegmentAlignment operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignment operator()(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
 
         }
     };
 
     struct SWNGAlignerFunctor_D {
-        SegmentAlignmentVector operator()(const std::string &sequence, seg_index_t seg_index, const std::string &segment_seq) const {
+        SegmentAlignmentVector operator()(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
 
         }
     };

@@ -91,6 +91,9 @@ namespace ymir {
     #endif
 
 
+    typedef std::string sequence_t;
+
+
     /**
     * \typedef eventind_t
     *

@@ -38,6 +38,7 @@ namespace ymir {
     /**
      * \class AbstractVDJAligner
      */
+    // template <typename V_Aligner<typename Alignment>, typename D_Aligner<typename Alignment>, typename J_Aligner<typename Alignment>>
     template <typename V_Aligner, typename D_Aligner, typename J_Aligner>
     class AbstractVDJAligner {
     public:
@@ -473,6 +474,100 @@ namespace ymir {
         const CodonTable _codons;
 
     };
+
+
+    //
+    // CDR3-only alignment without errors - align V starting from the left edge, 
+    // J starting from the right edge, and align D everywhere.
+    //
+
+    /**
+     * \brief
+     */
+    ///@{
+    struct NaiveCDR3AlignerFunctor_V {
+        NoGapAlignment operator()(const sequence_t &pattern, const sequence_t &text) const {
+            seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
+            for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
+                if (pattern[i] != text[i]) { break; }
+                matches += 1;
+            }
+            return NoGapAlignment(0, 0, matches);
+        }
+    };
+
+    struct NaiveCDR3AlignerFunctor_D {
+        NoGapAlignment operator()(const sequence_t &pattern, const sequence_t &text) const {
+            return NoGapAlignment();
+        }
+    };
+
+    struct NaiveCDR3AlignerFunctor_J {
+        NoGapAlignment operator()(const sequence_t &pattern, const sequence_t &text) const {
+            seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
+            for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
+                if (pattern[p_size - i - 1] != text[t_size - i - 1]) { break; }
+                matches += 1;
+            }
+            return NoGapAlignment(0, t_size - matches + 1, matches);
+        }
+    };
+    ///@}
+
+
+    typedef AbstractVDJAligner<NaiveCDR3AlignerFunctor_V, NaiveCDR3AlignerFunctor_D, NaiveCDR3AlignerFunctor_J> NaiveCDR3NucleotideAligner;
+
+
+    //
+    // CDR3-only alignment with errors - align V starting from the left edge, 
+    // J starting from the right edge, and align D everywhere.
+    //
+
+    /**
+     * \brief
+     */
+    ///@{
+    struct CDR3AlignerFunctor_V {
+        NoGapAlignment operator()(const sequence_t &pattern, const sequence_t &text) const {
+            seq_len_t p_size = pattern.size(), t_size = text.size();
+            NoGapAlignment::mismatch_storage_t vec;
+            vec.reserve(min(p_size, t_size));
+            for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
+                if (pattern[i] == text[i]) { 
+                    vec.push_back(false);
+                } else {
+                    vec.push_back(true);
+                }
+            }
+            return NoGapAlignment(0, 0, vec);
+        }
+    };
+
+    struct CDR3AlignerFunctor_D {
+        NoGapAlignment operator()(const sequence_t &pattern, const sequence_t &text) const {
+            return NoGapAlignment();
+        }
+    };
+
+    struct CDR3AlignerFunctor_J {
+        NoGapAlignment operator()(const sequence_t &pattern, const sequence_t &text) const {
+            seq_len_t p_size = pattern.size(), t_size = text.size();
+            NoGapAlignment::mismatch_storage_t vec;
+            vec.reserve(min(p_size, t_size));
+            for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
+                if (pattern[p_size - i - 1] != text[t_size - i - 1]) {
+                    vec.push_back(false);
+                } else {
+                    vec.push_back(true);
+                }
+            }
+            return NoGapAlignment(0, t_size - matches + 1, vec);
+        }
+    };
+    ///@}
+
+
+    typedef AbstractVDJAligner<CDR3AlignerFunctor_V, CDR3AlignerFunctor_D, CDR3AlignerFunctor_J> CDR3NucleotideAligner;
 
 
     /**

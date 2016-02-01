@@ -49,12 +49,12 @@ namespace ymir {
         typedef std::vector<bool> mismatch_storage_t;
 
 
-        NoGapAlignment(seq_len_t p_start, seq_len_t t_start, const mismatch_storage_t &errors) 
+        NoGapAlignment(seq_len_t p_start, seq_len_t t_start, mismatch_storage_t &errors) 
             : _pattern_start(p_start), 
               _text_start(t_start), 
-              _len(errors.size()),
-              _errors(errors)
+              _len(errors.size())
         {
+            _errors.swap(errors);
         }
 
 
@@ -89,31 +89,41 @@ namespace ymir {
     };
 
 
-    /**
-     * \typedef alignment_events_storage_t
-     */
-    typedef std::vector<bool> alignment_events_storage_t;
+    struct NoGapAlignmentVector {
+
+        // reserve
+
+        seq_len_t pattern_start(seq_len_t i) const {}
+
+        seq_len_t text_start(seq_len_t i) const {}
+
+        seq_len_t len(seq_len_t i) const { return _len; }
+
+        bool isMismatch(seq_len_t i, seq_len_t j) const { return _errors[j]; }
+
+        void addAlignment() {}
+
+        void finish();
+
+    private:
 
 
-    ///@{
-    inline void add_match(alignment_events_storage_t *vec)    { vec->push_back(false); vec->push_back(false); }
-
-    inline void add_mismatch(alignment_events_storage_t *vec) { vec->push_back(false); vec->push_back(true); }
-
-    inline void add_ins(alignment_events_storage_t *vec)      { vec->push_back(true); vec->push_back(false); }
-
-    inline void add_del(alignment_events_storage_t *vec)      { vec->push_back(true); vec->push_back(true); }
-    ///@}
+    };
 
 
     struct GappedAlignment {
 
+        /**
+         * \typedef alignment_events_storage_t
+         */
+        typedef std::vector<bool> alignment_events_storage_t;
 
-        GappedAlignment(seq_len_t p_start, seq_len_t t_start, const alignment_events_storage_t &errors) 
+
+        GappedAlignment(seq_len_t p_start, seq_len_t t_start, alignment_events_storage_t &events) 
             : _pattern_start(p_start), 
-              _text_start(t_start),
-              _errors(errors)
+              _text_start(t_start)
         {
+            _events.swap(events);
         }
 
 
@@ -143,6 +153,18 @@ namespace ymir {
         GappedAlignment() {}
 
     };
+
+
+
+    ///@{
+    inline void add_match(GappedAlignment::alignment_events_storage_t *vec)    { vec->push_back(false); vec->push_back(false); }
+
+    inline void add_mismatch(GappedAlignment::alignment_events_storage_t *vec) { vec->push_back(false); vec->push_back(true); }
+
+    inline void add_ins(GappedAlignment::alignment_events_storage_t *vec)      { vec->push_back(true);  vec->push_back(false); }
+
+    inline void add_del(GappedAlignment::alignment_events_storage_t *vec)      { vec->push_back(true);  vec->push_back(true); }
+    ///@}
 
 
     /**

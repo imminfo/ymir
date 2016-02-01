@@ -46,10 +46,10 @@ namespace ymir {
 
     struct NoGapAlignment {
 
-        typedef std::vector<bool> Mismatches;
+        typedef std::vector<bool> mismatch_storage_t;
 
 
-        NoGapAlignment(seq_len_t p_start, seq_len_t t_start, const Mismatches &errors) 
+        NoGapAlignment(seq_len_t p_start, seq_len_t t_start, const mismatch_storage_t &errors) 
             : _pattern_start(p_start), 
               _text_start(t_start), 
               _len(errors.size()),
@@ -81,7 +81,7 @@ namespace ymir {
     private:
 
         seq_len_t _pattern_start, _text_start, _len;
-        Mismatches _errors;
+        mismatch_storage_t _errors;
 
 
         NoGapAlignment() {}
@@ -89,17 +89,58 @@ namespace ymir {
     };
 
 
-    struct AlignmentEvents {
+    /**
+     * \typedef alignment_events_storage_t
+     */
+    typedef std::vector<bool> alignment_events_storage_t;
 
-    };
+
+    ///@{
+    inline void add_match(alignment_events_storage_t *vec)    { vec->push_back(false); vec->push_back(false); }
+
+    inline void add_mismatch(alignment_events_storage_t *vec) { vec->push_back(false); vec->push_back(true); }
+
+    inline void add_ins(alignment_events_storage_t *vec)      { vec->push_back(true); vec->push_back(false); }
+
+    inline void add_del(alignment_events_storage_t *vec)      { vec->push_back(true); vec->push_back(true); }
+    ///@}
 
 
     struct GappedAlignment {
 
+
+        GappedAlignment(seq_len_t p_start, seq_len_t t_start, const alignment_events_storage_t &errors) 
+            : _pattern_start(p_start), 
+              _text_start(t_start),
+              _errors(errors)
+        {
+        }
+
+
+        seq_len_t pattern_start() const { return _pattern_start; }
+
+
+        seq_len_t _text_start() const { return _text_start; }
+
+
+        ///@{
+        bool isMatch(seq_len_t i) const { return !(_events[i*2] && _events[i*2 + 1]); }
+
+        bool isMismatch(seq_len_t i) const { return !_events[i*2] && _events[i*2 + 1]; }
+
+        bool isIns(seq_len_t i) const { return _events[i*2] && !_events[i*2 + 1]; }
+
+        bool isDel(seq_len_t i) const { return _events[i*2] && _events[i*2 + 1]; }
+        ///@}
+
+
     private:
 
-        seq_len_t _pattern_start, _text_start, _len;
-        AlignmentEvents _events;
+        seq_len_t _pattern_start, _text_start;
+        Events _events;
+
+
+        GappedAlignment() {}
 
     };
 

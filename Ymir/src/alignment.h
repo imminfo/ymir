@@ -48,10 +48,43 @@ namespace ymir {
 
         typedef std::vector<bool> Mismatches;
 
+
+        NoGapAlignment(seq_len_t p_start, seq_len_t t_start, const Mismatches &errors) 
+            : _pattern_start(p_start), 
+              _text_start(t_start), 
+              _len(errors.size()),
+              _errors(errors)
+        {
+        }
+
+
+        NoGapAlignment(seq_len_t p_start, seq_len_t t_start, seq_len_t len) 
+            : _pattern_start(p_start), 
+              _text_start(t_start), 
+              _len(len)
+        {
+        }
+
+
+        seq_len_t pattern_start() const { return _pattern_start; }
+
+
+        seq_len_t _text_start() const { return _text_start; }
+
+
+        seq_len_t len() const { return _len; }
+
+
+        bool isMismatch(seq_len_t i) const { return _errors[i]; }
+
+
     private:
 
         seq_len_t _pattern_start, _text_start, _len;
         Mismatches _errors;
+
+
+        NoGapAlignment() {}
 
     };
 

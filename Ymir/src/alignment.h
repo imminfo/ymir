@@ -363,8 +363,8 @@ namespace ymir {
         }
 
 
-        virtual ~VDJAlignment() {
-
+        virtual ~VDJAlignment()
+        {
         }
 
 
@@ -392,6 +392,13 @@ namespace ymir {
         ///@}
 
 
+        /**
+         * \brief Get alignments for the specific gene.
+         */
+        ///@{
+        ///@}
+
+
         seq_len_t numDivAlignments(seg_index_t index) const {
             if (_n_D_alignments) {
                 return _n_D_alignments[index];
@@ -404,7 +411,7 @@ namespace ymir {
 
         unique_ptr<seg_index_t[]> _segments;  /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
                                               /// vector of indices of segments, aligned on this clone: V1--V2--V3--J1--J2--D1--D2--...
-        NoGapAlignmentVector _alignments;  /// Vector of alignments for segments, in order: V--J--D.
+        NoGapAlignmentVector _alignments;  /// Vector of alignments for segments.
         unique_ptr<seq_len_t[]> _n_D_alignments;  /// Number of alignments for each D gene segment; vector's length == _segments[2]
 
 

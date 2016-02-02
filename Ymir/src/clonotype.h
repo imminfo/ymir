@@ -47,6 +47,7 @@ namespace ymir {
     /**
     * \struct Clonotype
     */
+    // struct Clonotype : public VDJAlignment {
     struct Clonotype {
 
         Clonotype(const std::string& sequence,

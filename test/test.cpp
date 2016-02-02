@@ -1445,83 +1445,85 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_parser_vj)
 
-    RepertoireParser parser;
+    // RepertoireParser parser;
 
-    bool V_err, J_err;
-    VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
-            , "Jgene", TEST_DATA_FOLDER + "jgene.real.txt", &V_err, &J_err);
-    YMIR_ASSERT(V_err)
-    YMIR_ASSERT(J_err)
+    // bool V_err, J_err;
+    // VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
+    //         , "Jgene", TEST_DATA_FOLDER + "jgene.real.txt", &V_err, &J_err);
+    // YMIR_ASSERT(V_err)
+    // YMIR_ASSERT(J_err)
 
-    Cloneset cr;
-    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha.txt",
-                             &cr,
-                             vdj_genes,
-                             NUCLEOTIDE,
-                             VJ_RECOMB,
-                             RepertoireParser::AlignmentColumnOptions()
-                                     .setV(RepertoireParser::USE_PROVIDED)
-                                     .setJ(RepertoireParser::USE_PROVIDED),
-                             NaiveNucleotideAligner()))
+    // Cloneset cr;
+    // YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha.txt",
+    //                          &cr,
+    //                          vdj_genes,
+    //                          NUCLEOTIDE,
+    //                          VJ_RECOMB,
+    //                          RepertoireParser::AlignmentColumnOptions()
+    //                                  .setV(RepertoireParser::USE_PROVIDED)
+    //                                  .setJ(RepertoireParser::USE_PROVIDED),
+    //                          NaiveNucleotideAligner()))
 
-    YMIR_ASSERT(cr.size() == 30)
-    YMIR_ASSERT(cr[0].sequence() == "TGTGCAGCAAGTACCCCCTTAAGCTGGTGGTACTAGCTATGGAAAGCTGACATTT")
-    YMIR_ASSERT(cr[0].recombination() == VJ_RECOMB)
-    YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(0)].allele == "TRAV13-1")
-    YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(1)].allele == "TRAV13-2")
-    YMIR_ASSERT(cr[0].nVar() == 2)
-    YMIR_ASSERT(vdj_genes.J()[cr[0].getJoi(0)].allele == "TRAJ52")
-    YMIR_ASSERT(cr[0].nJoi() == 1)
+    // YMIR_ASSERT(cr.size() == 30)
+    // YMIR_ASSERT(cr[0].sequence() == "TGTGCAGCAAGTACCCCCTTAAGCTGGTGGTACTAGCTATGGAAAGCTGACATTT")
+    // YMIR_ASSERT(cr[0].recombination() == VJ_RECOMB)
+    // YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(0)].allele == "TRAV13-1")
+    // YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(1)].allele == "TRAV13-2")
+    // YMIR_ASSERT(cr[0].nVar() == 2)
+    // YMIR_ASSERT(vdj_genes.J()[cr[0].getJoi(0)].allele == "TRAJ52")
+    // YMIR_ASSERT(cr[0].nJoi() == 1)
 
-    YMIR_ASSERT(cr[2].sequence() == "TGTGCAACTCTTAGCAGGGATGAACACAGGCTTTCAGAAACTTGTATTT")
-    YMIR_ASSERT(cr[2].recombination() != VDJ_RECOMB)
-    YMIR_ASSERT(vdj_genes.V()[cr[2].getVar(0)].allele == "TRAV12-3")
-    YMIR_ASSERT(cr[2].nVar() == 1)
-    YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(0)].allele == "TRAJ8")
-    YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(1)].allele == "TRAJ18")
-    YMIR_ASSERT(cr[2].nJoi() == 2)
+    // YMIR_ASSERT(cr[2].sequence() == "TGTGCAACTCTTAGCAGGGATGAACACAGGCTTTCAGAAACTTGTATTT")
+    // YMIR_ASSERT(cr[2].recombination() != VDJ_RECOMB)
+    // YMIR_ASSERT(vdj_genes.V()[cr[2].getVar(0)].allele == "TRAV12-3")
+    // YMIR_ASSERT(cr[2].nVar() == 1)
+    // YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(0)].allele == "TRAJ8")
+    // YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(1)].allele == "TRAJ18")
+    // YMIR_ASSERT(cr[2].nJoi() == 2)
+
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_parser_vj_stream)
 
-    RepertoireParser parser;
+    // RepertoireParser parser;
 
-    bool V_err, J_err;
-    VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
-            , "Jgene", TEST_DATA_FOLDER + "jgene.real.txt", &V_err, &J_err);
-    YMIR_ASSERT(V_err)
-    YMIR_ASSERT(J_err)
+    // bool V_err, J_err;
+    // VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
+    //         , "Jgene", TEST_DATA_FOLDER + "jgene.real.txt", &V_err, &J_err);
+    // YMIR_ASSERT(V_err)
+    // YMIR_ASSERT(J_err)
 
-    Cloneset cr;
-    YMIR_ASSERT(parser.stream(TEST_DATA_FOLDER + "ymir.alpha.txt",
-                             vdj_genes,
-                             NUCLEOTIDE,
-                             VJ_RECOMB,
-                             RepertoireParser::AlignmentColumnOptions()
-                                     .setV(RepertoireParser::USE_PROVIDED)
-                                     .setJ(RepertoireParser::USE_PROVIDED),
-                             NaiveNucleotideAligner()))
+    // Cloneset cr;
+    // YMIR_ASSERT(parser.stream(TEST_DATA_FOLDER + "ymir.alpha.txt",
+    //                          vdj_genes,
+    //                          NUCLEOTIDE,
+    //                          VJ_RECOMB,
+    //                          RepertoireParser::AlignmentColumnOptions()
+    //                                  .setV(RepertoireParser::USE_PROVIDED)
+    //                                  .setJ(RepertoireParser::USE_PROVIDED),
+    //                          NaiveNucleotideAligner()))
 
-    parser.nextBlock(&cr, 2);
-    YMIR_ASSERT(cr.size() == 2)
-    YMIR_ASSERT(cr[0].sequence() == "TGTGCAGCAAGTACCCCCTTAAGCTGGTGGTACTAGCTATGGAAAGCTGACATTT")
-    YMIR_ASSERT(cr[0].recombination() == VJ_RECOMB)
-    YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(0)].allele == "TRAV13-1")
-    YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(1)].allele == "TRAV13-2")
-    YMIR_ASSERT(cr[0].nVar() == 2)
-    YMIR_ASSERT(vdj_genes.J()[cr[0].getJoi(0)].allele == "TRAJ52")
-    YMIR_ASSERT(cr[0].nJoi() == 1)
+    // parser.nextBlock(&cr, 2);
+    // YMIR_ASSERT(cr.size() == 2)
+    // YMIR_ASSERT(cr[0].sequence() == "TGTGCAGCAAGTACCCCCTTAAGCTGGTGGTACTAGCTATGGAAAGCTGACATTT")
+    // YMIR_ASSERT(cr[0].recombination() == VJ_RECOMB)
+    // YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(0)].allele == "TRAV13-1")
+    // YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(1)].allele == "TRAV13-2")
+    // YMIR_ASSERT(cr[0].nVar() == 2)
+    // YMIR_ASSERT(vdj_genes.J()[cr[0].getJoi(0)].allele == "TRAJ52")
+    // YMIR_ASSERT(cr[0].nJoi() == 1)
 
-    parser.nextBlock(&cr, 5);
-    YMIR_ASSERT(cr.size() == 5)
-    YMIR_ASSERT(cr[0].sequence() == "TGTGCAACTCTTAGCAGGGATGAACACAGGCTTTCAGAAACTTGTATTT")
-    YMIR_ASSERT(cr[0].recombination() != VDJ_RECOMB)
-    YMIR_ASSERT(vdj_genes.V()[cr[2].getVar(0)].allele == "TRAV12-3")
-    YMIR_ASSERT(cr[0].nVar() == 1)
-    YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(0)].allele == "TRAJ8")
-    YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(1)].allele == "TRAJ18")
-    YMIR_ASSERT(cr[0].nJoi() == 2)
+    // parser.nextBlock(&cr, 5);
+    // YMIR_ASSERT(cr.size() == 5)
+    // YMIR_ASSERT(cr[0].sequence() == "TGTGCAACTCTTAGCAGGGATGAACACAGGCTTTCAGAAACTTGTATTT")
+    // YMIR_ASSERT(cr[0].recombination() != VDJ_RECOMB)
+    // YMIR_ASSERT(vdj_genes.V()[cr[2].getVar(0)].allele == "TRAV12-3")
+    // YMIR_ASSERT(cr[0].nVar() == 1)
+    // YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(0)].allele == "TRAJ8")
+    // YMIR_ASSERT(vdj_genes.J()[cr[2].getJoi(1)].allele == "TRAJ18")
+    // YMIR_ASSERT(cr[0].nJoi() == 2)
+
 YMIR_TEST_END
 
 
@@ -1556,27 +1558,27 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
-    RepertoireParser parser;
+    // RepertoireParser parser;
 
-    Cloneset cr;
-    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.beta.txt",
-                             &cr,
-                             genes,
-                             NUCLEOTIDE,
-                             VDJ_RECOMB,
-                             RepertoireParser::AlignmentColumnOptions()
-                                     .setV(RepertoireParser::USE_PROVIDED)
-                                     .setJ(RepertoireParser::USE_PROVIDED)
-                                     .setD(RepertoireParser::OVERWRITE)))
+    // Cloneset cr;
+    // YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.beta.txt",
+    //                          &cr,
+    //                          genes,
+    //                          NUCLEOTIDE,
+    //                          VDJ_RECOMB,
+    //                          RepertoireParser::AlignmentColumnOptions()
+    //                                  .setV(RepertoireParser::USE_PROVIDED)
+    //                                  .setJ(RepertoireParser::USE_PROVIDED)
+    //                                  .setD(RepertoireParser::OVERWRITE)))
 
-    YMIR_ASSERT2(cr.size(), 1)
-    YMIR_ASSERT2(cr[0].sequence(), "CCCGACGGTTT")
-    YMIR_ASSERT2(genes.V()[cr[0].getJoi(0)].allele, "Vseg1")
-    YMIR_ASSERT2(genes.J()[cr[0].getJoi(0)].allele, "Jseg1")
-    YMIR_ASSERT2( (int) cr[0].nDiv(), 3)
-    YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 1)
-    YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 2)
-    YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 3)
+    // YMIR_ASSERT2(cr.size(), 1)
+    // YMIR_ASSERT2(cr[0].sequence(), "CCCGACGGTTT")
+    // YMIR_ASSERT2(genes.V()[cr[0].getJoi(0)].allele, "Vseg1")
+    // YMIR_ASSERT2(genes.J()[cr[0].getJoi(0)].allele, "Jseg1")
+    // YMIR_ASSERT2( (int) cr[0].nDiv(), 3)
+    // YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 1)
+    // YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 2)
+    // YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 3)
     // this is if default gene len is equal to 2
 //    YMIR_ASSERT2( (int) cr[0].nDivAlignments(0), 3)
 //    YMIR_ASSERT2( (int) cr[0].nDivAlignments(1), 4)
@@ -1586,44 +1588,45 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_clorep)
-    RepertoireParser parser;
 
-    bool V_err, J_err;
-    VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
-            , "Jgene", TEST_DATA_FOLDER + "jgene.real.txt", &V_err, &J_err);
-    YMIR_ASSERT(V_err)
-    YMIR_ASSERT(J_err)
+    // RepertoireParser parser;
 
-    Cloneset cr;
-    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha.txt",
-                             &cr,
-                             vdj_genes,
-                             NUCLEOTIDE,
-                             VJ_RECOMB,
-                             RepertoireParser::AlignmentColumnOptions()
-                                     .setV(RepertoireParser::USE_PROVIDED)
-                                     .setJ(RepertoireParser::USE_PROVIDED)))
+    // bool V_err, J_err;
+    // VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
+    //         , "Jgene", TEST_DATA_FOLDER + "jgene.real.txt", &V_err, &J_err);
+    // YMIR_ASSERT(V_err)
+    // YMIR_ASSERT(J_err)
 
-    YMIR_ASSERT(!has_end_codon(cr[3].sequence()))
-    YMIR_ASSERT(is_out_of_frame(cr[3].sequence()))
-    YMIR_ASSERT(has_end_codon(cr[24].sequence()))
-    YMIR_ASSERT(is_out_of_frame(cr[24].sequence()))
+    // Cloneset cr;
+    // YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha.txt",
+    //                          &cr,
+    //                          vdj_genes,
+    //                          NUCLEOTIDE,
+    //                          VJ_RECOMB,
+    //                          RepertoireParser::AlignmentColumnOptions()
+    //                                  .setV(RepertoireParser::USE_PROVIDED)
+    //                                  .setJ(RepertoireParser::USE_PROVIDED)))
 
-    ClonesetView crv = cr.head(10);
-    YMIR_ASSERT2(crv.size(), 10)
-    YMIR_ASSERT(cr[0].sequence() == crv[0].sequence())
+    // YMIR_ASSERT(!has_end_codon(cr[3].sequence()))
+    // YMIR_ASSERT(is_out_of_frame(cr[3].sequence()))
+    // YMIR_ASSERT(has_end_codon(cr[24].sequence()))
+    // YMIR_ASSERT(is_out_of_frame(cr[24].sequence()))
 
-    vector<size_t> inds = {1, 5, 10};
-    crv = cr.subvec(inds);
-    YMIR_ASSERT(crv[0].sequence() == cr[1].sequence())
-    YMIR_ASSERT(crv[1].sequence() == cr[5].sequence())
-    YMIR_ASSERT(crv[2].sequence() == cr[10].sequence())
+    // ClonesetView crv = cr.head(10);
+    // YMIR_ASSERT2(crv.size(), 10)
+    // YMIR_ASSERT(cr[0].sequence() == crv[0].sequence())
 
-    inds.clear(); inds.push_back(1); inds.push_back(2);
-    ClonesetView crv2 = crv.subvec(inds);
+    // vector<size_t> inds = {1, 5, 10};
+    // crv = cr.subvec(inds);
+    // YMIR_ASSERT(crv[0].sequence() == cr[1].sequence())
+    // YMIR_ASSERT(crv[1].sequence() == cr[5].sequence())
+    // YMIR_ASSERT(crv[2].sequence() == cr[10].sequence())
 
-    YMIR_ASSERT(crv2[0].sequence() == cr[5].sequence())
-    YMIR_ASSERT(crv2[1].sequence() == cr[10].sequence())
+    // inds.clear(); inds.push_back(1); inds.push_back(2);
+    // ClonesetView crv2 = crv.subvec(inds);
+
+    // YMIR_ASSERT(crv2[0].sequence() == cr[5].sequence())
+    // YMIR_ASSERT(crv2[1].sequence() == cr[10].sequence())
 
 YMIR_TEST_END
 
@@ -2428,95 +2431,96 @@ YMIR_TEST_START(test_model_vj_maag)
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
     YMIR_ASSERT(model.status())
 
-    RepertoireParser parser;
+    // RepertoireParser parser;
 
-    bool V_err, J_err;
-    VDJRecombinationGenes vj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
-                                    "Jgene", TEST_DATA_FOLDER + "jgene.real.txt",
-                                    &V_err, &J_err);
-    YMIR_ASSERT(V_err)
-    YMIR_ASSERT(J_err)
+    // bool V_err, J_err;
+    // VDJRecombinationGenes vj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
+    //                                 "Jgene", TEST_DATA_FOLDER + "jgene.real.txt",
+    //                                 &V_err, &J_err);
+    // YMIR_ASSERT(V_err)
+    // YMIR_ASSERT(J_err)
 
-    Cloneset cloneset;
-    YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha2.txt", &cloneset, vj_genes, NUCLEOTIDE, VJ_RECOMB))
+    // Cloneset cloneset;
+    // YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha2.txt", &cloneset, vj_genes, NUCLEOTIDE, VJ_RECOMB))
 
-    MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, NUCLEOTIDE)[1];
+    // MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, NUCLEOTIDE)[1];
 
-    YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
-    YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
-    YMIR_ASSERT2(maag.event_index(0, 0, 1, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 0))
-    YMIR_ASSERT2(maag.event_index(0, 0, 1, 2), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 2))
+    // YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
+    // YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
+    // YMIR_ASSERT2(maag.event_index(0, 0, 1, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 0))
+    // YMIR_ASSERT2(maag.event_index(0, 0, 1, 2), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 2))
 
-    YMIR_ASSERT2(maag.event_index(1, 0, 0, 0), mvec.event_index(VJ_VAR_DEL, 0, 4));
-    YMIR_ASSERT2(maag.event_index(1, 0, 0, 1), mvec.event_index(VJ_VAR_DEL, 0, 3));
-    YMIR_ASSERT2(maag.event_index(1, 0, 0, 2), mvec.event_index(VJ_VAR_DEL, 0, 2));
-    YMIR_ASSERT2(maag.event_index(1, 0, 0, 3), mvec.event_index(VJ_VAR_DEL, 0, 1));
-    YMIR_ASSERT2(maag.event_index(1, 0, 0, 4), mvec.event_index(VJ_VAR_DEL, 0, 0));
-    YMIR_ASSERT2(maag.event_index(1, 0, 0, 5), 0)
+    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 0), mvec.event_index(VJ_VAR_DEL, 0, 4));
+    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 1), mvec.event_index(VJ_VAR_DEL, 0, 3));
+    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 2), mvec.event_index(VJ_VAR_DEL, 0, 2));
+    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 3), mvec.event_index(VJ_VAR_DEL, 0, 1));
+    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 4), mvec.event_index(VJ_VAR_DEL, 0, 0));
+    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 5), 0)
 
-    YMIR_ASSERT2(maag.event_index(1, 1, 0, 0), mvec.event_index(VJ_VAR_DEL, 2, 6))
-    YMIR_ASSERT2(maag.event_index(1, 1, 0, 1), mvec.event_index(VJ_VAR_DEL, 2, 5))
-    YMIR_ASSERT2(maag.event_index(1, 1, 0, 2), mvec.event_index(VJ_VAR_DEL, 2, 4))
-    YMIR_ASSERT2(maag.event_index(1, 1, 0, 3), mvec.event_index(VJ_VAR_DEL, 2, 3))
-    YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec.event_index(VJ_VAR_DEL, 2, 2))
-    YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec.event_index(VJ_VAR_DEL, 2, 1))
+    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 0), mvec.event_index(VJ_VAR_DEL, 2, 6))
+    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 1), mvec.event_index(VJ_VAR_DEL, 2, 5))
+    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 2), mvec.event_index(VJ_VAR_DEL, 2, 4))
+    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 3), mvec.event_index(VJ_VAR_DEL, 2, 3))
+    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec.event_index(VJ_VAR_DEL, 2, 2))
+    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec.event_index(VJ_VAR_DEL, 2, 1))
 
-    YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
-    YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), 0)
+    // YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
+    // YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), 0)
 
-    YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
-    YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), mvec.event_index(VJ_JOI_DEL, 0, 2))
-    YMIR_ASSERT2(maag.event_index(3, 0, 2, 0), mvec.event_index(VJ_JOI_DEL, 0, 3))
-    YMIR_ASSERT2(maag.event_index(3, 0, 3, 0), mvec.event_index(VJ_JOI_DEL, 0, 4))
-    YMIR_ASSERT2(maag.event_index(3, 0, 4, 0), mvec.event_index(VJ_JOI_DEL, 0, 5))
-    YMIR_ASSERT2(maag.event_index(3, 0, 5, 0), mvec.event_index(VJ_JOI_DEL, 0, 6))
+    // YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
+    // YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), mvec.event_index(VJ_JOI_DEL, 0, 2))
+    // YMIR_ASSERT2(maag.event_index(3, 0, 2, 0), mvec.event_index(VJ_JOI_DEL, 0, 3))
+    // YMIR_ASSERT2(maag.event_index(3, 0, 3, 0), mvec.event_index(VJ_JOI_DEL, 0, 4))
+    // YMIR_ASSERT2(maag.event_index(3, 0, 4, 0), mvec.event_index(VJ_JOI_DEL, 0, 5))
+    // YMIR_ASSERT2(maag.event_index(3, 0, 5, 0), mvec.event_index(VJ_JOI_DEL, 0, 6))
 
-    YMIR_ASSERT2(maag.event_index(3, 2, 0, 0), mvec.event_index(VJ_JOI_DEL, 2, 1))
-    YMIR_ASSERT2(maag.event_index(3, 2, 1, 0), mvec.event_index(VJ_JOI_DEL, 2, 2))
-    YMIR_ASSERT2(maag.event_index(3, 2, 2, 0), mvec.event_index(VJ_JOI_DEL, 2, 3))
-    YMIR_ASSERT2(maag.event_index(3, 2, 3, 0), mvec.event_index(VJ_JOI_DEL, 2, 4))
-    YMIR_ASSERT2(maag.event_index(3, 2, 4, 0), mvec.event_index(VJ_JOI_DEL, 2, 5))
-    YMIR_ASSERT2(maag.event_index(3, 2, 5, 0), mvec.event_index(VJ_JOI_DEL, 2, 6))
+    // YMIR_ASSERT2(maag.event_index(3, 2, 0, 0), mvec.event_index(VJ_JOI_DEL, 2, 1))
+    // YMIR_ASSERT2(maag.event_index(3, 2, 1, 0), mvec.event_index(VJ_JOI_DEL, 2, 2))
+    // YMIR_ASSERT2(maag.event_index(3, 2, 2, 0), mvec.event_index(VJ_JOI_DEL, 2, 3))
+    // YMIR_ASSERT2(maag.event_index(3, 2, 3, 0), mvec.event_index(VJ_JOI_DEL, 2, 4))
+    // YMIR_ASSERT2(maag.event_index(3, 2, 4, 0), mvec.event_index(VJ_JOI_DEL, 2, 5))
+    // YMIR_ASSERT2(maag.event_index(3, 2, 5, 0), mvec.event_index(VJ_JOI_DEL, 2, 6))
 
-    YMIR_ASSERT2(maag.event_probability(0, 0, 0, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 0))
-    YMIR_ASSERT2(maag.event_probability(0, 0, 0, 1), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 1))
-    YMIR_ASSERT2(maag.event_probability(0, 0, 1, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 0))
-    YMIR_ASSERT2(maag.event_probability(0, 0, 1, 2), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 2))
+    // YMIR_ASSERT2(maag.event_probability(0, 0, 0, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 0))
+    // YMIR_ASSERT2(maag.event_probability(0, 0, 0, 1), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 1))
+    // YMIR_ASSERT2(maag.event_probability(0, 0, 1, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 0))
+    // YMIR_ASSERT2(maag.event_probability(0, 0, 1, 2), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 2))
 
-    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 0), mvec.event_prob(VJ_VAR_DEL, 0, 4));
-    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 1), mvec.event_prob(VJ_VAR_DEL, 0, 3));
-    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 2), mvec.event_prob(VJ_VAR_DEL, 0, 2));
-    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 3), mvec.event_prob(VJ_VAR_DEL, 0, 1));
-    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 4), mvec.event_prob(VJ_VAR_DEL, 0, 0));
-    YMIR_ASSERT2(maag.event_probability(1, 0, 0, 5), 0)
+    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 0), mvec.event_prob(VJ_VAR_DEL, 0, 4));
+    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 1), mvec.event_prob(VJ_VAR_DEL, 0, 3));
+    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 2), mvec.event_prob(VJ_VAR_DEL, 0, 2));
+    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 3), mvec.event_prob(VJ_VAR_DEL, 0, 1));
+    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 4), mvec.event_prob(VJ_VAR_DEL, 0, 0));
+    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 5), 0)
 
-    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 0), mvec.event_prob(VJ_VAR_DEL, 2, 6))
-    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 1), mvec.event_prob(VJ_VAR_DEL, 2, 5))
-    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 2), mvec.event_prob(VJ_VAR_DEL, 2, 4))
-    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 3), mvec.event_prob(VJ_VAR_DEL, 2, 3))
-    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 4), mvec.event_prob(VJ_VAR_DEL, 2, 2))
-    YMIR_ASSERT2(maag.event_probability(1, 1, 0, 5), mvec.event_prob(VJ_VAR_DEL, 2, 1))
+    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 0), mvec.event_prob(VJ_VAR_DEL, 2, 6))
+    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 1), mvec.event_prob(VJ_VAR_DEL, 2, 5))
+    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 2), mvec.event_prob(VJ_VAR_DEL, 2, 4))
+    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 3), mvec.event_prob(VJ_VAR_DEL, 2, 3))
+    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 4), mvec.event_prob(VJ_VAR_DEL, 2, 2))
+    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 5), mvec.event_prob(VJ_VAR_DEL, 2, 1))
 
-    YMIR_ASSERT2(maag.event_probability(2, 0, 0, 1), 0)
+    // YMIR_ASSERT2(maag.event_probability(2, 0, 0, 1), 0)
 
-    YMIR_ASSERT2(maag.event_probability(3, 0, 0, 0), 0)
-    YMIR_ASSERT2(maag.event_probability(3, 0, 1, 0), mvec.event_prob(VJ_JOI_DEL, 0, 2))
-    YMIR_ASSERT2(maag.event_probability(3, 0, 2, 0), mvec.event_prob(VJ_JOI_DEL, 0, 3))
-    YMIR_ASSERT2(maag.event_probability(3, 0, 3, 0), mvec.event_prob(VJ_JOI_DEL, 0, 4))
-    YMIR_ASSERT2(maag.event_probability(3, 0, 4, 0), mvec.event_prob(VJ_JOI_DEL, 0, 5))
-    YMIR_ASSERT2(maag.event_probability(3, 0, 5, 0), mvec.event_prob(VJ_JOI_DEL, 0, 6))
+    // YMIR_ASSERT2(maag.event_probability(3, 0, 0, 0), 0)
+    // YMIR_ASSERT2(maag.event_probability(3, 0, 1, 0), mvec.event_prob(VJ_JOI_DEL, 0, 2))
+    // YMIR_ASSERT2(maag.event_probability(3, 0, 2, 0), mvec.event_prob(VJ_JOI_DEL, 0, 3))
+    // YMIR_ASSERT2(maag.event_probability(3, 0, 3, 0), mvec.event_prob(VJ_JOI_DEL, 0, 4))
+    // YMIR_ASSERT2(maag.event_probability(3, 0, 4, 0), mvec.event_prob(VJ_JOI_DEL, 0, 5))
+    // YMIR_ASSERT2(maag.event_probability(3, 0, 5, 0), mvec.event_prob(VJ_JOI_DEL, 0, 6))
 
-    YMIR_ASSERT2(maag.event_probability(3, 2, 0, 0), mvec.event_prob(VJ_JOI_DEL, 2, 1))
-    YMIR_ASSERT2(maag.event_probability(3, 2, 1, 0), mvec.event_prob(VJ_JOI_DEL, 2, 2))
-    YMIR_ASSERT2(maag.event_probability(3, 2, 2, 0), mvec.event_prob(VJ_JOI_DEL, 2, 3))
-    YMIR_ASSERT2(maag.event_probability(3, 2, 3, 0), mvec.event_prob(VJ_JOI_DEL, 2, 4))
-    YMIR_ASSERT2(maag.event_probability(3, 2, 4, 0), mvec.event_prob(VJ_JOI_DEL, 2, 5))
-    YMIR_ASSERT2(maag.event_probability(3, 2, 5, 0), mvec.event_prob(VJ_JOI_DEL, 2, 6))
+    // YMIR_ASSERT2(maag.event_probability(3, 2, 0, 0), mvec.event_prob(VJ_JOI_DEL, 2, 1))
+    // YMIR_ASSERT2(maag.event_probability(3, 2, 1, 0), mvec.event_prob(VJ_JOI_DEL, 2, 2))
+    // YMIR_ASSERT2(maag.event_probability(3, 2, 2, 0), mvec.event_prob(VJ_JOI_DEL, 2, 3))
+    // YMIR_ASSERT2(maag.event_probability(3, 2, 3, 0), mvec.event_prob(VJ_JOI_DEL, 2, 4))
+    // YMIR_ASSERT2(maag.event_probability(3, 2, 4, 0), mvec.event_prob(VJ_JOI_DEL, 2, 5))
+    // YMIR_ASSERT2(maag.event_probability(3, 2, 5, 0), mvec.event_prob(VJ_JOI_DEL, 2, 6))
 
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_model_vdj_maag)
+
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vdj_model/");
     YMIR_ASSERT(model.status())
 
@@ -2747,9 +2751,9 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_errcorr_aligner())
 
     // Test for the repertoire parser and writer
-    YMIR_TEST(test_parser_vj())
-    YMIR_TEST(test_parser_vj_stream())
-    YMIR_TEST(test_parser_vdj_with_d_alignment())
+    // YMIR_TEST(test_parser_vj())
+    // YMIR_TEST(test_parser_vj_stream())
+    // YMIR_TEST(test_parser_vdj_with_d_alignment())
 //    YMIR_TEST(test_ymir_vdj_wo_d_alignment())
     YMIR_TEST(test_writer())
 

@@ -212,159 +212,92 @@ namespace ymir {
     // };
 
 
-//    template <class _Input, class _Output>
-    class AbstractAligner {
-    public:
+    // class NaiveAminoAcidAligner : public AbstractAligner {
 
-        /** \brief Vector of starts and ends of alignment results.
-        *
-        */
-        struct LocalAlignmentIndices {
-            // vector of 3-tuples: pattern start, text start, alignment length;
-//            _Output *alignment;
-            seq_len_t *alignment;
-            size_t n;
+    // public:
+
+    //     NaiveAminoAcidAligner() { }
 
 
-//            LocalAlignmentIndices(_Output *alignment_, size_t n_) : n(n_ / 4) {
-            LocalAlignmentIndices(const vector<seq_len_t> vec) {
-                if (vec.size()) {
-                    this->n = vec.size() / 3;
-                    this->alignment = new seq_len_t[this->n * 3];
-                    for (int i = 0; i < this->n * 3; ++i) {
-                        this->alignment[i] = vec[i];
-                    }
-                } else {
-                    this->n = 0;
-                    this->alignment = nullptr;
-                }
-            }
+    //     virtual seq_len_t align5end(const string& pattern, const string& text) const {
+    //         seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0, max_matches = 0, all_matches = 0;
+    //         string codon_s = "";
+    //         for (seq_len_t i = 0; i < std::min((seq_len_t) (1 + p_size / 3), t_size); ++i) {
+    //             max_matches = 0;
+    //             // go through all codons and find the maximal match
+    //             CodonTable::Codons codon = _codons.codons(text[i]);
+    //             while(!codon.end()) {
+    //                 matches = 0;
+    //                 codon_s = codon.next();
+    //                 if (pattern[i*3] == codon_s[0] && i*3 < p_size) {
+    //                     ++matches;
+    //                     if (pattern[i*3 + 1] == codon_s[1] && (i*3 + 1) < p_size) {
+    //                         ++matches;
+    //                         if (pattern[i*3 + 2] == codon_s[2] && (i*3 + 2) < p_size) {
+    //                             ++matches;
+    //                         }
+    //                     }
+    //                 }
+
+    //                 if (matches > max_matches) {
+    //                     max_matches = matches;
+    //                     if (max_matches == 3) { break; }
+    //                 }
+    //             }
+
+    //             // if match == 3 then go to the next amino acid
+    //             all_matches += max_matches;
+    //             if (max_matches != 3) { break; }
+    //         }
+
+    //         return all_matches;
+    //     }
 
 
-            LocalAlignmentIndices(const LocalAlignmentIndices& other) {
-                this->n = other.n;
-                this->alignment = new seq_len_t[this->n * 3];
-                for (int i = 0; i < this->n * 3; ++i) {
-                    this->alignment[i] = other.alignment[i];
-                }
-            }
+    //     virtual seq_len_t align3end(const string& pattern, const string& text) const {
+    //         seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0, max_matches = 0, all_matches = 0;
+    //         string codon_s = "";
+    //         for (seq_len_t i = 0; i < std::min((seq_len_t) (1 + p_size / 3), t_size); ++i) {
+    //             max_matches = 0;
+    //             // go through all codons and find the maximal match
+    //             CodonTable::Codons codon = _codons.codons(text[t_size - i - 1]);
+    //             while(!codon.end()) {
+    //                 matches = 0;
+    //                 codon_s = codon.next();
+    //                 if (pattern[p_size - 1 - i*3] == codon_s[2] && i*3 < p_size) {
+    //                     ++matches;
+    //                     if (pattern[p_size - 1 - i*3 - 1] == codon_s[1] && (i*3 + 1) < p_size) {
+    //                         ++matches;
+    //                         if (pattern[p_size - 1 - i*3 - 2] == codon_s[0] && (i*3 + 2) < p_size) {
+    //                             ++matches;
+    //                         }
+    //                     }
+    //                 }
+
+    //                 if (matches > max_matches) {
+    //                     max_matches = matches;
+    //                     if (max_matches == 3) { break; }
+    //                 }
+    //             }
+
+    //             // if match == 3 then go to the next amino acid
+    //             all_matches += max_matches;
+    //             if (max_matches != 3) { break; }
+    //         }
+
+    //         return all_matches;
+    //     }
 
 
-            virtual ~LocalAlignmentIndices() {
-                delete [] this->alignment;
-            }
+    //     virtual LocalAlignmentIndices alignLocal(const string& pattern, const string& text, seq_len_t match_min_len = 3) const {
+    //         return LocalAlignmentIndices(vector<seq_len_t>(1));
+    //     }
 
+    // protected:
 
-            size_t array_size() const { return this->n * 3; }
+    //     const CodonTable _codons;
 
-
-            size_t size() const { return this->n; }
-
-
-            Alignment operator[](size_t index) const {
-                return Alignment(this->alignment + 3*index);
-            }
-        };
-
-
-//        virtual static const seq_len_t& getEdgeAlignmentMaxIndex(const _Input& pattern, const _Input& text, bool on_reverse_text = false) const =0;
-
-
-        virtual seq_len_t align5end(const string& pattern, const string& text) const = 0;
-
-        virtual seq_len_t align3end(const string& pattern, const string& text) const = 0;
-
-        virtual LocalAlignmentIndices alignLocal(const string& pattern, const string& text, seq_len_t match_min_len = 3) const = 0;
-
-    };
-
-
-    class NaiveAminoAcidAligner : public AbstractAligner {
-
-    public:
-
-        NaiveAminoAcidAligner() { }
-
-
-        virtual seq_len_t align5end(const string& pattern, const string& text) const {
-            seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0, max_matches = 0, all_matches = 0;
-            string codon_s = "";
-            for (seq_len_t i = 0; i < std::min((seq_len_t) (1 + p_size / 3), t_size); ++i) {
-                max_matches = 0;
-                // go through all codons and find the maximal match
-                CodonTable::Codons codon = _codons.codons(text[i]);
-                while(!codon.end()) {
-                    matches = 0;
-                    codon_s = codon.next();
-                    if (pattern[i*3] == codon_s[0] && i*3 < p_size) {
-                        ++matches;
-                        if (pattern[i*3 + 1] == codon_s[1] && (i*3 + 1) < p_size) {
-                            ++matches;
-                            if (pattern[i*3 + 2] == codon_s[2] && (i*3 + 2) < p_size) {
-                                ++matches;
-                            }
-                        }
-                    }
-
-                    if (matches > max_matches) {
-                        max_matches = matches;
-                        if (max_matches == 3) { break; }
-                    }
-                }
-
-                // if match == 3 then go to the next amino acid
-                all_matches += max_matches;
-                if (max_matches != 3) { break; }
-            }
-
-            return all_matches;
-        }
-
-
-        virtual seq_len_t align3end(const string& pattern, const string& text) const {
-            seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0, max_matches = 0, all_matches = 0;
-            string codon_s = "";
-            for (seq_len_t i = 0; i < std::min((seq_len_t) (1 + p_size / 3), t_size); ++i) {
-                max_matches = 0;
-                // go through all codons and find the maximal match
-                CodonTable::Codons codon = _codons.codons(text[t_size - i - 1]);
-                while(!codon.end()) {
-                    matches = 0;
-                    codon_s = codon.next();
-                    if (pattern[p_size - 1 - i*3] == codon_s[2] && i*3 < p_size) {
-                        ++matches;
-                        if (pattern[p_size - 1 - i*3 - 1] == codon_s[1] && (i*3 + 1) < p_size) {
-                            ++matches;
-                            if (pattern[p_size - 1 - i*3 - 2] == codon_s[0] && (i*3 + 2) < p_size) {
-                                ++matches;
-                            }
-                        }
-                    }
-
-                    if (matches > max_matches) {
-                        max_matches = matches;
-                        if (max_matches == 3) { break; }
-                    }
-                }
-
-                // if match == 3 then go to the next amino acid
-                all_matches += max_matches;
-                if (max_matches != 3) { break; }
-            }
-
-            return all_matches;
-        }
-
-
-        virtual LocalAlignmentIndices alignLocal(const string& pattern, const string& text, seq_len_t match_min_len = 3) const {
-            return LocalAlignmentIndices(vector<seq_len_t>(1));
-        }
-
-    protected:
-
-        const CodonTable _codons;
-
-    };
+    // };
 
 
     //

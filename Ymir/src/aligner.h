@@ -562,14 +562,14 @@ namespace ymir {
      */
     ///@{
     struct SWAlignerFunctor_VJ {
-        SegmentAlignment operator()(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
-            return SegmentAlignment();
+        void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
+            // avec->addAlignment();
         }
     };
 
     struct SWAlignerFunctor_D {
-        SegmentAlignmentVector operator()(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
-
+        void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
+            // avec->addAlignment();
         }
     };
     ///@}
@@ -592,14 +592,14 @@ namespace ymir {
      */
     ///@{
     struct SWNGAlignerFunctor_VJ {
-        SegmentAlignment operator()(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
-
+        void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
+            // avec->addAlignment();
         }
     };
 
     struct SWNGAlignerFunctor_D {
-        SegmentAlignmentVector operator()(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
-
+        void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
+            // avec->addAlignment();
         }
     };
     ///@}

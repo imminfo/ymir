@@ -100,16 +100,16 @@ namespace ymir {
             return _alignments.pattern_start(vgene);
         }
 
-        seq_len_t getVarSeqStart() const {
+        seq_len_t getVarSeqStart(seg_index_t vgene) const {
             return _alignments.text_start(vgene);
         }
 
-        seq_len_t getVarLen() const {
+        seq_len_t getVarLen(seg_index_t vgene) const {
             return _alignments.len(vgene);
         }
 
-        bool isVarMismatch() const {
-            return _alignments.isMismatch(vgene);
+        bool isVarMismatch(seg_index_t vgene, seq_len_t pos) const {
+            return _alignments.isMismatch(vgene, pos);
         }
 
 
@@ -117,16 +117,16 @@ namespace ymir {
             return _alignments.pattern_start(_segments[0] + jgene);
         }
 
-        seq_len_t getJoiSeqStart() const {
+        seq_len_t getJoiSeqStart(seg_index_t jgene) const {
             return _alignments.text_start(_segments[0] + jgene);
         }
 
-        seq_len_t getJoiLen() const {
+        seq_len_t getJoiLen(seg_index_t jgene) const {
             return _alignments.len(_segments[0] + jgene);
         }
 
-        bool isJoiMismatch() const {
-            return _alignments.isMismatch(_segments[0] + jgene);
+        bool isJoiMismatch(seg_index_t jgene, seq_len_t pos) const {
+            return _alignments.isMismatch(_segments[0] + jgene, pos);
         }
 
 
@@ -142,8 +142,8 @@ namespace ymir {
             return _alignments.len(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i);
         }
 
-        bool isDivMismatch(seg_index_t dgene, seg_index_t align_i) const {
-            return _alignments.isMismatch(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i);
+        bool isDivMismatch(seg_index_t dgene, seg_index_t align_i, seq_len_t pos) const {
+            return _alignments.isMismatch(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i, pos);
         }
         ///@}
 

@@ -9,7 +9,7 @@
 #include <chrono>
 
 #include "insertionmodel.h"
-#include "clonotype.h"
+#include "clonotype_builder.h"
 
 
 namespace ymir {

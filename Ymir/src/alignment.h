@@ -119,7 +119,7 @@ namespace ymir {
     /**
      *
      */
-    struct GappedAlignment {
+    struct GappedAlignment : public AlignmentBase {
 
 
         GappedAlignment(seq_len_t p_start, seq_len_t t_start, events_storage_t &events) 
@@ -161,7 +161,7 @@ namespace ymir {
 
 
         AlignmentVectorBase() {
-            _start.reserve(default_start_reserve_size);
+            _starts.reserve(default_start_reserve_size);
             _events.reserve(default_events_reserve_size);
         }
 
@@ -231,7 +231,7 @@ namespace ymir {
             _data.push_back(len);
         }
 
-        void addAlignment(seq_len_t p_start, seq_len_t t_start, const mismatch_storage_t &vec) {
+        void addAlignment(seq_len_t p_start, seq_len_t t_start, const events_storage_t &vec) {
             _data.push_back(p_start);
             _data.push_back(t_start);
             _data.push_back(vec.size());
@@ -264,7 +264,7 @@ namespace ymir {
         }
 
 
-        void addAlignment(seq_len_t p_start, seq_len_t t_start, const mismatch_storage_t &vec) {
+        void addAlignment(seq_len_t p_start, seq_len_t t_start, const events_storage_t &vec) {
             _data.push_back(p_start);
             _data.push_back(t_start);
             _data.push_back(vec.size());
@@ -322,13 +322,13 @@ namespace ymir {
      * matches, mismatches, insertions or deletions.
      */
     ///@{
-    inline void add_match(GappedAlignment::events_storage_t *vec)    { vec->push_back(false); vec->push_back(false); }
+    inline void add_match(AlignmentVectorBase::events_storage_t *vec)    { vec->push_back(false); vec->push_back(false); }
 
-    inline void add_mismatch(GappedAlignment::events_storage_t *vec) { vec->push_back(false); vec->push_back(true); }
+    inline void add_mismatch(AlignmentVectorBase::events_storage_t *vec) { vec->push_back(false); vec->push_back(true); }
 
-    inline void add_ins(GappedAlignment::events_storage_t *vec)      { vec->push_back(true);  vec->push_back(false); }
+    inline void add_ins(AlignmentVectorBase::events_storage_t *vec)      { vec->push_back(true);  vec->push_back(false); }
 
-    inline void add_del(GappedAlignment::events_storage_t *vec)      { vec->push_back(true);  vec->push_back(true); }
+    inline void add_del(AlignmentVectorBase::events_storage_t *vec)      { vec->push_back(true);  vec->push_back(true); }
     ///@}
 
 

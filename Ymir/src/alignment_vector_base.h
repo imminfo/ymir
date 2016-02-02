@@ -48,8 +48,23 @@ namespace ymir {
 
 
         AlignmentVectorBase() {
-            _starts.reserve(default_start_reserve_size);
             _events.reserve(default_events_reserve_size);
+            _starts.reserve(default_start_reserve_size);
+        }
+
+
+        // waiting until C++14 ?
+        AlignmentVectorBase(AlignmentVectorBase &&other) 
+            : _events(std::move(other._events)), 
+              _starts(std::move(other._starts))
+        {
+        }
+
+
+        void extend(const AlignmentVectorBase &other) {
+            _data.insert(_data.begin(), other._data.begin(), other._data.end());
+            _starts.insert(_starts.begin(), other._starts.begin(), other._starts.end());
+            _events.insert(_events.begin(), other._events.begin(), other._events.end());
         }
 
 

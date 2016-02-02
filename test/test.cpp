@@ -1182,16 +1182,90 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_alignment_vector)
+YMIR_TEST_START(test_nogap_alignment_vector_no_err)
 
+    NoGapAlignmentVector vec;
+
+    YMIR_ASSERT2(vec.size(), 0)
+
+    vec.addAlignment(1, 2, 3);
+    YMIR_ASSERT2(vec.size(), 1)
+    YMIR_ASSERT2(vec.pattern_start(0), 1)
+    YMIR_ASSERT2(vec.text_start(0), 2)
+    YMIR_ASSERT2(vec.len(0), 3)
+
+    vec.addAlignment(4, 5, 6);
+    YMIR_ASSERT2(vec.size(), 2)
+    YMIR_ASSERT2(vec.pattern_start(0), 1)
+    YMIR_ASSERT2(vec.text_start(0), 2)
+    YMIR_ASSERT2(vec.len(0), 3)
+    YMIR_ASSERT2(vec.pattern_start(1), 4)
+    YMIR_ASSERT2(vec.text_start(1), 5)
+    YMIR_ASSERT2(vec.len(1), 6)
+
+    vec.addAlignment(8, 9, 10);
+    YMIR_ASSERT2(vec.size(), 3)
+    YMIR_ASSERT2(vec.pattern_start(1), 4)
+    YMIR_ASSERT2(vec.text_start(1), 5)
+    YMIR_ASSERT2(vec.len(1), 6)
+    YMIR_ASSERT2(vec.pattern_start(2), 8)
+    YMIR_ASSERT2(vec.text_start(2), 9)
+    YMIR_ASSERT2(vec.len(2), 10)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_nogap_alignment_vector_errors)
+
+    NoGapAlignmentVector vec;
+
+    YMIR_ASSERT2(vec.size(), 0)
+
+    AlignmentVectorBase::events_storage_t events1 {false, true, true};
+
+    vec.addAlignment(1, 2, events1);
+    YMIR_ASSERT2(vec.size(), 1)
+    YMIR_ASSERT2(vec.pattern_start(0), 1)
+    YMIR_ASSERT2(vec.text_start(0), 2)
+    YMIR_ASSERT2(vec.len(0), 3)
+    YMIR_ASSERT2(vec.isMismatch(0, 0), false)
+    YMIR_ASSERT2(vec.isMismatch(0, 1), true)
+    YMIR_ASSERT2(vec.isMismatch(0, 2), true)
+
+    AlignmentVectorBase::events_storage_t events2 {false, false, true, false};
+
+    vec.addAlignment(3, 4, events2);
+    YMIR_ASSERT2(vec.size(), 2)
+    YMIR_ASSERT2(vec.pattern_start(0), 1)
+    YMIR_ASSERT2(vec.text_start(0), 2)
+    YMIR_ASSERT2(vec.len(0), 3)
+    YMIR_ASSERT2(vec.isMismatch(0, 0), false)
+    YMIR_ASSERT2(vec.isMismatch(0, 1), true)
+    YMIR_ASSERT2(vec.isMismatch(0, 2), true)
+
+    YMIR_ASSERT2(vec.pattern_start(1), 3)
+    YMIR_ASSERT2(vec.text_start(1), 4)
+    YMIR_ASSERT2(vec.len(1), 4)
+    YMIR_ASSERT2(vec.isMismatch(1, 0), false)
+    YMIR_ASSERT2(vec.isMismatch(1, 1), false)
+    YMIR_ASSERT2(vec.isMismatch(1, 2), true)
+    YMIR_ASSERT2(vec.isMismatch(1, 3), false)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_gapped_alignment_vector)
+
+    GappedAlignmentVector vec;
     YMIR_ASSERT(false)
 
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_nuc_aligner)
+YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
-    NaiveNucleotideAligner nna;
+    NoGapAlignmentVector vec;
+    NaiveCDR3NucleotideAligner nna;
 
     YMIR_ASSERT2(nna.align5end("ACGT", "ACGTT"), 4)
     YMIR_ASSERT2(nna.align5end("ACGT", "ACGT"), 4)
@@ -1223,7 +1297,12 @@ YMIR_TEST_START(test_nuc_aligner)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_aa_aligner)
+YMIR_TEST_START(test_cdr3_nuc_aligner)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_cdr3_aa_aligner)
 
     NaiveAminoAcidAligner naa;
 
@@ -2607,12 +2686,15 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_clone())
     YMIR_TEST(test_clonebuilder_clonealign())
 
-    // AlignmentEventVector vector
-    YMIR_TEST(test_alignment_vector())
+    // Tests for NoGapAlignmentVector and GappedAlignmentVector
+    YMIR_TEST(test_nogap_alignment_vector_no_err())
+    YMIR_TEST(test_nogap_alignment_vector_errors())
+    YMIR_TEST(test_gapped_alignment_vector())
 
     // Tests for sequences aligners.
-    YMIR_TEST(test_nuc_aligner())
-    YMIR_TEST(test_aa_aligner())
+    YMIR_TEST(test_naive_cdr3_nuc_aligner())
+    YMIR_TEST(test_cdr3_nuc_aligner())
+    YMIR_TEST(test_cdr3_aa_aligner())
     YMIR_TEST(test_sw_aligner())
     YMIR_TEST(test_swng_aligner())
 

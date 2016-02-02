@@ -38,7 +38,6 @@ namespace ymir {
     /**
      * \class VDJAlignerBase
      */
-    // template <typename V_Aligner<typename Alignment>, typename D_Aligner<typename Alignment>, typename J_Aligner<typename Alignment>>
     // template <typename A, typename V_Aligner, typename D_Aligner, typename J_Aligner>
     // class VDJAlignerBase {
     // public:
@@ -104,10 +103,10 @@ namespace ymir {
     //      *
     //      */
     //     VDJAlignerBase(const VDJRecombinationGenes &genes,
-    //                        alignment_score_t threshold,
-    //                        const AlignmentEventScore &v_score = AlignmentEventScore(1, -1, -1, -1),
-    //                        const AlignmentEventScore &d_score = AlignmentEventScore(1, -1, -1, -1),
-    //                        const AlignmentEventScore &j_score = AlignmentEventScore(1, -1, -1, -1))
+    //                        alignment_score_t threshold
+    //                        // const AlignmentEventScore &v_score = AlignmentEventScore(1, -1, -1, -1),
+    //                        // const AlignmentEventScore &d_score = AlignmentEventScore(1, -1, -1, -1),
+    //                        // const AlignmentEventScore &j_score = AlignmentEventScore(1, -1, -1, -1))
     //             : _genes(genes), _threshold(threshold)
     //     {
     //     }

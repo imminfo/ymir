@@ -342,33 +342,6 @@ namespace ymir {
     inline void add_del(AlignmentVectorBase::events_storage_t *vec)      { vec->push_back(true);  vec->push_back(true); }
     ///@}
 
-
-    /**
-     * \struct Alignment
-     *
-     */
-    struct SegmentAlignment {
-
-        seg_index_t segment;
-        seq_len_t start, end;
-        alignment_score_t score;
-        AlignmentEventVector events;
-
-
-        SegmentAlignment()
-                : segment(0), start(0), end(0), score(0)
-        { }
-
-
-        SegmentAlignment(seg_index_t segment_, seq_len_t start_, seq_len_t end_, alignment_score_t score_, const AlignmentEventVector &events_)
-                : segment(segment_), start(start_), end(end_), score(score_), events(events_)
-        { }
-
-    };
-
-
-    typedef std::vector<SegmentAlignment> SegmentAlignmentVector;
-
 }
 
 #endif

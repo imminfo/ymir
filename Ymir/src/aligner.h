@@ -39,177 +39,177 @@ namespace ymir {
      * \class VDJAlignerBase
      */
     // template <typename V_Aligner<typename Alignment>, typename D_Aligner<typename Alignment>, typename J_Aligner<typename Alignment>>
-    template <typename V_Aligner, typename D_Aligner, typename J_Aligner>
-    class VDJAlignerBase {
-    public:
+    // template <typename A, typename V_Aligner, typename D_Aligner, typename J_Aligner>
+    // class VDJAlignerBase {
+    // public:
 
-        /**
-         * \struct VDJAlignment
-         */
-        struct VDJAlignment {
-
-
-            VDJAlignment()
-                    : _gene(UNDEF_GENE), _n_alignments(0), _alignments(nullptr)
-            { }
+    //     /**
+    //      * \struct VDJAlignment
+    //      */
+    //     struct VDJAlignment {
 
 
-            VDJAlignment(GeneSegments gene, seg_index_t n_alignments, SegmentAlignment *alignments)
-                    : _gene(gene), _n_alignments(n_alignments), _alignments(alignments)
-            { }
+    //         VDJAlignment()
+    //                 : _gene(UNDEF_GENE), _n_alignments(0), _alignments(nullptr)
+    //         { }
 
 
-            VDJAlignment(const VDJAlignment &other)
-                    : _gene(other._gene), _n_alignments(other._n_alignments)
-            {
-                _alignments = new SegmentAlignment[other._n_alignments];
-                std::copy(other._alignments, other._alignments + other._n_alignments, _alignments);
-            }
+    //         VDJAlignment(GeneSegments gene, seg_index_t n_alignments, A *alignments)
+    //                 : _gene(gene), _n_alignments(n_alignments), _alignments(alignments)
+    //         { }
 
 
-            ~VDJAlignment() {
-                delete [] _alignments;
-            }
+    //         VDJAlignment(const VDJAlignment &other)
+    //                 : _gene(other._gene), _n_alignments(other._n_alignments)
+    //         {
+    //             _alignments = new SegmentAlignment[other._n_alignments];
+    //             std::copy(other._alignments, other._alignments + other._n_alignments, _alignments);
+    //         }
 
 
-            VDJAlignment& operator=(const VDJAlignment &other) {
-                _gene = other._gene;
-                _n_alignments = other._n_alignments;
-                _alignments = new SegmentAlignment[other._n_alignments];
-                std::copy(other._alignments, other._alignments + other._n_alignments, _alignments);
-            }
+    //         ~VDJAlignment() {
+    //             delete [] _alignments;
+    //         }
 
 
-            GeneSegments gene() const { return _gene; }
+    //         VDJAlignment& operator=(const VDJAlignment &other) {
+    //             _gene = other._gene;
+    //             _n_alignments = other._n_alignments;
+    //             _alignments = new SegmentAlignment[other._n_alignments];
+    //             std::copy(other._alignments, other._alignments + other._n_alignments, _alignments);
+    //         }
 
 
-            size_t size() const { return _n_alignments; }
+    //         GeneSegments gene() const { return _gene; }
 
 
-            const SegmentAlignment& getAlignment(seg_index_t i) const { return _alignments[i]; }
-
-        protected:
-
-            GeneSegments _gene;
-            SegmentAlignment *_alignments;
-            seg_index_t _n_alignments;
-
-        };
+    //         size_t size() const { return _n_alignments; }
 
 
-        VDJAlignerBase() { }
+    //         const A& getAlignment(seg_index_t i) const { return _alignments[i]; }
+
+    //     protected:
+
+    //         GeneSegments _gene;
+    //         A *_alignments;
+    //         seg_index_t _n_alignments;
+
+    //     };
 
 
-        /**
-         *
-         */
-        VDJAlignerBase(const VDJRecombinationGenes &genes,
-                           alignment_score_t threshold,
-                           const AlignmentEventScore &v_score = AlignmentEventScore(1, -1, -1, -1),
-                           const AlignmentEventScore &d_score = AlignmentEventScore(1, -1, -1, -1),
-                           const AlignmentEventScore &j_score = AlignmentEventScore(1, -1, -1, -1))
-                : _genes(genes), _threshold(threshold)
-        {
-        }
+    //     VDJAlignerBase() { }
 
 
-        ~VDJAlignerBase() {
-        }
+    //     /**
+    //      *
+    //      */
+    //     VDJAlignerBase(const VDJRecombinationGenes &genes,
+    //                        alignment_score_t threshold,
+    //                        const AlignmentEventScore &v_score = AlignmentEventScore(1, -1, -1, -1),
+    //                        const AlignmentEventScore &d_score = AlignmentEventScore(1, -1, -1, -1),
+    //                        const AlignmentEventScore &j_score = AlignmentEventScore(1, -1, -1, -1))
+    //             : _genes(genes), _threshold(threshold)
+    //     {
+    //     }
 
 
-        /**
-         * \brief Align the given sequence to the specific gene segment of the specific gene.
-         *
-         * \param sequence Pattern sequence.
-         * \param seg_index Index of the target gene segment.
-         */
-        ///@{
-        SegmentAlignment alignVar(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
-            this->alignOneSegment<V_Aligner>(sequence, seg_index, segment_seq);
-        }
-
-        SegmentAlignmentVector alignDiv(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
-            this->alignManySegments<D_Aligner>(sequence, seg_index, segment_seq);
-        }
-
-        SegmentAlignment alignJoi(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
-            this->alignOneSegment<J_Aligner>(sequence, seg_index, segment_seq);
-        }
-        ///@}
+    //     ~VDJAlignerBase() {
+    //     }
 
 
-        /**
-         * \brief Align the given sequence to all gene segments of the specific gene.
-         *
-         * \param sequence Pattern sequence.
-         */
-        ///@{
-        void alignVar(const sequence_t& sequence) {
-            this->alignGeneSegments<V_Aligner>(sequence, _genes.V(), _last_v_alignment);
-        }
+    //     /**
+    //      * \brief Align the given sequence to the specific gene segment of the specific gene.
+    //      *
+    //      * \param sequence Pattern sequence.
+    //      * \param seg_index Index of the target gene segment.
+    //      */
+    //     ///@{
+    //     SegmentAlignment alignVar(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
+    //         this->alignOneSegment<V_Aligner>(sequence, seg_index, segment_seq);
+    //     }
 
-        void alignDiv(const sequence_t &sequence) {
-            this->alignGeneSegments<D_Aligner>(sequence, _genes.D(), _last_d_alignment);
-        }
+    //     SegmentAlignmentVector alignDiv(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
+    //         this->alignManySegments<D_Aligner>(sequence, seg_index, segment_seq);
+    //     }
 
-        void alignJoi(const sequence_t &sequence) {
-            this->alignGeneSegments<J_Aligner>(sequence, _genes.J(), _last_j_alignment);
-        }
-        ///@}
-
-
-        /**
-         * \brief Access the latest alignment results.
-         */
-        ///@{
-        const VDJAlignment& lastVarAlignment() const { return _last_v_alignment; }
-
-        const VDJAlignment& lastDivAlignment() const { return _last_d_alignment; }
-
-        const VDJAlignment& lastJoiAlignment() const { return _last_j_alignment; }
-        ///@}
-
-    protected:
-
-        alignment_score_t _threshold;
-        VDJRecombinationGenes _genes;
-        VDJAlignment _last_v_alignment, _last_d_alignment, _last_j_alignment;
+    //     SegmentAlignment alignJoi(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
+    //         this->alignOneSegment<J_Aligner>(sequence, seg_index, segment_seq);
+    //     }
+    //     ///@}
 
 
-        template <typename F_Aligner>
-        SegmentAlignment alignOneSegment(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
-            return F_Aligner(sequence, seg_index, segment_seq);
-        }
+    //     /**
+    //      * \brief Align the given sequence to all gene segments of the specific gene.
+    //      *
+    //      * \param sequence Pattern sequence.
+    //      */
+    //     ///@{
+    //     void alignVar(const sequence_t& sequence) {
+    //         this->alignGeneSegments<V_Aligner>(sequence, _genes.V(), _last_v_alignment);
+    //     }
+
+    //     void alignDiv(const sequence_t &sequence) {
+    //         this->alignGeneSegments<D_Aligner>(sequence, _genes.D(), _last_d_alignment);
+    //     }
+
+    //     void alignJoi(const sequence_t &sequence) {
+    //         this->alignGeneSegments<J_Aligner>(sequence, _genes.J(), _last_j_alignment);
+    //     }
+    //     ///@}
 
 
-        template <typename F_Aligner>
-        void alignGeneSegments(const sequence_t& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
-            SegmentAlignmentVector vec;
-            vec.reserve(gsa.size() / 2 + 2);
-            SegmentAlignment tmp;
-            for (seg_index_t i = 1; i <= gsa.max(); ++i) {
-                tmp = F_Aligner(sequence, i, gsa[i].sequence);
-                if (tmp.score >= _threshold) {
-                    vec.push_back(tmp);
-                }
-            }
-            SegmentAlignment *arr = new SegmentAlignment[vec.size()];
-            gs_alignment = VDJAlignment(gsa.gene_segment(), vec.size(), arr);
-        }
+    //     /**
+    //      * \brief Access the latest alignment results.
+    //      */
+    //     ///@{
+    //     const VDJAlignment& lastVarAlignment() const { return _last_v_alignment; }
 
-        template <typename F_Aligner>
-        void alignManySegments(const sequence_t& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
-            SegmentAlignmentVector vec, tmp;
-            vec.reserve(gsa.size() * 4);
-            for (seg_index_t i = 1; i <= gsa.max(); ++i) {
-                tmp = F_Aligner(sequence, i, gsa[i].sequence);
-                vec.insert(vec.end(), tmp.begin(), tmp.end());
-            }
-            SegmentAlignment *arr = new SegmentAlignment[vec.size()];
-            gs_alignment = VDJAlignment(gsa.gene_segment(), vec.size(), arr);
-        }
+    //     const VDJAlignment& lastDivAlignment() const { return _last_d_alignment; }
 
-    };
+    //     const VDJAlignment& lastJoiAlignment() const { return _last_j_alignment; }
+    //     ///@}
+
+    // protected:
+
+    //     alignment_score_t _threshold;
+    //     VDJRecombinationGenes _genes;
+    //     VDJAlignment _last_v_alignment, _last_d_alignment, _last_j_alignment;
+
+
+    //     template <typename F_Aligner>
+    //     SegmentAlignment alignOneSegment(const sequence_t &sequence, seg_index_t seg_index, const sequence_t &segment_seq) const {
+    //         return F_Aligner(sequence, seg_index, segment_seq);
+    //     }
+
+
+    //     template <typename F_Aligner>
+    //     void alignGeneSegments(const sequence_t& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
+    //         SegmentAlignmentVector vec;
+    //         vec.reserve(gsa.size() / 2 + 2);
+    //         SegmentAlignment tmp;
+    //         for (seg_index_t i = 1; i <= gsa.max(); ++i) {
+    //             tmp = F_Aligner(sequence, i, gsa[i].sequence);
+    //             if (tmp.score >= _threshold) {
+    //                 vec.push_back(tmp);
+    //             }
+    //         }
+    //         SegmentAlignment *arr = new SegmentAlignment[vec.size()];
+    //         gs_alignment = VDJAlignment(gsa.gene_segment(), vec.size(), arr);
+    //     }
+
+    //     template <typename F_Aligner>
+    //     void alignManySegments(const sequence_t& sequence, const GeneSegmentAlphabet &gsa, VDJAlignment &gs_alignment) {
+    //         SegmentAlignmentVector vec, tmp;
+    //         vec.reserve(gsa.size() * 4);
+    //         for (seg_index_t i = 1; i <= gsa.max(); ++i) {
+    //             tmp = F_Aligner(sequence, i, gsa[i].sequence);
+    //             vec.insert(vec.end(), tmp.begin(), tmp.end());
+    //         }
+    //         SegmentAlignment *arr = new SegmentAlignment[vec.size()];
+    //         gs_alignment = VDJAlignment(gsa.gene_segment(), vec.size(), arr);
+    //     }
+
+    // };
 
 
 //    template <class _Input, class _Output>
@@ -390,7 +390,7 @@ namespace ymir {
     };
 
     struct NaiveCDR3AlignerFunctor_D {
-        void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
+        void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec, seq_len_t match_min_len) const {
             seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
             bool open_match;
             seq_len_t p_start, t_start;
@@ -487,7 +487,7 @@ namespace ymir {
     };
 
     struct CDR3AlignerFunctor_D {
-        void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
+        void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec, seq_len_t match_min_len) const {
             // pass
         }
     };
@@ -506,7 +506,7 @@ namespace ymir {
                 }
             }
 
-            avec->addAlignment(1, t_size - matches + 1, vec);
+            avec->addAlignment(1, t_size - min(t_size, p_size) + 1, vec);
         }
     };
     ///@}
@@ -515,42 +515,42 @@ namespace ymir {
     // typedef VDJAlignerBase<CDR3AlignerFunctor_V, CDR3AlignerFunctor_D, CDR3AlignerFunctor_J> CDR3NucleotideAligner;
 
 
-    /**
-     * \class AlignmentMatrix
-     */
-    class AlignmentMatrix {
-    public:
+    // /**
+    //  * \class AlignmentMatrix
+    //  */
+    // class AlignmentMatrix {
+    // public:
 
 
-        AlignmentMatrix(seq_len_t nrow, seq_len_t ncol)
-                : _nrow(nrow), _ncol(ncol), _events((nrow+1) * (ncol + 1))
-        {
-            _starts = new bool[nrow * ncol];
-            std::fill(_starts, _starts + nrow * ncol, false);
-        }
+    //     AlignmentMatrix(seq_len_t nrow, seq_len_t ncol)
+    //             : _nrow(nrow), _ncol(ncol), _events((nrow+1) * (ncol + 1))
+    //     {
+    //         _starts = new bool[nrow * ncol];
+    //         std::fill(_starts, _starts + nrow * ncol, false);
+    //     }
 
 
-        ~AlignmentMatrix() {
-            delete [] _starts;
-        }
+    //     ~AlignmentMatrix() {
+    //         delete [] _starts;
+    //     }
 
 
-        alignment_event_t getEvent(seq_len_t row, seq_len_t col) const { return _events[row * _nrow + col]; }
+    //     // alignment_event_t getEvent(seq_len_t row, seq_len_t col) const { return _events[row * _nrow + col]; }
 
 
-        void setEvent(seq_len_t row, seq_len_t col, const alignment_event_t &event) { _events.setEvent(row * _nrow + col, event); }
+    //     void setEvent(seq_len_t row, seq_len_t col, const alignment_event_t &event) { _events.setEvent(row * _nrow + col, event); }
 
 
-        bool is_start(seq_len_t row, seq_len_t col) const { return _starts[row * _nrow + col]; }
+    //     bool is_start(seq_len_t row, seq_len_t col) const { return _starts[row * _nrow + col]; }
 
 
-    private:
+    // private:
 
-        seq_len_t _nrow, _ncol;
-        AlignmentEventVector _events;
-        bool *_starts;
+    //     seq_len_t _nrow, _ncol;
+    //     AlignmentEventVector _events;
+    //     bool *_starts;
 
-    };
+    // };
 
 
     //

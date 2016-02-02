@@ -58,7 +58,7 @@ namespace ymir {
         AlignmentBase(seq_len_t p_start, seq_len_t t_start, events_storage_t &events) 
             : _pattern_start(p_start), 
               _text_start(t_start), 
-              _len(events.size())
+              _size(events.size())
         {
             _events.swap(events);
         }
@@ -70,12 +70,12 @@ namespace ymir {
         seq_len_t text_start() const { return _text_start; }
 
 
-        seq_len_t len() const { return _len; }
+        seq_len_t size() const { return _size; }
 
 
     protected:
 
-        seq_len_t _pattern_start, _text_start, _len;
+        seq_len_t _pattern_start, _text_start, _size;
         events_storage_t _events;
 
 
@@ -101,7 +101,7 @@ namespace ymir {
         NoGapAlignment(seq_len_t p_start, seq_len_t t_start, seq_len_t len) 
             : _pattern_start(p_start), 
               _text_start(t_start), 
-              _len(len)
+              _size(len)
         {
         }
 
@@ -186,7 +186,7 @@ namespace ymir {
         }
 
 
-        seq_len_t len(seq_len_t i) const { 
+        seq_len_t size(seq_len_t i) const { 
 #ifndef DNDEBUG
             if (i*3 + 2 >= _data.size()) {
                 throw(std::runtime_error("Alignment vector: index is out of bounds."));
@@ -225,10 +225,10 @@ namespace ymir {
          * \brief Add a new alignment to the vector.
          */
         ///@{
-        void addAlignment(seq_len_t p_start, seq_len_t t_start, seq_len_t len) {
+        void addAlignment(seq_len_t p_start, seq_len_t t_start, seq_len_t size) {
             _data.push_back(p_start);
             _data.push_back(t_start);
-            _data.push_back(len);
+            _data.push_back(size);
         }
 
         void addAlignment(seq_len_t p_start, seq_len_t t_start, const events_storage_t &vec) {

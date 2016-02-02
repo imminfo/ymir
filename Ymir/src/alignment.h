@@ -73,7 +73,7 @@ namespace ymir {
         seq_len_t len() const { return _len; }
 
 
-    private:
+    protected:
 
         seq_len_t _pattern_start, _text_start, _len;
         events_storage_t _events;
@@ -109,7 +109,7 @@ namespace ymir {
         bool isMismatch(seq_len_t i) const { return _events[i]; }
 
 
-    private:
+    protected:
 
         NoGapAlignment() {}
 
@@ -139,7 +139,7 @@ namespace ymir {
         ///@}
 
 
-    private:
+    protected:
 
         GappedAlignment() {}
 
@@ -202,7 +202,7 @@ namespace ymir {
         }
 
 
-    private:
+    protected:
 
         std::vector<seq_len_t> _data;
         events_storage_t _events;;

@@ -47,26 +47,20 @@ namespace ymir {
     /**
      *
      */
-    struct NoGapAlignment {
+    struct AlignmentBase {
+
+        /**
+         * \typedef events_storage_t
+         */
+        typedef std::vector<bool> events_storage_t;
 
 
-        typedef std::vector<bool> mismatch_storage_t;
-
-
-        NoGapAlignment(seq_len_t p_start, seq_len_t t_start, mismatch_storage_t &errors) 
+        AlignmentBase(seq_len_t p_start, seq_len_t t_start, events_storage_t &events) 
             : _pattern_start(p_start), 
               _text_start(t_start), 
               _len(errors.size())
         {
             _errors.swap(errors);
-        }
-
-
-        NoGapAlignment(seq_len_t p_start, seq_len_t t_start, seq_len_t len) 
-            : _pattern_start(p_start), 
-              _text_start(t_start), 
-              _len(len)
-        {
         }
 
 
@@ -79,33 +73,100 @@ namespace ymir {
         seq_len_t len() const { return _len; }
 
 
+    private:
+
+        seq_len_t _pattern_start, _text_start, _len;
+        events_storage_t _events;
+
+
+        AlignmentBase() {}
+
+    };
+
+
+    /**
+     *
+     */
+    struct NoGapAlignment : public AlignmentBase {
+
+        /**
+         *
+         */
+        NoGapAlignment(seq_len_t p_start, seq_len_t t_start, events_storage_t &events) 
+            : AlignmentBase(p_start, t_start, events)
+        {
+        }
+
+
+        NoGapAlignment(seq_len_t p_start, seq_len_t t_start, seq_len_t len) 
+            : _pattern_start(p_start), 
+              _text_start(t_start), 
+              _len(len)
+        {
+        }
+
+
         bool isMismatch(seq_len_t i) const { return _errors[i]; }
 
 
     private:
-
-        seq_len_t _pattern_start, _text_start, _len;
-        mismatch_storage_t _errors;
-
 
         NoGapAlignment() {}
 
     };
 
 
-    struct NoGapAlignmentVector {
+    /**
+     *
+     */
+    struct GappedAlignment {
 
 
-        typedef std::vector<bool> mismatch_storage_t;
+        GappedAlignment(seq_len_t p_start, seq_len_t t_start, events_storage_t &events) 
+            : AlignmentBase(p_start, t_start, events)
+        {
+        }
+
+
+        ///@{
+        bool isMatch(seq_len_t i) const { return !(_events[i*2] && _events[i*2 + 1]); }
+
+        bool isMismatch(seq_len_t i) const { return !_events[i*2] && _events[i*2 + 1]; }
+
+        bool isIns(seq_len_t i) const { return _events[i*2] && !_events[i*2 + 1]; }
+
+        bool isDel(seq_len_t i) const { return _events[i*2] && _events[i*2 + 1]; }
+        ///@}
+
+
+    private:
+
+        GappedAlignment() {}
+
+    };
+
+
+    /**
+     *
+     */
+    struct AlignmentVectorBase {
+
+
+        typedef std::vector<bool> events_storage_t;
 
             
         static const size_t default_reserve_size = 100;
 
 
+        AlignmentVectorBase() {
+
+        }
+
+
         seq_len_t pattern_start(seq_len_t i) const { 
 #ifndef DNDEBUG
             if (i*3 >= _data.size()) {
-                throw(std::runtime_error("NoGapAlignmentError: index is out of bounds."));
+                throw(std::runtime_error("Alignment vector: index is out of bounds."));
             }
 #endif
             return _data[i*3];
@@ -115,7 +176,7 @@ namespace ymir {
         seq_len_t text_start(seq_len_t i) const {
 #ifndef DNDEBUG
             if (i*3 + 1 >= _data.size()) {
-                throw(std::runtime_error("NoGapAlignmentError: index is out of bounds."));
+                throw(std::runtime_error("Alignment vector: index is out of bounds."));
             }
 #endif
             return _data[i*3 + 1];
@@ -125,7 +186,7 @@ namespace ymir {
         seq_len_t len(seq_len_t i) const { 
 #ifndef DNDEBUG
             if (i*3 + 2 >= _data.size()) {
-                throw(std::runtime_error("NoGapAlignmentError: index is out of bounds."));
+                throw(std::runtime_error("Alignment vector: index is out of bounds."));
             }
 #endif
             return _data[i*3 + 2];
@@ -135,7 +196,7 @@ namespace ymir {
         bool isMismatch(seq_len_t i, seq_len_t j) const { 
 #ifndef DNDEBUG
             if (_starts[i] + j >= _data.size()) {
-                throw(std::runtime_error("NoGapAlignmentError: index is out of bounds."));
+                throw(std::runtime_error("Alignment vector: index is out of bounds."));
             }
 #endif
             return _errors[_starts[i] + j];
@@ -157,68 +218,20 @@ namespace ymir {
     private:
 
         std::vector<seq_len_t> _data;
-        mismatch_storage_t _errors;
+        events_storage_t _events;;
         std::vector<seq_len_t> _starts;
 
     };
 
 
-    struct GappedAlignment {
-
-        /**
-         * \typedef alignment_events_storage_t
-         */
-        typedef std::vector<bool> alignment_events_storage_t;
-
-
-        GappedAlignment(seq_len_t p_start, seq_len_t t_start, alignment_events_storage_t &events) 
-            : _pattern_start(p_start), 
-              _text_start(t_start)
-        {
-            _events.swap(events);
-        }
-
-
-        seq_len_t pattern_start() const { return _pattern_start; }
-
-
-        seq_len_t text_start() const { return _text_start; }
-
-
-        seq_len_t len() const { return _events.size() / 2; }
-
-
-        ///@{
-        bool isMatch(seq_len_t i) const { return !(_events[i*2] && _events[i*2 + 1]); }
-
-        bool isMismatch(seq_len_t i) const { return !_events[i*2] && _events[i*2 + 1]; }
-
-        bool isIns(seq_len_t i) const { return _events[i*2] && !_events[i*2 + 1]; }
-
-        bool isDel(seq_len_t i) const { return _events[i*2] && _events[i*2 + 1]; }
-        ///@}
-
-
-    private:
-
-        seq_len_t _pattern_start, _text_start;
-        Events _events;
-
-
-        GappedAlignment() {}
-
-    };
-
-
-
     ///@{
-    inline void add_match(GappedAlignment::alignment_events_storage_t *vec)    { vec->push_back(false); vec->push_back(false); }
+    inline void add_match(GappedAlignment::events_storage_t *vec)    { vec->push_back(false); vec->push_back(false); }
 
-    inline void add_mismatch(GappedAlignment::alignment_events_storage_t *vec) { vec->push_back(false); vec->push_back(true); }
+    inline void add_mismatch(GappedAlignment::events_storage_t *vec) { vec->push_back(false); vec->push_back(true); }
 
-    inline void add_ins(GappedAlignment::alignment_events_storage_t *vec)      { vec->push_back(true);  vec->push_back(false); }
+    inline void add_ins(GappedAlignment::events_storage_t *vec)      { vec->push_back(true);  vec->push_back(false); }
 
-    inline void add_del(GappedAlignment::alignment_events_storage_t *vec)      { vec->push_back(true);  vec->push_back(true); }
+    inline void add_del(GappedAlignment::events_storage_t *vec)      { vec->push_back(true);  vec->push_back(true); }
     ///@}
 
 

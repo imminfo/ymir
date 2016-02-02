@@ -58,9 +58,9 @@ namespace ymir {
         AlignmentBase(seq_len_t p_start, seq_len_t t_start, events_storage_t &events) 
             : _pattern_start(p_start), 
               _text_start(t_start), 
-              _len(errors.size())
+              _len(events.size())
         {
-            _errors.swap(errors);
+            _events.swap(events);
         }
 
 
@@ -106,7 +106,7 @@ namespace ymir {
         }
 
 
-        bool isMismatch(seq_len_t i) const { return _errors[i]; }
+        bool isMismatch(seq_len_t i) const { return _events[i]; }
 
 
     private:
@@ -155,11 +155,14 @@ namespace ymir {
         typedef std::vector<bool> events_storage_t;
 
             
-        static const size_t default_reserve_size = 100;
+        static const size_t default_start_reserve_size = 20;
+
+        static const size_t default_events_reserve_size = 600;
 
 
         AlignmentVectorBase() {
-
+            _start.reserve(default_start_reserve_size);
+            _events.reserve(default_events_reserve_size);
         }
 
 
@@ -193,25 +196,9 @@ namespace ymir {
         }
 
 
-        bool isMismatch(seq_len_t i, seq_len_t j) const { 
-#ifndef DNDEBUG
-            if (_starts[i] + j >= _data.size()) {
-                throw(std::runtime_error("Alignment vector: index is out of bounds."));
-            }
-#endif
-            return _errors[_starts[i] + j];
-        }
-
-
-        void addAlignment(const mismatch_storage_t &vec) {
-            _starts.push_back(_errors.size());
-            _errors.insert(_errors.end(), vec.begin(), vec.end());
-        }
-
-
         void finish() {
             _data.reserve(_data.size() + 1);
-            _errors.reserve(_errors.size() + 1);
+            _events.reserve(_events.size() + 1);
         }
 
 
@@ -224,6 +211,116 @@ namespace ymir {
     };
 
 
+    /**
+     *
+     */
+    struct NoGapAlignmentVector : public AlignmentVectorBase {
+
+        NoGapAlignmentVector() : AlignmentVectorBase() {
+
+        }
+
+
+        /**
+         * \brief Add a new alignment to the vector.
+         */
+        ///@{
+        void addAlignment(seq_len_t p_start, seq_len_t t_start, seq_len_t len) {
+            _data.push_back(p_start);
+            _data.push_back(t_start);
+            _data.push_back(len);
+        }
+
+        void addAlignment(seq_len_t p_start, seq_len_t t_start, const mismatch_storage_t &vec) {
+            _data.push_back(p_start);
+            _data.push_back(t_start);
+            _data.push_back(vec.size());
+            _starts.push_back(_events.size());
+            _events.insert(_events.end(), vec.begin(), vec.end());
+        }
+        ///@}
+
+
+        bool isMismatch(seq_len_t i, seq_len_t j) const { 
+#ifndef DNDEBUG
+            if (_starts[i] + j >= _events.size()) {
+                throw(std::runtime_error("Alignment vector: index is out of bounds."));
+            }
+#endif
+            return _events[_starts[i] + j];
+        }
+
+    };
+
+
+    /**
+     *
+     */
+    struct GappedAlignmentVector : public AlignmentVectorBase {
+
+
+        GappedAlignmentVector() : AlignmentVectorBase() {
+
+        }
+
+
+        void addAlignment(seq_len_t p_start, seq_len_t t_start, const mismatch_storage_t &vec) {
+            _data.push_back(p_start);
+            _data.push_back(t_start);
+            _data.push_back(vec.size());
+            _starts.push_back(_events.size());
+            _events.insert(_events.end(), vec.begin(), vec.end());
+        }
+
+
+        /**
+         * \brief Check if a some alignment has a specific events at a specific position.
+         */
+        ///@{
+        bool isMatch(seq_len_t i, seq_len_t j) const { 
+#ifndef DNDEBUG
+            if (_starts[i] + j*2 + 1 >= _events.size()) {
+                throw(std::runtime_error("Alignment vector: index is out of bounds."));
+            }
+#endif
+            return !(_events[_starts[i] + j*2] && _events[_starts[i] + j*2 + 1]);
+        }
+
+        bool isMismatch(seq_len_t i, seq_len_t j) const { 
+#ifndef DNDEBUG
+            if (_starts[i] + j*2 + 1 >= _events.size()) {
+                throw(std::runtime_error("Alignment vector: index is out of bounds."));
+            }
+#endif
+            return !_events[_starts[i] + j*2] && _events[_starts[i] + j*2 + 1];
+        }
+
+        bool isIns(seq_len_t i, seq_len_t j) const { 
+#ifndef DNDEBUG
+            if (_starts[i] + j*2 + 1 >= _events.size()) {
+                throw(std::runtime_error("Alignment vector: index is out of bounds."));
+            }
+#endif
+            return _events[_starts[i] + j*2] && !_events[_starts[i] + j*2 + 1];
+        }
+
+        bool isDel(seq_len_t i, seq_len_t j) const { 
+#ifndef DNDEBUG
+            if (_starts[i] + j*2 + 1 >= _events.size()) {
+                throw(std::runtime_error("Alignment vector: index is out of bounds."));
+            }
+#endif
+            return _events[_starts[i] + j*2] && _events[_starts[i] + j*2 + 1];
+        }
+        ///@}
+
+    };
+
+
+    /**
+     * \brief A set of functions to modify the vector with various alignment events:
+     * matches, mismatches, insertions or deletions.
+     */
     ///@{
     inline void add_match(GappedAlignment::events_storage_t *vec)    { vec->push_back(false); vec->push_back(false); }
 

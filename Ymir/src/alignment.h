@@ -342,6 +342,16 @@ namespace ymir {
     inline void add_del(AlignmentVectorBase::events_storage_t *vec)      { vec->push_back(true);  vec->push_back(true); }
     ///@}
 
+
+    struct VDJAlignment {
+
+    protected:
+
+        seg_index_t _segments;
+        NoGapAlignmentVector _alignments;
+
+    };
+
 }
 
 #endif

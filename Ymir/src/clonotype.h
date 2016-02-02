@@ -25,9 +25,7 @@
 #define _CLONOTYPE_H
 
 
-#include "types.h"
-
-#include "vector"
+#include "alignment.h"
 
 
 namespace ymir {
@@ -282,6 +280,9 @@ namespace ymir {
                                  /// for alignments for each aligned gene segment.
 
         seq_len_t *_n_D_alignments; //* Number of aligned D gene segments (i.e., 3-tuples); vector's length == _segments[2] */
+
+
+        // NoGapAlignmentVector _alignments;
 
 
         /**

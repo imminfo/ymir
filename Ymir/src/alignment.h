@@ -345,10 +345,70 @@ namespace ymir {
 
     struct VDJAlignment {
 
+        /**
+         * \brief Move constructor for _segments, _alignments and _n_D_alignments.
+         */
+        VDJAlignment(NoGapAlignmentVector &&alignments) 
+        {
+        }
+
+
+        VDJAlignment(const VDJAlignment &other) {
+
+        }
+
+
+        VDJAlignment& operator=(const VDJAlignment &other) {
+
+        }
+
+
+        virtual ~VDJAlignment() {
+
+        }
+
+
+        /** 
+         * \brief Get the number of alignments for the specific gene.
+         */
+        ///@{
+        seg_index_t nVar() const { return _segments[0]; }
+
+        seg_index_t nJoi() const { return _segments[1]; }
+
+        seg_index_t nDiv() const { return _segments[2]; }
+        ///@}
+
+
+        /**
+         * \brief Get the index of the aligned gene segment for the specific gene.
+         */
+        ///@{
+        seg_index_t getVar(size_t index) const { return _segments[3 + index]; }
+
+        seg_index_t getJoi(size_t index) const { return _segments[3 + _segments[0] + index]; }
+
+        seg_index_t getDiv(size_t index) const { return _segments[3 + _segments[0] + _segments[1] + index]; }
+        ///@}
+
+
+        seq_len_t numDivAlignments(seg_index_t index) const {
+            if (_n_D_alignments) {
+                return _n_D_alignments[index];
+            } else {
+                return 0;
+            }
+        }
+
     protected:
 
-        seg_index_t _segments;
-        NoGapAlignmentVector _alignments;
+        unique_ptr<seg_index_t[]> _segments;  /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
+                                              /// vector of indices of segments, aligned on this clone: V1--V2--V3--J1--J2--D1--D2--...
+        NoGapAlignmentVector _alignments;  /// Vector of alignments for segments, in order: V--J--D.
+        unique_ptr<seq_len_t[]> _n_D_alignments;  /// Number of alignments for each D gene segment; vector's length == _segments[2]
+
+
+        VDJAlignment();
 
     };
 

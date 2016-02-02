@@ -26,6 +26,7 @@
 
 
 #include "clonotype.h"
+#include "vdj_alignment_builder.h"
 
 
 namespace ymir {
@@ -38,7 +39,7 @@ namespace ymir {
     /**
     * \class ClonotypeBuilder
     */
-    class ClonotypeBuilder : protected Clonotype {
+    class ClonotypeBuilder : protected Clonotype, public VDJAlignmentBuilder {
     public:
 
         ClonotypeBuilder() {

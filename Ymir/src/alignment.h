@@ -81,6 +81,14 @@ namespace ymir {
 
         AlignmentBase() {}
 
+
+        AlignmentBase(seq_len_t p_start, seq_len_t t_start, seq_len_t len) 
+            : _pattern_start(p_start), 
+              _text_start(t_start), 
+              _len(len)
+        {
+        }
+
     };
 
 
@@ -99,9 +107,7 @@ namespace ymir {
 
 
         NoGapAlignment(seq_len_t p_start, seq_len_t t_start, seq_len_t len) 
-            : _pattern_start(p_start), 
-              _text_start(t_start), 
-              _len(len)
+            : AlignmentBase(p_start, t_start, len)
         {
         }
 

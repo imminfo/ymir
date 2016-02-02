@@ -44,7 +44,11 @@ namespace ymir {
     typedef int16_t alignment_score_t;
 
 
+    /**
+     *
+     */
     struct NoGapAlignment {
+
 
         typedef std::vector<bool> mismatch_storage_t;
 
@@ -91,22 +95,70 @@ namespace ymir {
 
     struct NoGapAlignmentVector {
 
-        // reserve
 
-        seq_len_t pattern_start(seq_len_t i) const {}
+        typedef std::vector<bool> mismatch_storage_t;
 
-        seq_len_t text_start(seq_len_t i) const {}
+            
+        static const size_t default_reserve_size = 100;
 
-        seq_len_t len(seq_len_t i) const { return _len; }
 
-        bool isMismatch(seq_len_t i, seq_len_t j) const { return _errors[j]; }
+        seq_len_t pattern_start(seq_len_t i) const { 
+#ifndef DNDEBUG
+            if (i*3 >= _data.size()) {
+                throw(std::runtime_error("NoGapAlignmentError: index is out of bounds."));
+            }
+#endif
+            return _data[i*3];
+        }
 
-        void addAlignment() {}
 
-        void finish();
+        seq_len_t text_start(seq_len_t i) const {
+#ifndef DNDEBUG
+            if (i*3 + 1 >= _data.size()) {
+                throw(std::runtime_error("NoGapAlignmentError: index is out of bounds."));
+            }
+#endif
+            return _data[i*3 + 1];
+        }
+
+
+        seq_len_t len(seq_len_t i) const { 
+#ifndef DNDEBUG
+            if (i*3 + 2 >= _data.size()) {
+                throw(std::runtime_error("NoGapAlignmentError: index is out of bounds."));
+            }
+#endif
+            return _data[i*3 + 2];
+        }
+
+
+        bool isMismatch(seq_len_t i, seq_len_t j) const { 
+#ifndef DNDEBUG
+            if (_starts[i] + j >= _data.size()) {
+                throw(std::runtime_error("NoGapAlignmentError: index is out of bounds."));
+            }
+#endif
+            return _errors[_starts[i] + j];
+        }
+
+
+        void addAlignment(const mismatch_storage_t &vec) {
+            _starts.push_back(_errors.size());
+            _errors.insert(_errors.end(), vec.begin(), vec.end());
+        }
+
+
+        void finish() {
+            _data.reserve(_data.size() + 1);
+            _errors.reserve(_errors.size() + 1);
+        }
+
 
     private:
 
+        std::vector<seq_len_t> _data;
+        mismatch_storage_t _errors;
+        std::vector<seq_len_t> _starts;
 
     };
 
@@ -131,6 +183,9 @@ namespace ymir {
 
 
         seq_len_t text_start() const { return _text_start; }
+
+
+        seq_len_t len() const { return _events.size() / 2; }
 
 
         ///@{

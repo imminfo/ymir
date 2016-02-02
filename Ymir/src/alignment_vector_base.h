@@ -53,9 +53,10 @@ namespace ymir {
         }
 
 
-        // waiting until C++14 ?
+        // waiting until C++14 for full support?
         AlignmentVectorBase(AlignmentVectorBase &&other) 
-            : _events(std::move(other._events)), 
+            : _data(std::move(other._data)),
+              _events(std::move(other._events)), 
               _starts(std::move(other._starts))
         {
         }
@@ -70,6 +71,12 @@ namespace ymir {
 
         size_t size() const { 
             return _data.size() / 3;
+        }
+
+
+        void finish() {
+            _data.reserve(_data.size() + 1);
+            _events.reserve(_events.size() + 1);
         }
 
 
@@ -103,16 +110,10 @@ namespace ymir {
         }
 
 
-        void finish() {
-            _data.reserve(_data.size() + 1);
-            _events.reserve(_events.size() + 1);
-        }
-
-
     protected:
 
-        std::vector<seq_len_t> _data;
-        events_storage_t _events;;
+        std::vector<seq_len_t> _data;  /// Vector of 4-tpuples (???) - pattern start, text start, alignment length and a text ID.
+        events_storage_t _events;
         std::vector<size_t> _starts;
 
     };

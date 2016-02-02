@@ -33,10 +33,22 @@ namespace ymir {
 
     struct VDJAlignment {
 
+
+        typedef unique_ptr<seg_index_t[]> segments_storage_t;
+
+
+        typedef unique_ptr<seq_len_t[]> n_D_alignments_storage_t;
+
+
         /**
          * \brief Move constructor for _segments, _alignments and _n_D_alignments.
          */
-        VDJAlignment(NoGapAlignmentVector &&alignments) 
+        VDJAlignment(segments_storage_t segments, 
+                     NoGapAlignmentVector &&alignments, 
+                     n_D_alignments_storage_t n_D_alignments) 
+            : _segments(std::move(segments), 
+              _alignments(alignments),
+              _n_D_alignments(std::move(n_D_alignments))
         {
         }
 
@@ -146,12 +158,12 @@ namespace ymir {
 
     protected:
 
-        unique_ptr<seg_index_t[]> _segments;  /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
+        segments_storage_t _segments;  /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
                                               /// vector of indices of segments, aligned on this clone: V1--V2--V3--J1--J2--D1--D2--...
 
         NoGapAlignmentVector _alignments;  /// Vector of alignments for segments.
         
-        unique_ptr<seq_len_t[]> _n_D_alignments;  /// Accumulated number of alignments for each D gene segment;
+        n_D_alignments_storage_t _n_D_alignments;  /// Accumulated number of alignments for each D gene segment;
                                                   /// vector's length == _segments[2] + 1. Number of alignments for i-th
                                                   /// gene is equal to v[i+1] - v[i].
 

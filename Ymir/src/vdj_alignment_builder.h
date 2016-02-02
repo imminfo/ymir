@@ -50,22 +50,14 @@ namespace ymir {
 
 
         /**
-         * \brief Interface to add alignments to the builder.
+         * \brief Add singular alignments to the builder.
          */
         ///@{
         VDJAlignmentBuilder& addVarAlignment(seg_index_t vseg, seq_len_t vstart, seq_len_t seqstart, seq_len_t alignment_len) {
-            _Vseg.push_back(vseg);
-            _Valign.push_back(vstart);
-            _Valign.push_back(seqstart);
-            _Valign.push_back(alignment_len);
+            _Valign.addAlignment(vseg, vstart, seqstart, alignment_len);
             return *this;
         }
 
-
-        VDJAlignmentBuilder& addVarAlignment(const NoGapAlignmentVector &vec) {
-            _Valign.extend(vec);
-            return *this;
-        }
 
         VDJAlignmentBuilder& addJoiAlignment(seg_index_t jseg, seq_len_t jstart, seq_len_t seqstart, seq_len_t alignment_len) {
             _Jseg.push_back(jseg);
@@ -88,6 +80,17 @@ namespace ymir {
             _Dalign.push_back(dstart);
             _Dalign.push_back(seqstart);
             _Dalign.push_back(alignment_len);
+            return *this;
+        }
+        ///@}
+
+
+        /**
+         * \brief Add vectors of alignments to the builder.
+         */
+        ///@{
+        VDJAlignmentBuilder& addVarAlignment(const NoGapAlignmentVector &vec) {
+            _Valign.extend(vec);
             return *this;
         }
         ///@}

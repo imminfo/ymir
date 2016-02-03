@@ -70,7 +70,7 @@ namespace ymir {
 
 
         size_t size() const { 
-            return _data.size() / 3;
+            return _data.size() / 4;
         }
 
 
@@ -82,37 +82,47 @@ namespace ymir {
 
         seq_len_t pattern_start(seq_len_t i) const { 
 #ifndef DNDEBUG
-            if (i*3 >= _data.size()) {
+            if (i*4 >= _data.size()) {
                 throw(std::runtime_error("Alignment vector: index is out of bounds."));
             }
 #endif
-            return _data[i*3];
+            return _data[i*4];
         }
 
 
         seq_len_t text_start(seq_len_t i) const {
 #ifndef DNDEBUG
-            if (i*3 + 1 >= _data.size()) {
+            if (i*4 + 1 >= _data.size()) {
                 throw(std::runtime_error("Alignment vector: index is out of bounds."));
             }
 #endif
-            return _data[i*3 + 1];
+            return _data[i*4 + 1];
         }
 
 
         seq_len_t len(seq_len_t i) const { 
 #ifndef DNDEBUG
-            if (i*3 + 2 >= _data.size()) {
+            if (i*4 + 2 >= _data.size()) {
                 throw(std::runtime_error("Alignment vector: index is out of bounds."));
             }
 #endif
-            return _data[i*3 + 2];
+            return _data[i*4 + 2];
+        }
+
+
+        seq_len_t id(seq_len_t i) const { 
+#ifndef DNDEBUG
+            if (i*4 + 3 >= _data.size()) {
+                throw(std::runtime_error("Alignment vector: index is out of bounds."));
+            }
+#endif
+            return _data[i*4 + 3];
         }
 
 
     protected:
 
-        std::vector<seq_len_t> _data;  /// Vector of 4-tpuples (???) - pattern start, text start, alignment length and a text ID.
+        std::vector<seq_len_t> _data;  /// Vector of 4-tpuples - pattern start, text start, alignment length and a text ID.
         events_storage_t _events;
         std::vector<size_t> _starts;
 

@@ -55,14 +55,14 @@ namespace ymir {
         }
 
 
-        VDJAlignment(const VDJAlignment &other) {
+        // VDJAlignment(const VDJAlignment &other) {
 
-        }
+        // }
 
 
-        VDJAlignment& operator=(const VDJAlignment &other) {
+        // VDJAlignment& operator=(const VDJAlignment &other) {
 
-        }
+        // }
 
 
         virtual ~VDJAlignment()

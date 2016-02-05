@@ -54,12 +54,12 @@ namespace ymir {
 
 
         // waiting until C++14 for full support?
-        AlignmentVectorBase(AlignmentVectorBase &&other) 
-            : _data(std::move(other._data)),
-              _events(std::move(other._events)), 
-              _starts(std::move(other._starts))
-        {
-        }
+        // AlignmentVectorBase(AlignmentVectorBase &&other) 
+        //     : _data(std::move(other._data)),
+        //       _events(std::move(other._events)), 
+        //       _starts(std::move(other._starts))
+        // {
+        // }
 
 
         void extend(const AlignmentVectorBase &other) {

@@ -47,10 +47,10 @@ namespace ymir {
 
 
         VDJAlignment build() {
-            segments_storage_t segments;
-            segments[0] = _segments[0];
-            segments[1] = _segments[1];
-            segments[2] = _segments[2];
+            // segments_storage_t segments;
+            // segments[0] = _segments[0];
+            // segments[1] = _segments[1];
+            // segments[2] = _segments[2];
 
             n_D_alignments_storage_t nDs(new seq_len_t[_n_Dalign.size()]);
             std::copy(nDs, _n_Dalign.begin(), _n_Dalign.end());
@@ -64,7 +64,7 @@ namespace ymir {
             _Jalign.clear();
             _Dalign.clear();
 
-            return VDJAlignment(segments, avec, nDs);
+            return VDJAlignment(std::move(_segments), std::move(avec), std::move(nDs));
         }
 
 

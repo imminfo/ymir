@@ -25,6 +25,8 @@
 #define _VDJ_ALIGNMENT_H_
 
 
+#include <array>
+
 #include "nogap_alignment_vector.h"
 
 
@@ -34,7 +36,7 @@ namespace ymir {
     struct VDJAlignment {
 
 
-        typedef seg_index_t[3] segments_storage_t;
+        typedef std::array<seg_index_t, 3> segments_storage_t;
 
 
         typedef unique_ptr<seq_len_t[]> n_D_alignments_storage_t;
@@ -43,7 +45,7 @@ namespace ymir {
         /**
          * \brief Move constructor for _segments, _alignments and _n_D_alignments.
          */
-        VDJAlignment(segments_storage_t segments, 
+        VDJAlignment(segments_storage_t &&segments, 
                      NoGapAlignmentVector &&alignments, 
                      n_D_alignments_storage_t n_D_alignments) 
             : _segments(std::move(segments)), 

@@ -34,7 +34,7 @@ namespace ymir {
     struct VDJAlignment {
 
 
-        typedef unique_ptr<seg_index_t[]> segments_storage_t;
+        typedef unique_ptr<seg_index_t[3]> segments_storage_t;
 
 
         typedef unique_ptr<seq_len_t[]> n_D_alignments_storage_t;
@@ -46,7 +46,7 @@ namespace ymir {
         VDJAlignment(segments_storage_t segments, 
                      NoGapAlignmentVector &&alignments, 
                      n_D_alignments_storage_t n_D_alignments) 
-            : _segments(std::move(segments), 
+            : _segments(std::move(segments)), 
               _alignments(alignments),
               _n_D_alignments(std::move(n_D_alignments))
         {
@@ -84,11 +84,11 @@ namespace ymir {
          * \brief Get the index of the aligned gene segment for the specific gene.
          */
         ///@{
-        seg_index_t getVar(size_t index) const { return _segments[3 + index]; }
+        seg_index_t getVar(size_t index) const { return _alignments.id(index); }
 
-        seg_index_t getJoi(size_t index) const { return _segments[3 + _segments[0] + index]; }
+        seg_index_t getJoi(size_t index) const { return _alignments.id(_segments[0] + index); }
 
-        seg_index_t getDiv(size_t index) const { return _segments[3 + _segments[0] + _segments[1] + index]; }
+        seg_index_t getDiv(size_t index) const { return _alignments.id(_segments[0] + _segments[1] + index); }
         ///@}
 
 
@@ -164,8 +164,8 @@ namespace ymir {
         NoGapAlignmentVector _alignments;  /// Vector of alignments for segments.
         
         n_D_alignments_storage_t _n_D_alignments;  /// Accumulated number of alignments for each D gene segment;
-                                                  /// vector's length == _segments[2] + 1. Number of alignments for i-th
-                                                  /// gene is equal to v[i+1] - v[i].
+                                                   /// vector's length == _segments[2] + 1. Number of alignments for i-th
+                                                   /// gene is equal to v[i+1] - v[i].
 
 
         VDJAlignment();

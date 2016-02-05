@@ -1188,7 +1188,7 @@ YMIR_TEST_START(test_nogap_alignment_vector_no_err)
 
     YMIR_ASSERT2(vec.size(), 0)
 
-    vec.addAlignment(1, 2, 3, 11);
+    vec.addAlignment(11, 1, 2, 3);
 
     YMIR_ASSERT2(vec.size(), 1)
     YMIR_ASSERT2(vec.pattern_start(0), 1)
@@ -1196,7 +1196,7 @@ YMIR_TEST_START(test_nogap_alignment_vector_no_err)
     YMIR_ASSERT2(vec.len(0), 3)
     YMIR_ASSERT2(vec.id(0), 11)
 
-    vec.addAlignment(4, 5, 6, 14);
+    vec.addAlignment(14, 4, 5, 6);
 
     YMIR_ASSERT2(vec.size(), 2)
     YMIR_ASSERT2(vec.pattern_start(0), 1)
@@ -1209,7 +1209,7 @@ YMIR_TEST_START(test_nogap_alignment_vector_no_err)
     YMIR_ASSERT2(vec.len(1), 6)
     YMIR_ASSERT2(vec.id(1), 14)
 
-    vec.addAlignment(8, 9, 10, 18);
+    vec.addAlignment(18, 8, 9, 10);
 
     YMIR_ASSERT2(vec.size(), 3)
     YMIR_ASSERT2(vec.pattern_start(1), 4)
@@ -1233,7 +1233,7 @@ YMIR_TEST_START(test_nogap_alignment_vector_errors)
 
     AlignmentVectorBase::events_storage_t events1 {false, true, true};
 
-    vec.addAlignment(1, 2, events1, 11);
+    vec.addAlignment(11, 1, 2, events1);
     YMIR_ASSERT2(vec.size(), 1)
     YMIR_ASSERT2(vec.pattern_start(0), 1)
     YMIR_ASSERT2(vec.text_start(0), 2)
@@ -1245,7 +1245,7 @@ YMIR_TEST_START(test_nogap_alignment_vector_errors)
 
     AlignmentVectorBase::events_storage_t events2 {false, false, true, false};
 
-    vec.addAlignment(3, 4, events2, 13);
+    vec.addAlignment(13, 3, 4, events2);
     YMIR_ASSERT2(vec.size(), 2)
     YMIR_ASSERT2(vec.pattern_start(0), 1)
     YMIR_ASSERT2(vec.text_start(0), 2)
@@ -1280,11 +1280,12 @@ YMIR_TEST_START(test_gapped_alignment_vector)
     add_ins(&events1);
     add_ins(&events1);
 
-    vec.addAlignment(1, 2, events1);
+    vec.addAlignment(11, 1, 2, events1);
     YMIR_ASSERT2(vec.size(), 1)
     YMIR_ASSERT2(vec.pattern_start(0), 1)
     YMIR_ASSERT2(vec.text_start(0), 2)
     YMIR_ASSERT2(vec.len(0), 3)
+    YMIR_ASSERT2(vec.id(0), 11)
     YMIR_ASSERT(vec.isMatch(0, 1))
     YMIR_ASSERT(vec.isMismatch(0, 2))
     YMIR_ASSERT(vec.isIns(0, 3))
@@ -1298,11 +1299,12 @@ YMIR_TEST_START(test_gapped_alignment_vector)
     add_del(&events2);
     add_del(&events2);
 
-    vec.addAlignment(3, 4, events2);
+    vec.addAlignment(14, 3, 4, events2);
     YMIR_ASSERT2(vec.size(), 2)
     YMIR_ASSERT2(vec.pattern_start(0), 1)
     YMIR_ASSERT2(vec.text_start(0), 2)
     YMIR_ASSERT2(vec.len(0), 3)
+    YMIR_ASSERT2(vec.id(0), 11)
     YMIR_ASSERT(vec.isMatch(0, 1))
     YMIR_ASSERT(vec.isMismatch(0, 2))
     YMIR_ASSERT(vec.isIns(0, 3))
@@ -1311,6 +1313,7 @@ YMIR_TEST_START(test_gapped_alignment_vector)
     YMIR_ASSERT2(vec.pattern_start(1), 3)
     YMIR_ASSERT2(vec.text_start(1), 4)
     YMIR_ASSERT2(vec.len(1), 5)
+    YMIR_ASSERT2(vec.id(1), 14)
     YMIR_ASSERT(vec.isMismatch(1, 1))
     YMIR_ASSERT(vec.isIns(1, 2))
     YMIR_ASSERT(vec.isMatch(1, 3))

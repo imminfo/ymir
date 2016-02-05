@@ -80,6 +80,13 @@ namespace ymir {
         }
 
 
+        void clear() {
+            _data.clear();
+            _starts.clear();
+            _events.clear();
+        }
+
+
         seq_len_t pattern_start(seq_len_t i) const { 
 #ifndef DNDEBUG
             if (i*4 >= _data.size()) {

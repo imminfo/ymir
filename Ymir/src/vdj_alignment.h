@@ -34,7 +34,7 @@ namespace ymir {
     struct VDJAlignment {
 
 
-        typedef unique_ptr<seg_index_t[3]> segments_storage_t;
+        typedef seg_index_t[3] segments_storage_t;
 
 
         typedef unique_ptr<seq_len_t[]> n_D_alignments_storage_t;
@@ -47,7 +47,7 @@ namespace ymir {
                      NoGapAlignmentVector &&alignments, 
                      n_D_alignments_storage_t n_D_alignments) 
             : _segments(std::move(segments)), 
-              _alignments(alignments),
+              _alignments(std::move(alignments)),
               _n_D_alignments(std::move(n_D_alignments))
         {
         }

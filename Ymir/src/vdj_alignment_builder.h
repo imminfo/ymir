@@ -47,7 +47,7 @@ namespace ymir {
 
 
         VDJAlignment&& build() {
-            segments_storage_t segments(3);
+            segments_storage_t segments;
             segments[0] = _segments[0];
             segments[1] = _segments[1];
             segments[2] = _segments[2];

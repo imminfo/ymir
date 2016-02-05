@@ -57,7 +57,7 @@ namespace ymir {
         }
 
 
-        void addAlignment(seq_len_t p_start, seq_len_t t_start, const events_storage_t &vec, seg_index_t id) {
+        void addAlignment(seg_index_t id, seq_len_t p_start, seq_len_t t_start, const events_storage_t &vec) {
             _data.push_back(p_start);
             _data.push_back(t_start);
             _data.push_back(vec.size());

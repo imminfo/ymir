@@ -44,14 +44,14 @@ namespace ymir {
          * \brief Add a new alignment to the vector.
          */
         ///@{
-        void addAlignment(seq_len_t p_start, seq_len_t t_start, seq_len_t size, seg_index_t id) {
+        void addAlignment(seg_index_t id, seq_len_t p_start, seq_len_t t_start, seq_len_t size) {
             _data.push_back(p_start);
             _data.push_back(t_start);
             _data.push_back(size);
-            _data.push_back(i);
+            _data.push_back(id);
         }
 
-        void addAlignment(seq_len_t p_start, seq_len_t t_start, const events_storage_t &vec, seg_index_t id) {
+        void addAlignment(seg_index_t id, seq_len_t p_start, seq_len_t t_start, const events_storage_t &vec) {
             _data.push_back(p_start);
             _data.push_back(t_start);
             _data.push_back(vec.size());

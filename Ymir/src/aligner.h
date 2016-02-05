@@ -438,7 +438,7 @@ namespace ymir {
                 }
             }
 
-            avec->addAlignment(0, 0, 1, t_size - min(t_size, p_size) + 1, vec);
+            avec->addAlignment(0, 1, t_size - min(t_size, p_size) + 1, vec);
         }
     };
     ///@}

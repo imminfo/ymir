@@ -170,7 +170,7 @@ namespace ymir {
                                                    /// gene is equal to v[i+1] - v[i].
 
 
-        VDJAlignment();
+        VDJAlignment() {}
 
     };
 

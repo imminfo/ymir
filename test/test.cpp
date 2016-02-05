@@ -1374,11 +1374,15 @@ YMIR_TEST_START(test_vdj_alignment_simple_vj)
     YMIR_ASSERT2(algn.nJoi(), 3)
     YMIR_ASSERT2(algn.nDiv(), 0)
 
-
+    std::cout << "1" << std::endl;
     YMIR_ASSERT2(algn.getVar(0), 11)
+    std::cout << "2" << std::endl;    
     YMIR_ASSERT2(algn.getVar(1), 12)
+    std::cout << "3" << std::endl;    
     YMIR_ASSERT2(algn.getJoi(0), 31)
+    std::cout << "4" << std::endl;    
     YMIR_ASSERT2(algn.getJoi(1), 33)
+    std::cout << "5" << std::endl;    
     YMIR_ASSERT2(algn.getJoi(2), 35)
 
     std::cout << "var" << std::endl;

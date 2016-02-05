@@ -1267,8 +1267,8 @@ YMIR_TEST_START(test_nogap_alignment_vector_errors)
 
     NoGapAlignmentVector vec2;
 
-    AlignmentVectorBase::events_storage_t events1 {true, false, true, false};
-    vec2.addAlignment(21, 5, 6, events1);
+    AlignmentVectorBase::events_storage_t events3 {true, false, true, false};
+    vec2.addAlignment(21, 5, 6, events3);
 
     vec.extend(vec2);
     YMIR_ASSERT2(vec.size(), 3)

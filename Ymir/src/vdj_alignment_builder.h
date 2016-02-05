@@ -93,6 +93,16 @@ namespace ymir {
             _Valign.extend(vec);
             return *this;
         }
+
+        VDJAlignmentBuilder& addJoiAlignment(const NoGapAlignmentVector &vec) {
+            _Jalign.extend(vec);
+            return *this;
+        }
+
+        VDJAlignmentBuilder& addDivAlignment(const NoGapAlignmentVector &vec) {
+            _Dalign.extend(vec);
+            return *this;
+        }
         ///@}
 
 

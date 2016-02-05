@@ -126,7 +126,7 @@ namespace ymir {
     protected:
 
         NoGapAlignmentVector _Valign, _Jalign, _Dalign;
-        std::vector<seg_index_t> _n_Dalign;
+        std::vector<seg_index_t> _n_Dalign, _Dseg;
 
     };
 

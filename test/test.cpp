@@ -1327,13 +1327,19 @@ YMIR_TEST_START(test_vdj_alignment_simple_vj)
 
     VDJAlignmentBuilder builder;
 
+    std::cout << "!!!" << std::endl;
+
     builder.addVarAlignment(11, 1, 2, 3)
            .addVarAlignment(12, 4, 5, 6)
            .addJoiAlignment(31, 7, 8, 9)
            .addJoiAlignment(33, 10, 11, 12)
            .addJoiAlignment(35, 13, 14, 15);
 
+    std::cout << "???" << std::endl;
+
     VDJAlignment algn = builder.build();
+
+    std::cout << "~~~" << std::endl;
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)

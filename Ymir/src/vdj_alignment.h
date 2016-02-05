@@ -42,12 +42,22 @@ namespace ymir {
         typedef std::vector<seq_len_t> n_D_alignments_storage_t;
 
 
+        VDJAlignment(const segments_storage_t &segments, 
+                     const NoGapAlignmentVector &alignments, 
+                     const n_D_alignments_storage_t &n_D_alignments) 
+            : _segments(segments), 
+              _alignments(alignments),
+              _n_D_alignments(n_D_alignments)
+        {
+        }
+
+
         /**
          * \brief Move constructor for _segments, _alignments and _n_D_alignments.
          */
         VDJAlignment(segments_storage_t &&segments, 
                      NoGapAlignmentVector &&alignments, 
-                     n_D_alignments_storage_t n_D_alignments) 
+                     n_D_alignments_storage_t &&n_D_alignments) 
             : _segments(std::move(segments)), 
               _alignments(std::move(alignments)),
               _n_D_alignments(std::move(n_D_alignments))

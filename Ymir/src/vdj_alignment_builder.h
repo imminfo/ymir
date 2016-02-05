@@ -69,7 +69,8 @@ namespace ymir {
             _Dalign.clear();
 
             // return std::move(VDJAlignment(std::move(segments), std::move(avec), std::move(nDs)));
-            return VDJAlignment(std::move(segments), std::move(avec), std::move(nDs));
+            // return VDJAlignment(std::move(segments), std::move(avec), std::move(nDs));
+            return VDJAlignment(segments, avec, nDs);
         }
 
 

@@ -1377,7 +1377,7 @@ YMIR_TEST_START(test_vdj_alignment_simple_vdj)
            .addDivAlignment(41, 23, 24, 25)
            .addDivAlignment(45, 30, 31, 32)
            .addDivAlignment(45, 33, 34, 35)
-           .addDivAlignment(45, 36, 37, 38)
+           .addDivAlignment(45, 36, 37, 38);
 
     VDJAlignment algn = builder.build();
 
@@ -1434,10 +1434,10 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
 
     NoGapAlignmentVector vec1;
     AlignmentVectorBase::events_storage_t events11 {false, true, true};
-    vec1.addAlignment(1, 2, events11, 11);
+    vec1.addAlignment(11, 1, 2, events11);
     AlignmentVectorBase::events_storage_t events12 {false, false, true, 
                                                     true, true, false};
-    vec1.addAlignment(4, 5, events12, 12);
+    vec1.addAlignment(12, 4, 5, events12);
 
 
     // J
@@ -1446,12 +1446,12 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
     AlignmentVectorBase::events_storage_t events21 {false, true, true, 
                                                     false, true, true, 
                                                     false, true, true};
-    vec2.addAlignment(7, 8, events21, 31);
+    vec2.addAlignment(31, 7, 8, events21);
     AlignmentVectorBase::events_storage_t events22 {true, false, true, 
                                                     true, true, false, 
                                                     false, false, true, 
                                                     true, true, false};
-    vec2.addAlignment(10, 11, events22, 33);
+    vec2.addAlignment(33, 10, 11, events22);
 
     NoGapAlignmentVector vec3;
     AlignmentVectorBase::events_storage_t events31 {false, true, true, 
@@ -1459,7 +1459,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
                                                     false, true, true,
                                                     false, true, true,
                                                     false, true, true};
-    vec3.addAlignment(13, 14, events21, 35);
+    vec3.addAlignment(35, 13, 14, events21);
 
 
     builder.addVarAlignment(vec1)

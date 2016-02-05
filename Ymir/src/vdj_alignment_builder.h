@@ -24,6 +24,7 @@
 #ifndef _VDJ_ALIGNMENT_BUILDER_H_
 #define _VDJ_ALIGNMENT_BUILDER_H_
 
+#include <iostream>
 
 #include "vdj_alignment.h"
 
@@ -36,8 +37,9 @@ namespace ymir {
         /**
          * \brief Move constructor for _segments, _alignments and _n_D_alignments.
          */
-        VDJAlignmentBuilder() 
+        VDJAlignmentBuilder()
         {
+            _segments.fill(0);
         }
 
 
@@ -59,6 +61,8 @@ namespace ymir {
             avec.extend(_Valign);
             avec.extend(_Jalign);
             avec.extend(_Dalign);
+
+            std::cout << (int) avec.size() << std::endl;
 
             _Valign.clear();
             _Jalign.clear();

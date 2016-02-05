@@ -1239,9 +1239,9 @@ YMIR_TEST_START(test_nogap_alignment_vector_errors)
     YMIR_ASSERT2(vec.text_start(0), 2)
     YMIR_ASSERT2(vec.len(0), 3)
     YMIR_ASSERT2(vec.id(0), 11)
-    YMIR_ASSERT2(vec.isMismatch(0, 0), false)
-    YMIR_ASSERT2(vec.isMismatch(0, 1), true)
+    YMIR_ASSERT2(vec.isMismatch(0, 1), false)
     YMIR_ASSERT2(vec.isMismatch(0, 2), true)
+    YMIR_ASSERT2(vec.isMismatch(0, 3), true)
 
     AlignmentVectorBase::events_storage_t events2 {false, false, true, false};
 
@@ -1251,18 +1251,18 @@ YMIR_TEST_START(test_nogap_alignment_vector_errors)
     YMIR_ASSERT2(vec.text_start(0), 2)
     YMIR_ASSERT2(vec.len(0), 3)
     YMIR_ASSERT2(vec.id(0), 11)
-    YMIR_ASSERT2(vec.isMismatch(0, 0), false)
-    YMIR_ASSERT2(vec.isMismatch(0, 1), true)
+    YMIR_ASSERT2(vec.isMismatch(0, 1), false)
     YMIR_ASSERT2(vec.isMismatch(0, 2), true)
+    YMIR_ASSERT2(vec.isMismatch(0, 3), true)
 
     YMIR_ASSERT2(vec.pattern_start(1), 3)
     YMIR_ASSERT2(vec.text_start(1), 4)
     YMIR_ASSERT2(vec.len(1), 4)
     YMIR_ASSERT2(vec.id(1), 13)
-    YMIR_ASSERT2(vec.isMismatch(1, 0), false)
     YMIR_ASSERT2(vec.isMismatch(1, 1), false)
-    YMIR_ASSERT2(vec.isMismatch(1, 2), true)
-    YMIR_ASSERT2(vec.isMismatch(1, 3), false)
+    YMIR_ASSERT2(vec.isMismatch(1, 2), false)
+    YMIR_ASSERT2(vec.isMismatch(1, 3), true)
+    YMIR_ASSERT2(vec.isMismatch(1, 4), false)
 
 YMIR_TEST_END
 
@@ -1285,10 +1285,10 @@ YMIR_TEST_START(test_gapped_alignment_vector)
     YMIR_ASSERT2(vec.pattern_start(0), 1)
     YMIR_ASSERT2(vec.text_start(0), 2)
     YMIR_ASSERT2(vec.len(0), 3)
-    YMIR_ASSERT(vec.isMatch(0, 0))
-    YMIR_ASSERT(vec.isMismatch(0, 1))
-    YMIR_ASSERT(vec.isIns(0, 2))
+    YMIR_ASSERT(vec.isMatch(0, 1))
+    YMIR_ASSERT(vec.isMismatch(0, 2))
     YMIR_ASSERT(vec.isIns(0, 3))
+    YMIR_ASSERT(vec.isIns(0, 4))
 
     // mismath ins match del del
     AlignmentVectorBase::events_storage_t events2;
@@ -1303,28 +1303,26 @@ YMIR_TEST_START(test_gapped_alignment_vector)
     YMIR_ASSERT2(vec.pattern_start(0), 1)
     YMIR_ASSERT2(vec.text_start(0), 2)
     YMIR_ASSERT2(vec.len(0), 3)
-    YMIR_ASSERT(vec.isMatch(0, 0))
-    YMIR_ASSERT(vec.isMismatch(0, 1))
-    YMIR_ASSERT(vec.isIns(0, 2))
+    YMIR_ASSERT(vec.isMatch(0, 1))
+    YMIR_ASSERT(vec.isMismatch(0, 2))
     YMIR_ASSERT(vec.isIns(0, 3))
+    YMIR_ASSERT(vec.isIns(0, 4))
 
     YMIR_ASSERT2(vec.pattern_start(1), 3)
     YMIR_ASSERT2(vec.text_start(1), 4)
-    YMIR_ASSERT2(vec.len(1), 4)
-    YMIR_ASSERT(vec.isMismatch(1, 0))
-    YMIR_ASSERT(vec.isIns(1, 1))
-    YMIR_ASSERT(vec.isMatch(1, 2))
-    YMIR_ASSERT(vec.isDel(1, 3))
+    YMIR_ASSERT2(vec.len(1), 5)
+    YMIR_ASSERT(vec.isMismatch(1, 1))
+    YMIR_ASSERT(vec.isIns(1, 2))
+    YMIR_ASSERT(vec.isMatch(1, 3))
     YMIR_ASSERT(vec.isDel(1, 4))
+    YMIR_ASSERT(vec.isDel(1, 5))
 
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_simple)
+YMIR_TEST_START(test_vdj_alignment_simple_vj)
 
     VDJAlignmentBuilder builder;
-
-    // VJ
 
     builder.addVarAlignment(11, 1, 2, 3)
            .addVarAlignment(12, 4, 5, 6)
@@ -1358,6 +1356,12 @@ YMIR_TEST_START(test_vdj_alignment_simple)
     YMIR_ASSERT2(algn.getJoiSeqStart(2), 14)
     YMIR_ASSERT2(algn.getJoiLen(2), 15)
 
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_vdj_alignment_simple_vdj)
+
+    VDJAlignmentBuilder builder;
 
     // VDJ
 
@@ -1372,7 +1376,7 @@ YMIR_TEST_START(test_vdj_alignment_simple)
            .addDivAlignment(45, 33, 34, 35)
            .addDivAlignment(45, 36, 37, 38)
 
-    algn = builder.build();
+    VDJAlignment algn = builder.build();
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)
@@ -1419,11 +1423,154 @@ YMIR_TEST_START(test_vdj_alignment_simple)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_vector)
+YMIR_TEST_START(test_vdj_alignment_vector_vj)
 
-    YMIR_ASSERT(false)
+    VDJAlignmentBuilder builder;
+
+    // V
+
+    NoGapAlignmentVector vec1;
+    AlignmentVectorBase::events_storage_t events11 {false, true, true};
+    vec1.addAlignment(1, 2, events11, 11);
+    AlignmentVectorBase::events_storage_t events12 {false, false, true, 
+                                                    true, true, false};
+    vec1.addAlignment(4, 5, events12, 12);
+
+
+    // J
+
+    NoGapAlignmentVector vec2;
+    AlignmentVectorBase::events_storage_t events21 {false, true, true, 
+                                                    false, true, true, 
+                                                    false, true, true};
+    vec2.addAlignment(7, 8, events21, 31);
+    AlignmentVectorBase::events_storage_t events22 {true, false, true, 
+                                                    true, true, false, 
+                                                    false, false, true, 
+                                                    true, true, false};
+    vec2.addAlignment(10, 11, events22, 33);
+
+    NoGapAlignmentVector vec3;
+    AlignmentVectorBase::events_storage_t events31 {false, true, true, 
+                                                    false, true, true, 
+                                                    false, true, true,
+                                                    false, true, true,
+                                                    false, true, true};
+    vec3.addAlignment(13, 14, events21, 35);
+
+
+    builder.addVarAlignment(vec1)
+           .addJoiAlignment(vec2)
+           .addJoiAlignment(vec3);
+
+    VDJAlignment algn = builder.build();
+
+    YMIR_ASSERT2(algn.nVar(), 2)
+    YMIR_ASSERT2(algn.nJoi(), 3)
+    YMIR_ASSERT2(algn.nDiv(), 0)
+
+    YMIR_ASSERT2(algn.getVar(0), 11)
+    YMIR_ASSERT2(algn.getVar(1), 12)
+    YMIR_ASSERT2(algn.getJoi(0), 31)
+    YMIR_ASSERT2(algn.getJoi(1), 33)
+    YMIR_ASSERT2(algn.getJoi(2), 35)
+
+    YMIR_ASSERT2(algn.getVarGeneStart(0), 1)
+    YMIR_ASSERT2(algn.getVarSeqStart(0), 2)
+    YMIR_ASSERT2(algn.getVarLen(0), 3)
+    YMIR_ASSERT(!algn.isVarMismatch(0, 1))
+    YMIR_ASSERT(algn.isVarMismatch(0, 2))
+    YMIR_ASSERT(algn.isVarMismatch(0, 3))
+
+    YMIR_ASSERT2(algn.getVarGeneStart(1), 4)
+    YMIR_ASSERT2(algn.getVarSeqStart(1), 5)
+    YMIR_ASSERT2(algn.getVarLen(1), 6)
+    YMIR_ASSERT(!algn.isVarMismatch(1, 1))
+    YMIR_ASSERT(algn.isVarMismatch(1, 3))
+    YMIR_ASSERT(!algn.isVarMismatch(1, 6))
+
+    YMIR_ASSERT2(algn.getJoiGeneStart(0), 7)
+    YMIR_ASSERT2(algn.getJoiSeqStart(0), 8)
+    YMIR_ASSERT2(algn.getJoiLen(0), 9)
+    YMIR_ASSERT(!algn.isJoiMismatch(0, 1))
+    YMIR_ASSERT(algn.isJoiMismatch(0, 5))
+    YMIR_ASSERT(algn.isJoiMismatch(0, 9))
+
+    YMIR_ASSERT(algn.isJoiMismatch(1, 1))
+    YMIR_ASSERT(algn.isJoiMismatch(1, 4))
+    YMIR_ASSERT(!algn.isJoiMismatch(1, 12))
+
+    YMIR_ASSERT2(algn.getJoiGeneStart(2), 13)
+    YMIR_ASSERT2(algn.getJoiSeqStart(2), 14)
+    YMIR_ASSERT2(algn.getJoiLen(2), 15)
+    YMIR_ASSERT(!algn.isJoiMismatch(2, 1))
+    YMIR_ASSERT(!algn.isJoiMismatch(2, 4))
+    YMIR_ASSERT(algn.isJoiMismatch(2, 14))
+    YMIR_ASSERT(algn.isJoiMismatch(2, 15))
 
 YMIR_TEST_END
+
+
+// YMIR_TEST_START(test_vdj_alignment_vector_vdj)
+
+//     VDJAlignmentBuilder builder;
+
+//     builder.addVarAlignment(11, 1, 2, 3)
+//            .addVarAlignment(12, 4, 5, 6)
+//            .addJoiAlignment(31, 7, 8, 9)
+//            .addJoiAlignment(33, 10, 11, 12)
+//            .addJoiAlignment(35, 13, 14, 15)
+//            .addDivAlignment(41, 20, 21, 22)
+//            .addDivAlignment(41, 23, 24, 25)
+//            .addDivAlignment(45, 30, 31, 32)
+//            .addDivAlignment(45, 33, 34, 35)
+//            .addDivAlignment(45, 36, 37, 38)
+
+//     VDJAlignment algn = builder.build();
+
+//     YMIR_ASSERT2(algn.nVar(), 2)
+//     YMIR_ASSERT2(algn.nJoi(), 3)
+//     YMIR_ASSERT2(algn.nDiv(), 2)
+//     YMIR_ASSERT2(algn.numDivAlignments(0), 2)
+//     YMIR_ASSERT2(algn.numDivAlignments(1), 3)
+
+//     YMIR_ASSERT2(algn.getVar(0), 11)
+//     YMIR_ASSERT2(algn.getVar(1), 12)
+//     YMIR_ASSERT2(algn.getJoi(0), 31)
+//     YMIR_ASSERT2(algn.getJoi(1), 33)
+//     YMIR_ASSERT2(algn.getJoi(2), 35)
+//     YMIR_ASSERT2(algn.getDiv(0), 41)
+//     YMIR_ASSERT2(algn.getDiv(0), 45)
+
+//     YMIR_ASSERT2(algn.getVarGeneStart(0), 1)
+//     YMIR_ASSERT2(algn.getVarSeqStart(0), 2)
+//     YMIR_ASSERT2(algn.getVarLen(0), 3)
+//     YMIR_ASSERT2(algn.getVarGeneStart(1), 4)
+//     YMIR_ASSERT2(algn.getVarSeqStart(1), 5)
+//     YMIR_ASSERT2(algn.getVarLen(1), 6)
+
+//     YMIR_ASSERT2(algn.getJoiGeneStart(0), 7)
+//     YMIR_ASSERT2(algn.getJoiSeqStart(0), 8)
+//     YMIR_ASSERT2(algn.getJoiLen(0), 9)
+//     YMIR_ASSERT2(algn.getJoiGeneStart(2), 13)
+//     YMIR_ASSERT2(algn.getJoiSeqStart(2), 14)
+//     YMIR_ASSERT2(algn.getJoiLen(2), 15)
+
+//     YMIR_ASSERT2(algn.getDivGeneStart(0, 0), 20)
+//     YMIR_ASSERT2(algn.getDivSeqStart(0, 0), 21)
+//     YMIR_ASSERT2(algn.getDivLen(0, 0), 22)
+//     YMIR_ASSERT2(algn.getDivGeneStart(0, 1), 23)
+//     YMIR_ASSERT2(algn.getDivSeqStart(0, 1), 24)
+//     YMIR_ASSERT2(algn.getDivLen(0, 1), 25)
+
+//     YMIR_ASSERT2(algn.getDivGeneStart(1, 0), 30)
+//     YMIR_ASSERT2(algn.getDivSeqStart(1, 0), 31)
+//     YMIR_ASSERT2(algn.getDivLen(1, 0), 32)
+//     YMIR_ASSERT2(algn.getDivGeneStart(1, 2), 36)
+//     YMIR_ASSERT2(algn.getDivSeqStart(1, 2), 37)
+//     YMIR_ASSERT2(algn.getDivLen(1, 2), 38)
+
+// YMIR_TEST_END
 
 
 YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
@@ -2860,8 +3007,10 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_gapped_alignment_vector())
 
     // Tests for VDJAlignment and VDJAlignmentBuilder
-    YMIR_TEST(test_vdj_alignment_simple())
-    YMIR_TEST(test_vdj_alignment_vector())
+    YMIR_TEST(test_vdj_alignment_simple_vj())
+    YMIR_TEST(test_vdj_alignment_simple_vdj())
+    YMIR_TEST(test_vdj_alignment_vector_vj())
+    // YMIR_TEST(test_vdj_alignment_vector_vdj())
 
     // Tests for sequences aligners.
     YMIR_TEST(test_naive_cdr3_nuc_aligner())

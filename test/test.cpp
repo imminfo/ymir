@@ -1264,6 +1264,41 @@ YMIR_TEST_START(test_nogap_alignment_vector_errors)
     YMIR_ASSERT2(vec.isMismatch(1, 3), true)
     YMIR_ASSERT2(vec.isMismatch(1, 4), false)
 
+
+    NoGapAlignmentVector vec2;
+
+    AlignmentVectorBase::events_storage_t events1 {true, false, true, false};
+    vec2.addAlignment(21, 5, 6, events1);
+
+    vec.extend(vec2);
+    YMIR_ASSERT2(vec.size(), 3)
+
+    YMIR_ASSERT2(vec.pattern_start(0), 1)
+    YMIR_ASSERT2(vec.text_start(0), 2)
+    YMIR_ASSERT2(vec.len(0), 3)
+    YMIR_ASSERT2(vec.id(0), 11)
+    YMIR_ASSERT2(vec.isMismatch(0, 1), false)
+    YMIR_ASSERT2(vec.isMismatch(0, 2), true)
+    YMIR_ASSERT2(vec.isMismatch(0, 3), true)
+
+    YMIR_ASSERT2(vec.pattern_start(1), 3)
+    YMIR_ASSERT2(vec.text_start(1), 4)
+    YMIR_ASSERT2(vec.len(1), 4)
+    YMIR_ASSERT2(vec.id(1), 13)
+    YMIR_ASSERT2(vec.isMismatch(1, 1), false)
+    YMIR_ASSERT2(vec.isMismatch(1, 2), false)
+    YMIR_ASSERT2(vec.isMismatch(1, 3), true)
+    YMIR_ASSERT2(vec.isMismatch(1, 4), false)
+
+    YMIR_ASSERT2(vec.pattern_start(2), 5)
+    YMIR_ASSERT2(vec.text_start(2), 6)
+    YMIR_ASSERT2(vec.len(2), 4)
+    YMIR_ASSERT2(vec.id(2), 21)
+    YMIR_ASSERT2(vec.isMismatch(2, 1), true)
+    YMIR_ASSERT2(vec.isMismatch(2, 2), false)
+    YMIR_ASSERT2(vec.isMismatch(2, 3), true)
+    YMIR_ASSERT2(vec.isMismatch(2, 4), false)
+
 YMIR_TEST_END
 
 
@@ -1327,19 +1362,13 @@ YMIR_TEST_START(test_vdj_alignment_simple_vj)
 
     VDJAlignmentBuilder builder;
 
-    std::cout << "!!!" << std::endl;
-
     builder.addVarAlignment(11, 1, 2, 3)
            .addVarAlignment(12, 4, 5, 6)
            .addJoiAlignment(31, 7, 8, 9)
            .addJoiAlignment(33, 10, 11, 12)
            .addJoiAlignment(35, 13, 14, 15);
 
-    std::cout << "???" << std::endl;
-
     VDJAlignment algn = builder.build();
-
-    std::cout << "~~~" << std::endl;
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)

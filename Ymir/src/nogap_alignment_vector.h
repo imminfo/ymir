@@ -64,11 +64,11 @@ namespace ymir {
 
         bool isMismatch(seq_len_t i, seq_len_t j) const { 
 #ifndef DNDEBUG
-            if (_starts[i] + j >= _events.size()) {
+            if (_starts[i] + j - 1 >= _events.size()) {
                 throw(std::runtime_error("Alignment vector: index is out of bounds."));
             }
 #endif
-            return _events[_starts[i] + j];
+            return _events[_starts[i] + j - 1];
         }
 
     };

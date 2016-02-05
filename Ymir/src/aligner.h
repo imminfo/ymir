@@ -317,7 +317,7 @@ namespace ymir {
                 matches += 1;
             }
 
-            avec->addAlignment(1, 1, matches);
+            avec->addAlignment(1, 1, matches, 0);
         }
     };
 
@@ -339,13 +339,13 @@ namespace ymir {
                         }
                     } else if (open_match) {
                         if ((pattern_i + i - p_start) >= match_min_len) {
-                            avec->addAlignment(p_start + 1, t_start + 1, pattern_i + i - p_start);
+                            avec->addAlignment(p_start + 1, t_start + 1, pattern_i + i - p_start, 0);
                         }
                         open_match = false;
                     }
                 }
                 if (open_match && (pattern_i + min_subsize - p_start) >= match_min_len) {
-                    avec->addAlignment(p_start + 1, t_start + 1, pattern_i + min_subsize - p_start);
+                    avec->addAlignment(p_start + 1, t_start + 1, pattern_i + min_subsize - p_start, 0);
                 }
             }
 
@@ -361,13 +361,13 @@ namespace ymir {
                         }
                     } else if (open_match) {
                         if ((i - p_start) >= match_min_len) {
-                            avec->addAlignment(p_start + 1, t_start + 1, i - p_start);
+                            avec->addAlignment(p_start + 1, t_start + 1, i - p_start, 0);
                         }
                         open_match = false;
                     }
                 }
                 if (open_match && (min_subsize - p_start) >= match_min_len) {
-                    avec->addAlignment(p_start + 1, t_start + 1, min_subsize - p_start);
+                    avec->addAlignment(p_start + 1, t_start + 1, min_subsize - p_start, 0);
                 }
             }
         }
@@ -382,7 +382,7 @@ namespace ymir {
                 matches += 1;
             }
 
-            avec->addAlignment(1, t_size - matches + 1, matches);
+            avec->addAlignment(1, t_size - matches + 1, matches, 0);
         }
     };
     ///@}
@@ -414,7 +414,7 @@ namespace ymir {
                 }
             }
 
-            avec->addAlignment(1, 1, vec);
+            avec->addAlignment(1, 1, vec, 0);
         }
     };
 
@@ -438,7 +438,7 @@ namespace ymir {
                 }
             }
 
-            avec->addAlignment(1, t_size - min(t_size, p_size) + 1, vec);
+            avec->addAlignment(1, t_size - min(t_size, p_size) + 1, vec, 0);
         }
     };
     ///@}

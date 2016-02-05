@@ -39,7 +39,8 @@ namespace ymir {
     /**
     * \class ClonotypeBuilder
     */
-    class ClonotypeBuilder : protected Clonotype, public VDJAlignmentBuilder {
+    // class ClonotypeBuilder : protected Clonotype, public VDJAlignmentBuilder {
+    class ClonotypeBuilder : protected Clonotype {
     public:
 
         ClonotypeBuilder() {

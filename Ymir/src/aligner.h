@@ -317,7 +317,7 @@ namespace ymir {
                 matches += 1;
             }
 
-            avec->addAlignment(1, 1, matches, 0);
+            avec->addAlignment(0, 1, 1, matches);
         }
     };
 
@@ -339,13 +339,13 @@ namespace ymir {
                         }
                     } else if (open_match) {
                         if ((pattern_i + i - p_start) >= match_min_len) {
-                            avec->addAlignment(p_start + 1, t_start + 1, pattern_i + i - p_start, 0);
+                            avec->addAlignment(0, p_start + 1, t_start + 1, pattern_i + i - p_start);
                         }
                         open_match = false;
                     }
                 }
                 if (open_match && (pattern_i + min_subsize - p_start) >= match_min_len) {
-                    avec->addAlignment(p_start + 1, t_start + 1, pattern_i + min_subsize - p_start, 0);
+                    avec->addAlignment(0, p_start + 1, t_start + 1, pattern_i + min_subsize - p_start);
                 }
             }
 
@@ -361,13 +361,13 @@ namespace ymir {
                         }
                     } else if (open_match) {
                         if ((i - p_start) >= match_min_len) {
-                            avec->addAlignment(p_start + 1, t_start + 1, i - p_start, 0);
+                            avec->addAlignment(0, p_start + 1, t_start + 1, i - p_start);
                         }
                         open_match = false;
                     }
                 }
                 if (open_match && (min_subsize - p_start) >= match_min_len) {
-                    avec->addAlignment(p_start + 1, t_start + 1, min_subsize - p_start, 0);
+                    avec->addAlignment(0, p_start + 1, t_start + 1, min_subsize - p_start);
                 }
             }
         }
@@ -382,7 +382,7 @@ namespace ymir {
                 matches += 1;
             }
 
-            avec->addAlignment(1, t_size - matches + 1, matches, 0);
+            avec->addAlignment(0, 1, t_size - matches + 1, matches);
         }
     };
     ///@}
@@ -414,7 +414,7 @@ namespace ymir {
                 }
             }
 
-            avec->addAlignment(1, 1, vec, 0);
+            avec->addAlignment(0, 1, 1, vec);
         }
     };
 
@@ -438,7 +438,7 @@ namespace ymir {
                 }
             }
 
-            avec->addAlignment(1, t_size - min(t_size, p_size) + 1, vec, 0);
+            avec->addAlignment(0, 0, 1, t_size - min(t_size, p_size) + 1, vec);
         }
     };
     ///@}
@@ -495,13 +495,13 @@ namespace ymir {
     ///@{
     struct SWAlignerFunctor_VJ {
         void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
-            // avec->addAlignment();
+            // avec->addAlignment(0, );
         }
     };
 
     struct SWAlignerFunctor_D {
         void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
-            // avec->addAlignment();
+            // avec->addAlignment(0, );
         }
     };
     ///@}
@@ -525,13 +525,13 @@ namespace ymir {
     ///@{
     struct SWNGAlignerFunctor_VJ {
         void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
-            // avec->addAlignment();
+            // avec->addAlignment(0, );
         }
     };
 
     struct SWNGAlignerFunctor_D {
         void operator()(const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
-            // avec->addAlignment();
+            // avec->addAlignment(0, );
         }
     };
     ///@}

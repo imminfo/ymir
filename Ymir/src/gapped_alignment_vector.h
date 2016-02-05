@@ -72,6 +72,7 @@ namespace ymir {
          */
         ///@{
         bool isMatch(seq_len_t i, seq_len_t j) const { 
+            --j;
 #ifndef DNDEBUG
             if (_starts[i] + j*2 + 1 >= _events.size()) {
                 throw(std::runtime_error("Alignment vector: index is out of bounds."));
@@ -81,6 +82,7 @@ namespace ymir {
         }
 
         bool isMismatch(seq_len_t i, seq_len_t j) const { 
+            --j;
 #ifndef DNDEBUG
             if (_starts[i] + j*2 + 1 >= _events.size()) {
                 throw(std::runtime_error("Alignment vector: index is out of bounds."));
@@ -90,6 +92,7 @@ namespace ymir {
         }
 
         bool isIns(seq_len_t i, seq_len_t j) const { 
+            --j;
 #ifndef DNDEBUG
             if (_starts[i] + j*2 + 1 >= _events.size()) {
                 throw(std::runtime_error("Alignment vector: index is out of bounds."));
@@ -99,6 +102,7 @@ namespace ymir {
         }
 
         bool isDel(seq_len_t i, seq_len_t j) const { 
+            --j;
 #ifndef DNDEBUG
             if (_starts[i] + j*2 + 1 >= _events.size()) {
                 throw(std::runtime_error("Alignment vector: index is out of bounds."));

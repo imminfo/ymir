@@ -90,7 +90,7 @@ namespace ymir {
         seq_len_t pattern_start(seq_len_t i) const { 
 #ifndef DNDEBUG
             if (i*4 >= _data.size()) {
-                throw(std::runtime_error("Alignment vector: index is out of bounds."));
+                throw(std::runtime_error("Alignment vector: pattern index is out of bounds."));
             }
 #endif
             return _data[i*4];
@@ -100,7 +100,7 @@ namespace ymir {
         seq_len_t text_start(seq_len_t i) const {
 #ifndef DNDEBUG
             if (i*4 + 1 >= _data.size()) {
-                throw(std::runtime_error("Alignment vector: index is out of bounds."));
+                throw(std::runtime_error("Alignment vector: test index is out of bounds."));
             }
 #endif
             return _data[i*4 + 1];
@@ -110,7 +110,7 @@ namespace ymir {
         seq_len_t len(seq_len_t i) const { 
 #ifndef DNDEBUG
             if (i*4 + 2 >= _data.size()) {
-                throw(std::runtime_error("Alignment vector: index is out of bounds."));
+                throw(std::runtime_error("Alignment vector: length index is out of bounds."));
             }
 #endif
             return _data[i*4 + 2];
@@ -120,7 +120,7 @@ namespace ymir {
         seq_len_t id(seq_len_t i) const { 
 #ifndef DNDEBUG
             if (i*4 + 3 >= _data.size()) {
-                throw(std::runtime_error("Alignment vector: index is out of bounds."));
+                throw(std::runtime_error("Alignment vector: ID index is out of bounds."));
             }
 #endif
             return _data[i*4 + 3];

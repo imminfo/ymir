@@ -1374,22 +1374,33 @@ YMIR_TEST_START(test_vdj_alignment_simple_vj)
     YMIR_ASSERT2(algn.nJoi(), 3)
     YMIR_ASSERT2(algn.nDiv(), 0)
 
+
     YMIR_ASSERT2(algn.getVar(0), 11)
     YMIR_ASSERT2(algn.getVar(1), 12)
     YMIR_ASSERT2(algn.getJoi(0), 31)
     YMIR_ASSERT2(algn.getJoi(1), 33)
     YMIR_ASSERT2(algn.getJoi(2), 35)
 
+    std::cout << "var" << std::endl;
+
     YMIR_ASSERT2(algn.getVarGeneStart(0), 1)
     YMIR_ASSERT2(algn.getVarSeqStart(0), 2)
     YMIR_ASSERT2(algn.getVarLen(0), 3)
+
+    std::cout << "var" << std::endl;
+
     YMIR_ASSERT2(algn.getVarGeneStart(1), 4)
     YMIR_ASSERT2(algn.getVarSeqStart(1), 5)
     YMIR_ASSERT2(algn.getVarLen(1), 6)
 
+    std::cout << "joi" << std::endl;
+
     YMIR_ASSERT2(algn.getJoiGeneStart(0), 7)
     YMIR_ASSERT2(algn.getJoiSeqStart(0), 8)
     YMIR_ASSERT2(algn.getJoiLen(0), 9)
+
+    std::cout << "joi" << std::endl;
+
     YMIR_ASSERT2(algn.getJoiGeneStart(2), 13)
     YMIR_ASSERT2(algn.getJoiSeqStart(2), 14)
     YMIR_ASSERT2(algn.getJoiLen(2), 15)

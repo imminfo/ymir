@@ -39,7 +39,7 @@ namespace ymir {
         typedef std::array<seg_index_t, 3> segments_storage_t;
 
 
-        typedef std::vector<seq_len_t> n_D_alignments_storage_t;
+        typedef std::vector<seg_index_t> n_D_alignments_storage_t;
 
 
         VDJAlignment(const segments_storage_t &segments, 

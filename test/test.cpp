@@ -3081,9 +3081,9 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_gapped_alignment_vector())
 
     // Tests for VDJAlignment and VDJAlignmentBuilder
-    YMIR_TEST(test_vdj_alignment_simple_vj())
-    YMIR_TEST(test_vdj_alignment_simple_vdj())
-    YMIR_TEST(test_vdj_alignment_vector_vj())
+    // YMIR_TEST(test_vdj_alignment_simple_vj())
+    // YMIR_TEST(test_vdj_alignment_simple_vdj())
+    // YMIR_TEST(test_vdj_alignment_vector_vj())
     // YMIR_TEST(test_vdj_alignment_vector_vdj())
 
     // Tests for sequences aligners.

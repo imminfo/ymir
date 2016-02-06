@@ -1598,7 +1598,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
            .addDivAlignment(41, 23, 24, 25)
            .addDivAlignment(45, 30, 31, 32)
            .addDivAlignment(45, 33, 34, 35)
-           .addDivAlignment(45, 36, 37, 38)
+           .addDivAlignment(45, 36, 37, 38);
 
     VDJAlignment algn = builder.build();
 

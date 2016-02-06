@@ -1401,6 +1401,8 @@ YMIR_TEST_START(test_vdj_alignment_simple_vj)
            .addJoiAlignment(53, 1, 2, 3)
            .addJoiAlignment(55, 4, 5, 6);
 
+    algn = builder.build();
+
     YMIR_ASSERT2(algn.nVar(), 3)
     YMIR_ASSERT2(algn.nJoi(), 2)
     YMIR_ASSERT2(algn.nDiv(), 0)

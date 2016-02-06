@@ -192,6 +192,8 @@ namespace ymir {
         * \brief Reset the builder to the initial state and remove all stored data for clone building.
         */
         void reset() {
+            _seq_type = UNDEF_SEQ_TYPE;
+
             _segments = nullptr;
             _alignments = nullptr;
             _n_D_alignments = nullptr;

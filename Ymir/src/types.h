@@ -236,8 +236,9 @@ namespace ymir {
      * \enum SequenceType
      */
     enum SequenceType {
-        NUCLEOTIDE,
-        AMINOACID
+        UNDEF_SEQ_TYPE = 0,
+        NUCLEOTIDE = 1,
+        AMINOACID = 2
     };
 
 

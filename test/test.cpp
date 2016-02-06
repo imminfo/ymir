@@ -1660,6 +1660,8 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     vector<string> avec3 {"D1", "D2", "D3"};
     vector<string> svec3 {"AA", "AACCTT", "ACT"};
 
+    VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
+
     // YMIR_ASSERT2(nna.alignVar(1, "ACGT").pattern_start(0), 1)
     // YMIR_ASSERT2(nna.alignVar(1, "ACGT").text_start(0), 1)
     // YMIR_ASSERT2(nna.alignVar(1, "ACGT").len(0), 4)
@@ -3163,6 +3165,7 @@ int main(int argc, char* argv[]) {
     // Tests for forward-backward algorithms
     YMIR_TEST(test_maag_forward_backward_vj())
     YMIR_TEST(test_maag_forward_backward_vdj())
+    */
     
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.

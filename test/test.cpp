@@ -1267,7 +1267,7 @@ YMIR_TEST_START(test_nogap_alignment_vector_errors)
 
     NoGapAlignmentVector vec2;
 
-    AlignmentVectorBase::events_storage_t events3 {true, false, true, false};
+    AlignmentVectorBase::events_storage_t events3 {true, true, true, false, true, false};
     vec2.addAlignment(21, 5, 6, events3);
 
     vec.extend(vec2);
@@ -1292,12 +1292,14 @@ YMIR_TEST_START(test_nogap_alignment_vector_errors)
 
     YMIR_ASSERT2(vec.pattern_start(2), 5)
     YMIR_ASSERT2(vec.text_start(2), 6)
-    YMIR_ASSERT2(vec.len(2), 4)
+    YMIR_ASSERT2(vec.len(2), 6)
     YMIR_ASSERT2(vec.id(2), 21)
     YMIR_ASSERT2(vec.isMismatch(2, 1), true)
-    YMIR_ASSERT2(vec.isMismatch(2, 2), false)
+    YMIR_ASSERT2(vec.isMismatch(2, 2), true)
     YMIR_ASSERT2(vec.isMismatch(2, 3), true)
     YMIR_ASSERT2(vec.isMismatch(2, 4), false)
+    YMIR_ASSERT2(vec.isMismatch(2, 5), true)
+    YMIR_ASSERT2(vec.isMismatch(2, 6), false)
 
 YMIR_TEST_END
 

@@ -1577,7 +1577,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
                                                     false, true, true,
                                                     false, true, true,
                                                     false, true, true};
-    vec3.addAlignment(35, 13, 14, events21);
+    vec3.addAlignment(35, 13, 14, events31);
 
 
     builder.addVarAlignment(vec1)
@@ -1627,10 +1627,8 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
     YMIR_ASSERT(!algn.isJoiMismatch(2, 1))
     YMIR_ASSERT(!algn.isJoiMismatch(2, 4))
 
-    // YMIR_ASSERT(algn.isJoiMismatch(2, 14))
-    // std::cout << "4" << std::endl;
-    // YMIR_ASSERT(algn.isJoiMismatch(2, 15))
-    // std::cout << "5" << std::endl;
+    YMIR_ASSERT(algn.isJoiMismatch(2, 14))
+    YMIR_ASSERT(algn.isJoiMismatch(2, 15))
 
 YMIR_TEST_END
 
@@ -3167,8 +3165,8 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_vdj_alignment_simple_vj())
     YMIR_TEST(test_vdj_alignment_simple_vdj())
     YMIR_TEST(test_vdj_alignment_vector_vj())
-/*    YMIR_TEST(test_vdj_alignment_vector_vdj())
-
+    YMIR_TEST(test_vdj_alignment_vector_vdj())
+/*
     // Tests for sequences aligners.
     YMIR_TEST(test_naive_cdr3_nuc_aligner())
     YMIR_TEST(test_cdr3_nuc_aligner())

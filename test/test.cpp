@@ -3076,9 +3076,9 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_clonebuilder_clonealign())
 
     // Tests for NoGapAlignmentVector and GappedAlignmentVector
-    YMIR_TEST(test_nogap_alignment_vector_no_err())
-    YMIR_TEST(test_nogap_alignment_vector_errors())
-    YMIR_TEST(test_gapped_alignment_vector())
+    // YMIR_TEST(test_nogap_alignment_vector_no_err())
+    // YMIR_TEST(test_nogap_alignment_vector_errors())
+    // YMIR_TEST(test_gapped_alignment_vector())
 
     // Tests for VDJAlignment and VDJAlignmentBuilder
     // YMIR_TEST(test_vdj_alignment_simple_vj())

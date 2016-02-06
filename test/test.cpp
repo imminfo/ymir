@@ -3074,8 +3074,8 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_vdjgenes_read())
 
     // Tests for clone, clone alignment and clone builder classes.
-    YMIR_TEST(test_clone())
-    YMIR_TEST(test_clonebuilder_clonealign())
+    // YMIR_TEST(test_clone())
+    // YMIR_TEST(test_clonebuilder_clonealign())
 
     // Tests for NoGapAlignmentVector and GappedAlignmentVector
     // YMIR_TEST(test_nogap_alignment_vector_no_err())
@@ -3103,15 +3103,15 @@ int main(int argc, char* argv[]) {
     // YMIR_TEST(test_parser_vj_stream())
     // YMIR_TEST(test_parser_vdj_with_d_alignment())
 //    YMIR_TEST(test_ymir_vdj_wo_d_alignment())
-    YMIR_TEST(test_writer())
+    // YMIR_TEST(test_writer())
 
     // Tests for clonal repertoires and clonal repertoire views.
-    YMIR_TEST(test_clorep())
+    // YMIR_TEST(test_clorep())
 
     // Tests for markov chain.
-    // YMIR_TEST(test_markovchain_nuc_mono())
-    // YMIR_TEST(test_markovchain_nuc_di())
-    // YMIR_TEST(test_markovchain_aa())
+    YMIR_TEST(test_markovchain_nuc_mono())
+    YMIR_TEST(test_markovchain_nuc_di())
+    YMIR_TEST(test_markovchain_aa())
 
     // Test for Multi-Matrix Chains
     YMIR_TEST(test_mmc())

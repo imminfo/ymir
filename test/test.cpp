@@ -1651,6 +1651,8 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
     NoGapAlignmentVector vec;
     // NaiveCDR3NucleotideAligner nna;
+    vector<string> avec1 {"V1", "V2", "V3", "V4"};
+    vector<string> svec1 {"ACGTT", "ACGT", "ACG", "TTT"};
 
     // YMIR_ASSERT2(nna.align5end("ACGT", "ACGTT"), 4)
     // YMIR_ASSERT2(nna.align5end("ACGT", "ACGT"), 4)
@@ -3087,11 +3089,11 @@ int main(int argc, char* argv[]) {
     // YMIR_TEST(test_vdj_alignment_vector_vdj())
 
     // Tests for sequences aligners.
-    YMIR_TEST(test_naive_cdr3_nuc_aligner())
-    YMIR_TEST(test_cdr3_nuc_aligner())
-    YMIR_TEST(test_cdr3_aa_aligner())
-    YMIR_TEST(test_sw_aligner())
-    YMIR_TEST(test_swng_aligner())
+    // YMIR_TEST(test_naive_cdr3_nuc_aligner())
+    // YMIR_TEST(test_cdr3_nuc_aligner())
+    // YMIR_TEST(test_cdr3_aa_aligner())
+    // YMIR_TEST(test_sw_aligner())
+    // YMIR_TEST(test_swng_aligner())
 
     // Error corrector test
     YMIR_TEST(test_errcorr_aligner())

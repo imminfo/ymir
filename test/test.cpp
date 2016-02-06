@@ -1649,7 +1649,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
-    NoGapAlignmentVector vec;
+    // NoGapAlignmentVector vec;
     // NaiveCDR3NucleotideAligner nna;
     vector<string> avec1 {"V1", "V2", "V3", "V4"};
     vector<string> svec1 {"ACGTT", "ACGT", "ACG", "TTT"};

@@ -54,8 +54,8 @@ namespace ymir {
             segments[1] = _segments[1];
             segments[2] = _segments[2];
 
-            n_D_alignments_storage_t nDs(_n_Dalign.size());
-            std::copy(_n_Dalign.begin(), _n_Dalign.end(), nDs.begin());
+            n_D_alignments_storage_t nDs = _n_Dalign;
+            // std::copy(_n_Dalign.begin(), _n_Dalign.end(), nDs.begin());
 
             NoGapAlignmentVector avec;
             avec.extend(_Valign);
@@ -67,6 +67,9 @@ namespace ymir {
             _Valign.clear();
             _Jalign.clear();
             _Dalign.clear();
+
+            _segments.clear();
+            _n_Dalign.clear();
 
             // return std::move(VDJAlignment(std::move(segments), std::move(avec), std::move(nDs)));
             // return VDJAlignment(std::move(segments), std::move(avec), std::move(nDs));

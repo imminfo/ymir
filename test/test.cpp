@@ -1182,7 +1182,6 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
 YMIR_TEST_END
 
 
-/*
 YMIR_TEST_START(test_nogap_alignment_vector_no_err)
 
     NoGapAlignmentVector vec;
@@ -1647,7 +1646,6 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
 
 YMIR_TEST_END
 
-*/
 
 YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
@@ -1695,21 +1693,20 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     // YMIR_ASSERT2(nna.alignJoi(4, "ACGG").len(0), 0)
 
 
-    // YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 3).size(), 0)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA", 3).size(), 0)
 
-    // YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2).size(), 2)
-    // YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].gene_start(), 1)
-    // YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].gene_end(), 2)
-    // YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].seq_start(), 3)
-    // YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 2)[0].seq_end(), 4)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA", 2).size(), 2)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA", 2).text_start(0), 1)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA", 2).pattern_start(0), 3)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA", 2).len(0), 2)
 
-    // YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2).size(), 3)
-    // YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].gene_start(), 5)
-    // YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].gene_end(), 6)
-    // YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].seq_start(), 5)
-    // YMIR_ASSERT2(nna.alignLocal("AACCTT", "AAGGTTGGGGGTT", 2)[1].seq_end(), 6)
+    // YMIR_ASSERT2(nna.alignDiv("AACCTT", "AAGGTTGGGGGTT", 2).size(), 3)
+    // YMIR_ASSERT2(nna.alignDiv("AACCTT", "AAGGTTGGGGGTT", 2)[1].gene_start(), 5)
+    // YMIR_ASSERT2(nna.alignDiv("AACCTT", "AAGGTTGGGGGTT", 2)[1].gene_end(), 6)
+    // YMIR_ASSERT2(nna.alignDiv("AACCTT", "AAGGTTGGGGGTT", 2)[1].seq_start(), 5)
+    // YMIR_ASSERT2(nna.alignDiv("AACCTT", "AAGGTTGGGGGTT", 2)[1].seq_end(), 6)
 
-    // YMIR_ASSERT2(nna.alignLocal("ACT", "ACTGACGACGGTATCTAC", 2).size(), 5)
+    // YMIR_ASSERT2(nna.alignDiv("ACT", "ACTGACGACGGTATCTAC", 2).size(), 5)
 
 YMIR_TEST_END
 

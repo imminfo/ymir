@@ -117,13 +117,13 @@ namespace ymir {
         ///@{
         VDJAlignmentBuilder& addVarAlignment(const NoGapAlignmentVector &vec) {
             _Valign.extend(vec);
-            ++_segments[0];
+            _segments[0] += vec.size();
             return *this;
         }
 
         VDJAlignmentBuilder& addJoiAlignment(const NoGapAlignmentVector &vec) {
             _Jalign.extend(vec);
-            ++_segments[1];
+            _segments[1] += vec.size();
             return *this;
         }
 

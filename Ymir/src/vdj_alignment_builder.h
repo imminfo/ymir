@@ -99,6 +99,7 @@ namespace ymir {
 
             if (_Dseg.size() == 0 || dseg != _Dseg[_Dseg.size() - 1]) {
                 _n_Dalign.push_back(0);
+                _Dseg.push_back(dseg);
                 _segments[2] += 1;
             }
 
@@ -116,15 +117,19 @@ namespace ymir {
         ///@{
         VDJAlignmentBuilder& addVarAlignment(const NoGapAlignmentVector &vec) {
             _Valign.extend(vec);
+            segments[0] += 1;
             return *this;
         }
 
         VDJAlignmentBuilder& addJoiAlignment(const NoGapAlignmentVector &vec) {
             _Jalign.extend(vec);
+            segments[1] += 1;
             return *this;
         }
 
         VDJAlignmentBuilder& addDivAlignment(const NoGapAlignmentVector &vec) {
+            _n_Dalign.push_back(vec.size());
+            segments[2] += 1;
             _Dalign.extend(vec);
             return *this;
         }

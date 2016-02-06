@@ -3090,12 +3090,12 @@ int main(int argc, char* argv[]) {
 
 
     //**************  TEST CASES  **************//
-    YMIR_TEST(test_basic())/*
+    YMIR_TEST(test_basic())
 
     // Tests for ModelParameterVector
     YMIR_TEST(test_model_param_vec_vj())
     YMIR_TEST(test_model_param_vec_vdj())
-
+/*
     // Tests for gene segments classes
     YMIR_TEST(test_genesegmentalphabet())
     YMIR_TEST(test_vdjgenes2())

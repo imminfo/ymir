@@ -1758,14 +1758,14 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
 
     YMIR_ASSERT2(algn.getDivGeneStart(1, 0), 17)
     YMIR_ASSERT2(algn.getDivSeqStart(1, 0), 18)
-    YMIR_ASSERT2(algn.getDivLen(0, 0), 7)
-    YMIR_ASSERT(!algn.isDivMismatch(0, 0, 1))
-    YMIR_ASSERT(!algn.isDivMismatch(0, 0, 2))
-    YMIR_ASSERT(algn.isDivMismatch(0, 0, 3))
-    YMIR_ASSERT(algn.isDivMismatch(0, 0, 4))
-    YMIR_ASSERT(!algn.isDivMismatch(0, 0, 5))
-    YMIR_ASSERT(algn.isDivMismatch(0, 0, 6))
-    YMIR_ASSERT(algn.isDivMismatch(0, 0, 7))
+    YMIR_ASSERT2(algn.getDivLen(1, 0), 7)
+    YMIR_ASSERT(!algn.isDivMismatch(1, 0, 1))
+    YMIR_ASSERT(!algn.isDivMismatch(1, 0, 2))
+    YMIR_ASSERT(algn.isDivMismatch(1, 0, 3))
+    YMIR_ASSERT(algn.isDivMismatch(1, 0, 4))
+    YMIR_ASSERT(!algn.isDivMismatch(1, 0, 5))
+    YMIR_ASSERT(algn.isDivMismatch(1, 0, 6))
+    YMIR_ASSERT(algn.isDivMismatch(1, 0, 7))
 
 YMIR_TEST_END
 

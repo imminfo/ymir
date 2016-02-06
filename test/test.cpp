@@ -3163,8 +3163,8 @@ int main(int argc, char* argv[]) {
     // Tests for VDJAlignment and VDJAlignmentBuilder
     YMIR_TEST(test_vdj_alignment_simple_vj())
     YMIR_TEST(test_vdj_alignment_simple_vdj())
-/*    YMIR_TEST(test_vdj_alignment_vector_vj())
-    YMIR_TEST(test_vdj_alignment_vector_vdj())
+    YMIR_TEST(test_vdj_alignment_vector_vj())
+/*    YMIR_TEST(test_vdj_alignment_vector_vdj())
 
     // Tests for sequences aligners.
     YMIR_TEST(test_naive_cdr3_nuc_aligner())

@@ -96,7 +96,7 @@ namespace ymir {
 
 
         Clonotype(const ClonotypePtr& other)
-                : _seq_type(other._seq_type),
+                : _seq_type(other->_seq_type),
                   _sequence(other->_sequence),
                   _recomb(other->_recomb)
         {

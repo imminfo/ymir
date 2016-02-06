@@ -62,7 +62,8 @@ namespace ymir {
 
 
         Clonotype(const Clonotype& other)
-                : _sequence(other._sequence),
+                : _seq_type(other._seq_type),
+                  _sequence(other._sequence),
                   _recomb(other._recomb)
         {
             _segments = new seg_index_t[3 + other._segments[0] + other._segments[1] + other._segments[2]];
@@ -95,7 +96,8 @@ namespace ymir {
 
 
         Clonotype(const ClonotypePtr& other)
-                : _sequence(other->_sequence),
+                : _seq_type(other._seq_type),
+                  _sequence(other->_sequence),
                   _recomb(other->_recomb)
         {
             _segments = new seg_index_t[3 + other->_segments[0] + other->_segments[1] + other->_segments[2]];
@@ -129,6 +131,7 @@ namespace ymir {
 
         ///@{
         Clonotype& operator=(const Clonotype &other) {
+            _seq_type = other._seq_type;
             _sequence = other._sequence;
             _recomb = other._recomb;
 
@@ -161,6 +164,8 @@ namespace ymir {
         }
 
         Clonotype& operator=(const ClonotypePtr &other) {
+            _seq_type = other->_seq_type;
+
             _sequence = other->_sequence;
             _recomb = other->_recomb;
 

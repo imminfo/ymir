@@ -40,6 +40,7 @@ namespace ymir {
         VDJAlignmentBuilder()
         {
             _segments.fill(0);
+            _n_Dalign.push_back(0);
         }
 
 
@@ -70,7 +71,7 @@ namespace ymir {
             _Dalign.clear();
 
             _segments.fill(0);
-            _n_Dalign.clear();
+            _n_Dalign.resize(1);
 
             // return std::move(VDJAlignment(std::move(segments), std::move(avec), std::move(nDs)));
             // return VDJAlignment(std::move(segments), std::move(avec), std::move(nDs));

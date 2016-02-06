@@ -1182,6 +1182,7 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
 YMIR_TEST_END
 
 
+/*
 YMIR_TEST_START(test_nogap_alignment_vector_no_err)
 
     NoGapAlignmentVector vec;
@@ -1646,6 +1647,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
 
 YMIR_TEST_END
 
+*/
 
 YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
@@ -1657,16 +1659,36 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     vector<string> avec2 {"J1", "J2", "J3", "J4"};
     vector<string> svec2 {"CGT", "TACGT", "TTCGT", "TTTTT"};
 
+    // YMIR_ASSERT2(nna.alignVar(1, "ACGT").pattern_start(0), 1)
+    // YMIR_ASSERT2(nna.alignVar(1, "ACGT").text_start(0), 1)
     // YMIR_ASSERT2(nna.alignVar(1, "ACGT").len(0), 4)
+
+    // YMIR_ASSERT2(nna.alignVar(2, "ACGT").pattern_start(0), 1)
+    // YMIR_ASSERT2(nna.alignVar(2, "ACGT").text_start(0), 1)
     // YMIR_ASSERT2(nna.alignVar(2, "ACGT").len(0), 4)
+
+    // YMIR_ASSERT2(nna.alignVar(3, "ACGT").pattern_start(0), 1)
+    // YMIR_ASSERT2(nna.alignVar(3, "ACGT").text_start(0), 1)
     // YMIR_ASSERT2(nna.alignVar(3, "ACGT").len(0), 3)
+
+    // YMIR_ASSERT2(nna.alignVar(4, "ACGT").pattern_start(0), 1)
+    // YMIR_ASSERT2(nna.alignVar(4, "ACGT").text_start(0), 1)
     // YMIR_ASSERT2(nna.alignVar(4, "ACGT").len(0), 0)
 
-    // YMIR_ASSERT2(nna.alignJoi(1, "ACGT").pattern_start(0), 3)
-    // YMIR_ASSERT2(nna.alignJoi(1, "ACGT").text_start(0), 3)
+    // YMIR_ASSERT2(nna.alignJoi(1, "ACGT").pattern_start(0), 2)
+    // YMIR_ASSERT2(nna.alignJoi(1, "ACGT").text_start(0), 1)
     // YMIR_ASSERT2(nna.alignJoi(1, "ACGT").len(0), 3)
+
+    // YMIR_ASSERT2(nna.alignJoi(2, "ACGT").pattern_start(0), 1)
+    // YMIR_ASSERT2(nna.alignJoi(2, "ACGT").text_start(0), 2)
     // YMIR_ASSERT2(nna.alignJoi(2, "ACGT").len(0), 4)
+
+    // YMIR_ASSERT2(nna.alignJoi(3, "ACGT").pattern_start(0), 2)
+    // YMIR_ASSERT2(nna.alignJoi(3, "ACGT").text_start(0), 3)
     // YMIR_ASSERT2(nna.alignJoi(3, "ACGT").len(0), 3)
+
+    // YMIR_ASSERT2(nna.alignJoi(4, "ACGT").pattern_start(0), 5)
+    // YMIR_ASSERT2(nna.alignJoi(4, "ACGT").text_start(0), 4)
     // YMIR_ASSERT2(nna.alignJoi(4, "ACGG").len(0), 0)
 
 
@@ -3068,19 +3090,19 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_basic())
 
     // Tests for ModelParameterVector
-    // YMIR_TEST(test_model_param_vec_vj())
-    // YMIR_TEST(test_model_param_vec_vdj())
+    YMIR_TEST(test_model_param_vec_vj())
+    YMIR_TEST(test_model_param_vec_vdj())
 
     // Tests for gene segments classes
-    // YMIR_TEST(test_genesegmentalphabet())
-    // YMIR_TEST(test_vdjgenes2())
-    // YMIR_TEST(test_vdjgenes3())
-    // YMIR_TEST(test_genesegmentalphabet_read())
-    // YMIR_TEST(test_vdjgenes_read())
+    YMIR_TEST(test_genesegmentalphabet())
+    YMIR_TEST(test_vdjgenes2())
+    YMIR_TEST(test_vdjgenes3())
+    YMIR_TEST(test_genesegmentalphabet_read())
+    YMIR_TEST(test_vdjgenes_read())
 
     // Tests for clone, clone alignment and clone builder classes.
-    // YMIR_TEST(test_clone())
-    // YMIR_TEST(test_clonebuilder_clonealign())
+    YMIR_TEST(test_clone())
+    YMIR_TEST(test_clonebuilder_clonealign())
 
     // Tests for NoGapAlignmentVector and GappedAlignmentVector
     // YMIR_TEST(test_nogap_alignment_vector_no_err())
@@ -3094,24 +3116,24 @@ int main(int argc, char* argv[]) {
     // YMIR_TEST(test_vdj_alignment_vector_vdj())
 
     // Tests for sequences aligners.
-    // YMIR_TEST(test_naive_cdr3_nuc_aligner())
-    // YMIR_TEST(test_cdr3_nuc_aligner())
-    // YMIR_TEST(test_cdr3_aa_aligner())
-    // YMIR_TEST(test_sw_aligner())
-    // YMIR_TEST(test_swng_aligner())
+    YMIR_TEST(test_naive_cdr3_nuc_aligner())
+    YMIR_TEST(test_cdr3_nuc_aligner())
+    YMIR_TEST(test_cdr3_aa_aligner())
+    YMIR_TEST(test_sw_aligner())
+    YMIR_TEST(test_swng_aligner())
 
     // Error corrector test
-    // YMIR_TEST(test_errcorr_aligner())
+    YMIR_TEST(test_errcorr_aligner())
 
     // Test for the repertoire parser and writer
     // YMIR_TEST(test_parser_vj())
     // YMIR_TEST(test_parser_vj_stream())
     // YMIR_TEST(test_parser_vdj_with_d_alignment())
 //    YMIR_TEST(test_ymir_vdj_wo_d_alignment())
-    // YMIR_TEST(test_writer())
+    YMIR_TEST(test_writer())
 
     // Tests for clonal repertoires and clonal repertoire views.
-    // YMIR_TEST(test_clorep())
+    YMIR_TEST(test_clorep())
 
     // Tests for markov chain.
     YMIR_TEST(test_markovchain_nuc_mono())

@@ -35,6 +35,7 @@ namespace ymir {
      */
     struct NoGapAlignmentVector : public AlignmentVectorBase {
 
+
         NoGapAlignmentVector() : AlignmentVectorBase() {
 
         }

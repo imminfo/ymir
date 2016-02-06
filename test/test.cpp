@@ -1654,15 +1654,20 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     vector<string> avec1 {"V1", "V2", "V3", "V4"};
     vector<string> svec1 {"ACGTT", "ACGT", "ACG", "TTT"};
 
-    // YMIR_ASSERT2(nna.align5end("ACGT", "ACGTT"), 4)
-    // YMIR_ASSERT2(nna.align5end("ACGT", "ACGT"), 4)
-    // YMIR_ASSERT2(nna.align5end("ACGT", "ACG"), 3)
-    // YMIR_ASSERT2(nna.align5end("ACGT", "TTT"), 0)
+    vector<string> avec2 {"J1", "J2", "J3", "J4"};
+    vector<string> svec2 {"CGT", "TACGT", "TTCGT", "TTTTT"};
 
-    // YMIR_ASSERT2(nna.align3end("ACGT", "CGT"), 3)
-    // YMIR_ASSERT2(nna.align3end("ACGT", "TACGT"), 4)
-    // YMIR_ASSERT2(nna.align3end("ACGT", "TTCGT"), 3)
-    // YMIR_ASSERT2(nna.align3end("ACGG", "TTTTT"), 0)
+    // YMIR_ASSERT2(nna.alignVar(1, "ACGT").len(0), 4)
+    // YMIR_ASSERT2(nna.alignVar(2, "ACGT").len(0), 4)
+    // YMIR_ASSERT2(nna.alignVar(3, "ACGT").len(0), 3)
+    // YMIR_ASSERT2(nna.alignVar(4, "ACGT").len(0), 0)
+
+    // YMIR_ASSERT2(nna.alignJoi(1, "ACGT").pattern_start(0), 3)
+    // YMIR_ASSERT2(nna.alignJoi(1, "ACGT").text_start(0), 3)
+    // YMIR_ASSERT2(nna.alignJoi(1, "ACGT").len(0), 3)
+    // YMIR_ASSERT2(nna.alignJoi(2, "ACGT").len(0), 4)
+    // YMIR_ASSERT2(nna.alignJoi(3, "ACGT").len(0), 3)
+    // YMIR_ASSERT2(nna.alignJoi(4, "ACGG").len(0), 0)
 
 
     // YMIR_ASSERT2(nna.alignLocal("AA", "TTAATAA", 3).size(), 0)
@@ -3063,15 +3068,15 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_basic())
 
     // Tests for ModelParameterVector
-    YMIR_TEST(test_model_param_vec_vj())
-    YMIR_TEST(test_model_param_vec_vdj())
+    // YMIR_TEST(test_model_param_vec_vj())
+    // YMIR_TEST(test_model_param_vec_vdj())
 
     // Tests for gene segments classes
-    YMIR_TEST(test_genesegmentalphabet())
-    YMIR_TEST(test_vdjgenes2())
-    YMIR_TEST(test_vdjgenes3())
-    YMIR_TEST(test_genesegmentalphabet_read())
-    YMIR_TEST(test_vdjgenes_read())
+    // YMIR_TEST(test_genesegmentalphabet())
+    // YMIR_TEST(test_vdjgenes2())
+    // YMIR_TEST(test_vdjgenes3())
+    // YMIR_TEST(test_genesegmentalphabet_read())
+    // YMIR_TEST(test_vdjgenes_read())
 
     // Tests for clone, clone alignment and clone builder classes.
     // YMIR_TEST(test_clone())
@@ -3096,7 +3101,7 @@ int main(int argc, char* argv[]) {
     // YMIR_TEST(test_swng_aligner())
 
     // Error corrector test
-    YMIR_TEST(test_errcorr_aligner())
+    // YMIR_TEST(test_errcorr_aligner())
 
     // Test for the repertoire parser and writer
     // YMIR_TEST(test_parser_vj())

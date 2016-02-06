@@ -70,14 +70,14 @@ namespace ymir {
             // _starts.insert(_starts.end(), other._starts.begin(), other._starts.end());
             size_t starts_size = _starts.size();
             for (size_t i = 0; i < other._starts.size(); ++i) {
-                _starts.push_back(starts_size + other._events[i]);
+                _starts.push_back(starts_size + other._starts[i]);
             }
 
             _events.reserve(_events.size() + other._events.size() + 1);
-            for (size_t i = 0; i < other._events.size(); ++i) {
-                _events.push_back(other._events[i]);
-            }
-            // _events.insert(_events.end(), other._events.begin(), other._events.end());
+            // for (size_t i = 0; i < other._events.size(); ++i) {
+            //     _events.push_back(other._events[i]);
+            // }
+            _events.insert(_events.end(), other._events.begin(), other._events.end());
         }
 
 

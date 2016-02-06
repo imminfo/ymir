@@ -1585,66 +1585,66 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
 YMIR_TEST_END
 
 
-// YMIR_TEST_START(test_vdj_alignment_vector_vdj)
+YMIR_TEST_START(test_vdj_alignment_vector_vdj)
 
-//     VDJAlignmentBuilder builder;
+    VDJAlignmentBuilder builder;
 
-//     builder.addVarAlignment(11, 1, 2, 3)
-//            .addVarAlignment(12, 4, 5, 6)
-//            .addJoiAlignment(31, 7, 8, 9)
-//            .addJoiAlignment(33, 10, 11, 12)
-//            .addJoiAlignment(35, 13, 14, 15)
-//            .addDivAlignment(41, 20, 21, 22)
-//            .addDivAlignment(41, 23, 24, 25)
-//            .addDivAlignment(45, 30, 31, 32)
-//            .addDivAlignment(45, 33, 34, 35)
-//            .addDivAlignment(45, 36, 37, 38)
+    builder.addVarAlignment(11, 1, 2, 3)
+           .addVarAlignment(12, 4, 5, 6)
+           .addJoiAlignment(31, 7, 8, 9)
+           .addJoiAlignment(33, 10, 11, 12)
+           .addJoiAlignment(35, 13, 14, 15)
+           .addDivAlignment(41, 20, 21, 22)
+           .addDivAlignment(41, 23, 24, 25)
+           .addDivAlignment(45, 30, 31, 32)
+           .addDivAlignment(45, 33, 34, 35)
+           .addDivAlignment(45, 36, 37, 38)
 
-//     VDJAlignment algn = builder.build();
+    VDJAlignment algn = builder.build();
 
-//     YMIR_ASSERT2(algn.nVar(), 2)
-//     YMIR_ASSERT2(algn.nJoi(), 3)
-//     YMIR_ASSERT2(algn.nDiv(), 2)
-//     YMIR_ASSERT2(algn.numDivAlignments(0), 2)
-//     YMIR_ASSERT2(algn.numDivAlignments(1), 3)
+    YMIR_ASSERT2(algn.nVar(), 2)
+    YMIR_ASSERT2(algn.nJoi(), 3)
+    YMIR_ASSERT2(algn.nDiv(), 2)
+    YMIR_ASSERT2(algn.numDivAlignments(0), 2)
+    YMIR_ASSERT2(algn.numDivAlignments(1), 3)
 
-//     YMIR_ASSERT2(algn.getVar(0), 11)
-//     YMIR_ASSERT2(algn.getVar(1), 12)
-//     YMIR_ASSERT2(algn.getJoi(0), 31)
-//     YMIR_ASSERT2(algn.getJoi(1), 33)
-//     YMIR_ASSERT2(algn.getJoi(2), 35)
-//     YMIR_ASSERT2(algn.getDiv(0), 41)
-//     YMIR_ASSERT2(algn.getDiv(0), 45)
+    YMIR_ASSERT2(algn.getVar(0), 11)
+    YMIR_ASSERT2(algn.getVar(1), 12)
+    YMIR_ASSERT2(algn.getJoi(0), 31)
+    YMIR_ASSERT2(algn.getJoi(1), 33)
+    YMIR_ASSERT2(algn.getJoi(2), 35)
+    YMIR_ASSERT2(algn.getDiv(0), 41)
+    YMIR_ASSERT2(algn.getDiv(0), 45)
 
-//     YMIR_ASSERT2(algn.getVarGeneStart(0), 1)
-//     YMIR_ASSERT2(algn.getVarSeqStart(0), 2)
-//     YMIR_ASSERT2(algn.getVarLen(0), 3)
-//     YMIR_ASSERT2(algn.getVarGeneStart(1), 4)
-//     YMIR_ASSERT2(algn.getVarSeqStart(1), 5)
-//     YMIR_ASSERT2(algn.getVarLen(1), 6)
+    YMIR_ASSERT2(algn.getVarGeneStart(0), 1)
+    YMIR_ASSERT2(algn.getVarSeqStart(0), 2)
+    YMIR_ASSERT2(algn.getVarLen(0), 3)
+    YMIR_ASSERT2(algn.getVarGeneStart(1), 4)
+    YMIR_ASSERT2(algn.getVarSeqStart(1), 5)
+    YMIR_ASSERT2(algn.getVarLen(1), 6)
 
-//     YMIR_ASSERT2(algn.getJoiGeneStart(0), 7)
-//     YMIR_ASSERT2(algn.getJoiSeqStart(0), 8)
-//     YMIR_ASSERT2(algn.getJoiLen(0), 9)
-//     YMIR_ASSERT2(algn.getJoiGeneStart(2), 13)
-//     YMIR_ASSERT2(algn.getJoiSeqStart(2), 14)
-//     YMIR_ASSERT2(algn.getJoiLen(2), 15)
+    YMIR_ASSERT2(algn.getJoiGeneStart(0), 7)
+    YMIR_ASSERT2(algn.getJoiSeqStart(0), 8)
+    YMIR_ASSERT2(algn.getJoiLen(0), 9)
+    YMIR_ASSERT2(algn.getJoiGeneStart(2), 13)
+    YMIR_ASSERT2(algn.getJoiSeqStart(2), 14)
+    YMIR_ASSERT2(algn.getJoiLen(2), 15)
 
-//     YMIR_ASSERT2(algn.getDivGeneStart(0, 0), 20)
-//     YMIR_ASSERT2(algn.getDivSeqStart(0, 0), 21)
-//     YMIR_ASSERT2(algn.getDivLen(0, 0), 22)
-//     YMIR_ASSERT2(algn.getDivGeneStart(0, 1), 23)
-//     YMIR_ASSERT2(algn.getDivSeqStart(0, 1), 24)
-//     YMIR_ASSERT2(algn.getDivLen(0, 1), 25)
+    YMIR_ASSERT2(algn.getDivGeneStart(0, 0), 20)
+    YMIR_ASSERT2(algn.getDivSeqStart(0, 0), 21)
+    YMIR_ASSERT2(algn.getDivLen(0, 0), 22)
+    YMIR_ASSERT2(algn.getDivGeneStart(0, 1), 23)
+    YMIR_ASSERT2(algn.getDivSeqStart(0, 1), 24)
+    YMIR_ASSERT2(algn.getDivLen(0, 1), 25)
 
-//     YMIR_ASSERT2(algn.getDivGeneStart(1, 0), 30)
-//     YMIR_ASSERT2(algn.getDivSeqStart(1, 0), 31)
-//     YMIR_ASSERT2(algn.getDivLen(1, 0), 32)
-//     YMIR_ASSERT2(algn.getDivGeneStart(1, 2), 36)
-//     YMIR_ASSERT2(algn.getDivSeqStart(1, 2), 37)
-//     YMIR_ASSERT2(algn.getDivLen(1, 2), 38)
+    YMIR_ASSERT2(algn.getDivGeneStart(1, 0), 30)
+    YMIR_ASSERT2(algn.getDivSeqStart(1, 0), 31)
+    YMIR_ASSERT2(algn.getDivLen(1, 0), 32)
+    YMIR_ASSERT2(algn.getDivGeneStart(1, 2), 36)
+    YMIR_ASSERT2(algn.getDivSeqStart(1, 2), 37)
+    YMIR_ASSERT2(algn.getDivLen(1, 2), 38)
 
-// YMIR_TEST_END
+YMIR_TEST_END
 
 
 YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
@@ -3107,9 +3107,9 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_clorep())
 
     // Tests for markov chain.
-    YMIR_TEST(test_markovchain_nuc_mono())
-    YMIR_TEST(test_markovchain_nuc_di())
-    YMIR_TEST(test_markovchain_aa())
+    // YMIR_TEST(test_markovchain_nuc_mono())
+    // YMIR_TEST(test_markovchain_nuc_di())
+    // YMIR_TEST(test_markovchain_aa())
 
     // Test for Multi-Matrix Chains
     YMIR_TEST(test_mmc())

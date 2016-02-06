@@ -67,16 +67,12 @@ namespace ymir {
             _data.insert(_data.end(), other._data.begin(), other._data.end());
 
             _starts.reserve(_starts.size() + other._starts.size() + 1);
-            // _starts.insert(_starts.end(), other._starts.begin(), other._starts.end());
             size_t events_size = _events.size();
             for (size_t i = 0; i < other._starts.size(); ++i) {
                 _starts.push_back(events_size + other._starts[i]);
             }
 
             _events.reserve(_events.size() + other._events.size() + 1);
-            // for (size_t i = 0; i < other._events.size(); ++i) {
-            //     _events.push_back(other._events[i]);
-            // }
             _events.insert(_events.end(), other._events.begin(), other._events.end());
         }
 

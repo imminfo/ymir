@@ -82,28 +82,26 @@ namespace ymir {
          */
         ///@{
         VDJAlignmentBuilder& addVarAlignment(seg_index_t vseg, seq_len_t vstart, seq_len_t seqstart, seq_len_t alignment_len) {
-            _segments[0] += 1;
+            _++segments[0];
             _Valign.addAlignment(vseg, vstart, seqstart, alignment_len);
             return *this;
         }
 
 
         VDJAlignmentBuilder& addJoiAlignment(seg_index_t jseg, seq_len_t jstart, seq_len_t seqstart, seq_len_t alignment_len) {
-            _segments[1] += 1;
+            ++_segments[1];
             _Jalign.addAlignment(jseg, jstart, seqstart, alignment_len);
             return *this;
         }
 
         VDJAlignmentBuilder& addDivAlignment(seg_index_t dseg, seq_len_t dstart, seq_len_t seqstart, seq_len_t alignment_len) {
-            // check for recombination type?
-
             if (_Dseg.size() == 0 || dseg != _Dseg[_Dseg.size() - 1]) {
-                _n_Dalign.push_back(0);
+                _n_Dalign.push_back(_n_Dalign[_n_Dalign.size() - 1]);
                 _Dseg.push_back(dseg);
-                _segments[2] += 1;
+                ++_segments[2];
             }
 
-            _n_Dalign[_n_Dalign.size() - 1] += 1;
+            ++_n_Dalign[_n_Dalign.size() - 1];
 
             _Dalign.addAlignment(dseg, dstart, seqstart, alignment_len);
             return *this;
@@ -117,19 +115,19 @@ namespace ymir {
         ///@{
         VDJAlignmentBuilder& addVarAlignment(const NoGapAlignmentVector &vec) {
             _Valign.extend(vec);
-            _segments[0] += 1;
+            ++_segments[0];
             return *this;
         }
 
         VDJAlignmentBuilder& addJoiAlignment(const NoGapAlignmentVector &vec) {
             _Jalign.extend(vec);
-            _segments[1] += 1;
+            ++_segments[1];
             return *this;
         }
 
         VDJAlignmentBuilder& addDivAlignment(const NoGapAlignmentVector &vec) {
             _n_Dalign.push_back(vec.size());
-            _segments[2] += 1;
+            ++_segments[2];
             _Dalign.extend(vec);
             return *this;
         }

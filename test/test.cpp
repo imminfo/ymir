@@ -1650,7 +1650,7 @@ YMIR_TEST_END
 YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
     // NoGapAlignmentVector vec;
-    // NaiveCDR3NucleotideAligner nna;
+    // NaiveCDR3NucleotideAligner nna(genes, VDJAlignerBase::Parameters(1, 3));
     vector<string> avec1 {"V1", "V2", "V3", "V4"};
     vector<string> svec1 {"ACGTT", "ACGT", "ACG", "TTT"};
 
@@ -1692,21 +1692,23 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     // YMIR_ASSERT2(nna.alignJoi(4, "ACGT").text_start(0), 4)
     // YMIR_ASSERT2(nna.alignJoi(4, "ACGG").len(0), 0)
 
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").size(), 2)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").text_start(0), 1)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").pattern_start(0), 3)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").len(0), 2)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").text_start(1), 1)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").pattern_start(1), 6)
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").len(1), 2)
 
-    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA", 3).size(), 0)
+    // NaiveCDR3NucleotideAligner nna2(genes, VDJAlignerBase::Parameters(1, 3));
+    // YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").size(), 0)
 
-    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA", 2).size(), 2)
-    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA", 2).text_start(0), 1)
-    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA", 2).pattern_start(0), 3)
-    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA", 2).len(0), 2)
+    // YMIR_ASSERT2(nna.alignDiv(2, "AAGGTTGGGGGTT").size(), 3)
+    // YMIR_ASSERT2(nna.alignDiv(2, "AAGGTTGGGGGTT").text_start(1), 5)
+    // YMIR_ASSERT2(nna.alignDiv(2, "AAGGTTGGGGGTT").pattern_start(1), 5)
+    // YMIR_ASSERT2(nna.alignDiv(2, "AAGGTTGGGGGTT").len(1), 2)
 
-    // YMIR_ASSERT2(nna.alignDiv("AACCTT", "AAGGTTGGGGGTT", 2).size(), 3)
-    // YMIR_ASSERT2(nna.alignDiv("AACCTT", "AAGGTTGGGGGTT", 2)[1].gene_start(), 5)
-    // YMIR_ASSERT2(nna.alignDiv("AACCTT", "AAGGTTGGGGGTT", 2)[1].gene_end(), 6)
-    // YMIR_ASSERT2(nna.alignDiv("AACCTT", "AAGGTTGGGGGTT", 2)[1].seq_start(), 5)
-    // YMIR_ASSERT2(nna.alignDiv("AACCTT", "AAGGTTGGGGGTT", 2)[1].seq_end(), 6)
-
-    // YMIR_ASSERT2(nna.alignDiv("ACT", "ACTGACGACGGTATCTAC", 2).size(), 5)
+    // YMIR_ASSERT2(nna.alignDiv(3, "ACTGACGACGGTATCTAC").size(), 5)
 
 YMIR_TEST_END
 
@@ -3099,11 +3101,11 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_vdjgenes3())
     YMIR_TEST(test_genesegmentalphabet_read())
     YMIR_TEST(test_vdjgenes_read())
-/*
+
     // Tests for clone, clone alignment and clone builder classes.
     YMIR_TEST(test_clone())
     YMIR_TEST(test_clonebuilder_clonealign())
-
+/*
     // Tests for NoGapAlignmentVector and GappedAlignmentVector
     // YMIR_TEST(test_nogap_alignment_vector_no_err())
     // YMIR_TEST(test_nogap_alignment_vector_errors())

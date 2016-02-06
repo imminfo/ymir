@@ -1621,13 +1621,13 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
     YMIR_ASSERT(algn.isJoiMismatch(1, 4))
     YMIR_ASSERT(!algn.isJoiMismatch(1, 12))
 
-    // YMIR_ASSERT2(algn.getJoiGeneStart(2), 13)
-    // YMIR_ASSERT2(algn.getJoiSeqStart(2), 14)
-    // YMIR_ASSERT2(algn.getJoiLen(2), 15)
-    // YMIR_ASSERT(!algn.isJoiMismatch(2, 1))
-    // YMIR_ASSERT(!algn.isJoiMismatch(2, 4))
-    // YMIR_ASSERT(algn.isJoiMismatch(2, 14))
-    // YMIR_ASSERT(algn.isJoiMismatch(2, 15))
+    YMIR_ASSERT2(algn.getJoiGeneStart(2), 13)
+    YMIR_ASSERT2(algn.getJoiSeqStart(2), 14)
+    YMIR_ASSERT2(algn.getJoiLen(2), 15)
+    YMIR_ASSERT(!algn.isJoiMismatch(2, 1))
+    YMIR_ASSERT(!algn.isJoiMismatch(2, 4))
+    YMIR_ASSERT(algn.isJoiMismatch(2, 14))
+    YMIR_ASSERT(algn.isJoiMismatch(2, 15))
 
 YMIR_TEST_END
 

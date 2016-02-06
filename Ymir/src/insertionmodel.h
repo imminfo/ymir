@@ -48,7 +48,7 @@ namespace ymir {
             if (_arr.get() != other._arr.get()) {
                 _type = other._type;
                 this->initProbabilities();
-                this->updateProbabilities(other._arr);
+                this->updateProbabilities(other._arr.get());
             }
         }
 
@@ -145,17 +145,17 @@ namespace ymir {
             if (len) {
                 if (_type == MONO_NUCLEOTIDE) {
                     std::discrete_distribution<int> distr;
-                    distr = std::discrete_distribution<int>(_arr, _arr + 4);
+                    distr = std::discrete_distribution<int>(_arr.get(), _arr.get() + 4);
 
                     for (seq_len_t i = 0; i < len; ++i) {
                         res += inv_nuc_hash(distr(rg));
                     }
                 } else {
                     std::discrete_distribution<int> distrs[] = {
-                            std::discrete_distribution<int>(_arr, _arr + 4),
-                            std::discrete_distribution<int>(_arr + 4, _arr + 8),
-                            std::discrete_distribution<int>(_arr + 8, _arr + 12),
-                            std::discrete_distribution<int>(_arr + 12, _arr + 16)
+                            std::discrete_distribution<int>(_arr.get(), _arr.get() + 4),
+                            std::discrete_distribution<int>(_arr.get() + 4, _arr.get() + 8),
+                            std::discrete_distribution<int>(_arr.get() + 8, _arr.get() + 12),
+                            std::discrete_distribution<int>(_arr.get() + 12, _arr.get() + 16)
                     };
 
                     if (first_char == NULL_CHAR) {
@@ -229,7 +229,7 @@ namespace ymir {
 
 
         InsertionModel() 
-            : _arr(new prob_t[4]) 
+            : _arr(std::move(prob_array_t(new prob_t[4])))
         {
             _type = MONO_NUCLEOTIDE;
         }

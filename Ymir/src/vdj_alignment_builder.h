@@ -82,7 +82,7 @@ namespace ymir {
          */
         ///@{
         VDJAlignmentBuilder& addVarAlignment(seg_index_t vseg, seq_len_t vstart, seq_len_t seqstart, seq_len_t alignment_len) {
-            _++segments[0];
+            ++_segments[0];
             _Valign.addAlignment(vseg, vstart, seqstart, alignment_len);
             return *this;
         }

@@ -1681,7 +1681,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
     NoGapAlignmentVector vec5;
     AlignmentVectorBase::events_storage_t events51 {false, false, true, true, 
                                                     false, true, true};
-    vec4.addAlignment(45, 17, 18, events51);
+    vec5.addAlignment(45, 17, 18, events51);
 
 
     builder.addVarAlignment(vec1)

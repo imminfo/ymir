@@ -128,7 +128,7 @@ namespace ymir {
         }
 
         VDJAlignmentBuilder& addDivAlignment(const NoGapAlignmentVector &vec) {
-            _n_Dalign.push_back(_n_Dalign[_n_Dalign.size() - 1] + vec.size());
+            _n_Dalign.push_back(vec.size());
             ++_segments[2];
             _Dalign.extend(vec);
             return *this;

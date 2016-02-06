@@ -3105,17 +3105,17 @@ int main(int argc, char* argv[]) {
     // Tests for clone, clone alignment and clone builder classes.
     YMIR_TEST(test_clone())
     YMIR_TEST(test_clonebuilder_clonealign())
-/*
-    // Tests for NoGapAlignmentVector and GappedAlignmentVector
-    // YMIR_TEST(test_nogap_alignment_vector_no_err())
-    // YMIR_TEST(test_nogap_alignment_vector_errors())
-    // YMIR_TEST(test_gapped_alignment_vector())
 
+    // Tests for NoGapAlignmentVector and GappedAlignmentVector
+    YMIR_TEST(test_nogap_alignment_vector_no_err())
+    YMIR_TEST(test_nogap_alignment_vector_errors())
+    YMIR_TEST(test_gapped_alignment_vector())
+/*
     // Tests for VDJAlignment and VDJAlignmentBuilder
-    // YMIR_TEST(test_vdj_alignment_simple_vj())
-    // YMIR_TEST(test_vdj_alignment_simple_vdj())
-    // YMIR_TEST(test_vdj_alignment_vector_vj())
-    // YMIR_TEST(test_vdj_alignment_vector_vdj())
+    YMIR_TEST(test_vdj_alignment_simple_vj())
+    YMIR_TEST(test_vdj_alignment_simple_vdj())
+    YMIR_TEST(test_vdj_alignment_vector_vj())
+    YMIR_TEST(test_vdj_alignment_vector_vdj())
 
     // Tests for sequences aligners.
     YMIR_TEST(test_naive_cdr3_nuc_aligner())
@@ -3163,7 +3163,7 @@ int main(int argc, char* argv[]) {
     // Tests for forward-backward algorithms
     YMIR_TEST(test_maag_forward_backward_vj())
     YMIR_TEST(test_maag_forward_backward_vdj())
-    */
+    
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.
 

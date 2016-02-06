@@ -3269,10 +3269,10 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_clorep())
 
     // Tests for markov chain.
-/*    YMIR_TEST(test_markovchain_nuc_mono())
+    YMIR_TEST(test_markovchain_nuc_mono())
     YMIR_TEST(test_markovchain_nuc_di())
     YMIR_TEST(test_markovchain_aa())
-
+/*
     // Test for Multi-Matrix Chains
     YMIR_TEST(test_mmc())
 

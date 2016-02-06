@@ -1659,6 +1659,9 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     vector<string> avec2 {"J1", "J2", "J3", "J4"};
     vector<string> svec2 {"CGT", "TACGT", "TTCGT", "TTTTT"};
 
+    vector<string> avec3 {"D1", "D2", "D3"};
+    vector<string> svec3 {"AA", "AACCTT", "ACT"};
+
     // YMIR_ASSERT2(nna.alignVar(1, "ACGT").pattern_start(0), 1)
     // YMIR_ASSERT2(nna.alignVar(1, "ACGT").text_start(0), 1)
     // YMIR_ASSERT2(nna.alignVar(1, "ACGT").len(0), 4)
@@ -3087,7 +3090,7 @@ int main(int argc, char* argv[]) {
 
 
     //**************  TEST CASES  **************//
-    YMIR_TEST(test_basic())
+    YMIR_TEST(test_basic())/*
 
     // Tests for ModelParameterVector
     YMIR_TEST(test_model_param_vec_vj())
@@ -3161,6 +3164,7 @@ int main(int argc, char* argv[]) {
     // Tests for forward-backward algorithms
     YMIR_TEST(test_maag_forward_backward_vj())
     YMIR_TEST(test_maag_forward_backward_vdj())
+    */
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.
 

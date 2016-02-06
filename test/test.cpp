@@ -3257,7 +3257,7 @@ int main(int argc, char* argv[]) {
 
     // Error corrector test
     YMIR_TEST(test_errcorr_aligner())
-/*
+
     // Test for the repertoire parser and writer
     // YMIR_TEST(test_parser_vj())
     // YMIR_TEST(test_parser_vj_stream())
@@ -3269,7 +3269,7 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_clorep())
 
     // Tests for markov chain.
-    YMIR_TEST(test_markovchain_nuc_mono())
+/*    YMIR_TEST(test_markovchain_nuc_mono())
     YMIR_TEST(test_markovchain_nuc_di())
     YMIR_TEST(test_markovchain_aa())
 

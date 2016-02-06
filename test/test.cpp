@@ -1355,6 +1355,51 @@ YMIR_TEST_START(test_gapped_alignment_vector)
     YMIR_ASSERT(vec.isDel(1, 4))
     YMIR_ASSERT(vec.isDel(1, 5))
 
+
+    GappedAlignmentVector vec2;
+    AlignmentVectorBase::events_storage_t events3;
+    add_ins(&events3);
+    add_del(&events3);
+    add_match(&events3);
+    add_mismatch(&events3);
+    add_del(&events3);
+    add_ins(&events3);
+    vec2.addAlignment(21, 5, 6, events3);
+
+    vec.extend(vec2);
+
+    YMIR_ASSERT2(vec.size(), 3)
+
+    YMIR_ASSERT2(vec.pattern_start(0), 1)
+    YMIR_ASSERT2(vec.text_start(0), 2)
+    YMIR_ASSERT2(vec.len(0), 4)
+    YMIR_ASSERT2(vec.id(0), 11)
+    YMIR_ASSERT(vec.isMatch(0, 1))
+    YMIR_ASSERT(vec.isMismatch(0, 2))
+    YMIR_ASSERT(vec.isIns(0, 3))
+    YMIR_ASSERT(vec.isIns(0, 4))
+
+    YMIR_ASSERT2(vec.pattern_start(1), 3)
+    YMIR_ASSERT2(vec.text_start(1), 4)
+    YMIR_ASSERT2(vec.len(1), 5)
+    YMIR_ASSERT2(vec.id(1), 14)
+    YMIR_ASSERT(vec.isMismatch(1, 1))
+    YMIR_ASSERT(vec.isIns(1, 2))
+    YMIR_ASSERT(vec.isMatch(1, 3))
+    YMIR_ASSERT(vec.isDel(1, 4))
+    YMIR_ASSERT(vec.isDel(1, 5))
+
+    YMIR_ASSERT2(vec.pattern_start(2), 5)
+    YMIR_ASSERT2(vec.text_start(2), 6)
+    YMIR_ASSERT2(vec.len(2), 6)
+    YMIR_ASSERT2(vec.id(2), 21)    
+    YMIR_ASSERT(vec.isIns(2, 1))
+    YMIR_ASSERT(vec.isDel(2, 2))
+    YMIR_ASSERT(vec.isMatch(2, 3))
+    YMIR_ASSERT(vec.isMismatch(2, 4))
+    YMIR_ASSERT(vec.isDel(2, 5))
+    YMIR_ASSERT(vec.isIns(2, 6))
+
 YMIR_TEST_END
 
 

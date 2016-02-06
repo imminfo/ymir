@@ -50,6 +50,7 @@ namespace ymir {
         AlignmentVectorBase() {
             _events.reserve(default_events_reserve_size);
             _starts.reserve(default_start_reserve_size);
+            _starts.push_back(0);
         }
 
 

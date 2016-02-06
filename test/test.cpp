@@ -1662,7 +1662,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
     YMIR_ASSERT2(algn.getJoi(1), 33)
     YMIR_ASSERT2(algn.getJoi(2), 35)
     YMIR_ASSERT2(algn.getDiv(0), 41)
-    YMIR_ASSERT2(algn.getDiv(0), 45)
+    YMIR_ASSERT2(algn.getDiv(1), 45)
 
     YMIR_ASSERT2(algn.getVarGeneStart(0), 1)
     YMIR_ASSERT2(algn.getVarSeqStart(0), 2)
@@ -3166,7 +3166,7 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_vdj_alignment_simple_vdj())
     YMIR_TEST(test_vdj_alignment_vector_vj())
     YMIR_TEST(test_vdj_alignment_vector_vdj())
-/*
+
     // Tests for sequences aligners.
     YMIR_TEST(test_naive_cdr3_nuc_aligner())
     YMIR_TEST(test_cdr3_nuc_aligner())
@@ -3176,7 +3176,7 @@ int main(int argc, char* argv[]) {
 
     // Error corrector test
     YMIR_TEST(test_errcorr_aligner())
-
+/*
     // Test for the repertoire parser and writer
     // YMIR_TEST(test_parser_vj())
     // YMIR_TEST(test_parser_vj_stream())

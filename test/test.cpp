@@ -3092,14 +3092,14 @@ int main(int argc, char* argv[]) {
     // Tests for ModelParameterVector
     YMIR_TEST(test_model_param_vec_vj())
     YMIR_TEST(test_model_param_vec_vdj())
-/*
+
     // Tests for gene segments classes
     YMIR_TEST(test_genesegmentalphabet())
     YMIR_TEST(test_vdjgenes2())
     YMIR_TEST(test_vdjgenes3())
     YMIR_TEST(test_genesegmentalphabet_read())
     YMIR_TEST(test_vdjgenes_read())
-
+/*
     // Tests for clone, clone alignment and clone builder classes.
     YMIR_TEST(test_clone())
     YMIR_TEST(test_clonebuilder_clonealign())

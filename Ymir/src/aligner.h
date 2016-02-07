@@ -546,7 +546,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerBase::Parameters params = VDJAlignerBase::Parameters()) const 
+                        SmithWatermanAligner::Parameters params = SmithWatermanAligner::Parameters()) const 
         {
             // avec->addAlignment(gene, );
         }
@@ -557,7 +557,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerBase::Parameters params = VDJAlignerBase::Parameters()) const 
+                        SmithWatermanAligner::Parameters params = SmithWatermanAligner::Parameters()) const 
         {
             // avec->addAlignment(gene, );
         }
@@ -594,7 +594,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerBase::Parameters params = VDJAlignerBase::Parameters()) const 
+                        SmithWatermanNoGapAligner::Parameters params = SmithWatermanNoGapAligner::Parameters()) const 
         {
             // avec->addAlignment(gene, );
         }
@@ -605,7 +605,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerBase::Parameters params = VDJAlignerBase::Parameters()) const 
+                        SmithWatermanNoGapAligner::Parameters params = SmithWatermanNoGapAligner::Parameters()) const 
         {
             // avec->addAlignment(gene, );
         }

@@ -154,7 +154,7 @@ namespace ymir {
         /**
          * \brief Access the latest alignment results and optionally move it.
          */
-         VDJAlignment&& last_alignment_and_clear() const { return _builder.build(); }
+         VDJAlignment&& last_alignment_and_clear() { return _builder.build(); }
 
     protected:
 
@@ -173,7 +173,11 @@ namespace ymir {
 
 
         /**
-         * \brief Alignment. 
+         * \brief Internal alignment functions.
+         *
+         * \param id
+         * \param pattern
+         * \param vec
          */
         ///@{
         void _alignVar(seg_index_t id, const sequence_t &pattern, AlignmentType *vec) const {
@@ -286,20 +290,6 @@ namespace ymir {
     //
 
 
-    struct NaiveCDR3AlignerFunctor_V;
-    struct NaiveCDR3AlignerFunctor_D;
-    struct NaiveCDR3AlignerFunctor_J;
-
-
-    /**
-     *
-     */
-    typedef VDJAlignerBase<NoGapAlignmentVector,
-                           NaiveCDR3AlignerFunctor_V, 
-                           NaiveCDR3AlignerFunctor_D, 
-                           NaiveCDR3AlignerFunctor_J> NaiveCDR3NucleotideAligner;
-
-
     /**
      * \brief
      */
@@ -400,24 +390,19 @@ namespace ymir {
     ///@}
 
 
+    /**
+     *
+     */
+    typedef VDJAlignerBase<NoGapAlignmentVector,
+                           NaiveCDR3AlignerFunctor_V, 
+                           NaiveCDR3AlignerFunctor_D, 
+                           NaiveCDR3AlignerFunctor_J> NaiveCDR3NucleotideAligner;
+
+
     //
     // CDR3-only alignment with errors - align V starting from the left edge, 
     // J starting from the right edge, and align D everywhere.
     //
-
-
-    struct CDR3AlignerFunctor_V;
-    struct CDR3AlignerFunctor_D;
-    struct CDR3AlignerFunctor_J;
-
-
-    /**
-     *
-     */
-    typedef VDJAlignerBase<NoGapAlignmentVector, 
-                           CDR3AlignerFunctor_V, 
-                           CDR3AlignerFunctor_D, 
-                           CDR3AlignerFunctor_J> CDR3NucleotideAligner;
 
 
     /**
@@ -483,6 +468,15 @@ namespace ymir {
     ///@}
 
 
+    /**
+     *
+     */
+    typedef VDJAlignerBase<NoGapAlignmentVector, 
+                           CDR3AlignerFunctor_V, 
+                           CDR3AlignerFunctor_D, 
+                           CDR3AlignerFunctor_J> CDR3NucleotideAligner;
+
+
     // /**
     //  * \class AlignmentMatrix
     //  */
@@ -526,21 +520,6 @@ namespace ymir {
     //
 
 
-    struct SWAlignerFunctor_VJ;
-    struct SWAlignerFunctor_D;
-
-
-    /**
-     * \typedef SmithWatermanAligner
-     *
-     * \brief Smith-Waterman aligner for finding maximal matches with gaps. Don't takes into account errors.
-     */
-    typedef VDJAlignerBase<GappedAlignmentVector, 
-                           SWAlignerFunctor_VJ, 
-                           SWAlignerFunctor_D, 
-                           SWAlignerFunctor_VJ> SmithWatermanAligner;
-
-
     /**
      * \brief
      */
@@ -569,24 +548,20 @@ namespace ymir {
     ///@}
 
 
+    /**
+     * \typedef SmithWatermanAligner
+     *
+     * \brief Smith-Waterman aligner for finding maximal matches with gaps. Don't takes into account errors.
+     */
+    typedef VDJAlignerBase<GappedAlignmentVector, 
+                           SWAlignerFunctor_VJ, 
+                           SWAlignerFunctor_D, 
+                           SWAlignerFunctor_VJ> SmithWatermanAligner;
+
+
     //
     // Smith-Waterman with no gap allowed, but with errors
     //
-
-
-    struct SWNGAlignerFunctor_VJ;
-    struct SWNGAlignerFunctor_D;
-
-
-    /**
-     * \typedef SmithWatermanNoGapAligner
-     *
-     * \brief Smith-Waterman aligner without gaps, returns maximal matches with information about mismatch errors.
-     */
-    typedef VDJAlignerBase<NoGapAlignmentVector,
-                           SWNGAlignerFunctor_VJ, 
-                           SWNGAlignerFunctor_D, 
-                           SWNGAlignerFunctor_VJ> SmithWatermanNoGapAligner;
 
 
     /**
@@ -615,6 +590,17 @@ namespace ymir {
         }
     };
     ///@}
+
+
+    /**
+     * \typedef SmithWatermanNoGapAligner
+     *
+     * \brief Smith-Waterman aligner without gaps, returns maximal matches with information about mismatch errors.
+     */
+    typedef VDJAlignerBase<NoGapAlignmentVector,
+                           SWNGAlignerFunctor_VJ, 
+                           SWNGAlignerFunctor_D, 
+                           SWNGAlignerFunctor_VJ> SmithWatermanNoGapAligner;
 
 }
 

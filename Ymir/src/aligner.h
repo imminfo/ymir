@@ -162,6 +162,10 @@ namespace ymir {
         VDJRecombinationGenes _genes;
         VDJAlignmentBuilder _builder;
 
+        V_Aligner _V_Aligner;
+        D_Aligner _D_Aligner;
+        J_Aligner _J_Aligner;
+
 
         VDJAlignerBase()
         {
@@ -173,15 +177,15 @@ namespace ymir {
          */
         ///@{
         void _alignVar(seg_index_t id, const sequence_t &pattern, AlignmentType *vec) const {
-            V_Aligner(id, pattern, _genes.V()[id].sequence, vec, _params);
+            _V_Aligner(id, pattern, _genes.V()[id].sequence, vec, _params);
         }
 
         void _alignDiv(seg_index_t id, const sequence_t &pattern, AlignmentType *vec) const {
-            D_Aligner(id, pattern, _genes.D()[id].sequence, vec, _params);
+            _D_Aligner(id, pattern, _genes.D()[id].sequence, vec, _params);
         }
 
         void _alignJoi(seg_index_t id, const sequence_t &pattern, AlignmentType *vec) const {
-            J_Aligner(id, pattern, _genes.J()[id].sequence, vec, _params);
+            _J_Aligner(id, pattern, _genes.J()[id].sequence, vec, _params);
         }
         ///@}
 
@@ -291,9 +295,9 @@ namespace ymir {
      *
      */
     typedef VDJAlignerBase<NoGapAlignmentVector,
-                           NaiveCDR3AlignerFunctor_V(), 
-                           NaiveCDR3AlignerFunctor_D(), 
-                           NaiveCDR3AlignerFunctor_J()> NaiveCDR3NucleotideAligner;
+                           NaiveCDR3AlignerFunctor_V, 
+                           NaiveCDR3AlignerFunctor_D, 
+                           NaiveCDR3AlignerFunctor_J> NaiveCDR3NucleotideAligner;
 
 
     /**

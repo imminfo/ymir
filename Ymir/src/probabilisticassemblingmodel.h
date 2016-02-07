@@ -1168,12 +1168,8 @@ namespace ymir {
         void save_vj(const string &folderpath) const {
             AbstractTDContainer* container;
 
-            std::cout << "here1" << std::endl;
-
             _genes->write(folderpath + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "vsegments.txt").asString(),
                           folderpath + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "jsegments.txt").asString());
-
-            std::cout << "here2" << std::endl;
 
             // V-J
             container = new TDMatrix(true);
@@ -1190,23 +1186,36 @@ namespace ymir {
             container->write(folderpath + _config.get("probtables", Json::Value()).get("v.j", Json::Value()).get("file", .0).asString());
             delete container;
 
-            std::cout << "here3" << std::endl;
-
             // V del
+
+            std::cout << "here40" << std::endl;
+
             container = new TDVectorList(true);
+
+            std::cout << "here41" << std::endl;
+
             for (auto i = 0; i <= _genes->V().maxLength(); ++i) {
                 container->addRowName(std::to_string(i));
             }
             container->addColumnName("V deletions");
+
+            std::cout << "here42" << std::endl;
+
             for (auto i = 1; i <= _genes->V().max(); ++i) {
                 container->addColumnName(_genes->V()[i].allele);
                 container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_DEL, i - 1, 0)),
                                          _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_DEL, i - 1, 0) + _param_vec->eventFamilySize(VJ_VAR_DEL, i - 1)));
             }
+
+            std::cout << "here43" << std::endl;
+
             container->write(folderpath + _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("file", .0).asString());
+
+            std::cout << "here44" << std::endl;
+
             delete container;
 
-            std::cout << "here4" << std::endl;
+            std::cout << "here45" << std::endl;
 
             // J del
             container = new TDVectorList(true);

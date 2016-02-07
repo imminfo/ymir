@@ -1785,7 +1785,7 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
-    NaiveCDR3NucleotideAligner nna(genes, NaiveCDR3NucleotideAligner::Parameters(1, 3));
+    NaiveCDR3NucleotideAligner nna(genes, VDJAlignerParameters(1, 3));
 
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").text_start(0), 1)
@@ -1827,7 +1827,7 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").pattern_start(1), 6)
     YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").len(1), 2)
 
-    NaiveCDR3NucleotideAligner nna2(genes, NaiveCDR3NucleotideAligner::Parameters(1, 2));
+    NaiveCDR3NucleotideAligner nna2(genes, VDJAlignerParameters(1, 2));
     YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").size(), 0)
 
     YMIR_ASSERT2(nna.alignDiv(2, "AAGGTTGGGGGTT").size(), 3)

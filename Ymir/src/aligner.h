@@ -157,7 +157,7 @@ namespace ymir {
 
     protected:
 
-        Parameters _params;
+        VDJAlignerParameters _params;
         VDJRecombinationGenes _genes;
         VDJAlignmentBuilder _builder;
 

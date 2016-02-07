@@ -56,11 +56,11 @@ namespace ymir {
 
 
         InsertionModel& operator=(const InsertionModel &other) {
-            if (_arr.get() != other._arr.get()) {
+            // if (_arr.get() != other._arr.get()) {
                 _type = other._type;
                 this->initProbabilities();
                 this->updateProbabilities(other._arr.get());
-            }
+            // }
         }
 
 

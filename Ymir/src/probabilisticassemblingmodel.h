@@ -1168,8 +1168,12 @@ namespace ymir {
         void save_vj(const string &folderpath) const {
             AbstractTDContainer* container;
 
+            std::cout << "here1" << std::endl;
+
             _genes->write(folderpath + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "vsegments.txt").asString(),
                           folderpath + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "jsegments.txt").asString());
+
+            std::cout << "here2" << std::endl;
 
             // V-J
             container = new TDMatrix(true);
@@ -1186,6 +1190,8 @@ namespace ymir {
             container->write(folderpath + _config.get("probtables", Json::Value()).get("v.j", Json::Value()).get("file", .0).asString());
             delete container;
 
+            std::cout << "here3" << std::endl;
+
             // V del
             container = new TDVectorList(true);
             for (auto i = 0; i <= _genes->V().maxLength(); ++i) {
@@ -1199,6 +1205,8 @@ namespace ymir {
             }
             container->write(folderpath + _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("file", .0).asString());
             delete container;
+
+            std::cout << "here4" << std::endl;
 
             // J del
             container = new TDVectorList(true);
@@ -1214,6 +1222,8 @@ namespace ymir {
             container->write(folderpath + _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("file", .0).asString());
             delete container;
 
+            std::cout << "here5" << std::endl;
+
             // VJ ins
             container = new TDVectorList(true);
             container->addColumnName("VJ ins len");
@@ -1226,6 +1236,8 @@ namespace ymir {
             container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("file", .0).asString());
             delete container;
 
+            std::cout << "here6" << std::endl;
+
             // VJ nuc
             container = new TDVectorList(true);
             container->addColumnName("VJ nucs");
@@ -1234,6 +1246,9 @@ namespace ymir {
             container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)),
                                      _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0) + 4));
             container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("file", .0).asString());
+
+            std::cout << "here7" << std::endl;
+
             delete container;
         }
 

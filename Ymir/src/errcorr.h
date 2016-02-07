@@ -6,9 +6,8 @@
 #define YMIR_ERRCORR_H
 
 
-#include "clonotype.h"
-#include "types.h"
-#include "genesegment.h"
+#include "clonotype_builder.h"
+#include "aligner.h"
 
 
 namespace ymir {
@@ -54,6 +53,7 @@ namespace ymir {
     //     }
 
     // };
+    
 }
 
 #endif //YMIR_ERRCORR_H

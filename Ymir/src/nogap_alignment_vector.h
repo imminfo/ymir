@@ -43,6 +43,12 @@ namespace ymir {
 
         /**
          * \brief Add a new alignment to the vector.
+         * 
+         * \param id
+         * \param p_start
+         * \param t_start
+         * \param size
+         * \param vec
          */
         ///@{
         void addAlignment(seg_index_t id, seq_len_t p_start, seq_len_t t_start, seq_len_t size) {
@@ -63,6 +69,9 @@ namespace ymir {
         ///@}
 
 
+        /**
+         *
+         */
         bool isMismatch(seq_len_t i, seq_len_t j) const { 
 #ifndef DNDEBUG
             if (_starts[i] + j - 1 >= _events.size()) {

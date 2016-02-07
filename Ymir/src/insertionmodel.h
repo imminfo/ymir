@@ -34,12 +34,14 @@ namespace ymir {
         }
 
 
-        InsertionModel(InsertionModelType mt, std::vector<prob_t>::const_iterator start) : InsertionModel(mt) {
+        InsertionModel(InsertionModelType mt, std::vector<prob_t>::const_iterator start) 
+            : InsertionModel(mt) {
             this->updateProbabilities(start);
         }
 
 
-        InsertionModel(const event_matrix_t& mat) : InsertionModel(DI_NUCLEOTIDE) {
+        InsertionModel(const event_matrix_t& mat) 
+            : InsertionModel(DI_NUCLEOTIDE) {
             this->updateProbabilities(mat);
         }
 
@@ -59,13 +61,11 @@ namespace ymir {
 
 
         void initProbabilities() {
-            prob_array_t tmp;
             if (_type == MONO_NUCLEOTIDE) {
-                tmp = prob_array_t(new prob_t[4]);
+                _arr.reset(new prob_t[4]);
             } else {
-                tmp = prob_array_t(new prob_t[16]);
+                _arr.reset(new prob_t[16]);
             }
-            _arr = std::move(tmp);
         }
 
 
@@ -142,6 +142,9 @@ namespace ymir {
         ///@}
 
 
+        /**
+         *
+         */
         std::string generate(seq_len_t len, std::default_random_engine &rg, char first_char = NULL_CHAR, bool reverse = false) const {
             std::string res = "";
             if (len) {

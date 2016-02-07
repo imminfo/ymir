@@ -25,7 +25,7 @@
 #define _ALIGNER_H_
 
 
-#include "alignment.h"
+#include "vdj_alignment_builder.h"
 #include "genesegment.h"
 
 
@@ -63,7 +63,7 @@ namespace ymir {
          *
          */
         VDJAlignerBase(const VDJRecombinationGenes &genes,
-                       VDJAlignerBase::Parameters params
+                       VDJAlignerBase::Parameters params)
                            // const AlignmentEventScore &v_score = AlignmentEventScore(1, -1, -1, -1),
                            // const AlignmentEventScore &d_score = AlignmentEventScore(1, -1, -1, -1),
                            // const AlignmentEventScore &j_score = AlignmentEventScore(1, -1, -1, -1))

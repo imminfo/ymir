@@ -108,7 +108,7 @@ namespace ymir {
         seq_len_t text_start(seq_len_t i) const {
 #ifndef DNDEBUG
             if (i*4 + 1 >= _data.size()) {
-                throw(std::runtime_error("Alignment vector: test index is out of bounds."));
+                throw(std::runtime_error("Alignment vector: text index is out of bounds."));
             }
 #endif
             return _data[i*4 + 1];

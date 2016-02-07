@@ -2890,7 +2890,7 @@ YMIR_TEST_START(test_model_vj_save_load)
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
     YMIR_ASSERT(model.status())
 
-    // YMIR_ASSERT(model.save(TEST_DATA_FOLDER + "test_vj_model2/"))
+    YMIR_ASSERT(model.save(TEST_DATA_FOLDER + "test_vj_model2/"))
     // ProbabilisticAssemblingModel model2(TEST_DATA_FOLDER + "test_vj_model2/");
     // YMIR_ASSERT(model2.status())
 

@@ -57,9 +57,7 @@ namespace ymir {
             _behaviour = behav;
 
             _recomb = UNDEF_RECOMB;
-            _status = false;
-
-            _genes = nullptr;
+            _status = false;    
 
             _status = this->parseModelConfig(_model_path)
                       && this->parseGeneSegments()
@@ -78,8 +76,8 @@ namespace ymir {
         /**
          *
          */
-        virtual ~ProbabilisticAssemblingModel() {
-            if (_genes) { delete _genes; }
+        virtual ~ProbabilisticAssemblingModel()
+        {
         }
 
 
@@ -308,7 +306,7 @@ namespace ymir {
         Recombination _recomb;
         string _model_path;
 
-        VDJRecombinationGenes *_genes;
+        unique_ptr<VDJRecombinationGenes> _genes;
         unique_ptr<ModelParameterVector> _param_vec;
 
         unique_ptr<MAAGBuilder> _builder;
@@ -387,7 +385,7 @@ namespace ymir {
             bool vok, jok, dok = true;
 
             if (_recomb == VJ_RECOMB) {
-                _genes = new VDJRecombinationGenes("VJ.V", v_path, "VJ.J", j_path, &vok, &jok);
+                _genes.reset(new VDJRecombinationGenes("VJ.V", v_path, "VJ.J", j_path, &vok, &jok));
             } else if (_recomb == VDJ_RECOMB) {
                 cout << "\tD gene seg.:     ";
                 if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
@@ -396,7 +394,7 @@ namespace ymir {
                     return false;
                 } else {
                     string d_path = _model_path + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
-                    _genes = new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok);
+                    _genes.reset(new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok));
                     _min_D_len = _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("min.len", DEFAULT_DIV_GENE_MIN_LEN).asUInt();
                     cout << "OK" << endl;
                 }

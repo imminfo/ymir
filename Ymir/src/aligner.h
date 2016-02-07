@@ -291,9 +291,9 @@ namespace ymir {
      *
      */
     typedef VDJAlignerBase<NoGapAlignmentVector,
-                           NaiveCDR3AlignerFunctor_V, 
-                           NaiveCDR3AlignerFunctor_D, 
-                           NaiveCDR3AlignerFunctor_J> NaiveCDR3NucleotideAligner;
+                           NaiveCDR3AlignerFunctor_V(), 
+                           NaiveCDR3AlignerFunctor_D(), 
+                           NaiveCDR3AlignerFunctor_J()> NaiveCDR3NucleotideAligner;
 
 
     /**

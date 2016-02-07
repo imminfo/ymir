@@ -1773,7 +1773,6 @@ YMIR_TEST_END
 YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
     NoGapAlignmentVector vec;
-    NaiveCDR3NucleotideAligner nna(genes, VDJAlignerBase::Parameters(1, 3));
 
     vector<string> avec1 {"V1", "V2", "V3", "V4"};
     vector<string> svec1 {"ACGTT", "ACGT", "ACG", "TTT"};
@@ -1785,6 +1784,8 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     vector<string> svec3 {"AA", "AACCTT", "ACT"};
 
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
+
+    NaiveCDR3NucleotideAligner nna(genes, NaiveCDR3NucleotideAligner::Parameters(1, 3));
 
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").text_start(0), 1)
@@ -1826,7 +1827,7 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").pattern_start(1), 6)
     YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").len(1), 2)
 
-    NaiveCDR3NucleotideAligner nna2(genes, VDJAlignerBase::Parameters(1, 2));
+    NaiveCDR3NucleotideAligner nna2(genes, NaiveCDR3NucleotideAligner::Parameters(1, 2));
     YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").size(), 0)
 
     YMIR_ASSERT2(nna.alignDiv(2, "AAGGTTGGGGGTT").size(), 3)

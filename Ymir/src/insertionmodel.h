@@ -48,6 +48,14 @@ namespace ymir {
         }
 
 
+        InsertionModel(const InsertionModel &other) 
+            : _type(other._type), 
+              _arr(new prob_t[other._type == MONO_NUCLEOTIDE ? 4 : 16])
+        {
+            this->updateProbabilities(other._arr.get());
+        }
+
+
         InsertionModel& operator=(const InsertionModel &other) {
             if (_arr.get() != other._arr.get()) {
                 _type = other._type;

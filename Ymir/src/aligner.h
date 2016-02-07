@@ -290,6 +290,9 @@ namespace ymir {
     //
 
 
+    class NaiveCDR3NucleotideAligner;
+
+
     /**
      * \brief
      */
@@ -403,6 +406,9 @@ namespace ymir {
     // CDR3-only alignment with errors - align V starting from the left edge, 
     // J starting from the right edge, and align D everywhere.
     //
+
+
+   class CDR3NucleotideAligner;
 
 
     /**
@@ -520,6 +526,9 @@ namespace ymir {
     //
 
 
+    class SmithWatermanAligner;
+
+
     /**
      * \brief
      */
@@ -562,6 +571,9 @@ namespace ymir {
     //
     // Smith-Waterman with no gap allowed, but with errors
     //
+
+
+    class SmithWatermanNoGapAligner;
 
 
     /**

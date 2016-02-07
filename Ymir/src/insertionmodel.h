@@ -59,11 +59,13 @@ namespace ymir {
 
 
         void initProbabilities() {
+            prob_array_t tmp;
             if (_type == MONO_NUCLEOTIDE) {
-                _arr = std::move(prob_array_t(new prob_t[4]));
+                tmp = prob_array_t(new prob_t[4]);
             } else {
-                _arr = std::move(prob_array_t(new prob_t[16]));
+                tmp = prob_array_t(new prob_t[16]);
             }
+            _arr = std::move(tmp);
         }
 
 
@@ -229,7 +231,7 @@ namespace ymir {
 
 
         InsertionModel() 
-            : _arr(std::move(prob_array_t(new prob_t[4])))
+            : _arr(new prob_t[4])
         {
             _type = MONO_NUCLEOTIDE;
         }

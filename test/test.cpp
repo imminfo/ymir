@@ -3220,7 +3220,7 @@ int main(int argc, char* argv[]) {
 
 
     //**************  TEST CASES  **************//
-    YMIR_TEST(test_basic())
+ /*   YMIR_TEST(test_basic())
 
     // Tests for ModelParameterVector
     YMIR_TEST(test_model_param_vec_vj())
@@ -3243,11 +3243,11 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_gapped_alignment_vector())
 
     // Tests for VDJAlignment and VDJAlignmentBuilder
- /*   YMIR_TEST(test_vdj_alignment_simple_vj())
+    YMIR_TEST(test_vdj_alignment_simple_vj())
     YMIR_TEST(test_vdj_alignment_simple_vdj())
     YMIR_TEST(test_vdj_alignment_vector_vj())
     YMIR_TEST(test_vdj_alignment_vector_vdj())
-*/
+
     // Tests for sequences aligners.
     YMIR_TEST(test_naive_cdr3_nuc_aligner())
     YMIR_TEST(test_cdr3_nuc_aligner())
@@ -3267,7 +3267,7 @@ int main(int argc, char* argv[]) {
 
     // Tests for clonal repertoires and clonal repertoire views.
     YMIR_TEST(test_clorep())
-
+*/
     // Tests for markov chain.
     YMIR_TEST(test_markovchain_nuc_mono())
     // YMIR_TEST(test_markovchain_nuc_di())

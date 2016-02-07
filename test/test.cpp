@@ -3220,7 +3220,7 @@ int main(int argc, char* argv[]) {
 
 
     //**************  TEST CASES  **************//
-    YMIR_TEST(test_basic())
+   /* YMIR_TEST(test_basic())
 
     // Tests for ModelParameterVector
     YMIR_TEST(test_model_param_vec_vj())
@@ -3270,8 +3270,8 @@ int main(int argc, char* argv[]) {
 
     // Tests for markov chain.
     YMIR_TEST(test_markovchain_nuc_mono())
-    // YMIR_TEST(test_markovchain_nuc_di())
-    // YMIR_TEST(test_markovchain_aa())
+    YMIR_TEST(test_markovchain_nuc_di())
+    YMIR_TEST(test_markovchain_aa())
 
     // Test for Multi-Matrix Chains
     YMIR_TEST(test_mmc())
@@ -3282,9 +3282,9 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_maag_builder_replace_vj())
     YMIR_TEST(test_maag_builder_replace_vdj())
 
-    // Tests for assembling statistical model (ASM) reading / writing files.
+    // Tests for probabilistic assembling model (PAM) reading / writing files.
     YMIR_TEST(test_model_vj_file())
-    YMIR_TEST(test_model_vdj_file())
+    YMIR_TEST(test_model_vdj_file()) */
     YMIR_TEST(test_model_vj_save_load())
     YMIR_TEST(test_model_vdj_save_load())
     YMIR_TEST(test_model_gene_usage())
@@ -3295,13 +3295,12 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_maag_forward_backward_vj())
     YMIR_TEST(test_maag_forward_backward_vdj())
     
-    
 
-    // Test for computing full nucleotide probabilities of repertoire with ASM.
+    // Test for computing full nucleotide probabilities of repertoire with PAM.
 
-    // Test for computing full amino acid probabilities of repertoire with ASM.
+    // Test for computing full amino acid probabilities of repertoire with PAM.
 
-    // Tests for statistical inference of ASM parameters.
+    // Tests for statistical inference of PAM parameters.
 
     //**************  **************//
 

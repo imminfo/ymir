@@ -98,22 +98,22 @@ namespace ymir {
          * \brief General methods for alignment.
          */
         ///@{
-        AlignmentType&& alignVar(seg_index_t id, const sequence_t &pattern) const {
+        AlignmentType alignVar(seg_index_t id, const sequence_t &pattern) const {
             AlignmentType vec;
             this->_alignVar(id, pattern, &vec);
-            return std::move(vec);
+            return vec;
         }
 
-        AlignmentType&& alignDiv(seg_index_t id, const sequence_t &pattern) const {
+        AlignmentType alignDiv(seg_index_t id, const sequence_t &pattern) const {
             AlignmentType vec;
             this->_alignDiv(id, pattern, &vec);
-            return std::move(vec);
+            return vec;
         }
 
-        AlignmentType&& alignJoi(seg_index_t id, const sequence_t &pattern) const {
+        AlignmentType alignJoi(seg_index_t id, const sequence_t &pattern) const {
             AlignmentType vec;
             this->_alignJoi(id, pattern, &vec);
-            return std::move(vec);
+            return vec;
         }
         ///@}
 

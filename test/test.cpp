@@ -1787,57 +1787,49 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
     NaiveCDR3NucleotideAligner nna(genes, VDJAlignerParameters(1, 3));
 
-    std::cout << "here" << std::endl;
-
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").len(0), 4)
-
-    std::cout << "here" << std::endl;
 
     YMIR_ASSERT2(nna.alignVar(2, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(2, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(2, "ACGT").len(0), 4)
 
-    std::cout << "here" << std::endl;
-
     YMIR_ASSERT2(nna.alignVar(3, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(3, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(3, "ACGT").len(0), 3)
-
-    std::cout << "here" << std::endl;
 
     YMIR_ASSERT2(nna.alignVar(4, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(4, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(4, "ACGT").len(0), 0)
 
-    std::cout << "here" << std::endl;
-
     YMIR_ASSERT2(nna.alignJoi(1, "ACGT").pattern_start(0), 2)
     YMIR_ASSERT2(nna.alignJoi(1, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignJoi(1, "ACGT").len(0), 3)
-
-    std::cout << "here" << std::endl;
 
     YMIR_ASSERT2(nna.alignJoi(2, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignJoi(2, "ACGT").text_start(0), 2)
     YMIR_ASSERT2(nna.alignJoi(2, "ACGT").len(0), 4)
 
-    std::cout << "here" << std::endl;
-
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").pattern_start(0), 2)
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").text_start(0), 3)
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").len(0), 3)
 
-    std::cout << "here" << std::endl;
+    std::cout << "1" << std::endl;
 
     YMIR_ASSERT2(nna.alignJoi(4, "ACGT").pattern_start(0), 5)
+    std::cout << "2" << std::endl;
     YMIR_ASSERT2(nna.alignJoi(4, "ACGT").text_start(0), 4)
+    std::cout << "3" << std::endl;
     YMIR_ASSERT2(nna.alignJoi(4, "ACGG").len(0), 0)
+    std::cout << "4" << std::endl;
 
     YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").size(), 2)
+    std::cout << "5" << std::endl;
     YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").text_start(0), 1)
+    std::cout << "6" << std::endl;
     YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").pattern_start(0), 3)
+    std::cout << "7" << std::endl;
     YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").len(0), 2)
     // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").text_start(1), 1)
     // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").pattern_start(1), 6)

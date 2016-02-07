@@ -40,6 +40,7 @@ namespace ymir {
      */
     template <typename AlignmentType, typename V_Aligner, typename D_Aligner, typename J_Aligner>
     class VDJAlignerBase {
+
     public:
 
         /**
@@ -142,7 +143,7 @@ namespace ymir {
 
         Parameters _params;
         VDJRecombinationGenes _genes;
-        VDJAlignment_builder _builder;
+        VDJAlignmentBuilder _builder;
 
 
         VDJAlignerBase()

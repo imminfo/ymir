@@ -2156,16 +2156,16 @@ YMIR_TEST_START(test_markovchain_nuc_mono)
 
     probs = {1, 0, 0, 0};
     m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
-    // std::default_random_engine rg;
-    // YMIR_ASSERT2(m.generate(5, rg), "AAAAA");
+    std::default_random_engine rg;
+    YMIR_ASSERT2(m.generate(5, rg), "AAAAA");
 
-    // probs = {0, 0, 0, 1};
-    // m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
-    // YMIR_ASSERT2(m.generate(1, rg), "T");
+    probs = {0, 0, 0, 1};
+    m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
+    YMIR_ASSERT2(m.generate(1, rg), "T");
 
-    // probs = {0, 1, 0, 0};
-    // m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
-    // YMIR_ASSERT2(m.generate(3, rg), "CCC");
+    probs = {0, 1, 0, 0};
+    m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
+    YMIR_ASSERT2(m.generate(3, rg), "CCC");
 
 YMIR_TEST_END
 
@@ -3220,7 +3220,7 @@ int main(int argc, char* argv[]) {
 
 
     //**************  TEST CASES  **************//
- /*   YMIR_TEST(test_basic())
+    YMIR_TEST(test_basic())
 
     // Tests for ModelParameterVector
     YMIR_TEST(test_model_param_vec_vj())
@@ -3267,12 +3267,12 @@ int main(int argc, char* argv[]) {
 
     // Tests for clonal repertoires and clonal repertoire views.
     YMIR_TEST(test_clorep())
-*/
+
     // Tests for markov chain.
     YMIR_TEST(test_markovchain_nuc_mono())
     // YMIR_TEST(test_markovchain_nuc_di())
     // YMIR_TEST(test_markovchain_aa())
-/*
+
     // Test for Multi-Matrix Chains
     YMIR_TEST(test_mmc())
 
@@ -3294,7 +3294,7 @@ int main(int argc, char* argv[]) {
     // Tests for forward-backward algorithms
     YMIR_TEST(test_maag_forward_backward_vj())
     YMIR_TEST(test_maag_forward_backward_vdj())
-    */
+    
     
 
     // Test for computing full nucleotide probabilities of repertoire with ASM.

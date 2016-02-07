@@ -2156,7 +2156,7 @@ YMIR_TEST_START(test_markovchain_nuc_mono)
 
     probs = {1, 0, 0, 0};
     m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
-    std::default_random_engine rg;
+    // std::default_random_engine rg;
     // YMIR_ASSERT2(m.generate(5, rg), "AAAAA");
 
     // probs = {0, 0, 0, 1};

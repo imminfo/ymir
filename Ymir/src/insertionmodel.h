@@ -35,13 +35,15 @@ namespace ymir {
 
 
         InsertionModel(InsertionModelType mt, std::vector<prob_t>::const_iterator start) 
-            : InsertionModel(mt) {
+            : InsertionModel(mt) 
+        {
             this->updateProbabilities(start);
         }
 
 
         InsertionModel(const event_matrix_t& mat) 
-            : InsertionModel(DI_NUCLEOTIDE) {
+            : InsertionModel(DI_NUCLEOTIDE) 
+        {
             this->updateProbabilities(mat);
         }
 
@@ -49,8 +51,8 @@ namespace ymir {
         InsertionModel& operator=(const InsertionModel &other) {
             if (_arr.get() != other._arr.get()) {
                 _type = other._type;
-                // this->initProbabilities();
-                // this->updateProbabilities(other._arr.get());
+                this->initProbabilities();
+                this->updateProbabilities(other._arr.get());
             }
         }
 

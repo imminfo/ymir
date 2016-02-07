@@ -30,7 +30,6 @@ namespace ymir {
         InsertionModel(InsertionModelType mt) 
             : _type(mt), _arr(new prob_t[mt == MONO_NUCLEOTIDE ? 4 : 16])
         {
-            // this->initProbabilities();
         }
 
 
@@ -71,11 +70,7 @@ namespace ymir {
 
 
         void initProbabilities() {
-            if (_type == MONO_NUCLEOTIDE) {
-                _arr.reset(new prob_t[4]);
-            } else {
-                _arr.reset(new prob_t[16]);
-            }
+            _arr.reset(new prob_t[_type == MONO_NUCLEOTIDE ? 4 : 16]);
         }
 
 

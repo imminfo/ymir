@@ -2891,10 +2891,10 @@ YMIR_TEST_START(test_model_vj_save_load)
     YMIR_ASSERT(model.status())
 
     YMIR_ASSERT(model.save(TEST_DATA_FOLDER + "test_vj_model2/"))
-    // ProbabilisticAssemblingModel model2(TEST_DATA_FOLDER + "test_vj_model2/");
-    // YMIR_ASSERT(model2.status())
+    ProbabilisticAssemblingModel model2(TEST_DATA_FOLDER + "test_vj_model2/");
+    YMIR_ASSERT(model2.status())
 
-    // YMIR_ASSERT(model.event_probabilities() == model2.event_probabilities())
+    YMIR_ASSERT(model.event_probabilities() == model2.event_probabilities())
 
 YMIR_TEST_END
 
@@ -3220,7 +3220,7 @@ int main(int argc, char* argv[]) {
 
 
     //**************  TEST CASES  **************//
-   /* YMIR_TEST(test_basic())
+    YMIR_TEST(test_basic())
 
     // Tests for ModelParameterVector
     YMIR_TEST(test_model_param_vec_vj())
@@ -3284,7 +3284,7 @@ int main(int argc, char* argv[]) {
 
     // Tests for probabilistic assembling model (PAM) reading / writing files.
     YMIR_TEST(test_model_vj_file())
-    YMIR_TEST(test_model_vdj_file()) */
+    YMIR_TEST(test_model_vdj_file())
     YMIR_TEST(test_model_vj_save_load())
     YMIR_TEST(test_model_vdj_save_load())
     YMIR_TEST(test_model_gene_usage())

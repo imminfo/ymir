@@ -34,6 +34,39 @@ using namespace std;
 
 namespace ymir {
 
+    /**
+     * \struct VDJAlignerParameters
+     */
+    struct VDJAlignerParameters {
+
+
+        static const alignment_score_t default_thr = 1;
+
+
+        static const seq_len_t default_minlen = 3;
+
+
+        VDJAlignerParameters() 
+            : threshold(default_thr), 
+              min_D_len(default_minlen)
+        {
+        }
+
+
+        VDJAlignerParameters(alignment_score_t thr, seq_len_t minlen) 
+            : threshold(thr), 
+              min_D_len(minlen)
+        {                
+        }
+
+
+        alignment_score_t threshold; ///
+        seq_len_t min_D_len; ///
+
+    private:
+
+    };
+
 
     /**
      * \class VDJAlignerBase
@@ -44,44 +77,10 @@ namespace ymir {
     public:
 
         /**
-         * \struct Parameters
-         */
-        struct Parameters {
-
-
-            static const alignment_score_t default_thr = 1;
-
-
-            static const seq_len_t default_minlen = 3;
-
-
-            Parameters() 
-                : threshold(default_thr), 
-                  min_D_len(default_minlen)
-            {
-            }
-
-
-            Parameters(alignment_score_t thr, seq_len_t minlen) 
-                : threshold(thr), 
-                  min_D_len(minlen)
-            {                
-            }
-
-
-            alignment_score_t threshold; ///
-            seq_len_t min_D_len; ///
-
-        private:
-
-        };
-
-
-        /**
          *
          */
         VDJAlignerBase(const VDJRecombinationGenes &genes,
-                       VDJAlignerBase::Parameters params)
+                       VDJAlignerParameters params)
                            // const AlignmentEventScore &v_score = AlignmentEventScore(1, -1, -1, -1),
                            // const AlignmentEventScore &d_score = AlignmentEventScore(1, -1, -1, -1),
                            // const AlignmentEventScore &j_score = AlignmentEventScore(1, -1, -1, -1))
@@ -290,9 +289,6 @@ namespace ymir {
     //
 
 
-    class NaiveCDR3NucleotideAligner;
-
-
     /**
      * \brief
      */
@@ -302,7 +298,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        NaiveCDR3NucleotideAligner::Parameters params = NaiveCDR3NucleotideAligner::Parameters()) const 
+                        VDJAlignerParameters params = VDJAlignerParameters()) const 
         {
             seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
 
@@ -320,7 +316,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        NaiveCDR3NucleotideAligner::Parameters params = NaiveCDR3NucleotideAligner::Parameters()) const 
+                        VDJAlignerParameters params = VDJAlignerParameters()) const 
         {
             seq_len_t match_min_len = params.min_D_len;
             seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
@@ -378,7 +374,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec,
-                        NaiveCDR3NucleotideAligner::Parameters params = NaiveCDR3NucleotideAligner::Parameters()) const
+                        VDJAlignerParameters params = VDJAlignerParameters()) const
         {
             seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
 
@@ -408,9 +404,6 @@ namespace ymir {
     //
 
 
-   class CDR3NucleotideAligner;
-
-
     /**
      * \brief
      */
@@ -420,7 +413,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        CDR3NucleotideAligner::Parameters params = CDR3NucleotideAligner::Parameters()) const
+                        VDJAlignerParameters params = VDJAlignerParameters()) const
         {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
@@ -443,7 +436,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        CDR3NucleotideAligner::Parameters params = CDR3NucleotideAligner::Parameters()) const 
+                        VDJAlignerParameters params = VDJAlignerParameters()) const 
         {
             // pass
         }
@@ -454,7 +447,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        CDR3NucleotideAligner::Parameters params = CDR3NucleotideAligner::Parameters()) const 
+                        VDJAlignerParameters params = VDJAlignerParameters()) const 
         {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
@@ -526,9 +519,6 @@ namespace ymir {
     //
 
 
-    class SmithWatermanAligner;
-
-
     /**
      * \brief
      */
@@ -538,7 +528,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        SmithWatermanAligner::Parameters params = SmithWatermanAligner::Parameters()) const 
+                        VDJAlignerParameters params = VDJAlignerParameters()) const 
         {
             // avec->addAlignment(gene, );
         }
@@ -549,7 +539,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        SmithWatermanAligner::Parameters params = SmithWatermanAligner::Parameters()) const 
+                        VDJAlignerParameters params = VDJAlignerParameters()) const 
         {
             // avec->addAlignment(gene, );
         }
@@ -573,9 +563,6 @@ namespace ymir {
     //
 
 
-    class SmithWatermanNoGapAligner;
-
-
     /**
      * \brief
      */
@@ -585,7 +572,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        SmithWatermanNoGapAligner::Parameters params = SmithWatermanNoGapAligner::Parameters()) const 
+                        VDJAlignerParameters params = VDJAlignerParameters()) const 
         {
             // avec->addAlignment(gene, );
         }
@@ -596,7 +583,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        SmithWatermanNoGapAligner::Parameters params = SmithWatermanNoGapAligner::Parameters()) const 
+                        VDJAlignerParameters params = VDJAlignerParameters()) const 
         {
             // avec->addAlignment(gene, );
         }

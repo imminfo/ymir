@@ -62,8 +62,8 @@ namespace ymir {
             }
 
 
-            alignment_score_t threshold;
-            seq_len_t min_D_len;
+            alignment_score_t threshold; ///
+            seq_len_t min_D_len; ///
 
         private:
 
@@ -278,6 +278,17 @@ namespace ymir {
     // J starting from the right edge, and align D everywhere.
     //
 
+    struct NaiveCDR3AlignerFunctor_V;
+    struct NaiveCDR3AlignerFunctor_D;
+    struct NaiveCDR3AlignerFunctor_J;
+
+
+    /**
+     *
+     */
+    typedef VDJAlignerBase<NoGapAlignmentVector, NaiveCDR3AlignerFunctor_V, NaiveCDR3AlignerFunctor_D, NaiveCDR3AlignerFunctor_J> NaiveCDR3NucleotideAligner;
+
+
     /**
      * \brief
      */
@@ -287,7 +298,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerBase::Parameters params = VDJAlignerBase::Parameters()) const 
+                        NaiveCDR3NucleotideAligner::Parameters params = NaiveCDR3NucleotideAligner::Parameters()) const 
         {
             seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
 
@@ -305,7 +316,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerBase::Parameters params = VDJAlignerBase::Parameters()) const 
+                        NaiveCDR3NucleotideAligner::Parameters params = NaiveCDR3NucleotideAligner::Parameters()) const 
         {
             seq_len_t match_min_len = params.min_D_len;
             seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
@@ -363,7 +374,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec,
-                        VDJAlignerBase::Parameters params = VDJAlignerBase::Parameters()) const
+                        NaiveCDR3NucleotideAligner::Parameters params = NaiveCDR3NucleotideAligner::Parameters()) const
         {
             seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
 
@@ -378,16 +389,22 @@ namespace ymir {
     ///@}
 
 
-    /**
-     *
-     */
-    typedef VDJAlignerBase<NoGapAlignmentVector, NaiveCDR3AlignerFunctor_V, NaiveCDR3AlignerFunctor_D, NaiveCDR3AlignerFunctor_J> NaiveCDR3NucleotideAligner;
-
-
     //
     // CDR3-only alignment with errors - align V starting from the left edge, 
     // J starting from the right edge, and align D everywhere.
     //
+
+
+    struct CDR3AlignerFunctor_V;
+    struct CDR3AlignerFunctor_D;
+    struct CDR3AlignerFunctor_J;
+    
+
+    /**
+     *
+     */
+    typedef VDJAlignerBase<NoGapAlignmentVector, CDR3AlignerFunctor_V, CDR3AlignerFunctor_D, CDR3AlignerFunctor_J> CDR3NucleotideAligner;
+
 
     /**
      * \brief
@@ -398,7 +415,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerBase::Parameters params = VDJAlignerBase::Parameters()) const
+                        CDR3NucleotideAligner::Parameters params = CDR3NucleotideAligner::Parameters()) const
         {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
@@ -421,7 +438,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerBase::Parameters params = VDJAlignerBase::Parameters()) const 
+                        CDR3NucleotideAligner::Parameters params = CDR3NucleotideAligner::Parameters()) const 
         {
             // pass
         }
@@ -432,7 +449,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerBase::Parameters params = VDJAlignerBase::Parameters()) const 
+                        CDR3NucleotideAligner::Parameters params = CDR3NucleotideAligner::Parameters()) const 
         {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
@@ -450,12 +467,6 @@ namespace ymir {
         }
     };
     ///@}
-
-
-    /**
-     *
-     */
-    typedef VDJAlignerBase<NoGapAlignmentVector, CDR3AlignerFunctor_V, CDR3AlignerFunctor_D, CDR3AlignerFunctor_J> CDR3NucleotideAligner;
 
 
     // /**

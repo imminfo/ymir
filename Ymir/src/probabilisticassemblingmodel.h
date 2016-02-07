@@ -60,10 +60,6 @@ namespace ymir {
             _status = false;
 
             _genes = nullptr;
-            _param_vec = nullptr;
-
-            _builder = nullptr;
-            _generator = nullptr;
 
             _status = this->parseModelConfig(_model_path)
                       && this->parseGeneSegments()
@@ -84,9 +80,6 @@ namespace ymir {
          */
         virtual ~ProbabilisticAssemblingModel() {
             if (_genes) { delete _genes; }
-            if (_param_vec) { delete _param_vec; }
-            if (_builder) { delete _builder; }
-            if (_generator) { delete _generator; }
         }
 
 
@@ -106,7 +99,7 @@ namespace ymir {
         vector<prob_t> computeFullProbabilities(const ClonesetView& repertoire,
                                                 bool aminoacid = false,
                                                 MAAGComputeProbAction action = SUM_PROBABILITY) const {
-            return this->_builder->buildAndCompute(repertoire, aminoacid, action);
+            return _builder->buildAndCompute(repertoire, aminoacid, action);
         }
 
 
@@ -123,7 +116,7 @@ namespace ymir {
                                    MetadataMode save_metadata = SAVE_METADATA,
                                    SequenceType sequence_type = NUCLEOTIDE,
                                    bool verbose = true) const {
-#ifdef YDEBUG
+#ifndef DNDEBUG
             if (!_status) {
                 throw(std::runtime_error("Can't build graphs due to a model's failed status!"));
             }
@@ -136,7 +129,7 @@ namespace ymir {
          * \brief Update event probabilities in the given MAAG repertoire with new ones.
          */
         void updateEventProbabilities(MAAGRepertoire *repertoire) {
-            this->_builder->updateEventProbabilities(repertoire);
+            _builder->updateEventProbabilities(repertoire);
         }
 
 
@@ -149,7 +142,7 @@ namespace ymir {
          * \return Artificial repertoire.
          */
         Cloneset generateSequences(size_t count = 1) const {
-#ifdef YDEBUG
+#ifndef DNDEBUG
             if (!_status) {
                 throw(std::runtime_error("Can't generate sequences due to a model's failed status!"));
             }
@@ -165,7 +158,7 @@ namespace ymir {
          * \return Const reference to the gene segments table.
          */
         const VDJRecombinationGenes& gene_segments() const {
-#ifdef YDEBUG
+#ifndef DNDEBUG
             if (!_status) {
                 throw(std::runtime_error("Can't access gene segments in a model due to its failed status!"));
             }
@@ -178,7 +171,7 @@ namespace ymir {
          * \brief Access to vector of probabilities.
          */
         const ModelParameterVector& event_probabilities() const {
-#ifdef YDEBUG
+#ifndef DNDEBUG
             if (!_status) {
                 throw(std::runtime_error("Can't access the event probabilities vector in a model due to its failed status!"));
             }
@@ -192,7 +185,7 @@ namespace ymir {
          * \param vec Vector with new event probabilities.
          */
         void updateEventProbabilitiesVector(const ModelParameterVector &vec) {
-#ifdef YDEBUG
+#ifndef DNDEBUG
             if (_param_vec->recombination() != vec.recombination()) {
                 throw(std::runtime_error("Model parameter vectors are not comparable due to different recombination types!"));
             }
@@ -316,10 +309,10 @@ namespace ymir {
         string _model_path;
 
         VDJRecombinationGenes *_genes;
-        ModelParameterVector *_param_vec;
+        unique_ptr<ModelParameterVector> _param_vec;
 
-        MAAGBuilder *_builder;
-        ClonotypeAssembler *_generator;
+        unique_ptr<MAAGBuilder> _builder;
+        unique_ptr<ClonotypeAssembler> _generator;
 
         seq_len_t _min_D_len;
 
@@ -638,8 +631,7 @@ namespace ymir {
          * \brief Make MAAGBuilder with this model's parameters (event probabilities and gene segments).
          */
         void make_builder() {
-            if (_builder) { delete _builder; }
-            _builder = new MAAGBuilder(*_param_vec, *_genes);
+            _builder.reset(new MAAGBuilder(*_param_vec, *_genes));
         }
 
 
@@ -647,8 +639,7 @@ namespace ymir {
          * \brief Make ClonotypeAssembler with this model's parameters (event probabilities and gene segments).
          */
         void make_assembler() {
-            if (_generator) { delete _generator; }
-            _generator = new ClonotypeAssembler(*_param_vec, *_genes);
+            _generator.reset(new ClonotypeAssembler(*_param_vec, *_genes));
         }
 
 
@@ -1080,7 +1071,7 @@ namespace ymir {
                              laplace,
                              1);
 
-                _param_vec = new ModelParameterVector(VJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace);
+                _param_vec.reset(new ModelParameterVector(VJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace));
                 is_ok = true;
             }
 
@@ -1168,7 +1159,7 @@ namespace ymir {
                              1);
 
                 for (seg_index_t i = 1; i <= _genes->D().max(); ++i) { min_D_len_vec.push_back(_min_D_len); }
-                _param_vec = new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, true, min_D_len_vec);
+                _param_vec.reset(new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, true, min_D_len_vec));
                 is_ok = true;
             }
 

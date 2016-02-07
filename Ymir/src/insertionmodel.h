@@ -75,6 +75,45 @@ namespace ymir {
 
 
         /**
+        * \name Update chain probabilities.
+        *
+        * \brief Update internal std::vector of nucleotide joint probabilities.
+        *
+        * \param start Iterator to std::vector, in which each 4 elements are rows in nucleotide joint probability matrix, i.e.
+        * row for prev-A-nucleotide, row for prev-C-nucleotide and so on.
+        * \param mat Matrix with nucleotide joint probabilities with rows for prev nucleotide and columns
+        * for next nucleotide.
+        */
+        ///@{
+        void updateProbabilities(std::vector<prob_t>::const_iterator start) {
+            uint8_t last = _type == MONO_NUCLEOTIDE ? 4 : 16;
+            for (uint8_t i = 0; i < last; ++i, ++start) {
+                _arr[i] = *start;
+            }
+        }
+
+        void updateProbabilities(prob_t *start) {
+            uint8_t last = _type == MONO_NUCLEOTIDE ? 4 : 16;
+            for (uint8_t i = 0; i < last; ++i) {
+                _arr[i] = *(start + i);
+            }
+        }
+
+        void updateProbabilities(const event_matrix_t& mat) {
+#ifndef DNDEBUG
+            if (_type == MONO_NUCLEOTIDE) { throw(std::runtime_error("Can't initialise the mono-nucleotide insertion model with a matrix!")); }
+#endif
+
+            for (uint8_t i = 0; i < 4; ++i) {
+                for (uint8_t j = 0; j < 4; ++j) {
+                    _arr[4*i + j] = mat(i, j);
+                }
+            }
+        }
+        ///@}
+
+
+        /**
         * \brief Probability of the given nucleotide sequence.
         */
         ///@{
@@ -183,45 +222,6 @@ namespace ymir {
 
             return res;
         }
-
-
-        /**
-        * \name Update chain probabilities.
-        *
-        * \brief Update internal std::vector of nucleotide joint probabilities.
-        *
-        * \param start Iterator to std::vector, in which each 4 elements are rows in nucleotide joint probability matrix, i.e.
-        * row for prev-A-nucleotide, row for prev-C-nucleotide and so on.
-        * \param mat Matrix with nucleotide joint probabilities with rows for prev nucleotide and columns
-        * for next nucleotide.
-        */
-        ///@{
-        void updateProbabilities(std::vector<prob_t>::const_iterator start) {
-            uint8_t last = _type == MONO_NUCLEOTIDE ? 4 : 16;
-            for (uint8_t i = 0; i < last; ++i, ++start) {
-                _arr[i] = *start;
-            }
-        }
-
-        void updateProbabilities(prob_t *start) {
-            uint8_t last = _type == MONO_NUCLEOTIDE ? 4 : 16;
-            for (uint8_t i = 0; i < last; ++i) {
-                _arr[i] = *(start + i);
-            }
-        }
-
-        void updateProbabilities(const event_matrix_t& mat) {
-#ifndef DNDEBUG
-            if (_type == MONO_NUCLEOTIDE) { throw(std::runtime_error("Can't initialise the mono-nucleotide insertion model with a matrix!")); }
-#endif
-
-            for (uint8_t i = 0; i < 4; ++i) {
-                for (uint8_t j = 0; j < 4; ++j) {
-                    _arr[4*i + j] = mat(i, j);
-                }
-            }
-        }
-        ///@}
 
 
         /**

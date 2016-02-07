@@ -1189,7 +1189,8 @@ namespace ymir {
             // V del
             container = new TDVectorList(true);
 
-            std::cout << "here41" << std::endl;
+            std::cout << "here41 start" << std::endl;
+            std::cout << std::to_string(_genes->V().maxLength()) << std::endl;
 
             for (auto i = 0; i <= _genes->V().maxLength(); ++i) {
                 std::cout << "here" << std::to_string(i) << std::endl;
@@ -1197,7 +1198,7 @@ namespace ymir {
             }
             container->addColumnName("V deletions");
 
-            std::cout << "here42" << std::endl;
+            std::cout << "here42 end" << std::endl;
 
             for (auto i = 1; i <= _genes->V().max(); ++i) {
                 container->addColumnName(_genes->V()[i].allele);

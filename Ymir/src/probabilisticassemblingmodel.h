@@ -1190,7 +1190,6 @@ namespace ymir {
             container = new TDVectorList(true);
 
             for (auto i = 0; i <= _genes->V().maxLength(); ++i) {
-                std::cout << "here" << std::to_string(i) << std::endl;
                 container->addRowName(std::to_string(i));
             }
             container->addColumnName("V deletions");

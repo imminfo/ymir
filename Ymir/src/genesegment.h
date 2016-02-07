@@ -214,7 +214,11 @@ namespace ymir {
 
         seq_len_t maxLength() const {
             seq_len_t res = 0;
-            for (auto i = 1; i <= _vec.size(); ++i) { res = std::max(res, (seq_len_t) _vec[i].sequence.size()); }
+            std::cout << "start maxLen" << std::endl;
+            for (auto i = 1; i <= _vec.size(); ++i) { 
+                std::cout << std::to_string(i) << std::endl;
+                res = std::max(res, (seq_len_t) _vec[i].sequence.size());
+            }
             return res;
         }
 

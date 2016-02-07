@@ -28,9 +28,9 @@ namespace ymir {
 
 
         InsertionModel(InsertionModelType mt) 
-            : _type(mt)
+            : _type(mt), _arr(new prob_t[mt == MONO_NUCLEOTIDE ? 4 : 16])
         {
-            this->initProbabilities();
+            // this->initProbabilities();
         }
 
 

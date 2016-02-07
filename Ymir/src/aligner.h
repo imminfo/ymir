@@ -55,9 +55,16 @@ namespace ymir {
             static const seq_len_t default_minlen = 3;
 
 
-            Parameters(alignment_score_t thr = default_thr, 
-                       seq_len_t minlen = default_minlen) 
-                : threshold(thr), min_D_len(minlen)
+            Parameters() 
+                : threshold(default_thr), 
+                  min_D_len(default_minlen)
+            {
+            }
+
+
+            Parameters(alignment_score_t thr, seq_len_t minlen) 
+                : threshold(thr), 
+                  min_D_len(minlen)
             {                
             }
 
@@ -66,10 +73,6 @@ namespace ymir {
             seq_len_t min_D_len; ///
 
         private:
-
-            Parameters()
-            {
-            }
 
         };
 
@@ -278,6 +281,7 @@ namespace ymir {
     // J starting from the right edge, and align D everywhere.
     //
 
+
     struct NaiveCDR3AlignerFunctor_V;
     struct NaiveCDR3AlignerFunctor_D;
     struct NaiveCDR3AlignerFunctor_J;
@@ -286,7 +290,10 @@ namespace ymir {
     /**
      *
      */
-    typedef VDJAlignerBase<NoGapAlignmentVector, NaiveCDR3AlignerFunctor_V, NaiveCDR3AlignerFunctor_D, NaiveCDR3AlignerFunctor_J> NaiveCDR3NucleotideAligner;
+    typedef VDJAlignerBase<NoGapAlignmentVector,
+                           NaiveCDR3AlignerFunctor_V, 
+                           NaiveCDR3AlignerFunctor_D, 
+                           NaiveCDR3AlignerFunctor_J> NaiveCDR3NucleotideAligner;
 
 
     /**
@@ -398,12 +405,15 @@ namespace ymir {
     struct CDR3AlignerFunctor_V;
     struct CDR3AlignerFunctor_D;
     struct CDR3AlignerFunctor_J;
-    
+
 
     /**
      *
      */
-    typedef VDJAlignerBase<NoGapAlignmentVector, CDR3AlignerFunctor_V, CDR3AlignerFunctor_D, CDR3AlignerFunctor_J> CDR3NucleotideAligner;
+    typedef VDJAlignerBase<NoGapAlignmentVector, 
+                           CDR3AlignerFunctor_V, 
+                           CDR3AlignerFunctor_D, 
+                           CDR3AlignerFunctor_J> CDR3NucleotideAligner;
 
 
     /**
@@ -511,6 +521,22 @@ namespace ymir {
     // Classic Smith-Waterman
     //
 
+
+    struct SWAlignerFunctor_VJ;
+    struct SWAlignerFunctor_D;
+
+
+    /**
+     * \typedef SmithWatermanAligner
+     *
+     * \brief Smith-Waterman aligner for finding maximal matches with gaps. Don't takes into account errors.
+     */
+    typedef VDJAlignerBase<GappedAlignmentVector, 
+                           SWAlignerFunctor_VJ, 
+                           SWAlignerFunctor_D, 
+                           SWAlignerFunctor_VJ> SmithWatermanAligner;
+
+
     /**
      * \brief
      */
@@ -539,17 +565,25 @@ namespace ymir {
     ///@}
 
 
-    /**
-     * \typedef SmithWatermanAligner
-     *
-     * \brief Smith-Waterman aligner for finding maximal matches with gaps. Don't takes into account errors.
-     */
-    typedef VDJAlignerBase<GappedAlignmentVector, SWAlignerFunctor_VJ, SWAlignerFunctor_D, SWAlignerFunctor_VJ> SmithWatermanAligner;
-
-
     //
     // Smith-Waterman with no gap allowed, but with errors
     //
+
+
+    struct SWNGAlignerFunctor_VJ;
+    struct SWNGAlignerFunctor_D;
+
+
+    /**
+     * \typedef SmithWatermanNoGapAligner
+     *
+     * \brief Smith-Waterman aligner without gaps, returns maximal matches with information about mismatch errors.
+     */
+    typedef VDJAlignerBase<NoGapAlignmentVector,
+                           SWNGAlignerFunctor_VJ, 
+                           SWNGAlignerFunctor_D, 
+                           SWNGAlignerFunctor_VJ> SmithWatermanNoGapAligner;
+
 
     /**
      * \brief
@@ -577,14 +611,6 @@ namespace ymir {
         }
     };
     ///@}
-
-
-    /**
-     * \typedef SmithWatermanNoGapAligner
-     *
-     * \brief Smith-Waterman aligner without gaps, returns maximal matches with information about mismatch errors.
-     */
-    typedef VDJAlignerBase<NoGapAlignmentVector, SWNGAlignerFunctor_VJ, SWNGAlignerFunctor_D, SWNGAlignerFunctor_VJ> SmithWatermanNoGapAligner;
 
 }
 

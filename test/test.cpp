@@ -1787,33 +1787,49 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
     NaiveCDR3NucleotideAligner nna(genes, VDJAlignerParameters(1, 3));
 
+    std::cout << "here" << std::endl;
+
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").len(0), 4)
+
+    std::cout << "here" << std::endl;
 
     YMIR_ASSERT2(nna.alignVar(2, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(2, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(2, "ACGT").len(0), 4)
 
+    std::cout << "here" << std::endl;
+
     YMIR_ASSERT2(nna.alignVar(3, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(3, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(3, "ACGT").len(0), 3)
+
+    std::cout << "here" << std::endl;
 
     YMIR_ASSERT2(nna.alignVar(4, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(4, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(4, "ACGT").len(0), 0)
 
+    std::cout << "here" << std::endl;
+
     YMIR_ASSERT2(nna.alignJoi(1, "ACGT").pattern_start(0), 2)
     YMIR_ASSERT2(nna.alignJoi(1, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignJoi(1, "ACGT").len(0), 3)
+
+    std::cout << "here" << std::endl;
 
     YMIR_ASSERT2(nna.alignJoi(2, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignJoi(2, "ACGT").text_start(0), 2)
     YMIR_ASSERT2(nna.alignJoi(2, "ACGT").len(0), 4)
 
+    std::cout << "here" << std::endl;
+
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").pattern_start(0), 2)
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").text_start(0), 3)
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").len(0), 3)
+
+    std::cout << "here" << std::endl;
 
     YMIR_ASSERT2(nna.alignJoi(4, "ACGT").pattern_start(0), 5)
     YMIR_ASSERT2(nna.alignJoi(4, "ACGT").text_start(0), 4)

@@ -48,7 +48,15 @@ namespace ymir {
          */
         struct Parameters {
 
-            Parameters(alignment_score_t thr, seq_len_t minlen) 
+
+            static const alignment_score_t default_thr = 1;
+
+
+            static const seq_len_t default_minlen = 3;
+
+
+            Parameters(alignment_score_t thr = default_thr, 
+                       seq_len_t minlen = default_minlen) 
                 : threshold(thr), min_D_len(minlen)
             {                
             }
@@ -56,6 +64,12 @@ namespace ymir {
 
             alignment_score_t threshold;
             seq_len_t min_D_len;
+
+        private:
+
+            Parameters()
+            {
+            }
 
         };
 

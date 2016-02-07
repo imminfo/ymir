@@ -112,14 +112,14 @@ namespace ymir {
             for (seg_index_t id = 1; id <= _genes.V().max(); ++id) {
                 this->_alignVar(id, sequence, &vec);
             }
-            builder.addVarAlignment(vec);
+            _builder.addVarAlignment(vec);
         }
 
         void alignDiv(const sequence_t &sequence) {
             NoGapAlignmentVector vec;
             for (seg_index_t id = 1; id <= _genes.D().max(); ++id) {
                 this->_alignDiv(id, sequence, &vec);
-                builder.addDivAlignment(vec);
+                _builder.addDivAlignment(vec);
             }
         }
 
@@ -128,7 +128,7 @@ namespace ymir {
             for (seg_index_t id = 1; id <= _genes.J().max(); ++id) {
                 this->_alignJoi(id, sequence, &vec);
             }
-            builder.addJoiAlignment(vec);
+            _builder.addJoiAlignment(vec);
         }
         ///@}
 
@@ -142,7 +142,7 @@ namespace ymir {
 
         Parameters _params;
         VDJRecombinationGenes _genes;
-        VDJAlignmentBuilder _builder;
+        VDJAlignment_builder _builder;
 
 
         VDJAlignerBase()

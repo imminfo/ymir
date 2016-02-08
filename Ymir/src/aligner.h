@@ -444,21 +444,12 @@ namespace ymir {
             // AlignmentVectorBase::events_storage_t bitvec;
             // bitvec.reserve(t_size + p_size*2);
 
+            // bitvec.push_back(pattern_i[i] == text[text_i + i]);
+
             // for (seq_len_t text_i = 0; text_i < t_size - match_min_len + 1; ++text_i) {
             //     min_subsize = min((int) p_size, t_size - text_i);
             //     for (seq_len_t i = 0; i < min_subsize; ++i) {
-            //         if (pattern[i] == text[text_i + i]) {
-            //             if (!open_match) {
-            //                 p_start = i;
-            //                 t_start = text_i + i;
-            //                 open_match = true;
-            //             }
-            //         } else if (open_match) {
-            //             if ((i - p_start) >= match_min_len) {
-            //                 avec->addAlignment(gene, p_start + 1, t_start + 1, i - p_start);
-            //             }
-            //             open_match = false;
-            //         }
+            //         bitvec.push_back(pattern_i[i] == text[text_i + i]);
             //     }
             //     if (open_match && (min_subsize - p_start) >= match_min_len) {
             //         avec->addAlignment(gene, p_start + 1, t_start + 1, min_subsize - p_start);

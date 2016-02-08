@@ -1852,7 +1852,102 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_cdr3_nuc_aligner)
 
-    YMIR_ASSERT(false)
+    NoGapAlignmentVector vec;
+
+    vector<string> avec1 {"V1", "V2", "V3", "V4"};
+    vector<string> svec1 {"ACGTT", "ACGT", "ACG", "TTT"};
+
+    vector<string> avec2 {"J1", "J2", "J3", "J4"};
+    vector<string> svec2 {"CGT", "TACGT", "TTCGT", "TTTTT"};
+
+    vector<string> avec3 {"D1", "D2", "D3"};
+    vector<string> svec3 {"AA", "AACCTT", "ACT"};
+
+    VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
+
+    CDR3NucleotideAligner nna(genes, VDJAlignerParameters(1, 3));
+
+    YMIR_ASSERT2(nna.alignVar(1, "ACGT").pattern_start(0), 1)
+    YMIR_ASSERT2(nna.alignVar(1, "ACGT").text_start(0), 1)
+    YMIR_ASSERT2(nna.alignVar(1, "ACGT").len(0), 4)
+
+    YMIR_ASSERT2(nna.alignVar(2, "ACGT").pattern_start(0), 1)
+    YMIR_ASSERT2(nna.alignVar(2, "ACGT").text_start(0), 1)
+    YMIR_ASSERT2(nna.alignVar(2, "ACGT").len(0), 4)
+
+    YMIR_ASSERT2(nna.alignVar(3, "ACGT").pattern_start(0), 1)
+    YMIR_ASSERT2(nna.alignVar(3, "ACGT").text_start(0), 1)
+    YMIR_ASSERT2(nna.alignVar(3, "ACGT").len(0), 3)
+
+    YMIR_ASSERT2(nna.alignVar(4, "ACGT").pattern_start(0), 1)
+    YMIR_ASSERT2(nna.alignVar(4, "ACGT").text_start(0), 1)
+    YMIR_ASSERT2(nna.alignVar(4, "ACGT").len(0), 3)
+    YMIR_ASSERT(nna.alignVar(4, "ACGT").isMismatch(0, 1))
+    YMIR_ASSERT(nna.alignVar(4, "ACGT").isMismatch(0, 2))
+    YMIR_ASSERT(nna.alignVar(4, "ACGT").isMismatch(0, 3))
+
+    YMIR_ASSERT2(nna.alignJoi(1, "ACGT").pattern_start(0), 2)
+    YMIR_ASSERT2(nna.alignJoi(1, "ACGT").text_start(0), 1)
+    YMIR_ASSERT2(nna.alignJoi(1, "ACGT").len(0), 3)
+    YMIR_ASSERT(!nna.alignJoi(1, "ACGT").isMismatch(0, 1))
+    YMIR_ASSERT(!nna.alignJoi(1, "ACGT").isMismatch(0, 2))
+    YMIR_ASSERT(!nna.alignJoi(1, "ACGT").isMismatch(0, 3))
+
+    YMIR_ASSERT2(nna.alignJoi(2, "ACGT").pattern_start(0), 1)
+    YMIR_ASSERT2(nna.alignJoi(2, "ACGT").text_start(0), 2)
+    YMIR_ASSERT2(nna.alignJoi(2, "ACGT").len(0), 4)
+    YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 1))
+    YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 1))
+    YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 1))
+    YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 1))
+
+    YMIR_ASSERT2(nna.alignJoi(3, "ACGT").pattern_start(0), 2)
+    YMIR_ASSERT2(nna.alignJoi(3, "ACGT").text_start(0), 3)
+    YMIR_ASSERT2(nna.alignJoi(3, "ACGT").len(0), 4)
+    YMIR_ASSERT(nna.alignJoi(3, "ACGT").isMismatch(0, 1))
+    YMIR_ASSERT(!nna.alignJoi(3, "ACGT").isMismatch(0, 2))
+    YMIR_ASSERT(!nna.alignJoi(3, "ACGT").isMismatch(0, 3))
+    YMIR_ASSERT(!nna.alignJoi(3, "ACGT").isMismatch(0, 4))
+
+    YMIR_ASSERT2(nna.alignJoi(4, "ACGT").pattern_start(0), 4)
+    YMIR_ASSERT2(nna.alignJoi(4, "ACGT").text_start(0), 5)
+    YMIR_ASSERT2(nna.alignJoi(4, "ACGT").len(0), 4)
+    YMIR_ASSERT(nna.alignJoi(4, "ACGT").isMismatch(0, 1))
+    YMIR_ASSERT(nna.alignJoi(4, "ACGT").isMismatch(0, 2))
+    YMIR_ASSERT(nna.alignJoi(4, "ACGT").isMismatch(0, 3))
+    YMIR_ASSERT(!nna.alignJoi(4, "ACGT").isMismatch(0, 4))
+
+    YMIR_ASSERT2(nna.alignJoi(4, "ACGG").len(0), 4)
+    YMIR_ASSERT(nna.alignJoi(4, "ACGG").isMismatch(0, 1))
+    YMIR_ASSERT(nna.alignJoi(4, "ACGG").isMismatch(0, 2))
+    YMIR_ASSERT(nna.alignJoi(4, "ACGG").isMismatch(0, 3))
+    YMIR_ASSERT(nna.alignJoi(4, "ACGG").isMismatch(0, 4))
+
+    // YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").size(), 0)
+
+    // NaiveCDR3NucleotideAligner nna2(genes, VDJAlignerParameters(1, 2));
+    // YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").size(), 2)
+    // YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").text_start(0), 1)
+    // YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").pattern_start(0), 3)
+    // YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").len(0), 2)
+    // YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").text_start(1), 1)
+    // YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").pattern_start(1), 6)
+    // YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").len(1), 2)
+
+    // YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").size(), 3)
+    // YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").text_start(0), 1)
+    // YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").pattern_start(0), 1)
+    // YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").len(0), 2)
+
+    // YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").text_start(1), 5)
+    // YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").pattern_start(1), 5)
+    // YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").len(1), 2)
+
+    // YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").text_start(2), 5)
+    // YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").pattern_start(2), 12)
+    // YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").len(2), 2)
+
+    // YMIR_ASSERT2(nna2.alignDiv(3, "ACTGACGACGGTATCTAC").size(), 5)
 
 YMIR_TEST_END
 

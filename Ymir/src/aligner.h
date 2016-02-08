@@ -383,7 +383,7 @@ namespace ymir {
                 matches += 1;
             }
 
-            avec->addAlignment(gene, 1, t_size - matches + 1, matches);
+            avec->addAlignment(gene, p_size - matches + 1, t_size - matches + 1, matches);
         }
     };
     ///@}
@@ -461,7 +461,7 @@ namespace ymir {
                 }
             }
 
-            avec->addAlignment(gene, 1, t_size - min(t_size, p_size) + 1, vec);
+            avec->addAlignment(gene, p_size - min(t_size, p_size) + 1, t_size - min(t_size, p_size) + 1, vec);
         }
     };
     ///@}

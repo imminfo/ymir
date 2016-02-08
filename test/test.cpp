@@ -1897,10 +1897,11 @@ YMIR_TEST_START(test_cdr3_nuc_aligner)
     YMIR_ASSERT2(nna.alignJoi(2, "ACGT").text_start(0), 2)
     YMIR_ASSERT2(nna.alignJoi(2, "ACGT").len(0), 4)
     YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 1))
-    YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 1))
-    YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 1))
-    YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 1))
+    YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 2))
+    YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 3))
+    YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 4))
 
+    // TTCGT
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").text_start(0), 2)
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").len(0), 4)
@@ -1909,6 +1910,7 @@ YMIR_TEST_START(test_cdr3_nuc_aligner)
     YMIR_ASSERT(!nna.alignJoi(3, "ACGT").isMismatch(0, 3))
     YMIR_ASSERT(!nna.alignJoi(3, "ACGT").isMismatch(0, 4))
 
+    // TTTTT
     YMIR_ASSERT2(nna.alignJoi(4, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignJoi(4, "ACGT").text_start(0), 2)
     YMIR_ASSERT2(nna.alignJoi(4, "ACGT").len(0), 4)

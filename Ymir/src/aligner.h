@@ -417,7 +417,7 @@ namespace ymir {
         {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
-            vec.reserve(min(p_size, t_size));
+            vec.reserve(min(p_size, t_size) + 1);
 
             for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
                 vec.push_back(pattern[i] != text[i]);
@@ -484,7 +484,7 @@ namespace ymir {
         {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
-            vec.reserve(min(p_size, t_size));
+            vec.reserve(min(p_size, t_size) + 1);
 
             for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
                 vec.push_back(pattern[p_size - i - 1] != text[t_size - i - 1]);

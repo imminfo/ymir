@@ -1832,7 +1832,7 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").pattern_start(1), 6)
     YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").len(1), 2)
 
-    YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").size(), 5)
+    YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").size(), 3)
     YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").text_start(0), 1)
     YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").pattern_start(0), 1)
     YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").len(0), 2)
@@ -1845,15 +1845,7 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
     YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").pattern_start(2), 12)
     YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").len(2), 2)
 
-    YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").text_start(3), 5)
-    YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").pattern_start(3), 12)
-    YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").len(3), 2)
-
-    YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").text_start(4), 5)
-    YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").pattern_start(4), 12)
-    YMIR_ASSERT2(nna2.alignDiv(2, "AAGGTTGGGGGTT").len(4), 2)
-
-    YMIR_ASSERT2(nna2.alignDiv(3, "ACTGACGACGGTATCTAC").size(), 6)
+    YMIR_ASSERT2(nna2.alignDiv(3, "ACTGACGACGGTATCTAC").size(), 5)
 
 YMIR_TEST_END
 

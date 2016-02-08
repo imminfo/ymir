@@ -13,7 +13,7 @@
 namespace ymir {
 
 
-    // class ErrorCorrector {
+    // class ErrorCorrector : public VDJAlignerBase {
     // public:
 
 

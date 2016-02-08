@@ -323,28 +323,6 @@ namespace ymir {
             bool open_match;
             seq_len_t p_start, t_start;
 
-            for (seq_len_t pattern_i = 1 /* WTF?! */ ; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
-                open_match = false;
-                min_subsize = min(p_size - pattern_i, (int) t_size);
-                for (seq_len_t i = 0; i < min_subsize; ++i) {
-                    if (pattern[pattern_i + i] == text[i]) {
-                        if (!open_match) {
-                            p_start = pattern_i + i;
-                            t_start = i;
-                            open_match = true;
-                        }
-                    } else if (open_match) {
-                        if ((pattern_i + i - p_start) >= match_min_len) {
-                            avec->addAlignment(gene, p_start + 1, t_start + 1, pattern_i + i - p_start);
-                        }
-                        open_match = false;
-                    }
-                }
-                if (open_match && (pattern_i + min_subsize - p_start) >= match_min_len) {
-                    avec->addAlignment(gene, p_start + 1, t_start + 1, pattern_i + min_subsize - p_start);
-                }
-            }
-
             for (seq_len_t text_i = 0; text_i < t_size - match_min_len + 1; ++text_i) {
                 open_match = false;
                 min_subsize = min((int) p_size, t_size - text_i);
@@ -364,6 +342,28 @@ namespace ymir {
                 }
                 if (open_match && (min_subsize - p_start) >= match_min_len) {
                     avec->addAlignment(gene, p_start + 1, t_start + 1, min_subsize - p_start);
+                }
+            }
+
+            for (seq_len_t pattern_i = 1 /* WTF?! */ ; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
+                open_match = false;
+                min_subsize = min(p_size - pattern_i, (int) t_size);
+                for (seq_len_t i = 0; i < min_subsize; ++i) {
+                    if (pattern[pattern_i + i] == text[i]) {
+                        if (!open_match) {
+                            p_start = pattern_i + i;
+                            t_start = i;
+                            open_match = true;
+                        }
+                    } else if (open_match) {
+                        if ((pattern_i + i - p_start) >= match_min_len) {
+                            avec->addAlignment(gene, p_start + 1, t_start + 1, pattern_i + i - p_start);
+                        }
+                        open_match = false;
+                    }
+                }
+                if (open_match && (pattern_i + min_subsize - p_start) >= match_min_len) {
+                    avec->addAlignment(gene, p_start + 1, t_start + 1, pattern_i + min_subsize - p_start);
                 }
             }
         }
@@ -438,7 +438,53 @@ namespace ymir {
                         NoGapAlignmentVector *avec, 
                         VDJAlignerParameters params = VDJAlignerParameters()) const 
         {
-            // pass
+            // seq_len_t match_min_len = params.min_D_len;
+            // seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
+            // seq_len_t p_start, t_start;
+            // AlignmentVectorBase::events_storage_t bitvec;
+            // bitvec.reserve(t_size + p_size*2);
+
+            // for (seq_len_t text_i = 0; text_i < t_size - match_min_len + 1; ++text_i) {
+            //     min_subsize = min((int) p_size, t_size - text_i);
+            //     for (seq_len_t i = 0; i < min_subsize; ++i) {
+            //         if (pattern[i] == text[text_i + i]) {
+            //             if (!open_match) {
+            //                 p_start = i;
+            //                 t_start = text_i + i;
+            //                 open_match = true;
+            //             }
+            //         } else if (open_match) {
+            //             if ((i - p_start) >= match_min_len) {
+            //                 avec->addAlignment(gene, p_start + 1, t_start + 1, i - p_start);
+            //             }
+            //             open_match = false;
+            //         }
+            //     }
+            //     if (open_match && (min_subsize - p_start) >= match_min_len) {
+            //         avec->addAlignment(gene, p_start + 1, t_start + 1, min_subsize - p_start);
+            //     }
+            // }
+
+            // for (seq_len_t pattern_i = 1 /* WTF?! */ ; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
+            //     min_subsize = min(p_size - pattern_i, (int) t_size);
+            //     for (seq_len_t i = 0; i < min_subsize; ++i) {
+            //         if (pattern[pattern_i + i] == text[i]) {
+            //             if (!open_match) {
+            //                 p_start = pattern_i + i;
+            //                 t_start = i;
+            //                 open_match = true;
+            //             }
+            //         } else if (open_match) {
+            //             if ((pattern_i + i - p_start) >= match_min_len) {
+            //                 avec->addAlignment(gene, p_start + 1, t_start + 1, pattern_i + i - p_start);
+            //             }
+            //             open_match = false;
+            //         }
+            //     }
+            //     if (open_match && (pattern_i + min_subsize - p_start) >= match_min_len) {
+            //         avec->addAlignment(gene, p_start + 1, t_start + 1, pattern_i + min_subsize - p_start);
+            //     }
+            // }
         }
     };
 

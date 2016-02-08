@@ -420,11 +420,7 @@ namespace ymir {
             vec.reserve(min(p_size, t_size));
 
             for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
-                if (pattern[i] == text[i]) { 
-                    vec.push_back(false);
-                } else {
-                    vec.push_back(true);
-                }
+                vec.push_back(pattern[i] != text[i]);
             }
 
             avec->addAlignment(gene, 1, 1, vec);
@@ -491,11 +487,7 @@ namespace ymir {
             vec.reserve(min(p_size, t_size));
 
             for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
-                if (pattern[p_size - i - 1] != text[t_size - i - 1]) {
-                    vec.push_back(false);
-                } else {
-                    vec.push_back(true);
-                }
+                vec.push_back(pattern[p_size - i - 1] != text[t_size - i - 1]);
             }
 
             avec->addAlignment(gene, p_size - min(t_size, p_size) + 1, t_size - min(t_size, p_size) + 1, vec);

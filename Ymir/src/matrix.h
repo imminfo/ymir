@@ -23,10 +23,11 @@ namespace ymir {
     public:
 
         // def
-        Matrix() {
-            _rows = 0;
-            _cols = 0;
-            _data = nullptr;
+        Matrix()
+            : _rows(0),
+              _cols(0),
+              _data(nullptr)
+        {
         }
 
 

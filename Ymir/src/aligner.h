@@ -434,23 +434,33 @@ namespace ymir {
                         NoGapAlignmentVector *avec, 
                         VDJAlignerParameters params = VDJAlignerParameters()) const 
         {
-            // seq_len_t match_min_len = params.min_D_len;
-            // seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
-            // seq_len_t p_start, t_start;
-            // AlignmentVectorBase::events_storage_t bitvec;
-            // bitvec.reserve(t_size + p_size*2);
+             seq_len_t match_min_len = params.min_D_len;
+             seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
+             seq_len_t p_start, t_start;
+             AlignmentVectorBase::events_storage_t bitvec;
+             bitvec.reserve(p_size + 1);
 
-            // bitvec.push_back(pattern_i[i] == text[text_i + i]);
+             for (seq_len_t text_i = 0; text_i < t_size - match_min_len + 1; ++text_i) {
+                 min_subsize = min((int) p_size, t_size - text_i);
+                 if (min_subsize >= match_min_len) {
+                     bitvec.resize(min_subsize);
+                     for (seq_len_t i = 0; i < min_subsize; ++i) {
+                         bitvec[i] = pattern[i] != text[text_i + i];
+                     }
+                     avec->addAlignment(gene, 1, text_i + 1, bitvec);
+                 }
+             }
 
-            // for (seq_len_t text_i = 0; text_i < t_size - match_min_len + 1; ++text_i) {
-            //     min_subsize = min((int) p_size, t_size - text_i);
-            //     for (seq_len_t i = 0; i < min_subsize; ++i) {
-            //         bitvec.push_back(pattern_i[i] == text[text_i + i]);
-            //     }
-            //     if (open_match && (min_subsize - p_start) >= match_min_len) {
-            //         avec->addAlignment(gene, p_start + 1, t_start + 1, min_subsize - p_start);
-            //     }
-            // }
+            for (seq_len_t pattern_i = 1; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
+                min_subsize = min(p_size - pattern_i, (int) t_size);
+                if (min_subsize >= match_min_len) {
+                    bitvec.resize(min_subsize);
+                    for (seq_len_t i = 0; i < min_subsize; ++i) {
+                        bitvec[i] = pattern[pattern_i + i] != text[i];
+                    }
+                    avec->addAlignment(gene, pattern_i + 1, 1, bitvec);
+                }
+            }
 
             // for (seq_len_t pattern_i = 1 /* WTF?! */ ; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
             //     min_subsize = min(p_size - pattern_i, (int) t_size);

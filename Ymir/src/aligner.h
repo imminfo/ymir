@@ -34,6 +34,29 @@ using namespace std;
 
 namespace ymir {
 
+
+    /**
+     *
+     */
+    struct AlignmentEventScore {
+
+        /**
+         *
+         */
+        AlignmentEventScore(alignment_score_t match_,
+                            alignment_score_t mism_,
+                            alignment_score_t ins_,
+                            alignment_score_t del_)
+            : match(match_), mism(mism_), ins(ins_), del(del_)
+        {
+        }
+
+
+        alignment_score_t match, mism, ins, del;
+
+    };
+
+
     /**
      * \struct VDJAlignerParameters
      */
@@ -81,9 +104,6 @@ namespace ymir {
          */
         VDJAlignerBase(const VDJRecombinationGenes &genes,
                        VDJAlignerParameters params)
-                           // const AlignmentEventScore &v_score = AlignmentEventScore(1, -1, -1, -1),
-                           // const AlignmentEventScore &d_score = AlignmentEventScore(1, -1, -1, -1),
-                           // const AlignmentEventScore &j_score = AlignmentEventScore(1, -1, -1, -1))
                 : _genes(genes), _params(params)
         {
         }

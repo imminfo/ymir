@@ -461,27 +461,6 @@ namespace ymir {
                     avec->addAlignment(gene, pattern_i + 1, 1, bitvec);
                 }
             }
-
-            // for (seq_len_t pattern_i = 1 /* WTF?! */ ; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
-            //     min_subsize = min(p_size - pattern_i, (int) t_size);
-            //     for (seq_len_t i = 0; i < min_subsize; ++i) {
-            //         if (pattern[pattern_i + i] == text[i]) {
-            //             if (!open_match) {
-            //                 p_start = pattern_i + i;
-            //                 t_start = i;
-            //                 open_match = true;
-            //             }
-            //         } else if (open_match) {
-            //             if ((pattern_i + i - p_start) >= match_min_len) {
-            //                 avec->addAlignment(gene, p_start + 1, t_start + 1, pattern_i + i - p_start);
-            //             }
-            //             open_match = false;
-            //         }
-            //     }
-            //     if (open_match && (pattern_i + min_subsize - p_start) >= match_min_len) {
-            //         avec->addAlignment(gene, p_start + 1, t_start + 1, pattern_i + min_subsize - p_start);
-            //     }
-            // }
         }
     };
 

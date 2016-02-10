@@ -298,7 +298,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerParameters params = VDJAlignerParameters()) const 
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const 
         {
             seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
 
@@ -316,7 +316,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerParameters params = VDJAlignerParameters()) const 
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const 
         {
             seq_len_t match_min_len = params.min_D_len;
             seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
@@ -374,7 +374,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec,
-                        VDJAlignerParameters params = VDJAlignerParameters()) const
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const
         {
             seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0;
 
@@ -413,7 +413,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerParameters params = VDJAlignerParameters()) const
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const
         {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
@@ -432,7 +432,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerParameters params = VDJAlignerParameters()) const 
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const 
         {
              seq_len_t match_min_len = params.min_D_len;
              seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
@@ -469,7 +469,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerParameters params = VDJAlignerParameters()) const 
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const
         {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
@@ -494,43 +494,82 @@ namespace ymir {
                            CDR3AlignerFunctor_J> CDR3NucleotideAligner;
 
 
-    // /**
-    //  * \class AlignmentMatrix
-    //  */
-    // class AlignmentMatrix {
-    // public:
+    /**
+     *
+     */
+    struct SWAlignmentMatrix {
 
 
-    //     AlignmentMatrix(seq_len_t nrow, seq_len_t ncol)
-    //             : _nrow(nrow), _ncol(ncol), _events((nrow+1) * (ncol + 1))
-    //     {
-    //         _starts = new bool[nrow * ncol];
-    //         std::fill(_starts, _starts + nrow * ncol, false);
-    //     }
+        typedef std::vector<bool> bit_storage_t;
 
 
-    //     ~AlignmentMatrix() {
-    //         delete [] _starts;
-    //     }
+        typedef std::vector<alignment_score_t > score_storage_t;
 
 
-    //     // alignment_event_t getEvent(seq_len_t row, seq_len_t col) const { return _events[row * _nrow + col]; }
+        SWAlignmentMatrix(seg_index_t gene,
+                          const sequence_t &pattern,
+                          const sequence_t &text,
+                          const VDJAlignerParameters &params)
+                : _gene(gene),
+                  _nrow(pattern.size() + 1),
+                  _ncol(text.size() + 1),
+                  _params(params),
+                  _starts(_nrow * _ncol, false),
+                  _matrix(_nrow * _ncol, 0)
+        {
+        }
 
 
-    //     void setEvent(seq_len_t row, seq_len_t col, const alignment_event_t &event) { _events.setEvent(row * _nrow + col, event); }
+        void reinit(seg_index_t gene,
+                    const sequence_t &pattern,
+                    const sequence_t &text,
+                    const VDJAlignerParameters &params)
+        {
+            _gene = gene;
+            _nrow = pattern.size() + 1;
+            _ncol = text.size() + 1;
+            _params = params;
+            _starts.resize(_nrow * _ncol);
+            std::fill(_starts.begin(), _starts.end(), false);
+            _matrix.resize(_nrow * _ncol);
+            std::fill(_matrix.begin(), _matrix.end(), 0);
+        }
 
 
-    //     bool is_start(seq_len_t row, seq_len_t col) const { return _starts[row * _nrow + col]; }
+        void setStart(seq_len_t row, seq_len_t col) { _starts[row * _ncol + col] = true; }
 
 
-    // private:
+        void getBestAlignment(GappedAlignmentVector *vec) const {
+            AlignmentVectorBase::events_storage_t bitvec;
+            seq_len_t pstart, tstart;
 
-    //     seq_len_t _nrow, _ncol;
-    //     AlignmentEventVector _events;
-    //     bool *_starts;
+            // Find maximum score.
+            seq_len_t max_i = 0, max_j = 0;
+            alignment_score_t max_score;
+            for (seq_len_t i = 0; i < _nrow; ++i) {
+                for (seq_len_t j = 0; j < _ncol; ++j) {
+                    if (_matrix[i*_ncol + j] > max_score) {
+                        max_i = i;
+                        max_j = j;
+                        max_score = _matrix[i*_ncol + j];
+                    }
+                }
+            }
 
-    // };
+            // Traceback to the start, storing alignment events.
 
+            vec->addAlignment(_gene, pstart, tstart, bitvec);
+        }
+
+    private:
+
+        seq_len_t _nrow, _ncol;
+        seg_index_t _gene;
+        VDJAlignerParameters _params;
+        bit_storage_t _starts;
+        score_storage_t _matrix;
+
+    };
 
     //
     // Classic Smith-Waterman
@@ -546,10 +585,15 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerParameters params = VDJAlignerParameters()) const 
+                        const VDJAlignerParameters &params = VDJAlignerParameters())
         {
             // avec->addAlignment(gene, );
         }
+
+    private:
+
+        SWAlignmentMatrix _matrix;
+
     };
 
     struct SWAlignerFunctor_D {
@@ -557,10 +601,15 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerParameters params = VDJAlignerParameters()) const 
+                        const VDJAlignerParameters &params = VDJAlignerParameters())
         {
             // avec->addAlignment(gene, );
         }
+
+    private:
+
+        SWAlignmentMatrix _matrix;
+
     };
     ///@}
 
@@ -590,7 +639,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerParameters params = VDJAlignerParameters()) const 
+                        const VDJAlignerParameters &params = VDJAlignerParameters())
         {
             // avec->addAlignment(gene, );
         }
@@ -601,7 +650,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        VDJAlignerParameters params = VDJAlignerParameters()) const 
+                        const VDJAlignerParameters &params = VDJAlignerParameters())
         {
             // avec->addAlignment(gene, );
         }

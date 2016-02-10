@@ -536,10 +536,13 @@ namespace ymir {
         }
 
 
-        void setStart(seq_len_t row, seq_len_t col) { _starts[row * _ncol + col] = true; }
+        void setStart(seq_len_t row, seq_len_t col) { _starts[index(row, col)] = true; }
 
 
-        void getBestAlignment(GappedAlignmentVector *vec) const {
+        alignment_score_t getBestAlignment(GappedAlignmentVector *vec,
+                                           const sequence_t &pattern,
+                                           const sequence_t &text) const
+        {
             AlignmentVectorBase::events_storage_t bitvec;
             seq_len_t pstart, tstart;
 
@@ -548,21 +551,47 @@ namespace ymir {
             alignment_score_t max_score = -1;
             for (seq_len_t i = 0; i < _nrow; ++i) {
                 for (seq_len_t j = 0; j < _ncol; ++j) {
-                    if (_matrix[i*_ncol + j] > max_score) {
+                    if (score(i, j) > max_score) {
                         max_i = i;
                         max_j = j;
-                        max_score = _matrix[i*_ncol + j];
+                        max_score = score(i, j);
                     }
                 }
             }
 
             // Traceback to the start, storing alignment events.
-            add_match(&bitvec);
-            add_mismatch(&bitvec);
-            add_ins(&bitvec);
-            add_del(&bitvec);
+            seq_len_t cur_i = max_i, cur_j = max_j, max_index = 0;
+            std::array<alignment_score_t, 3> score_arr;
+            while (!_starts[index(cur_i, cur_j)]) {
+                score_arr[0] = score(cur_i - 1, cur_j - 1);
+                score_arr[1] = cur_j > 0 ? score(cur_i, cur_j - 1) : -1;
+                score_arr[2] = cur_i > 0 ? score(cur_i - 1, cur_j) : -1;
+                max_index = std::distance(score_arr.begin(), std::max_element(score_arr.begin(), score_arr.end()));
+                switch (max_index) {
+                    case 0:
+                        pattern[cur_i] == text[cur_j] ? add_match(&bitvec) : add_mismatch(&bitvec);
+                        --cur_i;
+                        --cur_j;
+                        break;
+
+                    case 1:
+                        add_ins(&bitvec);
+                        --cur_j;
+                        break;
+
+                    case 2:
+                        add_del(&bitvec);
+                        --cur_i;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
 
             vec->addAlignment(_gene, pstart, tstart, bitvec);
+
+            return score(max_i, max_j);
         }
 
     private:
@@ -572,6 +601,12 @@ namespace ymir {
         VDJAlignerParameters _params;
         bit_storage_t _starts;
         score_storage_t _matrix;
+
+
+        size_t index(seq_len_t row, seq_len_t col) const { return row * _ncol + col; }
+
+
+        alignment_score_t score(seq_len_t row, seq_len_t col) const { return _matrix[index(row, col)]; }
 
     };
 

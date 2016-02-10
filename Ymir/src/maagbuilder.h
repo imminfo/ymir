@@ -56,7 +56,7 @@ namespace ymir {
     class MAAGBuilder : protected MAAG {
 
     public:
-
+        
 
         /**
          * \brief Constructor for the builder from given vector with event probabilities and gene segments.

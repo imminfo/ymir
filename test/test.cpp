@@ -1901,6 +1901,18 @@ YMIR_TEST_START(test_cdr3_nuc_aligner)
     YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 3))
     YMIR_ASSERT(!nna.alignJoi(2, "ACGT").isMismatch(0, 4))
 
+    /*
+1:  test_cdr3_nuc_aligner() 
+
+    1.1:  nna.alignJoi(3, "ACGT").isMismatch(0, 1)
+
+    1.2:  !nna.alignJoi(3, "ACGT").isMismatch(0, 4)
+
+    1.3:  nna.alignJoi(4, "ACGT").isMismatch(0, 1)
+
+    1.4:  !nna.alignJoi(4, "ACGT").isMismatch(0, 4)
+    */
+
     // TTCGT
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").pattern_start(0), 1)
     YMIR_ASSERT2(nna.alignJoi(3, "ACGT").text_start(0), 2)

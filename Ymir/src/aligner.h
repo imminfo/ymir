@@ -545,7 +545,7 @@ namespace ymir {
 
             // Find maximum score.
             seq_len_t max_i = 0, max_j = 0;
-            alignment_score_t max_score;
+            alignment_score_t max_score = -1;
             for (seq_len_t i = 0; i < _nrow; ++i) {
                 for (seq_len_t j = 0; j < _ncol; ++j) {
                     if (_matrix[i*_ncol + j] > max_score) {
@@ -557,6 +557,10 @@ namespace ymir {
             }
 
             // Traceback to the start, storing alignment events.
+            add_match(&bitvec);
+            add_mismatch(&bitvec);
+            add_ins(&bitvec);
+            add_del(&bitvec);
 
             vec->addAlignment(_gene, pstart, tstart, bitvec);
         }

@@ -69,15 +69,12 @@ namespace ymir {
         static const seq_len_t default_minlen = 3;
 
 
-        static const AlignmentEventScore default_score = AlignmentEventScore(1, -1, -3, -3);
-
-
         VDJAlignerParameters() 
             : threshold(default_thr), 
               min_D_len(default_minlen),
-              v_score(default_score),
-              d_score(default_score),
-              j_score(default_score)
+              v_score(AlignmentEventScore(1, -1, -3, -3)),
+              d_score(AlignmentEventScore(1, -1, -3, -3)),
+              j_score(AlignmentEventScore(1, -1, -3, -3))
         {
         }
 
@@ -85,9 +82,9 @@ namespace ymir {
         VDJAlignerParameters(alignment_score_t thr, seq_len_t minlen) 
             : threshold(thr), 
               min_D_len(minlen),
-              v_score(default_score),
-              d_score(default_score),
-              j_score(default_score)
+              v_score(AlignmentEventScore(1, -1, -3, -3)),
+              d_score(AlignmentEventScore(1, -1, -3, -3)),
+              j_score(AlignmentEventScore(1, -1, -3, -3))
         {                
         }
 
@@ -536,6 +533,20 @@ namespace ymir {
         typedef std::vector<alignment_score_t > score_storage_t;
 
 
+        static const seq_len_t default_nrows = 80;
+
+
+        static const seq_len_t default_ncols = 20;
+
+
+        SWAlignmentMatrix()
+                : _gene(0),
+                  _nrow(default_nrows),
+                  _ncol(default_ncols)
+        {
+        }
+
+
         SWAlignmentMatrix(seg_index_t gene,
                           const sequence_t &pattern,
                           const sequence_t &text,
@@ -639,6 +650,7 @@ namespace ymir {
         alignment_score_t score(seq_len_t row, seq_len_t col) const { return _matrix[index(row, col)]; }
 
     };
+
 
     //
     // Classic Smith-Waterman

@@ -487,7 +487,7 @@ namespace ymir {
             vec.reserve(min(p_size, t_size) + 1);
 
             for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
-                vec.push_back(pattern[p_size - i - 1] != text[t_size - i - 1]);
+                vec.insert(vec.begin(), pattern[p_size - i - 1] != text[t_size - i - 1]);
             }
 
             avec->addAlignment(gene, p_size - min(t_size, p_size) + 1, t_size - min(t_size, p_size) + 1, vec);

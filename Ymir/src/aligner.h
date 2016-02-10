@@ -69,22 +69,32 @@ namespace ymir {
         static const seq_len_t default_minlen = 3;
 
 
+        static const AlignmentEventScore default_score = AlignmentEventScore(1, -1, -3, -3);
+
+
         VDJAlignerParameters() 
             : threshold(default_thr), 
-              min_D_len(default_minlen)
+              min_D_len(default_minlen),
+              v_score(default_score),
+              d_score(default_score),
+              j_score(default_score)
         {
         }
 
 
         VDJAlignerParameters(alignment_score_t thr, seq_len_t minlen) 
             : threshold(thr), 
-              min_D_len(minlen)
+              min_D_len(minlen),
+              v_score(default_score),
+              d_score(default_score),
+              j_score(default_score)
         {                
         }
 
 
         alignment_score_t threshold; ///
         seq_len_t min_D_len; ///
+        AlignmentEventScore v_score, d_score, j_score;
 
     private:
 

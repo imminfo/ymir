@@ -89,6 +89,21 @@ namespace ymir {
         }
 
 
+        VDJAlignerParameters(alignment_score_t thr,
+                             seq_len_t minlen,
+                             AlignmentEventScore v_score_,
+                             AlignmentEventScore d_score_,
+                             AlignmentEventScore j_score_)
+                : threshold(thr),
+                  min_D_len(minlen),
+                  v_score(v_score_),
+                  d_score(d_score_),
+                  j_score(j_score_)
+        {
+        }
+
+
+
         alignment_score_t threshold; ///
         seq_len_t min_D_len; ///
         AlignmentEventScore v_score, d_score, j_score;

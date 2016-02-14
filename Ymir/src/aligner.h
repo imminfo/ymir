@@ -45,14 +45,13 @@ namespace ymir {
          */
         AlignmentEventScore(alignment_score_t match_,
                             alignment_score_t mism_,
-                            alignment_score_t ins_,
-                            alignment_score_t del_)
-            : match(match_), mism(mism_), ins(ins_), del(del_)
+                            alignment_score_t indel_)
+            : match(match_), mism(mism_), indel(indel_)
         {
         }
 
 
-        alignment_score_t match, mism, ins, del;
+        alignment_score_t match, mism, indel;
 
     };
 
@@ -72,9 +71,9 @@ namespace ymir {
         VDJAlignerParameters() 
             : threshold(default_thr), 
               min_D_len(default_minlen),
-              v_score(AlignmentEventScore(1, -1, -3, -3)),
-              d_score(AlignmentEventScore(1, -1, -3, -3)),
-              j_score(AlignmentEventScore(1, -1, -3, -3))
+              v_score(AlignmentEventScore(1, -1, -3)),
+              d_score(AlignmentEventScore(1, -1, -3)),
+              j_score(AlignmentEventScore(1, -1, -3))
         {
         }
 
@@ -82,9 +81,9 @@ namespace ymir {
         VDJAlignerParameters(alignment_score_t thr, seq_len_t minlen) 
             : threshold(thr), 
               min_D_len(minlen),
-              v_score(AlignmentEventScore(1, -1, -3, -3)),
-              d_score(AlignmentEventScore(1, -1, -3, -3)),
-              j_score(AlignmentEventScore(1, -1, -3, -3))
+              v_score(AlignmentEventScore(1, -1, -3)),
+              d_score(AlignmentEventScore(1, -1, -3)),
+              j_score(AlignmentEventScore(1, -1, -3))
         {                
         }
 

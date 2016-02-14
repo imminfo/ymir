@@ -100,7 +100,7 @@ namespace ymir {
 
         seg_index_t getJoi(size_t index) const { return _alignments.id(_segments[0] + index); }
 
-        seg_index_t getDiv(size_t index) const { return _alignments.id(_segments[0] + _segments[1] + _n_D_alignments[index] + index); }
+        seg_index_t getDiv(size_t index) const { return _alignments.id(_segments[0] + _segments[1] + _n_D_alignments[index]); }
         ///@}
 
 

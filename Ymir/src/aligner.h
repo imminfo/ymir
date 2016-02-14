@@ -25,8 +25,9 @@
 #define _ALIGNER_H_
 
 
-#include "vdj_alignment_builder.h"
 #include "genesegment.h"
+#include "alignment_matrix.h"
+#include "vdj_alignment_builder.h"
 
 
 using namespace std;
@@ -533,139 +534,6 @@ namespace ymir {
                            CDR3AlignerFunctor_V, 
                            CDR3AlignerFunctor_D, 
                            CDR3AlignerFunctor_J> CDR3NucleotideAligner;
-
-
-    /**
-     * \struct SWAlignmentMatrix
-     */
-    struct SWAlignmentMatrix {
-
-
-        typedef std::vector<bool> bit_storage_t;
-
-
-        typedef std::vector<alignment_score_t > score_storage_t;
-
-
-        static const seq_len_t default_nrows = 80;
-
-
-        static const seq_len_t default_ncols = 20;
-
-
-        SWAlignmentMatrix()
-                : _gene(0),
-                  _nrow(default_nrows),
-                  _ncol(default_ncols)
-        {
-        }
-
-
-        SWAlignmentMatrix(seg_index_t gene,
-                          const sequence_t &pattern,
-                          const sequence_t &text)
-                : _gene(gene),
-                  _nrow(pattern.size() + 1),
-                  _ncol(text.size() + 1),
-                  _starts(_nrow * _ncol, false),
-                  _matrix(_nrow * _ncol, 0)
-        {
-        }
-
-
-        void reinit(seg_index_t gene,
-                    const sequence_t &pattern,
-                    const sequence_t &text)
-        {
-            _gene = gene;
-            _nrow = pattern.size() + 1;
-            _ncol = text.size() + 1;
-            _starts.resize(_nrow * _ncol);
-            std::fill(_starts.begin(), _starts.end(), false);
-            _matrix.resize(_nrow * _ncol);
-            std::fill(_matrix.begin(), _matrix.end(), 0);
-        }
-
-
-        void setStart(seq_len_t row, seq_len_t col) { _starts[index(row, col)] = true; }
-
-
-        alignment_score_t getBestAlignment(GappedAlignmentVector *vec,
-                                           const sequence_t &pattern,
-                                           const sequence_t &text) const
-        {
-            AlignmentVectorBase::events_storage_t bitvec;
-            seq_len_t pstart, tstart;
-
-            // Find maximum score.
-            seq_len_t max_i = 0, max_j = 0;
-            alignment_score_t max_score = -1;
-            for (seq_len_t i = 0; i < _nrow; ++i) {
-                for (seq_len_t j = 0; j < _ncol; ++j) {
-                    if (score(i, j) > max_score) {
-                        max_i = i;
-                        max_j = j;
-                        max_score = score(i, j);
-                    }
-                }
-            }
-
-            // Traceback to the start, storing alignment events.
-            seq_len_t cur_i = max_i, cur_j = max_j, max_index = 0;
-            std::array<alignment_score_t, 3> score_arr;
-            while (!_starts[index(cur_i, cur_j)]) {
-                score_arr[0] = score(cur_i - 1, cur_j - 1);
-                score_arr[1] = cur_j > 0 ? score(cur_i, cur_j - 1) : -1;
-                score_arr[2] = cur_i > 0 ? score(cur_i - 1, cur_j) : -1;
-                max_index = std::distance(score_arr.begin(), std::max_element(score_arr.begin(), score_arr.end()));
-                switch (max_index) {
-                    case 0:
-                        pattern[cur_i] == text[cur_j] ? add_match(&bitvec) : add_mismatch(&bitvec);
-                        --cur_i;
-                        --cur_j;
-                        break;
-
-                    case 1:
-                        add_ins(&bitvec);
-                        --cur_j;
-                        break;
-
-                    case 2:
-                        add_del(&bitvec);
-                        --cur_i;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            vec->addAlignment(_gene, pstart, tstart, bitvec);
-
-            return score(max_i, max_j);
-        }
-
-
-        /**
-         *
-         */
-        ///@{
-        alignment_score_t score(seq_len_t row, seq_len_t col) const { return _matrix[index(row, col)]; }
-
-        alignment_score_t& score(seq_len_t row, seq_len_t col) { return _matrix[index(row, col)]; }
-        ///@}
-
-    private:
-
-        seq_len_t _nrow, _ncol;
-        seg_index_t _gene;
-        bit_storage_t _starts;
-        score_storage_t _matrix;
-
-
-        size_t index(seq_len_t row, seq_len_t col) const { return row * _ncol + col; }
-
-    };
 
 
     //

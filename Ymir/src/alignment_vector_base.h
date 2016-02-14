@@ -97,25 +97,25 @@ namespace ymir {
 
 
         seq_len_t pattern_start(seq_len_t i) const {
-            check_and_throw(i*4 >= _data.size(), "Alignment vector: pattern index " + std::to_string(i*4) + " is out of bounds");
+            check_and_throw(i*4 >= _data.size(), "Alignment vector: pattern index " + std::to_string(i*4) + " is out of bounds (" + std::to_string(_data.size()) + ")");
             return _data[i*4];
         }
 
 
         seq_len_t text_start(seq_len_t i) const {
-            check_and_throw(i*4 + 1 >= _data.size(), "Alignment vector: text index " + std::to_string(i*4 + 1) + " is out of bounds");
+            check_and_throw(i*4 + 1 >= _data.size(), "Alignment vector: text index " + std::to_string(i*4 + 1) + " is out of bounds (" + std::to_string(_data.size()) + ")");
             return _data[i*4 + 1];
         }
 
 
         seq_len_t len(seq_len_t i) const {
-            check_and_throw(i*4 + 2 >= _data.size(), "Alignment vector: length index " + std::to_string(i*4 + 2) + " is out of bounds");
+            check_and_throw(i*4 + 2 >= _data.size(), "Alignment vector: length index " + std::to_string(i*4 + 2) + " is out of bounds (" + std::to_string(_data.size()) + ")");
             return _data[i*4 + 2];
         }
 
 
         seq_len_t id(seq_len_t i) const {
-            check_and_throw(i*4 + 3 >= _data.size(), "Alignment vector: ID index " + std::to_string(i*4 + 3) + " is out of bounds");
+            check_and_throw(i*4 + 3 >= _data.size(), "Alignment vector: ID index " + std::to_string(i*4 + 3) + " is out of bounds (" + std::to_string(_data.size()) + ")");
             return _data[i*4 + 3];
         }
 

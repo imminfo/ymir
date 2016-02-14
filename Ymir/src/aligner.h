@@ -536,7 +536,7 @@ namespace ymir {
 
 
     /**
-     *
+     * \struct SWAlignmentMatrix
      */
     struct SWAlignmentMatrix {
 
@@ -563,12 +563,10 @@ namespace ymir {
 
         SWAlignmentMatrix(seg_index_t gene,
                           const sequence_t &pattern,
-                          const sequence_t &text,
-                          const VDJAlignerParameters &params)
+                          const sequence_t &text)
                 : _gene(gene),
                   _nrow(pattern.size() + 1),
                   _ncol(text.size() + 1),
-                  _params(params),
                   _starts(_nrow * _ncol, false),
                   _matrix(_nrow * _ncol, 0)
         {
@@ -577,13 +575,11 @@ namespace ymir {
 
         void reinit(seg_index_t gene,
                     const sequence_t &pattern,
-                    const sequence_t &text,
-                    const VDJAlignerParameters &params)
+                    const sequence_t &text)
         {
             _gene = gene;
             _nrow = pattern.size() + 1;
             _ncol = text.size() + 1;
-            _params = params;
             _starts.resize(_nrow * _ncol);
             std::fill(_starts.begin(), _starts.end(), false);
             _matrix.resize(_nrow * _ncol);
@@ -649,19 +645,25 @@ namespace ymir {
             return score(max_i, max_j);
         }
 
+
+        /**
+         *
+         */
+        ///@{
+        alignment_score_t score(seq_len_t row, seq_len_t col) const { return _matrix[index(row, col)]; }
+
+        alignment_score_t& score(seq_len_t row, seq_len_t col) { return _matrix[index(row, col)]; }
+        ///@}
+
     private:
 
         seq_len_t _nrow, _ncol;
         seg_index_t _gene;
-        VDJAlignerParameters _params;
         bit_storage_t _starts;
         score_storage_t _matrix;
 
 
         size_t index(seq_len_t row, seq_len_t col) const { return row * _ncol + col; }
-
-
-        alignment_score_t score(seq_len_t row, seq_len_t col) const { return _matrix[index(row, col)]; }
 
     };
 

@@ -37,6 +37,15 @@
 namespace ymir {
 
 
+    inline void check_and_throw(bool condition, const std::string &error_msg) {
+#ifndef DNDEBUG
+        if (condition) {
+            throw(std::runtime_error(error_msg));
+        }
+#endif
+    }
+
+
     inline uint8_t nuc_hash(char nuc) {
         switch (nuc) {
             case 'A': return 0;

@@ -130,12 +130,18 @@ namespace ymir {
         // Traceback to the start, storing alignment events.
         seq_len_t cur_i = max_i, cur_j = max_j;
         while (!_starts[index(cur_i, cur_j)]) {
-            bitvec.push_back(pattern[cur_i] == text[cur_j]);
+            bitvec.push_back(pattern[cur_i - 1] != text[cur_j - 1]);
             --cur_i;
             --cur_j;
         }
+        bitvec.push_back(false);
 
-        vec->addAlignment(_gene, cur_i, cur_j, bitvec);
+        AlignmentVectorBase::events_storage_t bitvec2;
+
+        for (int i = bitvec.size() - 1; i >= 0; --i) {
+            bitvec2.push_back(bitvec[i]);
+        }
+        vec->addAlignment(_gene, cur_i, cur_j, bitvec2);
 
         return score(max_i, max_j);
     }

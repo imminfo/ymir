@@ -2040,7 +2040,7 @@ YMIR_TEST_START(test_sw_alignment_matrix)
     mat.score(4, 6) = 3;
 
     GappedAlignmentVector vec;
-    YMIR_ASSERT2(mat.getBestAlignment(&vec, alpha, beta), 5);
+    YMIR_ASSERT2(mat.getBestAlignment(&vec, beta, alpha), 5);
     YMIR_ASSERT2(vec.id(0), 10)
     YMIR_ASSERT2(vec.pattern_start(0), 3)
     YMIR_ASSERT2(vec.text_start(0), 3)
@@ -2066,24 +2066,44 @@ YMIR_TEST_START(test_swng_alignment_matrix)
 
     /*
      0  0  0  0  0  0  0  0
-     0 *1  2  0
-     0  0  3  0
-     0  0  0 *1  2
-     0  0  0  0  0  3
-     0  0  0  0  0  4  5
+     0 *1  0  0
+     0  0  2 *1
+     0  0  0  3  2
+     0 *1  0  0  0  3
+     0  0  2  0  0  0  4
 
      */
     sequence_t alpha, beta;
-    alpha = "123456";
-    beta = "12345";
+    alpha = "112365";
+    beta =   "12345";
 
-    SWNGAlignmentMatrix mat(10, alpha, beta);
+    SWNGAlignmentMatrix mat(10, beta, alpha);
+
+    mat.score(1, 1) = 1;
+    mat.score(2, 2) = 2;
+    mat.score(3, 3) = 3;
+    mat.score(2, 3) = 1;
+    mat.score(3, 4) = 2;
+    mat.score(4, 5) = 3;
+    mat.score(5, 6) = 4;
+    mat.score(4, 1) = 1;
+    mat.score(5, 2) = 2;
 
     mat.setStart(1, 1);
-    mat.setStart(3, 3);
+    mat.setStart(2, 3);
+    mat.setStart(4, 1);
 
+    NoGapAlignmentVector vec;
+    YMIR_ASSERT2(mat.getBestAlignment(&vec, beta, alpha), 4);
+    YMIR_ASSERT2(vec.id(0), 10)
+    YMIR_ASSERT2(vec.pattern_start(0), 2)
+    YMIR_ASSERT2(vec.text_start(0), 3)
+    YMIR_ASSERT2(vec.len(0), 4)
 
-    YMIR_ASSERT(false)
+    YMIR_ASSERT(!vec.isMismatch(0, 1))
+    YMIR_ASSERT(!vec.isMismatch(0, 2))
+    YMIR_ASSERT(vec.isMismatch(0, 3))
+    YMIR_ASSERT(!vec.isMismatch(0, 4))
 
 YMIR_TEST_END
 

@@ -40,14 +40,16 @@ namespace ymir {
         AlignmentMatrixBase()
                 : _gene(0),
                   _nrow(default_nrows),
-                  _ncol(default_ncols)
+                  _ncol(default_ncols),
+                  _starts(_nrow * _ncol, false),
+                  _matrix(_nrow * _ncol, 0)
         {
         }
 
 
         AlignmentMatrixBase(seg_index_t gene,
-                          const sequence_t &pattern,
-                          const sequence_t &text)
+                            const sequence_t &pattern,
+                            const sequence_t &text)
                 : _gene(gene),
                   _nrow(pattern.size() + 1),
                   _ncol(text.size() + 1),
@@ -169,7 +171,8 @@ namespace ymir {
             max_index = std::distance(score_arr.begin(), std::max_element(score_arr.begin(), score_arr.end()));
             switch (max_index) {
                 case 0:
-                    pattern[cur_i] == text[cur_j] ? add_match(&bitvec) : add_mismatch(&bitvec);
+//                    std::cout  << (int) cur_i << ":" << (int) cur_j << std::endl;
+                    pattern[cur_i - 1] == text[cur_j - 1] ? add_match(&bitvec) : add_mismatch(&bitvec);
                     --cur_i;
                     --cur_j;
                     break;
@@ -189,7 +192,15 @@ namespace ymir {
             }
         }
 
-        vec->addAlignment(_gene, cur_i, cur_j, bitvec);
+        add_match(&bitvec);
+        // reverse
+        AlignmentVectorBase::events_storage_t bitvec2;
+
+        for (int i = bitvec.size() / 2 - 1; i >= 0; --i) {
+            bitvec2.push_back(bitvec[i*2]);
+            bitvec2.push_back(bitvec[i*2 + 1]);
+        }
+        vec->addAlignment(_gene, cur_i, cur_j, bitvec2);
 
         return score(max_i, max_j);
     }

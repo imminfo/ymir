@@ -1704,6 +1704,8 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
     YMIR_ASSERT2(algn.getJoi(0), 31)
     YMIR_ASSERT2(algn.getJoi(1), 33)
     YMIR_ASSERT2(algn.getJoi(2), 35)
+    YMIR_ASSERT2(algn.getDiv(0), 43)
+    YMIR_ASSERT2(algn.getDiv(1), 45)
 
     YMIR_ASSERT2(algn.getVarGeneStart(0), 1)
     YMIR_ASSERT2(algn.getVarSeqStart(0), 2)
@@ -1739,33 +1741,33 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
     YMIR_ASSERT(algn.isJoiMismatch(2, 14))
     YMIR_ASSERT(algn.isJoiMismatch(2, 15))
 
-    // YMIR_ASSERT2(algn.getDivGeneStart(0, 0), 13)
-    // YMIR_ASSERT2(algn.getDivSeqStart(0, 0), 14)
-    // YMIR_ASSERT2(algn.getDivLen(0, 0), 6)
-    // YMIR_ASSERT(!algn.isDivMismatch(0, 0, 1))
-    // YMIR_ASSERT(algn.isDivMismatch(0, 0, 2))
-    // YMIR_ASSERT(algn.isDivMismatch(0, 0, 3))
-    // YMIR_ASSERT(!algn.isDivMismatch(0, 0, 4))
-    // YMIR_ASSERT(algn.isDivMismatch(0, 0, 5))
-    // YMIR_ASSERT(algn.isDivMismatch(0, 0, 6))
+     YMIR_ASSERT2(algn.getDivGeneStart(0, 0), 13)
+     YMIR_ASSERT2(algn.getDivSeqStart(0, 0), 14)
+     YMIR_ASSERT2(algn.getDivLen(0, 0), 6)
+     YMIR_ASSERT(!algn.isDivMismatch(0, 0, 1))
+     YMIR_ASSERT(algn.isDivMismatch(0, 0, 2))
+     YMIR_ASSERT(algn.isDivMismatch(0, 0, 3))
+     YMIR_ASSERT(!algn.isDivMismatch(0, 0, 4))
+     YMIR_ASSERT(algn.isDivMismatch(0, 0, 5))
+     YMIR_ASSERT(algn.isDivMismatch(0, 0, 6))
 
-    // YMIR_ASSERT2(algn.getDivGeneStart(0, 1), 15)
-    // YMIR_ASSERT2(algn.getDivSeqStart(0, 1), 16)
-    // YMIR_ASSERT2(algn.getDivLen(0, 1), 3)
-    // YMIR_ASSERT(!algn.isDivMismatch(0, 1, 1))
-    // YMIR_ASSERT(algn.isDivMismatch(0, 1, 2))
-    // YMIR_ASSERT(!algn.isDivMismatch(0, 1, 3))
+     YMIR_ASSERT2(algn.getDivGeneStart(0, 1), 15)
+     YMIR_ASSERT2(algn.getDivSeqStart(0, 1), 16)
+     YMIR_ASSERT2(algn.getDivLen(0, 1), 3)
+     YMIR_ASSERT(!algn.isDivMismatch(0, 1, 1))
+     YMIR_ASSERT(algn.isDivMismatch(0, 1, 2))
+     YMIR_ASSERT(!algn.isDivMismatch(0, 1, 3))
 
-    // YMIR_ASSERT2(algn.getDivGeneStart(1, 0), 17)
-    // YMIR_ASSERT2(algn.getDivSeqStart(1, 0), 18)
-    // YMIR_ASSERT2(algn.getDivLen(1, 0), 7)
-    // YMIR_ASSERT(!algn.isDivMismatch(1, 0, 1))
-    // YMIR_ASSERT(!algn.isDivMismatch(1, 0, 2))
-    // YMIR_ASSERT(algn.isDivMismatch(1, 0, 3))
-    // YMIR_ASSERT(algn.isDivMismatch(1, 0, 4))
-    // YMIR_ASSERT(!algn.isDivMismatch(1, 0, 5))
-    // YMIR_ASSERT(algn.isDivMismatch(1, 0, 6))
-    // YMIR_ASSERT(algn.isDivMismatch(1, 0, 7))
+     YMIR_ASSERT2(algn.getDivGeneStart(1, 0), 17)
+     YMIR_ASSERT2(algn.getDivSeqStart(1, 0), 18)
+     YMIR_ASSERT2(algn.getDivLen(1, 0), 7)
+     YMIR_ASSERT(!algn.isDivMismatch(1, 0, 1))
+     YMIR_ASSERT(!algn.isDivMismatch(1, 0, 2))
+     YMIR_ASSERT(algn.isDivMismatch(1, 0, 3))
+     YMIR_ASSERT(algn.isDivMismatch(1, 0, 4))
+     YMIR_ASSERT(!algn.isDivMismatch(1, 0, 5))
+     YMIR_ASSERT(algn.isDivMismatch(1, 0, 6))
+     YMIR_ASSERT(algn.isDivMismatch(1, 0, 7))
 
 YMIR_TEST_END
 
@@ -2005,7 +2007,81 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_sw_alignment_matrix)
+
+    /*
+          1  2  3  4  5  6
+       0  0  0  0  0  0  0  0
+     1 0 *1  2  0
+     2 0  0  3  0
+     3 0  0  0 *1--2\ 2
+     4 0  0  0  0  0 |3  3
+     5 0  0  0  0  0 |4--5
+
+     */
+    sequence_t alpha, beta;
+    alpha = "123456";
+    beta = "12345";
+
+    SWAlignmentMatrix mat(10, beta, alpha);
+
+    mat.setStart(1, 1);
+    mat.setStart(3, 3);
+
+    mat.score(1, 1) = 1;
+    mat.score(1, 2) = 2;
+    mat.score(2, 2) = 3;
+    mat.score(3, 3) = 1;
+    mat.score(3, 4) = 2;
+    mat.score(3, 5) = 2;
+    mat.score(4, 5) = 3;
+    mat.score(5, 5) = 4;
+    mat.score(5, 6) = 5;
+    mat.score(4, 6) = 3;
+
+    GappedAlignmentVector vec;
+    YMIR_ASSERT2(mat.getBestAlignment(&vec, alpha, beta), 5);
+    YMIR_ASSERT2(vec.id(0), 10)
+    YMIR_ASSERT2(vec.pattern_start(0), 3)
+    YMIR_ASSERT2(vec.text_start(0), 3)
+    YMIR_ASSERT2(vec.len(0), 5)
+
+    YMIR_ASSERT(vec.isMatch(0, 1))
+    YMIR_ASSERT(vec.isIns(0, 2))
+    YMIR_ASSERT(vec.isMatch(0, 3))
+    YMIR_ASSERT(vec.isDel(0, 4))
+    YMIR_ASSERT(vec.isIns(0, 5))
+
+YMIR_TEST_END
+
+
 YMIR_TEST_START(test_sw_aligner)
+
+    YMIR_ASSERT(false)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_swng_alignment_matrix)
+
+    /*
+     0  0  0  0  0  0  0  0
+     0 *1  2  0
+     0  0  3  0
+     0  0  0 *1  2
+     0  0  0  0  0  3
+     0  0  0  0  0  4  5
+
+     */
+    sequence_t alpha, beta;
+    alpha = "123456";
+    beta = "12345";
+
+    SWNGAlignmentMatrix mat(10, alpha, beta);
+
+    mat.setStart(1, 1);
+    mat.setStart(3, 3);
+
 
     YMIR_ASSERT(false)
 
@@ -3379,7 +3455,9 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_naive_cdr3_nuc_aligner())
     YMIR_TEST(test_cdr3_nuc_aligner())
     YMIR_TEST(test_cdr3_aa_aligner())
+    YMIR_TEST(test_sw_alignment_matrix())
     YMIR_TEST(test_sw_aligner())
+    YMIR_TEST(test_swng_alignment_matrix())
     YMIR_TEST(test_swng_aligner())
 
     // Error corrector test

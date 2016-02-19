@@ -552,7 +552,9 @@ namespace ymir {
                         NoGapAlignmentVector *avec, 
                         const VDJAlignerParameters &params = VDJAlignerParameters())
         {
-            // avec->addAlignment(gene, );
+            SWAlignmentMatrix mat(gene, pattern, text);
+
+            mat.getBestAlignment(&avec, pattern, text);
         }
 
     private:
@@ -606,7 +608,9 @@ namespace ymir {
                         NoGapAlignmentVector *avec, 
                         const VDJAlignerParameters &params = VDJAlignerParameters())
         {
-            // avec->addAlignment(gene, );
+            SWNGAlignmentMatrix mat(gene, pattern, text);
+
+            mat.getBestAlignment(&avec, pattern, text);
         }
     };
 

@@ -48,8 +48,8 @@ namespace ymir {
          *
          */
         struct GeneSegment {
-            std::string allele;
-            std::string sequence;
+            sequence_t allele;
+            sequence_t sequence;
             std::string orig_sequence;
             seg_index_t index;
 
@@ -246,6 +246,8 @@ namespace ymir {
     * \class VDJRecombinationGenes
     */
     class VDJRecombinationGenes {
+
+        typedef unique_ptr<GeneSegmentAlphabet> GSA_ptr;
     public:
 
 
@@ -255,10 +257,9 @@ namespace ymir {
         VDJRecombinationGenes(const std::string& v_segments_name, const std::string& v_segments_file,
                               const std::string& j_segments_name, const std::string& j_segments_file,
                               bool *is_V_ok = nullptr, bool *is_J_ok = nullptr)
+            : _V(new GeneSegmentAlphabet(VARIABLE, v_segments_name, v_segments_file, is_V_ok)),
+              _J(new GeneSegmentAlphabet(JOINING, j_segments_name, j_segments_file, is_J_ok))
         {
-            this->_V = new GeneSegmentAlphabet(VARIABLE, v_segments_name, v_segments_file, is_V_ok);
-            this->_J = new GeneSegmentAlphabet(JOINING, j_segments_name, j_segments_file, is_J_ok);
-            this->_D = nullptr;
         }
 
 
@@ -266,51 +267,59 @@ namespace ymir {
                               const std::string& j_segments_name, const std::string& j_segments_file,
                               const std::string& d_segments_name, const std::string& d_segments_file,
                               bool *is_V_ok = nullptr, bool *is_J_ok = nullptr, bool *is_D_ok = nullptr)
-                : VDJRecombinationGenes(v_segments_name, v_segments_file, v_segments_name, j_segments_file, is_V_ok, is_J_ok)
+            : _V(new GeneSegmentAlphabet(VARIABLE, v_segments_name, v_segments_file, is_V_ok)),
+              _J(new GeneSegmentAlphabet(JOINING, j_segments_name, j_segments_file, is_J_ok)),
+              _D(new GeneSegmentAlphabet(DIVERSITY, d_segments_name, d_segments_file, is_D_ok))
         {
-            this->_D = new GeneSegmentAlphabet(DIVERSITY, d_segments_name, d_segments_file, is_D_ok);
         }
 
 
         VDJRecombinationGenes(const std::string& V_name, const std::vector<std::string>& V_alleles, const std::vector<std::string>& V_sequences,
                               const std::string& J_name, const std::vector<std::string>& J_alleles, const std::vector<std::string>& J_sequences)
+            : _V(new GeneSegmentAlphabet(VARIABLE, V_name, V_alleles, V_sequences)),
+              _J(new GeneSegmentAlphabet(JOINING, J_name, J_alleles, J_sequences))
         {
-            this->_V = new GeneSegmentAlphabet(VARIABLE, V_name, V_alleles, V_sequences);
-            this->_J = new GeneSegmentAlphabet(JOINING, J_name, J_alleles, J_sequences);
-            this->_D = nullptr;
         }
 
 
         VDJRecombinationGenes(const std::string& V_name, const std::vector<std::string>& V_alleles, const std::vector<std::string>& V_sequences,
                               const std::string& J_name, const std::vector<std::string>& J_alleles, const std::vector<std::string>& J_sequences,
                               const std::string& D_name, const std::vector<std::string>& D_alleles, const std::vector<std::string>& D_sequences)
-                : VDJRecombinationGenes(V_name, V_alleles, V_sequences, J_name, J_alleles, J_sequences)
+            : _V(new GeneSegmentAlphabet(VARIABLE, V_name, V_alleles, V_sequences)),
+              _J(new GeneSegmentAlphabet(JOINING, J_name, J_alleles, J_sequences)),
+              _D(new GeneSegmentAlphabet(DIVERSITY, D_name, D_alleles, D_sequences))
         {
-            this->_D = new GeneSegmentAlphabet(DIVERSITY, D_name, D_alleles, D_sequences);
         }
 
 
         VDJRecombinationGenes(const VDJRecombinationGenes &other) {
-            _V = new GeneSegmentAlphabet(*other._V);
-            _J = new GeneSegmentAlphabet(*other._J);
+            _V.reset(new GeneSegmentAlphabet(*other._V));
+            _J.reset(new GeneSegmentAlphabet(*other._J));
             if (other._D) {
-                _D = new GeneSegmentAlphabet(*other._D);
+                _D.reset(new GeneSegmentAlphabet(*other._D));
             } else {
-                _D = nullptr;
+                _D.release();
             }
         }
 
 
-        ~VDJRecombinationGenes() {
-            delete this->_V;
-            delete this->_J;
-            if (_D) { delete this->_D; }
+        VDJRecombinationGenes& operator=(const VDJRecombinationGenes &other) {
+            _V.reset(new GeneSegmentAlphabet(*other._V));
+            _J.reset(new GeneSegmentAlphabet(*other._J));
+            if (other._D) {
+                _D.reset(new GeneSegmentAlphabet(*other._D));
+            } else {
+                _D.release();
+            }
         }
 
 
-        bool is_vdj() const {
-            return this->_D != nullptr;
+        ~VDJRecombinationGenes()
+        {
         }
+
+
+        bool is_vdj() const { return this->_D != nullptr; }
 
 
         /**
@@ -356,7 +365,7 @@ namespace ymir {
 
     protected:
 
-        GeneSegmentAlphabet *_V, *_J, *_D;
+        GSA_ptr _V, _J, _D;
 
     };
 }

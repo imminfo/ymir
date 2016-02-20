@@ -172,7 +172,8 @@ namespace ymir {
                   const VDJRecombinationGenes &gene_segments,
                   SequenceType seq_type,
                   Recombination recomb,
-                  AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE)) {
+                  AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE),
+                  VDJAlignerParameters params = VDJAlignerParameters()) {
             _status = false;
             _stats.reset();
 
@@ -190,6 +191,7 @@ namespace ymir {
                 _opts = opts;
                 _status = true;
                 _aligner.set_genes(_genes);
+                _aligner.set_parameters(params);
                 return true;
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
@@ -228,7 +230,8 @@ namespace ymir {
                           const VDJRecombinationGenes &gene_segments,
                           SequenceType seq_type,
                           Recombination recomb,
-                          AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE)) {
+                          AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE),
+                          VDJAlignerParameters params = VDJAlignerParameters()) {
             if (this->open(filepath, gene_segments, seq_type, recomb, opts)) {
                 this->parse(cloneset);
                 _stats.print();

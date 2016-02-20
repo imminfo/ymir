@@ -1869,8 +1869,8 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
 
     NaiveNucParser parser;
 
-     Cloneset cr;
-     YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "ymir.beta.txt",
+    Cloneset cr;
+    YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "ymir.beta.txt",
                                      &cr,
                                      genes,
                                      NUCLEOTIDE,
@@ -1878,16 +1878,17 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
                                      NaiveNucParser::AlignmentColumnOptions()
                                       .setV(NaiveNucParser::USE_PROVIDED)
                                       .setJ(NaiveNucParser::USE_PROVIDED)
-                                      .setD(NaiveNucParser::OVERWRITE)))
+                                      .setD(NaiveNucParser::OVERWRITE),
+                                    VDJAlignerParameters(1, 2)))
 
-     YMIR_ASSERT2(cr.size(), 1)
-     YMIR_ASSERT2(cr[0].sequence(), "CCCGACGGTTT")
-     YMIR_ASSERT2(genes.V()[cr[0].getJoi(0)].allele, "Vseg1")
-     YMIR_ASSERT2(genes.J()[cr[0].getJoi(0)].allele, "Jseg1")
-     YMIR_ASSERT2( (int) cr[0].nDiv(), 3)
-     YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 1)
-     YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 2)
-     YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 3)
+    YMIR_ASSERT2(cr.size(), 1)
+    YMIR_ASSERT2(cr[0].sequence(), "CCCGACGGTTT")
+    YMIR_ASSERT2(genes.V()[cr[0].getJoi(0)].allele, "Vseg1")
+    YMIR_ASSERT2(genes.J()[cr[0].getJoi(0)].allele, "Jseg1")
+    YMIR_ASSERT2( (int) cr[0].nDiv(), 3)
+    YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 1)
+    YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 2)
+    YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 3)
 //     this is if default gene len is equal to 2
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 3)
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 4)

@@ -93,7 +93,7 @@ namespace ymir {
     * To make new parsers inherit from this class and rewrite virtual private method
     * "parseRepertoire".
     */
-    template <typename Aligner>
+    template <typename Aligner >
     class RepertoireParser {
 
     public:
@@ -347,7 +347,7 @@ namespace ymir {
                         }
                     } else {
                         getline(column_stream, segment_word, column_sep);
-                        this->parseAlignment<VARIABLE>(symbol_stream, segment_word, vseg, _genes.V(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
+                        this->parseAlignment(symbol_stream, segment_word, vseg, VARIABLE, _genes.V(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
                     }
 
                     //
@@ -363,7 +363,7 @@ namespace ymir {
                             }
                         } else {
                             getline(column_stream, segment_word, column_sep);
-                            this->parseAlignment<DIVERSITY>(symbol_stream, segment_word, dseg, _genes.D(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
+                            this->parseAlignment(symbol_stream, segment_word, dseg, DIVERSITY, _genes.D(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
                         }
                     }
 
@@ -377,7 +377,7 @@ namespace ymir {
                         }
                     } else {
                         getline(column_stream, segment_word, column_sep);
-                        this->parseAlignment<JOINING>(symbol_stream, segment_word, jseg, _genes.J(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
+                        this->parseAlignment(symbol_stream, segment_word, jseg, JOINING, _genes.J(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
                     }
 
                     ++_stats.count_all;
@@ -426,10 +426,10 @@ namespace ymir {
         }
 
 
-        template <GeneSegments GENE>
         void parseAlignment(stringstream &symbol_stream,
                             const string &segment_word,
                             const vector<seg_index_t> &segvec,
+                            GeneSegments gene,
                             const GeneSegmentAlphabet &gsa,
                             size_t line_num,
                             char segment_sep,
@@ -456,7 +456,7 @@ namespace ymir {
                 getline(temp_stream, temp_str, internal_sep);
                 alignment_len = std::atoi(temp_str.c_str());
 
-                _aligner.addAlignment<GENE>(segvec[0], gene_start, seq_start, alignment_len);
+                _aligner.addAlignment(gene, segvec[0], gene_start, seq_start, alignment_len);
             } else {
                 while (!symbol_stream.eof()) {
                     getline(symbol_stream, temp_str, segment_sep);
@@ -479,7 +479,7 @@ namespace ymir {
                         gene_start = gsa[segvec[seg_order]].sequence.size() - alignment_len + 1;
                     }
 
-                    _aligner.addAlignment<GENE>(segvec[seg_order], gene_start, seq_start, alignment_len);
+                    _aligner.addAlignment(gene, segvec[seg_order], gene_start, seq_start, alignment_len);
 
                     ++seg_order;
                 }
@@ -516,6 +516,15 @@ namespace ymir {
 
     template <>
     void RepertoireParserStatistics::update_no_algn<JOINING>() { ++no_J_algn; }
+
+//
+//    template <GeneSegments GENE>
+//    inline void add_alignment(Aligner &aligner, seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len);
+//
+//
+//    inline void add_alignment<Aligner, VARIABLE>(Aligner &aligner, seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len) {
+//        aligner.addVarAlignment(seg_index, genestart, seqstart, alignment_len);
+//    };
 
 
 

@@ -135,10 +135,22 @@ namespace ymir {
         }
         ///@}
 
-        template <GeneSegments GENE>
-        VDJAlignmentBuilder& addAlignment(seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len);
 
+//        template <GeneSegments GENE>
+//        inline VDJAlignmentBuilder& addAlignment(seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len);
 
+        inline VDJAlignmentBuilder& addAlignment(GeneSegments gene, seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len) {
+            switch (gene) {
+                case VARIABLE:
+                    return this->addVarAlignment(seg_index, genestart, seqstart, alignment_len);
+                case JOINING:
+                    return this->addJoiAlignment(seg_index, genestart, seqstart, alignment_len);
+                case DIVERSITY:
+                    return this->addDivAlignment(seg_index, genestart, seqstart, alignment_len);
+                default:
+                    return *this;
+            }
+        }
 
     protected:
 
@@ -148,22 +160,22 @@ namespace ymir {
     };
 
 
-    template <>
-    VDJAlignmentBuilder& VDJAlignmentBuilder::addAlignment<VARIABLE>(seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len) {
-        return this->addVarAlignment(seg_index, genestart, seqstart, alignment_len);
-    }
-
-
-    template <>
-    VDJAlignmentBuilder& VDJAlignmentBuilder::addAlignment<DIVERSITY>(seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len) {
-        return this->addDivAlignment(seg_index, genestart, seqstart, alignment_len);
-    }
-
-
-    template <>
-    VDJAlignmentBuilder& VDJAlignmentBuilder::addAlignment<JOINING>(seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len) {
-        return this->addJoiAlignment(seg_index, genestart, seqstart, alignment_len);
-    }
+//    template <>
+//    VDJAlignmentBuilder& VDJAlignmentBuilder::addAlignment<VARIABLE>(seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len) {
+//        return this->addVarAlignment(seg_index, genestart, seqstart, alignment_len);
+//    }
+//
+//
+//    template <>
+//    VDJAlignmentBuilder& VDJAlignmentBuilder::addAlignment<DIVERSITY>(seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len) {
+//        return this->addDivAlignment(seg_index, genestart, seqstart, alignment_len);
+//    }
+//
+//
+//    template <>
+//    VDJAlignmentBuilder& VDJAlignmentBuilder::addAlignment<JOINING>(seg_index_t seg_index, seq_len_t genestart, seq_len_t seqstart, seq_len_t alignment_len) {
+//        return this->addJoiAlignment(seg_index, genestart, seqstart, alignment_len);
+//    }
 
 }
 

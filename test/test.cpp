@@ -925,7 +925,7 @@ YMIR_TEST_START(test_vdj_alignment_simple_vj)
            .addJoiAlignment(33, 10, 11, 12)
            .addJoiAlignment(35, 13, 14, 15);
 
-    VDJAlignment algn = builder.build();
+    VDJAlignment algn = builder.buildAlignment();
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)
@@ -958,7 +958,7 @@ YMIR_TEST_START(test_vdj_alignment_simple_vj)
            .addJoiAlignment(53, 1, 2, 3)
            .addJoiAlignment(55, 4, 5, 6);
 
-    algn = builder.build();
+    algn = builder.buildAlignment();
 
     YMIR_ASSERT2(algn.nVar(), 3)
     YMIR_ASSERT2(algn.nJoi(), 2)
@@ -1007,7 +1007,7 @@ YMIR_TEST_START(test_vdj_alignment_simple_vdj)
            .addDivAlignment(45, 33, 34, 35)
            .addDivAlignment(45, 36, 37, 38);
 
-    VDJAlignment algn = builder.build();
+    VDJAlignment algn = builder.buildAlignment();
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)
@@ -1094,7 +1094,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
            .addJoiAlignment(vec2)
            .addJoiAlignment(vec3);
 
-    VDJAlignment algn = builder.build();
+    VDJAlignment algn = builder.buildAlignment();
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)
@@ -1200,7 +1200,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
            .addDivAlignment(vec4)
            .addDivAlignment(vec5);
 
-    VDJAlignment algn = builder.build();
+    VDJAlignment algn = builder.buildAlignment();
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)

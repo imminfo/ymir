@@ -75,17 +75,20 @@ namespace ymir {
                     }
 
                     for (auto seg_i = 0; seg_i < cloneset[i].nVar(); ++seg_i) {
-                        ofs << cloneset[i].getVarAlignment(seg_i).gene_start() << "|";
-                        ofs << cloneset[i].getVarAlignment(seg_i).seq_start() << "|";
-                        ofs << cloneset[i].getVarAlignment(seg_i).length();
+                        ofs << cloneset[i].getVarGeneStart(seg_i) << "|";
+                        ofs << cloneset[i].getVarSeqStart(seg_i) << "|";
+                        ofs << cloneset[i].getVarLen(seg_i);
                         CELL_FILL(seg_i, cloneset[i].nVar(), ofs, ',', '\t')
                     }
 
                     if (gene_segments.is_vdj()) {
+                        //
+                        // TODO: make so every D alignment will show up in the output file
+                        //
                         for (auto seg_i = 0; seg_i < cloneset[i].nDiv(); ++seg_i) {
-                            ofs << cloneset[i].getDivAlignment(seg_i, 0).gene_start() << "|";
-                            ofs << cloneset[i].getDivAlignment(seg_i, 0).seq_start() << "|";
-                            ofs << cloneset[i].getDivAlignment(seg_i, 0).length();
+                            ofs << cloneset[i].getDivGeneStart(seg_i, 0) << "|";
+                            ofs << cloneset[i].getDivSeqStart(seg_i, 0) << "|";
+                            ofs << cloneset[i].getDivLen(seg_i, 0);
                             CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ';', '\t')
                         }
                     } else {
@@ -93,9 +96,9 @@ namespace ymir {
                     }
 
                     for (auto seg_i = 0; seg_i < cloneset[i].nJoi(); ++seg_i) {
-                        ofs << cloneset[i].getJoiAlignment(seg_i).gene_start() << "|";
-                        ofs << cloneset[i].getJoiAlignment(seg_i).seq_start() << "|";
-                        ofs << cloneset[i].getJoiAlignment(seg_i).length();
+                        ofs << cloneset[i].getJoiGeneStart(seg_i) << "|";
+                        ofs << cloneset[i].getJoiSeqStart(seg_i) << "|";
+                        ofs << cloneset[i].getJoiLen(seg_i);
                         CELL_FILL(seg_i, cloneset[i].nJoi(), ofs, ',', std::endl)
                     }
                 }

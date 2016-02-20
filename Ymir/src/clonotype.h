@@ -212,10 +212,30 @@ namespace ymir {
         }
 
 
-        const std::string& sequence() const { return _sequence; }
+        ///@{
+        const sequence_t& sequence() const { return _sequence; }
+
+        const sequence_t& nuc_sequence() const {
+#ifndef DNDEBUG
+            check_and_throw(_seq_type != NUCLEOTIDE, "Clonotype's call to nuc_sequence() is incorrect: wrong sequence type.");
+#endif
+            return _sequence;
+        }
+
+        const sequence_t& aa_sequence() const {
+#ifndef DNDEBUG
+            check_and_throw(_seq_type == UNDEF_SEQ_TYPE, "Clonotype's call to aa_sequence() is incorrect: undefined sequence type.");
+#endif
+            if (_seq_type == NUCLEOTIDE) {
+                return translate(_sequence);
+            } else {
+                return _sequence;
+            }
+        }
+        ///@}
 
 
-        std::string::const_iterator seq_iterator(seq_len_t pos) const { return _sequence.cbegin() + pos; }
+        sequence_t::const_iterator seq_iterator(seq_len_t pos) const { return _sequence.cbegin() + pos; }
 
 
         Recombination recombination() const { return _recomb; }

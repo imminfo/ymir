@@ -27,7 +27,7 @@
 
 #include "genesegment.h"
 #include "alignment_matrix.h"
-#include "vdj_alignment_builder.h"
+#include "clonotype_builder.h"
 
 
 using namespace std;
@@ -117,9 +117,17 @@ namespace ymir {
      * \class VDJAlignerBase
      */
     template <typename AlignmentType, typename V_Aligner, typename D_Aligner, typename J_Aligner>
-    class VDJAlignerBase {
+    class VDJAlignerBase : public ClonotypeBuilder {
 
     public:
+
+        /**
+         *
+         */
+        VDJAlignerBase()
+        {
+        }
+
 
         /**
          *
@@ -131,9 +139,15 @@ namespace ymir {
         }
 
 
-        ~VDJAlignerBase() 
+        virtual ~VDJAlignerBase()
         {
         }
+
+
+        void set_genes(const VDJRecombinationGenes &genes) { _genes = genes; }
+
+
+        void set_parameters(VDJAlignerParameters params) { _params = params; }
 
 
         /**
@@ -164,56 +178,47 @@ namespace ymir {
          * \brief Align the given sequence to all gene segments of the specific gene.
          *
          * \param sequence Pattern sequence.
+         *
+         * \return True if has been aligned at least one gene segment, False if no gene segments have been aligned.
          */
         ///@{
-        void alignVar(const sequence_t &sequence) {
+        bool alignVar() {
             NoGapAlignmentVector vec;
             for (seg_index_t id = 1; id <= _genes.V().max(); ++id) {
-                this->_alignVar(id, sequence, &vec);
+                this->_alignVar(id, _sequence, &vec);
             }
-            _builder.addVarAlignment(vec);
+            this->addVarAlignment(vec);
+            return vec.size() != 0;
         }
 
-        void alignDiv(const sequence_t &sequence) {
+        bool alignDiv() {
             NoGapAlignmentVector vec;
             for (seg_index_t id = 1; id <= _genes.D().max(); ++id) {
-                this->_alignDiv(id, sequence, &vec);
-                _builder.addDivAlignment(vec);
+                this->_alignDiv(id, _sequence, &vec);
+                this->addDivAlignment(vec);
             }
+            return vec.size() != 0;
         }
 
-        void alignJoi(const sequence_t &sequence) {
+        bool alignJoi() {
             NoGapAlignmentVector vec;
             for (seg_index_t id = 1; id <= _genes.J().max(); ++id) {
-                this->_alignJoi(id, sequence, &vec);
+                this->_alignJoi(id, _sequence, &vec);
             }
-            _builder.addJoiAlignment(vec);
+            this->addJoiAlignment(vec);
+            return vec.size() != 0;
         }
         ///@}
 
-
-        /**
-         * \brief Access the latest alignment results and optionally move it.
-         */
-         VDJAlignment&& last_alignment_and_clear() { return _builder.buildAlignment(); }
 
     protected:
 
         VDJAlignerParameters _params;
         VDJRecombinationGenes _genes;
-        VDJAlignmentBuilder _builder;
 
         V_Aligner _V_Aligner;
         D_Aligner _D_Aligner;
         J_Aligner _J_Aligner;
-
-
-        /**
-         *
-         */
-        VDJAlignerBase()
-        {
-        }
 
 
         /**

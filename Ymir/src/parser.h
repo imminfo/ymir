@@ -41,6 +41,53 @@ using std::getline;
 namespace ymir {
 
     /**
+    *
+    */
+    struct RepertoireParserStatistics {
+
+        RepertoireParserStatistics()
+        {
+            this->reset();
+        }
+
+        void reset() {
+            count_all = 0;
+            count_errors = 0;
+            bad_V_seg = 0;
+            bad_D_seg = 0;
+            bad_J_seg = 0;
+            no_V_algn = 0;
+            no_D_algn = 0;
+            no_J_algn = 0;
+        }
+
+        void print() {
+            std::cout << "Parsed " <<
+            (size_t) count_all <<
+            " lines (" <<
+            (size_t) count_errors <<
+            " error clonotypes found)." <<
+            std::endl <<
+            "Parsing is complete. Resulting cloneset size: " <<
+            (size_t) (count_all - 1) <<
+            std::endl;
+        }
+
+
+        template <GeneSegments GENE>
+        void update_bad_seg();
+
+
+        template <GeneSegments GENE>
+        void update_no_algn();
+
+
+        size_t count_all, count_errors, bad_V_seg, bad_D_seg, bad_J_seg, no_V_algn, no_D_algn, no_J_algn;
+
+    };
+
+
+    /**
     * \class RepertoireParser
     *
     * \brief Parser for text files with repertoire data. By default it's MiTCR parser.
@@ -49,45 +96,6 @@ namespace ymir {
     */
     template <typename Aligner>
     class RepertoireParser {
-
-
-        struct Statistics {
-
-            Statistics()
-            {
-                this->reset();
-            }
-
-            void reset() {
-                count_all = 0;
-                count_errors = 0;
-                bad_V_seg = 0;
-                bad_D_seg = 0;
-                bad_J_seg = 0;
-                no_V_algn = 0;
-                no_D_algn = 0;
-                no_J_algn = 0;
-            }
-
-            void print() {
-                std::cout << "Parsed " <<
-                (size_t) count_all <<
-                " lines (" <<
-                (size_t) count_errors <<
-                " error clonotypes found)." <<
-                std::endl <<
-                "Parsing is complete. Resulting cloneset size: " <<
-                (size_t) (count_all - 1) <<
-                std::endl;
-            }
-
-//            void update_bad_seg<VARIABLE>() {}
-//
-//            void update_bad_seg<JOINING>() {}
-
-            size_t count_all, count_errors, bad_V_seg, bad_D_seg, bad_J_seg, no_V_algn, no_D_algn, no_J_algn;
-
-        };
 
     public:
 
@@ -231,7 +239,7 @@ namespace ymir {
         Recombination _recomb;
         AlignmentColumnOptions _opts;
         SequenceType _seq_type;
-        Statistics _stats;
+        RepertoireParserStatistics _stats;
         Aligner _aligner;
         bool _status;
 
@@ -509,6 +517,31 @@ namespace ymir {
         }
 
     };
+
+
+    template <>
+    void RepertoireParserStatistics::update_bad_seg<VARIABLE>() { ++bad_V_seg; }
+
+
+    template <>
+    void RepertoireParserStatistics::update_bad_seg<DIVERSITY>() { ++bad_D_seg; }
+
+
+    template <>
+    void RepertoireParserStatistics::update_bad_seg<JOINING>() { ++bad_J_seg; }
+
+
+    template <>
+    void RepertoireParserStatistics::update_no_algn<VARIABLE>() { ++no_V_algn; }
+
+
+    template <>
+    void RepertoireParserStatistics::update_no_algn<DIVERSITY>() { ++no_D_algn; }
+
+
+    template <>
+    void RepertoireParserStatistics::update_no_algn<JOINING>() { ++no_J_algn; }
+
 
 
     typedef RepertoireParser<NaiveCDR3NucleotideAligner> NaiveNucParser;

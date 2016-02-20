@@ -41,8 +41,8 @@ using std::getline;
 namespace ymir {
 
     /**
-    *
-    */
+     *
+     */
     struct RepertoireParserStatistics {
 
         RepertoireParserStatistics()
@@ -52,7 +52,6 @@ namespace ymir {
 
         void reset() {
             count_all = 0;
-            count_errors = 0;
             bad_V_seg = 0;
             bad_D_seg = 0;
             bad_J_seg = 0;
@@ -62,15 +61,15 @@ namespace ymir {
         }
 
         void print() {
-            std::cout << "Parsed " <<
-            (size_t) count_all <<
-            " lines (" <<
-            (size_t) count_errors <<
-            " error clonotypes found)." <<
-            std::endl <<
-            "Parsing is complete. Resulting cloneset size: " <<
-            (size_t) (count_all - 1) <<
-            std::endl;
+            std::cout <<
+                    "Parsing complete. Parsed " << (size_t) count_all << " lines, clonotype errors:" << std::endl <<
+                    "\tunrecognised Variable segments:\t" << (size_t) bad_V_seg << std::endl <<
+                    "\tunrecognised Diversity segments:\t" << (size_t) bad_D_seg << std::endl <<
+                    "\tunrecognised Joining segments:\t" << (size_t) bad_J_seg << std::endl <<
+                    "\tunaligned Variable segments:\t" << (size_t) no_V_algn << std::endl <<
+                    "\tunaligned Diversity segments:\t" << (size_t) no_D_algn << std::endl <<
+                    "\tunaligned Joining segments:\t" << (size_t) no_J_algn << std::endl <<
+                    "Resulting cloneset size: " << (size_t) (count_all > 0 ? count_all - 1 : 0) << std::endl;
         }
 
 
@@ -82,7 +81,7 @@ namespace ymir {
         void update_no_algn();
 
 
-        size_t count_all, count_errors, bad_V_seg, bad_D_seg, bad_J_seg, no_V_algn, no_D_algn, no_J_algn;
+        size_t count_all, bad_V_seg, bad_D_seg, bad_J_seg, no_V_algn, no_D_algn, no_J_algn;
 
     };
 
@@ -110,6 +109,13 @@ namespace ymir {
             OVERWRITE,
             USE_PROVIDED
         };
+
+
+//        enum AlignmentColumnsAction {
+//            USE_PROVIDED,
+//            ALIGN_ONLY_D,
+//            ALIGN_ALL
+//        };
 
 
         struct AlignmentColumnOptions {
@@ -177,13 +183,13 @@ namespace ymir {
 
             _stream.open(filepath);
             if (_stream.good()) {
-                std::cout << "Input file [" << filepath << "] has been open for reading" << endl;
+                std::cout << "Open [" << filepath << "] for reading" << endl;
                 _genes = gene_segments;
                 _seq_type = seq_type;
                 _recomb = recomb;
                 _opts = opts;
                 _status = true;
-                _aligner = Aligner(_genes);
+                _aligner.set_genes(_genes);
                 return true;
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
@@ -267,9 +273,8 @@ namespace ymir {
             vector<seg_index_t> vseg, jseg, dseg;
             string temp_str;
 
-            ClonotypeBuilder clone_builder;
-            clone_builder.setSequenceType(_seq_type);
-            clone_builder.setRecombination(_recomb);
+            _aligner.setSequenceType(_seq_type);
+            _aligner.setRecombination(_recomb);
 
             // Skip header
             getline(_stream, line);
@@ -296,7 +301,7 @@ namespace ymir {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                         getline(column_stream, sequence, column_sep);
                     }
-                    clone_builder.setSequence(sequence);
+                    _aligner.setSequence(sequence);
 
                     //
                     // Parse Variable genes
@@ -305,7 +310,7 @@ namespace ymir {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         getline(column_stream, segment_word, column_sep);
-                        this->parseSegment(symbol_stream, segment_word, vseg, _genes.V(), clone_builder, line_num, segment_sep, temp_str);
+                        this->parseSegment<VARIABLE>(symbol_stream, segment_word, vseg, _genes.V(), line_num, segment_sep, temp_str);
                     }
 
                     //
@@ -318,7 +323,7 @@ namespace ymir {
                             column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                         } else {
                             getline(column_stream, segment_word, column_sep);
-                            this->parseSegment(symbol_stream, segment_word, dseg, _genes.D(), clone_builder, line_num, segment_sep, temp_str);
+                            this->parseSegment<DIVERSITY>(symbol_stream, segment_word, dseg, _genes.D(), line_num, segment_sep, temp_str);
                         }
                     }
 
@@ -329,7 +334,7 @@ namespace ymir {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         getline(column_stream, segment_word, column_sep);
-                        this->parseSegment(symbol_stream, segment_word, jseg, _genes.J(), clone_builder, line_num, segment_sep, temp_str);
+                        this->parseSegment<JOINING>(symbol_stream, segment_word, jseg, _genes.J(), line_num, segment_sep, temp_str);
                     }
 
                     //
@@ -337,17 +342,12 @@ namespace ymir {
                     //
                     if (do_align_V) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
-
-                        //
-                        // alignment here
-                        //
-                        // TODO: implement V alignment in parser
-                        //
-                        //
-
+                        if (!_aligner.alignVar()) {
+                            _stats.update_no_algn<VARIABLE>();
+                        }
                     } else {
                         getline(column_stream, segment_word, column_sep);
-                        this->parseAlignment<VARIABLE>(symbol_stream, segment_word, vseg, _genes.V(), clone_builder, line_num, segment_sep, internal_sep, temp_str, temp_stream);
+                        this->parseAlignment<VARIABLE>(symbol_stream, segment_word, vseg, _genes.V(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
                     }
 
                     //
@@ -358,31 +358,12 @@ namespace ymir {
                     } else {
                         if (do_align_D) {
                             column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
-
-                            //
-                            // alignment here
-                            //
-                            // TODO: implement D alignment in parser
-                            align_ok = false;
-                            for (seg_index_t seg_i = 1; seg_i <= _genes.D().max(); ++seg_i) {
-                                _aligner::LocalAlignmentIndices indices =
-                                        aligner.alignLocal(gene_segments.D()[seg_i].sequence,
-                                                           sequence,
-                                                           DEFAULT_DIV_GENE_MIN_LEN);
-                                if (indices.size()) {
-                                    align_ok = true;
-                                    for (size_t align_i = 0; align_i < indices.size(); ++align_i) {
-                                        clone_builder.addDivAlignment(seg_i, indices[align_i]);
-                                    }
-                                }
+                            if (!_aligner.alignDiv()) {
+                                _stats.update_no_algn<DIVERSITY>();
                             }
-//                            if (!align_ok) {
-//                                cout << "Diversity gene could NOT be aligned with the given minimal gene length (min gene length " << (size_t) DEFAULT_DIV_GENE_MIN_LEN << ", line " << (size_t) glob_index << ")" << endl;
-//                                ++_count_errors;
-//                            }
                         } else {
                             getline(column_stream, segment_word, column_sep);
-                            this->parseAlignment<DIVERSITY>(symbol_stream, segment_word, dseg, _genes.D(), clone_builder, line_num, segment_sep, internal_sep, temp_str, temp_stream);
+                            this->parseAlignment<DIVERSITY>(symbol_stream, segment_word, dseg, _genes.D(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
                         }
                     }
 
@@ -391,17 +372,12 @@ namespace ymir {
                     //
                     if (do_align_J) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
-
-                        //
-                        // alignment here
-                        //
-                        // TODO: implement J alignment in parser
-                        //
-                        //
-
+                        if (!_aligner.alignJoi()) {
+                            _stats.update_no_algn<JOINING>();
+                        }
                     } else {
                         getline(column_stream, segment_word, column_sep);
-                        this->parseAlignment<JOINING>(symbol_stream, segment_word, jseg, _genes.J(), clone_builder, line_num, segment_sep, internal_sep, temp_str, temp_stream);
+                        this->parseAlignment<JOINING>(symbol_stream, segment_word, jseg, _genes.J(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
                     }
 
                     ++_stats.count_all;
@@ -410,19 +386,20 @@ namespace ymir {
                         cout << "Parsed " << (size_t) _stats.count_all << " lines" << endl;
                     }
 
+                    //
                     // TODO: remove bad clonotypes here ???
-                    vec.push_back(clone_builder.buildClonotype());
-                    if (!align_ok) { ++_stats.count_errors; }
+                    //
+                    vec.push_back(_aligner.buildClonotype());
                 }
             }
         }
 
 
+        template <GeneSegments GENE>
         void parseSegment(stringstream &symbol_stream,
                           const string &segment_word,
                           vector<seg_index_t> &segvec,
                           const GeneSegmentAlphabet &gsa,
-                          ClonotypeBuilder &clone_builder,
                           size_t line_num,
                           char segment_sep,
                           string &temp_str)
@@ -434,7 +411,7 @@ namespace ymir {
                 if (gsa[segment_word].index != 0) {
                     segvec.push_back(gsa[segment_word].index);
                 } else {
-                    std::cout << "can't find '" << segment_word << "' among gene segments at the line " << (size_t) line_num << std::endl;
+                    _stats.update_bad_seg<GENE>();
                 }
             } else {
                 while (!symbol_stream.eof()) {
@@ -442,7 +419,7 @@ namespace ymir {
                     if (gsa[temp_str].index != 0) {
                         segvec.push_back(gsa[temp_str].index);
                     } else {
-                        std::cout << "can't find '" << temp_str << "' among genes at line " << line_num << std::endl;
+                        _stats.update_bad_seg<GENE>();
                     }
                 }
             }
@@ -454,7 +431,6 @@ namespace ymir {
                             const string &segment_word,
                             const vector<seg_index_t> &segvec,
                             const GeneSegmentAlphabet &gsa,
-                            ClonotypeBuilder &clone_builder,
                             size_t line_num,
                             char segment_sep,
                             char internal_sep,
@@ -480,8 +456,7 @@ namespace ymir {
                 getline(temp_stream, temp_str, internal_sep);
                 alignment_len = std::atoi(temp_str.c_str());
 
-                clone_builder.addAlignment<GENE>(segvec[0], gene_start, seq_start, alignment_len);
-
+                _aligner.addAlignment<GENE>(segvec[0], gene_start, seq_start, alignment_len);
             } else {
                 while (!symbol_stream.eof()) {
                     getline(symbol_stream, temp_str, segment_sep);
@@ -504,7 +479,7 @@ namespace ymir {
                         gene_start = gsa[segvec[seg_order]].sequence.size() - alignment_len + 1;
                     }
 
-                    clone_builder.addAlignment<GENE>(segvec[seg_order], gene_start, seq_start, alignment_len);
+                    _aligner.addAlignment<GENE>(segvec[seg_order], gene_start, seq_start, alignment_len);
 
                     ++seg_order;
                 }

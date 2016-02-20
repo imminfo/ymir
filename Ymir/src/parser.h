@@ -33,7 +33,9 @@
 #include "clonotype_builder.h"
 #include "errcorr.h"
 #include "repertoire.h"
-#include "genesegment.h"
+
+
+using std::getline;
 
 
 namespace ymir {
@@ -45,12 +47,10 @@ namespace ymir {
     * To make new parsers inherit from this class and rewrite virtual private method
     * "parseRepertoire".
     */
+    template <typename Aligner>
     class RepertoireParser {
 
     public:
-
-        static const size_t default_block_size = 100000;
-
 
         /**
         * \enum ALIGNMENT_COLUMN_ACTION
@@ -107,141 +107,116 @@ namespace ymir {
         * Parse all lines in the file and return a repertoire. If no alignments found or any of align_* parameters
         * is true, create alignment using input aligner from function loadFile().
         *
-        * \param rep Pointer to clonal repertoire object to which data will be uploaded.
-        * \param gene_segments Alphabets of gene segments.
         * \param filepath Path to a file with sequences.
-        * \param aligner Aligner object for alignment of clones.
-        * \param nuc_sequences Boolean - if true than generate clones with nucleotide sequences from column
-        * with nucleotide sequences data. Otherwise generate clones with amino acid sequences from corresponding
-        * column.
-        * \param align_V What action to do with column with V alignments.
-        * \param align_J What action to do with column with J alignments.
-        * \param align_D What action to do with column with D alignments.
+        * \param gene_segments Alphabets of gene segments.
+        * \param seq_type
+        * \param recomb
+        * \param opts What action to do with columns with V, D and J alignments.
         *
         * \return True if found has been successfully processed, false otherwise.
         */
-        bool parse(const std::string& filepath,
-                   Cloneset *rep,
-                   const VDJRecombinationGenes& gene_segments,
-                   SequenceType seq_type,
-                   Recombination recomb,
-                   AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE),
-                   const AbstractAligner& aligner = NaiveNucleotideAligner()) {
+        bool open(const std::string &filepath,
+                  const VDJRecombinationGenes &gene_segments,
+                  SequenceType seq_type,
+                  Recombination recomb,
+                  AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE)) {
+            _status = false;
 
-            if (recomb == UNDEF_RECOMB) {
-                std::cout << "Repertoire parser error:" << "\tno recombination type for [" << filepath << "]" << endl;
-                return false;
-            }
-
-            ClonotypeVector clonevec;
-            clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
-
-            ifstream ifs;
-            ifs.open(filepath);
-            bool res = false;
-            if (ifs.is_open()) {
-                std::cout << "Parsing input file:\t" << filepath << endl;
-                res = this->parseRepertoire(ifs, 
-                                            clonevec, 
-                                            gene_segments, 
-                                            aligner, 
-                                            seq_type, 
-                                            opts, 
-                                            recomb);
-                if (res) { 
-                    rep->swap(clonevec);
-                }
-            } else {
-                std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
-                res = false;
-            }
-
-            return res;
-        }
-
-
-        /**
-         * \brief Open the parser in the stream mode - iteratively parse an
-         * input repertoire by blocks and return each block.
-         */
-        bool stream(const std::string& filepath, 
-                    const VDJRecombinationGenes& gene_segments,
-                    SequenceType seq_type,
-                    Recombination recomb,
-                    AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE),
-                    const AbstractAligner& aligner = NaiveNucleotideAligner())
-        {
             if (recomb == UNDEF_RECOMB) {
                 std::cout << "Repertoire parser error:" << "\tno recombination type for [" << filepath << "]" << endl;
                 return false;
             }
 
             _stream.open(filepath);
-            if (_stream.is_open()) {
-                std::cout << "Open the stream to the input file:\t" << filepath << endl;
+            if (_stream.good()) {
+                std::cout << "Input file [" << filepath << "] has been open for reading" << endl;
+                _count = 0;
+                _count_errors = 0;
                 _genes = gene_segments;
-                _aligner = aligner;
+                _seq_type = seq_type;
                 _recomb = recomb;
                 _opts = opts;
-                _seq_type = seq_type;
+                _status = true;
                 return true;
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
-                return false;
             }
+
+            return false;
         }
 
 
         /**
-         * \brief Get the next Block from the parser stream.
+         * \param cloneset Pointer to clonal repertoire object to which data will be uploaded.
          */
-        void nextBlock(Cloneset *rep, size_t block_size = default_block_size) {
-            if (_stream.good()) {
-                ClonotypeVector clonevec;
-                clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
+        bool parse(Cloneset *cloneset, size_t max_clonotype_count = (size_t)-1) {
+            if (_count) {
+                std::cout << "Parsed " <<
+                            (size_t) _count <<
+                            " lines (" <<
+                            (size_t) _count_errors  <<
+                            " error clonotypes removed)." <<
+                            std::endl <<
+                            "Parsing is complete. Resulting cloneset size: " <<
+                            (size_t) _count <<
+                            std::endl;
 
-                bool res = this->parseRepertoire(_stream, 
-                                                 clonevec, 
-                                                 _genes, 
-                                                 *_aligner, 
-                                                 _seq_type, 
-                                                 _opts, 
-                                                 _recomb, 
-                                                 block_size);
-                if (res) {
-                    rep->swap(clonevec);
-                }
-            } else {
-                std::cout << "Repertoire parser error: bad / closed stream" << endl;
+                _count = 0;
+                _count_errors = 0;
+                _status = false;
+                return false;
             }
 
-            if (_stream.eof()) {
-                delete _aligner; 
-                _stream.close();
+            if (!_status) {
+                std::cout << "Something bad is happening - can\'t parse the input file. Perhaps you need to open it first with open()?" << endl;
+                return false;
             }
+
+            ClonotypeVector clonevec;
+            clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
+
+            this->parseRepertoire(clonevec, max_clonotype_count);
+            cloneset->swap(clonevec);
         }
 
 
+        bool openAndParse(const std::string &filepath,
+                          Cloneset *cloneset,
+                          const VDJRecombinationGenes &gene_segments,
+                          SequenceType seq_type,
+                          Recombination recomb,
+                          AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE)) {
+            if (this->open(filepath, gene_segments, seq_type, recomb, opts)) {
+                this->parse(cloneset);
+
+                std::cout << "Parsed " <<
+                            (size_t) _count <<
+                            " lines (" <<
+                            (size_t) _count_errors  <<
+                            " error clonotypes removed)." <<
+                            std::endl <<
+                            "Parsing is complete. Resulting cloneset size: " <<
+                            (size_t) cloneset->size() <<
+                            std::endl;
+
+                return true;
+            }
+
+            return false;
+        }
+
     protected:
 
-//        ParserConfig _config;
-//        bool _config_is_loaded;
         std::ifstream _stream;
         VDJRecombinationGenes _genes;
-        AbstractAligner *_aligner;
         Recombination _recomb;
         AlignmentColumnOptions _opts;
         SequenceType _seq_type;
+        size_t _count, _count_errors;
+        bool _status;
 
 
-        virtual bool parseRepertoire(ifstream& ifs,
-                                     ClonotypeVector& vec,
-                                     const VDJRecombinationGenes& gene_segments,
-                                     const AbstractAligner& aligner,
-                                     SequenceType seq_type,
-                                     AlignmentColumnOptions opts,
-                                     Recombination recomb, 
-                                     size_t clonotype_count = (size_t)-1)
+        bool parseRepertoire(ClonotypeVector& vec, size_t max_clonotype_count)
         {
             char column_sep ='\t',
                  segment_sep = ',',
@@ -250,27 +225,28 @@ namespace ymir {
                  start_bracket = '(',
                  end_bracket = ')';
 
-            bool do_align_V = opts.align_V == OVERWRITE,
-                 do_align_J = opts.align_J == OVERWRITE,
-                 do_align_D = opts.align_D == OVERWRITE;
+            bool do_align_V = _opts.align_V == OVERWRITE,
+                 do_align_J = _opts.align_J == OVERWRITE,
+                 do_align_D = _opts.align_D == OVERWRITE;
 
             stringstream column_stream, symbol_stream, temp_stream;
             string line, segment_word, sequence;
 
-            int index = 0;
+            int clonotype_num = 0, line_num = _count + 1;
 
             vector<seg_index_t> vseg, jseg, dseg;
             string temp_str;
 
             ClonotypeBuilder clone_builder;
-
-            int glob_index = 1, bad_index = 0;
+            clone_builder.setSequenceType(_seq_type);
+            clone_builder.setRecombination(_recomb);
 
             // Skip header
-            getline(ifs, line);
-            while (!ifs.eof() && glob_index < clonotype_count) {
+            getline(_stream, line);
+            while (!_stream.eof() && clonotype_num <= max_clonotype_count) {
                 // Start processing clonotypes
-                getline(ifs, line);
+                getline(_stream, line);
+
                 if (line.size() > 2) {
                     // parse body and build clonotypes from each line
                     vseg.clear();
@@ -280,38 +256,33 @@ namespace ymir {
                     column_stream.clear();
                     column_stream.str(line);
 
-                    clone_builder.setRecombination(recomb);
-
                     // Get nucleotide or amino acid sequence
-                    if (seq_type == NUCLEOTIDE) {
+                    if (_seq_type == NUCLEOTIDE) {
                         getline(column_stream, sequence, column_sep);
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                         getline(column_stream, sequence, column_sep);
                     }
-
                     clone_builder.setSequence(sequence);
-                    clone_builder.setSequenceType(seq_type);
-
 
                     // Parse Variable genes
                     if (do_align_V) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         getline(column_stream, segment_word, column_sep);
-                        this->parseSegment(symbol_stream, segment_word, vseg, gene_segments.V(), clone_builder, glob_index, segment_sep, temp_str);
+                        this->parseSegment(symbol_stream, segment_word, vseg, _genes.V(), clone_builder, glob_index, segment_sep, temp_str);
                     }
 
                     // Parse Diversity genes
-                    if (recomb == VJ_RECOMB) {
+                    if (_recomb == VJ_RECOMB) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         if (do_align_D) {
                             column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                         } else {
                             getline(column_stream, segment_word, column_sep);
-                            this->parseSegment(symbol_stream, segment_word, dseg, gene_segments.D(), clone_builder, glob_index, segment_sep, temp_str);
+                            this->parseSegment(symbol_stream, segment_word, dseg, _genes.D(), clone_builder, glob_index, segment_sep, temp_str);
                         }
                     }
 
@@ -320,7 +291,7 @@ namespace ymir {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         getline(column_stream, segment_word, column_sep);
-                        this->parseSegment(symbol_stream, segment_word, jseg, gene_segments.J(), clone_builder, glob_index, segment_sep, temp_str);
+                        this->parseSegment(symbol_stream, segment_word, jseg, _genes.J(), clone_builder, glob_index, segment_sep, temp_str);
                     }
 
 
@@ -339,7 +310,7 @@ namespace ymir {
 
                     bool align_ok = true;
                     // Parse Diversity alignments
-                    if (recomb == VJ_RECOMB) {
+                    if (_recomb == VJ_RECOMB) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         if (do_align_D) {
@@ -368,7 +339,7 @@ namespace ymir {
                             }
                         } else {
                             getline(column_stream, segment_word, column_sep);
-                            this->parseAlignment(symbol_stream, segment_word, dseg, gene_segments.D(), clone_builder, glob_index, segment_sep, internal_sep, temp_str, temp_stream);
+                            this->parseAlignment(symbol_stream, segment_word, dseg, _genes.D(), clone_builder, glob_index, segment_sep, internal_sep, temp_str, temp_stream);
                         }
                     }
 
@@ -382,36 +353,27 @@ namespace ymir {
                         // TODO: implement J alignment in parser
                     } else {
                         getline(column_stream, segment_word, column_sep);
-                        this->parseAlignment(symbol_stream, segment_word, jseg, gene_segments.J(), clone_builder, glob_index, segment_sep, internal_sep, temp_str, temp_stream);
+                        this->parseAlignment(symbol_stream, segment_word, jseg, _genes.J(), clone_builder, glob_index, segment_sep, internal_sep, temp_str, temp_stream);
                     }
 
-                    ++index;
-
-                    if (glob_index % 50000 == 0) {
-                        cout << "Parsed " << (size_t) glob_index << " lines" << endl;
+                    if (_count % 50000 == 0) {
+                        cout << "Parsed " << (size_t) _count << " lines" << endl;
                     }
-                    ++glob_index;
+                    ++_count;
+
+                    ++cur_clonotype_index;
 
                     //
                     // remove bad clonotypes here ???
                     //
                     if (align_ok) {
                         vec.push_back(clone_builder.buildClonotype());
+                        ++_count_errors;
                     }
 
 //                    vec.push_back(clone_builder.buildClonotype());
                 }
             }
-
-            std::cout << "Parsed " <<
-                    (size_t) glob_index <<
-                    " lines (" <<
-                    (size_t) bad_index  <<
-                    " error clonotypes removed)." <<
-                    std::endl <<
-                    "Parsing is complete. Resulting cloneset size: " <<
-                    (size_t) vec.size() <<
-                    std::endl;
 
             return true;
         }

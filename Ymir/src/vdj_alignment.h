@@ -55,14 +55,14 @@ namespace ymir {
         /**
          * \brief Move constructor for _segments, _alignments and _n_D_alignments.
          */
-        VDJAlignment(segments_storage_t &&segments, 
-                     NoGapAlignmentVector &&alignments, 
-                     n_D_alignments_storage_t &&n_D_alignments) 
-            : _segments(std::move(segments)), 
-              _alignments(std::move(alignments)),
-              _n_D_alignments(std::move(n_D_alignments))
-        {
-        }
+//        VDJAlignment(segments_storage_t &&segments,
+//                     NoGapAlignmentVector &&alignments,
+//                     n_D_alignments_storage_t &&n_D_alignments)
+//            : _segments(std::move(segments)),
+//              _alignments(std::move(alignments)),
+//              _n_D_alignments(std::move(n_D_alignments))
+//        {
+//        }
 
 
         // VDJAlignment(const VDJAlignment &other) {
@@ -112,8 +112,16 @@ namespace ymir {
             return _alignments.pattern_start(vgene);
         }
 
+        seq_len_t getVarGeneEnd(seg_index_t vgene) const {
+            return _alignments.pattern_start(vgene) + _alignments.len(vgene) - 1;
+        }
+
         seq_len_t getVarSeqStart(seg_index_t vgene) const {
             return _alignments.text_start(vgene);
+        }
+
+        seq_len_t getVarSeqEnd(seg_index_t vgene) const {
+            return _alignments.text_start(vgene) + _alignments.len(vgene) - 1;
         }
 
         seq_len_t getVarLen(seg_index_t vgene) const {
@@ -129,8 +137,16 @@ namespace ymir {
             return _alignments.pattern_start(_segments[0] + jgene);
         }
 
+        seq_len_t getJoiGeneEnd(seg_index_t jgene) const {
+            return _alignments.pattern_start(_segments[0] + jgene) + _alignments.len(_segments[0] + jgene) - 1;
+        }
+
         seq_len_t getJoiSeqStart(seg_index_t jgene) const {
             return _alignments.text_start(_segments[0] + jgene);
+        }
+
+        seq_len_t getJoiSeqEnd(seg_index_t jgene) const {
+            return _alignments.text_start(_segments[0] + jgene) + _alignments.len(_segments[0] + jgene) - 1;
         }
 
         seq_len_t getJoiLen(seg_index_t jgene) const {
@@ -146,8 +162,18 @@ namespace ymir {
             return _alignments.pattern_start(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i);
         }
 
+        seq_len_t getDivGeneEnd(seg_index_t dgene, seg_index_t align_i) const {
+            return _alignments.pattern_start(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i)
+                   + _alignments.len(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i) - 1;
+        }
+
         seq_len_t getDivSeqStart(seg_index_t dgene, seg_index_t align_i) const {
             return _alignments.text_start(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i);
+        }
+
+        seq_len_t getDivSeqEnd(seg_index_t dgene, seg_index_t align_i) const {
+            return _alignments.text_start(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i)
+                   + _alignments.len(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i) - 1;
         }
 
         seq_len_t getDivLen(seg_index_t dgene, seg_index_t align_i) const {

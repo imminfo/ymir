@@ -2059,6 +2059,26 @@ YMIR_TEST_START(test_sw_aligner)
 
     YMIR_ASSERT(false)
 
+    vector<string> avec1 {"V1", "V2", "V3", "V4"};
+    vector<string> svec1 {"ACGTT", "ACGT", "ACG", "TTT"};
+
+    vector<string> avec2 {"J1", "J2", "J3", "J4"};
+    vector<string> svec2 {"CGT", "TACGT", "TTCGT", "TTTTT"};
+
+    vector<string> avec3 {"D1", "D2", "D3"};
+    vector<string> svec3 {"AA", "AACCTT", "ACT"};
+
+    VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
+
+    SmithWatermanNoGapAligner swnga(genes, VDJAlignerParameters(1,
+                                                                3,
+                                                                AlignmentEventScore(1, -1, -3),
+                                                                AlignmentEventScore(2, -1, -1),
+                                                                AlignmentEventScore(3, -2, -3)));
+
+
+
+
 YMIR_TEST_END
 
 
@@ -2069,12 +2089,12 @@ YMIR_TEST_START(test_swng_alignment_matrix)
      0 *1  0  0
      0  0  2 *1
      0  0  0  3  2
-     0 *1  0  0  0  3
-     0  0  2  0  0  0  4
+     0 *1  0  0  0  3     0
+     0  0  2  0  0  0  4  3
 
      */
     sequence_t alpha, beta;
-    alpha = "112365";
+    alpha = "1123657";
     beta =   "12345";
 
     SWNGAlignmentMatrix mat(10, beta, alpha);
@@ -2088,6 +2108,7 @@ YMIR_TEST_START(test_swng_alignment_matrix)
     mat.score(5, 6) = 4;
     mat.score(4, 1) = 1;
     mat.score(5, 2) = 2;
+    mat.score(5, 7) = 3;
 
     mat.setStart(1, 1);
     mat.setStart(2, 3);
@@ -2096,21 +2117,37 @@ YMIR_TEST_START(test_swng_alignment_matrix)
     NoGapAlignmentVector vec;
     YMIR_ASSERT2(mat.getBestAlignment(&vec, beta, alpha), 4);
     YMIR_ASSERT2(vec.id(0), 10)
-    YMIR_ASSERT2(vec.pattern_start(0), 2)
-    YMIR_ASSERT2(vec.text_start(0), 3)
-    YMIR_ASSERT2(vec.len(0), 4)
+    YMIR_ASSERT2(vec.pattern_start(0), 1)
+    YMIR_ASSERT2(vec.text_start(0), 2)
+    YMIR_ASSERT2(vec.len(0), 5)
 
     YMIR_ASSERT(!vec.isMismatch(0, 1))
     YMIR_ASSERT(!vec.isMismatch(0, 2))
-    YMIR_ASSERT(vec.isMismatch(0, 3))
-    YMIR_ASSERT(!vec.isMismatch(0, 4))
+    YMIR_ASSERT(!vec.isMismatch(0, 3))
+    YMIR_ASSERT(vec.isMismatch(0, 4))
+    YMIR_ASSERT(!vec.isMismatch(0, 5))
 
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_swng_aligner)
 
-    YMIR_ASSERT(false)
+    vector<string> avec1 {"V1", "V2", "V3", "V4"};
+    vector<string> svec1 {"ACGTT", "ACGT", "ACG", "TTT"};
+
+    vector<string> avec2 {"J1", "J2", "J3", "J4"};
+    vector<string> svec2 {"CGT", "TACGT", "TTCGT", "TTTTT"};
+
+    vector<string> avec3 {"D1", "D2", "D3"};
+    vector<string> svec3 {"AA", "AACCTT", "ACT"};
+
+    VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
+
+    SmithWatermanNoGapAligner swnga(genes, VDJAlignerParameters(1,
+                                                                3,
+                                                                AlignmentEventScore(1, -1, -3),
+                                                                AlignmentEventScore(2, -1, -1),
+                                                                AlignmentEventScore(3, -2, -3)));
 
 YMIR_TEST_END
 

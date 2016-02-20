@@ -212,6 +212,9 @@ namespace ymir {
         }
 
 
+        /**
+         *
+         */
         ///@{
         const sequence_t& sequence() const { return _sequence; }
 

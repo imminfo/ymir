@@ -208,6 +208,9 @@ namespace ymir {
         J_Aligner _J_Aligner;
 
 
+        /**
+         *
+         */
         VDJAlignerBase()
         {
         }
@@ -549,12 +552,12 @@ namespace ymir {
         void operator()(seg_index_t gene, 
                         const sequence_t &pattern, 
                         const sequence_t &text, 
-                        NoGapAlignmentVector *avec, 
+                        GappedAlignmentVector *avec,
                         const VDJAlignerParameters &params = VDJAlignerParameters())
         {
             SWAlignmentMatrix mat(gene, pattern, text);
 
-            mat.getBestAlignment(&avec, pattern, text);
+            mat.getBestAlignment(avec, pattern, text);
         }
 
     private:
@@ -566,8 +569,8 @@ namespace ymir {
     struct SWAlignerFunctor_D {
         void operator()(seg_index_t gene, 
                         const sequence_t &pattern, 
-                        const sequence_t &text, 
-                        NoGapAlignmentVector *avec, 
+                        const sequence_t &text,
+                        GappedAlignmentVector *avec,
                         const VDJAlignerParameters &params = VDJAlignerParameters())
         {
             // avec->addAlignment(gene, );
@@ -601,7 +604,7 @@ namespace ymir {
      * \brief
      */
     ///@{
-    struct SWNGAlignerFunctor_VJ {
+    struct SWNGAlignerFunctor_V {
         void operator()(seg_index_t gene, 
                         const sequence_t &pattern, 
                         const sequence_t &text, 
@@ -610,7 +613,13 @@ namespace ymir {
         {
             SWNGAlignmentMatrix mat(gene, pattern, text);
 
-            mat.getBestAlignment(&avec, pattern, text);
+            for (seq_len_t col_i = 0; col_i < text.size(); ++col_i) {
+                for (seq_len_t row_i = 0; row_i < pattern.size(); ++row_i) {
+                    mat.score(row_i + 1, col_i + 1) = std::max({mat.score(row_i, col_i) + (text[col_i] == pattern[row_i] ? params.v_score.match : params.v_score.mism), 0});
+                }
+            }
+
+            mat.getBestAlignment(avec, pattern, text);
         }
     };
 
@@ -624,6 +633,25 @@ namespace ymir {
             // avec->addAlignment(gene, );
         }
     };
+
+    struct SWNGAlignerFunctor_J {
+        void operator()(seg_index_t gene,
+                        const sequence_t &pattern,
+                        const sequence_t &text,
+                        NoGapAlignmentVector *avec,
+                        const VDJAlignerParameters &params = VDJAlignerParameters())
+        {
+            SWNGAlignmentMatrix mat(gene, pattern, text);
+
+            for (seq_len_t col_i = 0; col_i < text.size(); ++col_i) {
+                for (seq_len_t row_i = 0; row_i < pattern.size(); ++row_i) {
+                    mat.score(row_i + 1, col_i + 1) = std::max({mat.score(row_i, col_i) + (text[col_i] == pattern[row_i] ? params.j_score.match : params.j_score.mism), 0});
+                }
+            }
+
+            mat.getBestAlignment(avec, pattern, text);
+        }
+    };
     ///@}
 
 
@@ -633,9 +661,9 @@ namespace ymir {
      * \brief Smith-Waterman aligner without gaps, returns maximal matches with information about mismatch errors.
      */
     typedef VDJAlignerBase<NoGapAlignmentVector,
-                           SWNGAlignerFunctor_VJ, 
+                           SWNGAlignerFunctor_V,
                            SWNGAlignerFunctor_D, 
-                           SWNGAlignerFunctor_VJ> SmithWatermanNoGapAligner;
+                           SWNGAlignerFunctor_J> SmithWatermanNoGapAligner;
 
 }
 

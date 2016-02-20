@@ -553,7 +553,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         GappedAlignmentVector *avec,
-                        const VDJAlignerParameters &params = VDJAlignerParameters())
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const
         {
             SWAlignmentMatrix mat(gene, pattern, text);
 
@@ -571,7 +571,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text,
                         GappedAlignmentVector *avec,
-                        const VDJAlignerParameters &params = VDJAlignerParameters())
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const
         {
             // avec->addAlignment(gene, );
         }
@@ -609,7 +609,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        const VDJAlignerParameters &params = VDJAlignerParameters())
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const
         {
             SWNGAlignmentMatrix mat(gene, pattern, text);
 
@@ -628,7 +628,7 @@ namespace ymir {
                         const sequence_t &pattern, 
                         const sequence_t &text, 
                         NoGapAlignmentVector *avec, 
-                        const VDJAlignerParameters &params = VDJAlignerParameters())
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const
         {
             // avec->addAlignment(gene, );
         }
@@ -639,7 +639,7 @@ namespace ymir {
                         const sequence_t &pattern,
                         const sequence_t &text,
                         NoGapAlignmentVector *avec,
-                        const VDJAlignerParameters &params = VDJAlignerParameters())
+                        const VDJAlignerParameters &params = VDJAlignerParameters()) const
         {
             SWNGAlignmentMatrix mat(gene, pattern, text);
 

@@ -2060,7 +2060,7 @@ YMIR_TEST_START(test_sw_aligner)
     YMIR_ASSERT(false)
 
     vector<string> avec1 {"V1", "V2", "V3", "V4"};
-    vector<string> svec1 {"ACGTT", "ACGT", "ACG", "TTT"};
+    vector<string> svec1 {"ACGTTGGC", "ACGTTAGCTA", "ACG", "TTT"};
 
     vector<string> avec2 {"J1", "J2", "J3", "J4"};
     vector<string> svec2 {"CGT", "TACGT", "TTCGT", "TTTTT"};
@@ -2070,13 +2070,11 @@ YMIR_TEST_START(test_sw_aligner)
 
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
-    SmithWatermanNoGapAligner swnga(genes, VDJAlignerParameters(1,
-                                                                3,
-                                                                AlignmentEventScore(1, -1, -3),
-                                                                AlignmentEventScore(2, -1, -1),
-                                                                AlignmentEventScore(3, -2, -3)));
-
-
+    SmithWatermanNoGapAligner swa(genes, VDJAlignerParameters(1,
+                                                              3,
+                                                              AlignmentEventScore(1, -1, -3),
+                                                              AlignmentEventScore(2, -1, -1),
+                                                              AlignmentEventScore(3, -2, -3)));
 
 
 YMIR_TEST_END
@@ -2133,10 +2131,10 @@ YMIR_TEST_END
 YMIR_TEST_START(test_swng_aligner)
 
     vector<string> avec1 {"V1", "V2", "V3", "V4"};
-    vector<string> svec1 {"ACGTT", "ACGT", "ACG", "TTT"};
+    vector<string> svec1 {"ACGTTGGGATC", "ACGT", "ACG", "TTT"};
 
     vector<string> avec2 {"J1", "J2", "J3", "J4"};
-    vector<string> svec2 {"CGT", "TACGT", "TTCGT", "TTTTT"};
+    vector<string> svec2 {"TTT", "ACGTTGGGATC", "ACGT"};
 
     vector<string> avec3 {"D1", "D2", "D3"};
     vector<string> svec3 {"AA", "AACCTT", "ACT"};
@@ -2145,9 +2143,89 @@ YMIR_TEST_START(test_swng_aligner)
 
     SmithWatermanNoGapAligner swnga(genes, VDJAlignerParameters(1,
                                                                 3,
-                                                                AlignmentEventScore(1, -1, -3),
+                                                                AlignmentEventScore(3, -1, -3),
                                                                 AlignmentEventScore(2, -1, -1),
                                                                 AlignmentEventScore(3, -2, -3)));
+
+    sequence_t pattern;
+    NoGapAlignmentVector alignment;
+
+    // V: ACGTTGGGATC
+    // P:    ATGGGTT
+    pattern = "ATGGGTT";
+    alignment = swnga.alignVar(1, pattern);
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 4)
+    YMIR_ASSERT2(alignment.len(0), 7)
+    YMIR_ASSERT2(alignment.id(0), 1)
+    YMIR_ASSERT(alignment.isMismatch(0, 1))
+    YMIR_ASSERT(!alignment.isMismatch(0, 2))
+    YMIR_ASSERT(!alignment.isMismatch(0, 3))
+    YMIR_ASSERT(!alignment.isMismatch(0, 4))
+    YMIR_ASSERT(!alignment.isMismatch(0, 5))
+    YMIR_ASSERT(alignment.isMismatch(0, 6))
+    YMIR_ASSERT(!alignment.isMismatch(0, 7))
+
+    alignment = swnga.alignJoi(2, pattern);
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 4)
+    YMIR_ASSERT2(alignment.len(0), 7)
+    YMIR_ASSERT2(alignment.id(0), 2)
+    YMIR_ASSERT(alignment.isMismatch(0, 1))
+    YMIR_ASSERT(!alignment.isMismatch(0, 2))
+    YMIR_ASSERT(!alignment.isMismatch(0, 3))
+    YMIR_ASSERT(!alignment.isMismatch(0, 4))
+    YMIR_ASSERT(!alignment.isMismatch(0, 5))
+    YMIR_ASSERT(alignment.isMismatch(0, 6))
+    YMIR_ASSERT(!alignment.isMismatch(0, 7))
+
+    // V: ACGTTGGGATC
+    // P:       TGATCTT
+    pattern = "TGATCTT";
+    alignment = swnga.alignVar(1, pattern);
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 7)
+    YMIR_ASSERT2(alignment.len(0), 5)
+    YMIR_ASSERT2(alignment.id(0), 1)
+    YMIR_ASSERT(alignment.isMismatch(0, 1))
+    YMIR_ASSERT(!alignment.isMismatch(0, 2))
+    YMIR_ASSERT(!alignment.isMismatch(0, 3))
+    YMIR_ASSERT(!alignment.isMismatch(0, 4))
+    YMIR_ASSERT(!alignment.isMismatch(0, 5))
+
+    alignment = swnga.alignJoi(2, pattern);
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 7)
+    YMIR_ASSERT2(alignment.len(0), 5)
+    YMIR_ASSERT2(alignment.id(0), 2)
+    YMIR_ASSERT(alignment.isMismatch(0, 1))
+    YMIR_ASSERT(!alignment.isMismatch(0, 2))
+    YMIR_ASSERT(!alignment.isMismatch(0, 3))
+    YMIR_ASSERT(!alignment.isMismatch(0, 4))
+    YMIR_ASSERT(!alignment.isMismatch(0, 5))
+
+    // V:    ACGT
+    // P: GGAACTTAGGG
+    pattern = "GGAACTTAGGG";
+    alignment = swnga.alignVar(2, pattern);
+    YMIR_ASSERT2(alignment.pattern_start(0), 4)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 4)
+    YMIR_ASSERT2(alignment.id(0), 2)
+    YMIR_ASSERT(!alignment.isMismatch(0, 1))
+    YMIR_ASSERT(!alignment.isMismatch(0, 2))
+    YMIR_ASSERT(alignment.isMismatch(0, 3))
+    YMIR_ASSERT(!alignment.isMismatch(0, 4))
+
+    alignment = swnga.alignJoi(3, pattern);
+    YMIR_ASSERT2(alignment.pattern_start(0), 4)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 4)
+    YMIR_ASSERT2(alignment.id(0), 3)
+    YMIR_ASSERT(!alignment.isMismatch(0, 1))
+    YMIR_ASSERT(!alignment.isMismatch(0, 2))
+    YMIR_ASSERT(alignment.isMismatch(0, 3))
+    YMIR_ASSERT(!alignment.isMismatch(0, 4))
 
 YMIR_TEST_END
 

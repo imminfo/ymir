@@ -341,7 +341,7 @@ namespace ymir {
             seq_len_t len = 0;
             seg_index_t v_num = clonotype.nVar(), j_num = clonotype.nJoi();
             for (int v_index = 0; v_index < v_num; ++v_index) {
-                len = std::max(len, clonotype.getVarAlignment(v_index).length());
+                len = std::max(len, clonotype.getVarLen(v_index));
             }
 
             // compute V deletions
@@ -371,7 +371,7 @@ namespace ymir {
                 v_gene = clonotype.getVar(v_index);
                 v_len = _genes->V()[v_gene].sequence.size();
                 // FIXME: v_end AND seq_end to start with
-                v_end = clonotype.getVarAlignment(v_index).gene_end();
+                v_end = clonotype.getVarGeneEnd(v_index);
 
                 if (clonotype.recombination() == VJ_RECOMB) {
                     // probability of choosing this V gene segment
@@ -445,7 +445,7 @@ namespace ymir {
             seg_index_t j_num = clonotype.nJoi();
             seq_len_t len = 0;
             for (int j_index = 0; j_index < j_num; ++j_index) {
-                len = std::max(len, clonotype.getJoiAlignment(j_index).length());
+                len = std::max(len, clonotype.getJoiLen(j_index));
             }
 //            len = clonotype.sequence().size() - len + 1;
 //            cout << "len = " << len << endl;
@@ -475,7 +475,7 @@ namespace ymir {
                 j_gene = clonotype.getJoi(j_index);
                 j_len = _genes->J()[j_gene].sequence.size();
                 // FIXME: j_start AND gene_start
-                j_start = clonotype.getJoiAlignment(j_index).seq_start();
+                j_start = clonotype.getJoiSeqStart(j_index);
 
                 if (clonotype.recombination() == VDJ_RECOMB) {
                     for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
@@ -549,14 +549,15 @@ namespace ymir {
                 seq_len_t min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
 
                 for (seg_index_t j = 0; j < clonotype.numDivAlignments(d_index); ++j) {
-                    d_alignment = clonotype.getDivAlignment(d_index, j);
+                    seq_len_t d_seq_start = clonotype.getDivSeqStart(d_index, j),
+                              d_seq_end = clonotype.getDivSeqEnd(d_index, j);
 
                     // yes-yes, I know that it could be done more efficiently. But I don't want to.
-                    for (seq_len_t i = d_alignment.seq_start(); i <= d_alignment.seq_end() - min_D_len + 1; ++i) {
+                    for (seq_len_t i = d_seq_start; i <= d_seq_end - min_D_len + 1; ++i) {
                         seq_row[i] = 1;
                     }
 
-                    for (seq_len_t i = d_alignment.seq_start() + min_D_len - (seq_len_t) 1; i <= d_alignment.seq_end(); ++i) {
+                    for (seq_len_t i = d_seq_start + min_D_len - (seq_len_t) 1; i <= d_seq_end; ++i) {
                         seq_col[i] = 1;
                     }
                 }
@@ -605,21 +606,24 @@ namespace ymir {
 
                 // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
                 for (seg_index_t j = 0; j < clonotype.numDivAlignments(d_index); ++j) {
-                    d_alignment = clonotype.getDivAlignment(d_index, j);
+                    seq_len_t d_seq_start = clonotype.getDivSeqStart(d_index, j),
+                              d_seq_end = clonotype.getDivSeqEnd(d_index, j);
+                    seq_len_t d_gene_start = clonotype.getDivGeneStart(d_index, j),
+                              d_gene_end = clonotype.getDivGeneEnd(d_index, j);
 
-                    for (seq_len_t left_pos = d_alignment.seq_start(); left_pos <= d_alignment.seq_end() - min_D_len + 1; ++left_pos) {
-                        for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_alignment.seq_end(); ++right_pos) {
+                    for (seq_len_t left_pos = d_seq_start; left_pos <= d_seq_end - min_D_len + 1; ++left_pos) {
+                        for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_seq_end; ++right_pos) {
                             probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                     = _param_vec->event_prob(VDJ_DIV_DEL,
                                                              d_gene - 1,
-                                                             d_alignment.gene_start() + left_pos - d_alignment.seq_start(),
-                                                             d_len - (d_alignment.gene_end() - (d_alignment.seq_end() - right_pos)));
+                                                             d_gene_start + left_pos - d_seq_start,
+                                                             d_len - (d_gene_end - (d_seq_end - right_pos)));
                             if (metadata_mode) {
                                 events(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                         = _param_vec->event_index(VDJ_DIV_DEL,
                                                                   d_gene - 1,
-                                                                  d_alignment.gene_start() + left_pos - d_alignment.seq_start(),
-                                                                  d_len - (d_alignment.gene_end() - (d_alignment.seq_end() - right_pos)));
+                                                                  d_gene_start + left_pos - d_seq_start,
+                                                                  d_len - (d_gene_end - (d_seq_end - right_pos)));
                             }
                         }
                     }

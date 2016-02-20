@@ -195,7 +195,7 @@ namespace ymir {
         /**
          * \brief Access the latest alignment results and optionally move it.
          */
-         VDJAlignment&& last_alignment_and_clear() { return _builder.build(); }
+         VDJAlignment&& last_alignment_and_clear() { return _builder.buildAlignment(); }
 
     protected:
 

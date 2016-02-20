@@ -28,7 +28,7 @@ namespace ymir {
         typedef std::vector<bool> bit_storage_t;
 
 
-        typedef std::vector<alignment_score_t > score_storage_t;
+        typedef std::vector<alignment_score_t> score_storage_t;
 
 
         static const seq_len_t default_nrows = 80;

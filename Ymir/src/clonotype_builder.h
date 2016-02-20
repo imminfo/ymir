@@ -31,11 +31,6 @@
 
 namespace ymir {
 
-    #define CLONOTYPEBUILDER_VSEG_DEFAULT_RESERVE_SIZE 9
-    #define CLONOTYPEBUILDER_JSEG_DEFAULT_RESERVE_SIZE 6
-    #define CLONOTYPEBUILDER_DSEG_DEFAULT_RESERVE_SIZE 30
-
-
     /**
     * \class ClonotypeBuilder
     */
@@ -47,8 +42,8 @@ namespace ymir {
         }
 
 
-        virtual ~ClonotypeBuilder() {
-
+        virtual ~ClonotypeBuilder()
+        {
         }
 
 

@@ -1805,9 +1805,9 @@ YMIR_TEST_START(test_parser_vj)
                                      vdj_genes,
                                      NUCLEOTIDE,
                                      VJ_RECOMB,
-                                     NaiveNucParser::AlignmentColumnOptions()
-                                      .setV(NaiveNucParser::USE_PROVIDED)
-                                      .setJ(NaiveNucParser::USE_PROVIDED)))
+                                     AlignmentColumnOptions()
+                                      .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                      .setJ(AlignmentColumnOptions::USE_PROVIDED)))
 
      YMIR_ASSERT(cr.size() == 30)
      YMIR_ASSERT(cr[0].sequence() == "TGTGCAGCAAGTACCCCCTTAAGCTGGTGGTACTAGCTATGGAAAGCTGACATTT")
@@ -1875,10 +1875,10 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
                                      genes,
                                      NUCLEOTIDE,
                                      VDJ_RECOMB,
-                                     NaiveNucParser::AlignmentColumnOptions()
-                                      .setV(NaiveNucParser::USE_PROVIDED)
-                                      .setJ(NaiveNucParser::USE_PROVIDED)
-                                      .setD(NaiveNucParser::OVERWRITE),
+                                     AlignmentColumnOptions()
+                                      .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                      .setJ(AlignmentColumnOptions::USE_PROVIDED)
+                                      .setD(AlignmentColumnOptions::OVERWRITE),
                                     VDJAlignerParameters(1, 2)))
 
     YMIR_ASSERT2(cr.size(), 1)
@@ -1913,9 +1913,9 @@ YMIR_TEST_START(test_clorep)
                                      vdj_genes,
                                      NUCLEOTIDE,
                                      VJ_RECOMB,
-                                     NaiveNucParser::AlignmentColumnOptions()
-                                      .setV(NaiveNucParser::USE_PROVIDED)
-                                      .setJ(NaiveNucParser::USE_PROVIDED)))
+                                     AlignmentColumnOptions()
+                                      .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                      .setJ(AlignmentColumnOptions::USE_PROVIDED)))
 
      YMIR_ASSERT(!has_end_codon(cr[3].sequence()))
      YMIR_ASSERT(is_out_of_frame(cr[3].sequence()))

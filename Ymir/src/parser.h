@@ -86,6 +86,49 @@ namespace ymir {
     };
 
 
+//        enum AlignmentColumnsAction {
+//            USE_PROVIDED,
+//            ALIGN_ONLY_D,
+//            ALIGN_ALL
+//        };
+
+
+    struct AlignmentColumnOptions {
+
+        /**
+         * \enum ALIGNMENT_COLUMN_ACTION
+         *
+         * \brief Specify an action to perform with an alignment column:
+         * either overwrite found alignments (OVERWRITE)
+         * or use found (USE_PROVIDED) alignments in the input file.
+        */
+        enum Action {
+            OVERWRITE,
+            USE_PROVIDED
+        };
+
+        Action align_V, align_J, align_D;
+
+        AlignmentColumnOptions() {}
+
+
+        AlignmentColumnOptions& setV(Action action) {
+            this->align_V = action;
+            return *this;
+        }
+
+        AlignmentColumnOptions& setJ(Action action) {
+            this->align_J = action;
+            return *this;
+        }
+
+        AlignmentColumnOptions& setD(Action action) {
+            this->align_D = action;
+            return *this;
+        }
+    };
+
+
     /**
     * \class RepertoireParser
     *
@@ -97,49 +140,6 @@ namespace ymir {
     class RepertoireParser {
 
     public:
-
-        /**
-        * \enum ALIGNMENT_COLUMN_ACTION
-        *
-        * \brief Specify an action to perform with an alignment column:
-        * either overwrite found alignments (OVERWRITE)
-        * or use found (USE_PROVIDED) alignments in the input file.
-        */
-        enum ALIGNMENT_COLUMN_ACTION {
-            OVERWRITE,
-            USE_PROVIDED
-        };
-
-
-//        enum AlignmentColumnsAction {
-//            USE_PROVIDED,
-//            ALIGN_ONLY_D,
-//            ALIGN_ALL
-//        };
-
-
-        struct AlignmentColumnOptions {
-            ALIGNMENT_COLUMN_ACTION align_V, align_J, align_D;
-
-            AlignmentColumnOptions() {}
-
-
-            AlignmentColumnOptions& setV(ALIGNMENT_COLUMN_ACTION action) {
-                this->align_V = action;
-                return *this;
-            }
-
-            AlignmentColumnOptions& setJ(ALIGNMENT_COLUMN_ACTION action) {
-                this->align_J = action;
-                return *this;
-            }
-
-            AlignmentColumnOptions& setD(ALIGNMENT_COLUMN_ACTION action) {
-                this->align_D = action;
-                return *this;
-            }
-        };
-
 
         /**
         * \typedef ParserConfig
@@ -172,7 +172,7 @@ namespace ymir {
                   const VDJRecombinationGenes &gene_segments,
                   SequenceType seq_type,
                   Recombination recomb,
-                  AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE),
+                  AlignmentColumnOptions opts = AlignmentColumnOptions().setV(AlignmentColumnOptions::USE_PROVIDED).setJ(AlignmentColumnOptions::USE_PROVIDED).setD(AlignmentColumnOptions::OVERWRITE),
                   VDJAlignerParameters params = VDJAlignerParameters()) {
             _status = false;
             _stats.reset();
@@ -230,7 +230,7 @@ namespace ymir {
                           const VDJRecombinationGenes &gene_segments,
                           SequenceType seq_type,
                           Recombination recomb,
-                          AlignmentColumnOptions opts = AlignmentColumnOptions().setV(USE_PROVIDED).setJ(USE_PROVIDED).setD(OVERWRITE),
+                          AlignmentColumnOptions opts = AlignmentColumnOptions().setV(AlignmentColumnOptions::USE_PROVIDED).setJ(AlignmentColumnOptions::USE_PROVIDED).setD(AlignmentColumnOptions::OVERWRITE),
                           VDJAlignerParameters params = VDJAlignerParameters()) {
             if (this->open(filepath, gene_segments, seq_type, recomb, opts)) {
                 this->parse(cloneset);
@@ -262,9 +262,9 @@ namespace ymir {
                  start_bracket = '(',
                  end_bracket = ')';
 
-            bool do_align_V = _opts.align_V == OVERWRITE,
-                 do_align_J = _opts.align_J == OVERWRITE,
-                 do_align_D = _opts.align_D == OVERWRITE;
+            bool do_align_V = _opts.align_V == AlignmentColumnOptions::OVERWRITE,
+                 do_align_J = _opts.align_J == AlignmentColumnOptions::OVERWRITE,
+                 do_align_D = _opts.align_D == AlignmentColumnOptions::OVERWRITE;
 
             stringstream column_stream, symbol_stream, temp_stream;
             string line, segment_word, sequence;

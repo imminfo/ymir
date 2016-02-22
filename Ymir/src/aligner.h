@@ -154,21 +154,21 @@ namespace ymir {
          * \brief General methods for alignment.
          */
         ///@{
-        AlignmentType alignVar(seg_index_t id, const sequence_t &pattern) const {
+        AlignmentType alignVar(seg_index_t id, const sequence_t &sequence) const {
             AlignmentType vec;
-            this->_alignVar(id, pattern, &vec);
+            this->_alignVar(id, sequence, &vec);
             return vec;
         }
 
-        AlignmentType alignDiv(seg_index_t id, const sequence_t &pattern) const {
+        AlignmentType alignDiv(seg_index_t id, const sequence_t &sequence) const {
             AlignmentType vec;
-            this->_alignDiv(id, pattern, &vec);
+            this->_alignDiv(id, sequence, &vec);
             return vec;
         }
 
-        AlignmentType alignJoi(seg_index_t id, const sequence_t &pattern) const {
+        AlignmentType alignJoi(seg_index_t id, const sequence_t &sequence) const {
             AlignmentType vec;
-            this->_alignJoi(id, pattern, &vec);
+            this->_alignJoi(id, sequence, &vec);
             return vec;
         }
         ///@}
@@ -177,7 +177,7 @@ namespace ymir {
         /**
          * \brief Align the given sequence to all gene segments of the specific gene.
          *
-         * \param sequence Pattern sequence.
+         * \param sequence sequence sequence.
          *
          * \return True if has been aligned at least one gene segment, False if no gene segments have been aligned.
          */
@@ -225,20 +225,20 @@ namespace ymir {
          * \brief Internal alignment functions.
          *
          * \param id
-         * \param pattern
+         * \param sequence
          * \param vec
          */
         ///@{
-        void _alignVar(seg_index_t id, const sequence_t &pattern, AlignmentType *vec) const {
-            _V_Aligner(id, pattern, _genes.V()[id].sequence, vec, _params);
+        void _alignVar(seg_index_t id, const sequence_t &sequence, AlignmentType *vec) const {
+            _V_Aligner(id, _genes.V()[id].sequence, sequence, vec, _params);
         }
 
-        void _alignDiv(seg_index_t id, const sequence_t &pattern, AlignmentType *vec) const {
-            _D_Aligner(id, pattern, _genes.D()[id].sequence, vec, _params);
+        void _alignDiv(seg_index_t id, const sequence_t &sequence, AlignmentType *vec) const {
+            _D_Aligner(id, _genes.D()[id].sequence, sequence, vec, _params);
         }
 
-        void _alignJoi(seg_index_t id, const sequence_t &pattern, AlignmentType *vec) const {
-            _J_Aligner(id, pattern, _genes.J()[id].sequence, vec, _params);
+        void _alignJoi(seg_index_t id, const sequence_t &sequence, AlignmentType *vec) const {
+            _J_Aligner(id, _genes.J()[id].sequence, sequence, vec, _params);
         }
         ///@}
 

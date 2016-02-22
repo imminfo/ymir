@@ -174,7 +174,10 @@ namespace ymir {
                   Recombination recomb,
                   AlignmentColumnOptions opts = AlignmentColumnOptions().setV(AlignmentColumnOptions::USE_PROVIDED).setJ(AlignmentColumnOptions::USE_PROVIDED).setD(AlignmentColumnOptions::OVERWRITE),
                   VDJAlignerParameters params = VDJAlignerParameters()) {
+            _stream.close();
+
             _status = false;
+            _read_header = true;
             _stats.reset();
 
             if (recomb == UNDEF_RECOMB) {
@@ -205,7 +208,7 @@ namespace ymir {
          * \param cloneset Pointer to clonal repertoire object to which data will be uploaded.
          */
         bool parse(Cloneset *cloneset, size_t max_clonotype_count = (size_t)-1) {
-            if (_stats.count_all) {
+            if (_stream.eof()) {
                 _stats.print();
                 _stats.reset();
                 _status = false;
@@ -222,6 +225,8 @@ namespace ymir {
 
             this->parseRepertoire(clonevec, max_clonotype_count);
             cloneset->swap(clonevec);
+
+            return true;
         }
 
 
@@ -232,7 +237,7 @@ namespace ymir {
                           Recombination recomb,
                           AlignmentColumnOptions opts = AlignmentColumnOptions().setV(AlignmentColumnOptions::USE_PROVIDED).setJ(AlignmentColumnOptions::USE_PROVIDED).setD(AlignmentColumnOptions::OVERWRITE),
                           VDJAlignerParameters params = VDJAlignerParameters()) {
-            if (this->open(filepath, gene_segments, seq_type, recomb, opts)) {
+            if (this->open(filepath, gene_segments, seq_type, recomb, opts, params)) {
                 this->parse(cloneset);
                 _stats.print();
                 return true;
@@ -251,6 +256,7 @@ namespace ymir {
         RepertoireParserStatistics _stats;
         Aligner _aligner;
         bool _status;
+        bool _read_header;
 
 
         void parseRepertoire(ClonotypeVector& vec, size_t max_clonotype_count)
@@ -280,8 +286,11 @@ namespace ymir {
             _aligner.setRecombination(_recomb);
 
             // Skip header
-            getline(_stream, line);
-            while (!_stream.eof() && clonotype_num <= max_clonotype_count) {
+            if (_read_header) {
+                getline(_stream, line);
+                _read_header = false;
+            }
+            while (!_stream.eof() && clonotype_num < max_clonotype_count) {
                 // Start processing clonotypes
                 getline(_stream, line);
 
@@ -383,11 +392,13 @@ namespace ymir {
                         this->parseAlignment(symbol_stream, segment_word, jseg, JOINING, _genes.J(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
                     }
 
-                    ++_stats.count_all;
                     ++clonotype_num;
+                    ++_stats.count_all;
                     if (_stats.count_all % 50000 == 0) {
                         cout << "Parsed " << (size_t) _stats.count_all << " lines" << endl;
                     }
+
+
 
                     //
                     // TODO: remove bad clonotypes here ???

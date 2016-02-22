@@ -740,7 +740,7 @@ YMIR_TEST_START(test_gapped_alignment_vector)
     YMIR_ASSERT2(vec.pattern_start(2), 5)
     YMIR_ASSERT2(vec.text_start(2), 6)
     YMIR_ASSERT2(vec.len(2), 6)
-    YMIR_ASSERT2(vec.id(2), 21)    
+    YMIR_ASSERT2(vec.id(2), 21)
     YMIR_ASSERT(vec.isIns(2, 1))
     YMIR_ASSERT(vec.isDel(2, 2))
     YMIR_ASSERT(vec.isMatch(2, 3))
@@ -769,8 +769,8 @@ YMIR_TEST_START(test_vdj_alignment_simple_vj)
 
     YMIR_ASSERT2(algn.getVar(0), 11)
     YMIR_ASSERT2(algn.getVar(1), 12)
-    YMIR_ASSERT2(algn.getJoi(0), 31)  
-    YMIR_ASSERT2(algn.getJoi(1), 33)  
+    YMIR_ASSERT2(algn.getJoi(0), 31)
+    YMIR_ASSERT2(algn.getJoi(1), 33)
     YMIR_ASSERT2(algn.getJoi(2), 35)
 
     YMIR_ASSERT2(algn.getVarGeneStart(0), 1)
@@ -810,8 +810,8 @@ YMIR_TEST_START(test_vdj_alignment_simple_vj)
 
     YMIR_ASSERT2(algn.getVar(0), 41)
     YMIR_ASSERT2(algn.getVar(1), 42)
-    YMIR_ASSERT2(algn.getVar(2), 49)  
-    YMIR_ASSERT2(algn.getJoi(0), 53)  
+    YMIR_ASSERT2(algn.getVar(2), 49)
+    YMIR_ASSERT2(algn.getJoi(0), 53)
     YMIR_ASSERT2(algn.getJoi(1), 55)
 
     YMIR_ASSERT2(algn.getVarGeneStart(0), 41)
@@ -915,7 +915,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
     NoGapAlignmentVector vec1;
     AlignmentVectorBase::events_storage_t events11 {false, true, true};
     vec1.addAlignment(11, 1, 2, events11);
-    AlignmentVectorBase::events_storage_t events12 {false, false, true, 
+    AlignmentVectorBase::events_storage_t events12 {false, false, true,
                                                     true, true, false};
     vec1.addAlignment(12, 4, 5, events12);
 
@@ -923,19 +923,19 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
     // J
 
     NoGapAlignmentVector vec2;
-    AlignmentVectorBase::events_storage_t events21 {false, true, true, 
-                                                    false, true, true, 
+    AlignmentVectorBase::events_storage_t events21 {false, true, true,
+                                                    false, true, true,
                                                     false, true, true};
     vec2.addAlignment(31, 7, 8, events21);
-    AlignmentVectorBase::events_storage_t events22 {true, false, true, 
-                                                    true, true, false, 
-                                                    false, false, true, 
+    AlignmentVectorBase::events_storage_t events22 {true, false, true,
+                                                    true, true, false,
+                                                    false, false, true,
                                                     true, true, false};
     vec2.addAlignment(33, 10, 11, events22);
 
     NoGapAlignmentVector vec3;
-    AlignmentVectorBase::events_storage_t events31 {false, true, true, 
-                                                    false, true, true, 
+    AlignmentVectorBase::events_storage_t events31 {false, true, true,
+                                                    false, true, true,
                                                     false, true, true,
                                                     false, true, true,
                                                     false, true, true};
@@ -1004,7 +1004,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
     NoGapAlignmentVector vec1;
     AlignmentVectorBase::events_storage_t events11 {false, true, true};
     vec1.addAlignment(11, 1, 2, events11);
-    AlignmentVectorBase::events_storage_t events12 {false, false, true, 
+    AlignmentVectorBase::events_storage_t events12 {false, false, true,
                                                     true, true, false};
     vec1.addAlignment(12, 4, 5, events12);
 
@@ -1012,19 +1012,19 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
     // J
 
     NoGapAlignmentVector vec2;
-    AlignmentVectorBase::events_storage_t events21 {false, true, true, 
-                                                    false, true, true, 
+    AlignmentVectorBase::events_storage_t events21 {false, true, true,
+                                                    false, true, true,
                                                     false, true, true};
     vec2.addAlignment(31, 7, 8, events21);
-    AlignmentVectorBase::events_storage_t events22 {true, false, true, 
-                                                    true, true, false, 
-                                                    false, false, true, 
+    AlignmentVectorBase::events_storage_t events22 {true, false, true,
+                                                    true, true, false,
+                                                    false, false, true,
                                                     true, true, false};
     vec2.addAlignment(33, 10, 11, events22);
 
     NoGapAlignmentVector vec3;
-    AlignmentVectorBase::events_storage_t events31 {false, true, true, 
-                                                    false, true, true, 
+    AlignmentVectorBase::events_storage_t events31 {false, true, true,
+                                                    false, true, true,
                                                     false, true, true,
                                                     false, true, true,
                                                     false, true, true};
@@ -1034,14 +1034,14 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
     // D
 
     NoGapAlignmentVector vec4;
-    AlignmentVectorBase::events_storage_t events41 {false, true, true, 
+    AlignmentVectorBase::events_storage_t events41 {false, true, true,
                                                     false, true, true};
     AlignmentVectorBase::events_storage_t events42 {false, true, false};
     vec4.addAlignment(43, 13, 14, events41);
     vec4.addAlignment(43, 15, 16, events42);
 
     NoGapAlignmentVector vec5;
-    AlignmentVectorBase::events_storage_t events51 {false, false, true, true, 
+    AlignmentVectorBase::events_storage_t events51 {false, false, true, true,
                                                     false, true, true};
     vec5.addAlignment(45, 17, 18, events51);
 
@@ -1831,7 +1831,42 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_parser_vj_by_block)
 
-    YMIR_ASSERT(false)
+    NaiveNucParser parser;
+
+    bool V_err, J_err;
+    VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
+            , "Jgene", TEST_DATA_FOLDER + "jgene.real.txt", &V_err, &J_err);
+    YMIR_ASSERT(V_err)
+    YMIR_ASSERT(J_err)
+
+    Cloneset cr;
+    YMIR_ASSERT(parser.open(TEST_DATA_FOLDER + "ymir.alpha.txt",
+                                    vdj_genes,
+                                    NUCLEOTIDE,
+                                    VJ_RECOMB,
+                                    AlignmentColumnOptions()
+                                            .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                            .setJ(AlignmentColumnOptions::USE_PROVIDED)))
+
+    YMIR_ASSERT(parser.parse(&cr, 1))
+    YMIR_ASSERT2(cr.size(), 1)
+    YMIR_ASSERT(cr[0].sequence() == "TGTGCAGCAAGTACCCCCTTAAGCTGGTGGTACTAGCTATGGAAAGCTGACATTT")
+    YMIR_ASSERT(cr[0].recombination() == VJ_RECOMB)
+    YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(0)].allele == "TRAV13-1")
+    YMIR_ASSERT(vdj_genes.V()[cr[0].getVar(1)].allele == "TRAV13-2")
+    YMIR_ASSERT(cr[0].nVar() == 2)
+    YMIR_ASSERT(vdj_genes.J()[cr[0].getJoi(0)].allele == "TRAJ52")
+    YMIR_ASSERT(cr[0].nJoi() == 1)
+
+    YMIR_ASSERT(parser.parse(&cr, 2))
+    YMIR_ASSERT2(cr.size(), 2)
+    YMIR_ASSERT2(cr[1].sequence(),"TGTGCAACTCTTAGCAGGGATGAACACAGGCTTTCAGAAACTTGTATTT")
+    YMIR_ASSERT(cr[1].recombination() != VDJ_RECOMB)
+    YMIR_ASSERT2(cr[1].nVar(), 1)
+    YMIR_ASSERT2(cr[1].nJoi(), 2)
+    YMIR_ASSERT(vdj_genes.V()[cr[1].getVar(0)].allele == "TRAV12-3")
+    YMIR_ASSERT(vdj_genes.J()[cr[1].getJoi(0)].allele == "TRAJ8")
+    YMIR_ASSERT(vdj_genes.J()[cr[1].getJoi(1)].allele == "TRAJ18")
 
 YMIR_TEST_END
 
@@ -1862,8 +1897,8 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
     alvec3.push_back("Dseg2");
     alvec3.push_back("Dseg3");
     seqvec3.push_back("GTTT");
-    seqvec3.push_back("ACCGGT");
-    seqvec3.push_back("CCCGGAC");
+//    seqvec3.push_back("ACCGGT");
+//    seqvec3.push_back("CCCGGAC");
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
@@ -1879,20 +1914,45 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
                                       .setV(AlignmentColumnOptions::USE_PROVIDED)
                                       .setJ(AlignmentColumnOptions::USE_PROVIDED)
                                       .setD(AlignmentColumnOptions::OVERWRITE),
-                                    VDJAlignerParameters(1, 2)))
+                                    VDJAlignerParameters(1, 3)))
 
     YMIR_ASSERT2(cr.size(), 1)
     YMIR_ASSERT2(cr[0].sequence(), "CCCGACGGTTT")
     YMIR_ASSERT2(genes.V()[cr[0].getJoi(0)].allele, "Vseg1")
     YMIR_ASSERT2(genes.J()[cr[0].getJoi(0)].allele, "Jseg1")
+
+    // CCCGACGGTTT
+    // .......GTTT
+    // ...ACCGGT
+    // ....ACCGGT
+    //CCCGGAC
+    // CCCGGAC
+    // ...CCCGGAC
     YMIR_ASSERT2( (int) cr[0].nDiv(), 3)
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 1)
-    YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 2)
-    YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 3)
+//    YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 2)
+//    YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 3)
+    YMIR_ASSERT2(cr[0].getDivSeqStart(0, 0), 8)
+    YMIR_ASSERT2(cr[0].getDivGeneStart(0, 0), 1)
+    YMIR_ASSERT2(cr[0].getDivLen(0, 0), 4)
+//    YMIR_ASSERT2(cr[0].getDivSeqStart(1, 0), 8)
+//    YMIR_ASSERT2(cr[0].getDivGeneStart(1, 0), 1)
+//    YMIR_ASSERT2(cr[0].getDivLen(1, 0), 4)
+
+    YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "ymir.beta.txt",
+                                    &cr,
+                                    genes,
+                                    NUCLEOTIDE,
+                                    VDJ_RECOMB,
+                                    AlignmentColumnOptions()
+                                            .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                            .setJ(AlignmentColumnOptions::USE_PROVIDED)
+                                            .setD(AlignmentColumnOptions::OVERWRITE),
+                                    VDJAlignerParameters(1, 2)))
 //     this is if default gene len is equal to 2
-    YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 3)
-    YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 4)
-    YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 5)
+//    YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 3)
+//    YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 4)
+//    YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 5)
 
 YMIR_TEST_END
 

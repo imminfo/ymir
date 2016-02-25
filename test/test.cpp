@@ -2970,9 +2970,11 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     alvec1.push_back("Vseg1");
     alvec1.push_back("Vseg2");
     alvec1.push_back("Vseg3");
+    alvec1.push_back("Vseg4");
     seqvec1.push_back("CCCA");
     seqvec1.push_back("GGG");
     seqvec1.push_back("CCCAGG");
+    seqvec1.push_back("TTCCCAGG");
 
     vector<string> alvec2;
     vector<string> seqvec2;
@@ -3004,6 +3006,7 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
             .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 4)
+            .addVarAlignment(4, 3, 1, 4)
             .addJoiAlignment(1, 2, 11, 3)
             .addJoiAlignment(2, 2, 10, 3)
             .addJoiAlignment(3, 2, 11, 3);

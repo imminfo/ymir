@@ -2992,6 +2992,10 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     MAAGBuilder maag_builder(mvec, genes);
 
     ClonotypeBuilder cl_builder;
+    // CCCAAAAAAATT
+    //       CCGTTT
+    //         CATT
+    //       AGGTTT
     // CCCG.AC.GGTTT
     // poses:
     // vs: 0-1-2-3-4-5
@@ -2999,11 +3003,10 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     cl_builder.setSequence("CCCAAAAAAATT")
             .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
-//            .addVarAlignment(3, 5)
-//            .addJoiAlignment(1, 8)
-//            .addJoiAlignment(2, 9)
-            .addJoiAlignment(2, 2, 10, 3);
-//            .addJoiAlignment(3, 7);
+            .addVarAlignment(3, 1, 1, 4)
+            .addJoiAlignment(1, 2, 11, 3)
+            .addJoiAlignment(2, 2, 10, 3)
+            .addJoiAlignment(3, 2, 11, 3);
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 

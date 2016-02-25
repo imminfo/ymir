@@ -194,6 +194,7 @@ namespace ymir {
         bool alignDiv() {
             NoGapAlignmentVector vec;
             for (seg_index_t id = 1; id <= _genes.D().max(); ++id) {
+                vec.clear(); // TODO: some strange behaviour here after I added this line. Be careful. Maybe there is some bug in clear().
                 this->_alignDiv(id, _sequence, &vec);
                 this->addDivAlignment(vec);
             }

@@ -1944,8 +1944,8 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
     alvec3.push_back("Dseg2");
     alvec3.push_back("Dseg3");
     seqvec3.push_back("GTTT");
-//    seqvec3.push_back("ACCGGT");
-//    seqvec3.push_back("CCCGGAC");
+    seqvec3.push_back("ACCGGT");
+    seqvec3.push_back("CCCGGAC");
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
@@ -1971,20 +1971,26 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
     // CCCGACGGTTT
     // .......GTTT
     // ...ACCGGT
-    // ....ACCGGT
+    // ACCGGT
     //CCCGGAC
     // CCCGGAC
     // ...CCCGGAC
     YMIR_ASSERT2( (int) cr[0].nDiv(), 3)
+    YMIR_ASSERT2(cr[0].getDiv(0), 1);
+    YMIR_ASSERT2(cr[0].getDiv(1), 2);
+    YMIR_ASSERT2(cr[0].getDiv(2), 3);
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 1)
-//    YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 2)
-//    YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 3)
+    YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 2)
+    YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 3)
     YMIR_ASSERT2(cr[0].getDivSeqStart(0, 0), 8)
     YMIR_ASSERT2(cr[0].getDivGeneStart(0, 0), 1)
     YMIR_ASSERT2(cr[0].getDivLen(0, 0), 4)
-//    YMIR_ASSERT2(cr[0].getDivSeqStart(1, 0), 8)
-//    YMIR_ASSERT2(cr[0].getDivGeneStart(1, 0), 1)
-//    YMIR_ASSERT2(cr[0].getDivLen(1, 0), 4)
+    YMIR_ASSERT2(cr[0].getDivSeqStart(1, 0), 2)
+    YMIR_ASSERT2(cr[0].getDivGeneStart(1, 0), 2)
+    YMIR_ASSERT2(cr[0].getDivLen(1, 0), 3)
+    YMIR_ASSERT2(cr[0].getDivSeqStart(1, 1), 6)
+    YMIR_ASSERT2(cr[0].getDivGeneStart(1, 1), 3)
+    YMIR_ASSERT2(cr[0].getDivLen(1, 1), 4)
 
     YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "ymir.beta.txt",
                                     &cr,
@@ -1997,9 +2003,9 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
                                             .setD(AlignmentColumnOptions::OVERWRITE),
                                     VDJAlignerParameters(1, 2)))
 //     this is if default gene len is equal to 2
-//    YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 3)
-//    YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 4)
-//    YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 5)
+    YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 3)
+    YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 4)
+    YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 5)
 
 YMIR_TEST_END
 

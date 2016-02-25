@@ -381,19 +381,11 @@ namespace ymir {
 
                 // V deletions
                 v_len = _genes->V()[v_gene].sequence.size();
-                // FIXME: v_end AND seq_end to start with
                 v_start = clonotype.getVarGeneStart(v_index);
                 v_end = clonotype.getVarGeneEnd(v_index);
 
-                for (seq_len_t i = 0; i < len + 1; ++i) {
-                    if (v_len - i >= 0 && i <= v_end) {
-                        probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, 1 + v_len - v_start - i); // probability of deletions
-                    } else {
-                        // TODO: remove this assignment because all initialised to zeros and check the speed
-                        probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0; // if exceeds length of V gene segment
-                    }
-                    // probs(1, v_index, 0, i) = (v_len - i >= 0) ? _param_vec->prob_V_del(v_gene, v_len - i) : 0;
-                    // OPTIMISATION: first find where zeros are start and then just fill this part of the vector with zeros without any "ifs"
+                for (seq_len_t i = 0; i < v_end - v_start + 1; ++i) {
+                    probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, static_cast<int16_t>(1 + v_len) - static_cast<int16_t>(v_start + i)); // probability of deletions
                 }
 
                 if (metadata_mode) {
@@ -407,13 +399,8 @@ namespace ymir {
                         events(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_index(VDJ_VAR_GEN, 0, v_gene - 1);
                     }
 
-                    for (seq_len_t i = 0; i < len + 1; ++i) {
-                        if (v_len - i >= 0 && i <= v_end) {
-                            events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_index(V_DEL, v_gene - 1, 1 + v_len - v_start - i);
-                        } else {
-                            // TODO: remove this assignment because all initialised to zeros and check the speed
-                            events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0;
-                        }
+                    for (seq_len_t i = 0; i < v_end - v_start + 1; ++i) {
+                        events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_index(V_DEL, v_gene - 1, static_cast<int16_t>(1 + v_len) - static_cast<int16_t>(v_start + i));
                     }
                 }
             }
@@ -468,16 +455,13 @@ namespace ymir {
             }
 
             // compute J deletions
-            seq_len_t j_len = 0;
-            seg_index_t j_gene = 0;
-            seq_len_t j_start = 0;
+            seq_len_t j_len, j_gene, j_start, j_end;
 
             EventClass J_DEL = clonotype.recombination() == VJ_RECOMB ? VJ_JOI_DEL : VDJ_JOI_DEL;
             for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
+                // probability of choosing the J segment
                 j_gene = clonotype.getJoi(j_index);
                 j_len = _genes->J()[j_gene].sequence.size();
-                // FIXME: j_start AND gene_start
-                j_start = clonotype.getJoiSeqStart(j_index);
 
                 if (clonotype.recombination() == VDJ_RECOMB) {
                     for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
@@ -486,15 +470,23 @@ namespace ymir {
                     }
                 }
 
-                for (seq_len_t i = 0; i < len + 1; ++i) {
-                    if (j_len - len + i >= 0 && len - i <= clonotype.sequence().size() - j_start + 1) {
-                        probs(J_index_dels, j_index, i, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_len - len + i); // probability of deletions
-                    } else {
-                        // TODO: remove this assignment because all initialised to zeros and check the speed
-                        probs(J_index_dels, j_index, i, 0) = 0; // if exceeds length of J gene segment
-                    }
-
+                // J deletions
+                j_start = clonotype.getJoiSeqStart(j_index);
+                j_end = clonotype.getJoiSeqEnd(j_index);
+                for (seq_len_t i = j_start; i < len + 1; ++i) {
+                    // TODO: cast to int because this is always more than zero
+                     probs(J_index_dels, j_index, i, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_len - len + i); // probability of deletions
                 }
+
+//                for (seq_len_t i = 0; i < len + 1; ++i) {
+//                    // TODO: cast to int because this is always more than zero
+//                    if (j_end - len + i >= 0 && len - i <= j_end - j_start + 1) {
+//                        probs(J_index_dels, j_index, i, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_len - len + i); // probability of deletions
+//                    } else {
+//                        // TODO: remove this assignment because all initialised to zeros and check the speed
+//                        probs(J_index_dels, j_index, i, 0) = 0; // if exceeds length of J gene segment
+//                    }
+//                }
 
                 if (metadata_mode) {
                     if (clonotype.recombination() == VDJ_RECOMB) {
@@ -505,7 +497,7 @@ namespace ymir {
                     }
 
                     for (seq_len_t i = 0; i < len + 1; ++i) {
-                        if (j_len - len + i >= 0 && len - i <= clonotype.sequence().size() - j_start + 1) {
+                        if (j_end - len + i >= 0 && len - i <= j_end - j_start + 1) {
                             events(J_index_dels, j_index, i, 0) = _param_vec->event_index(J_DEL, j_gene - 1, j_len - len + i);
                         } else {
                             // TODO: remove this assignment because all initialised to zeros and check the speed

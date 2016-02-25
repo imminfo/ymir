@@ -1648,7 +1648,7 @@ YMIR_TEST_START(test_swng_aligner)
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
     SmithWatermanNoGapAligner swnga(genes, VDJAlignerParameters(1,
-                                                                3,
+                                                                2,
                                                                 AlignmentEventScore(3, -1, -3),
                                                                 AlignmentEventScore(2, -1, -1),
                                                                 AlignmentEventScore(3, -2, -3)));
@@ -1732,6 +1732,53 @@ YMIR_TEST_START(test_swng_aligner)
     YMIR_ASSERT(!alignment.isMismatch(0, 2))
     YMIR_ASSERT(alignment.isMismatch(0, 3))
     YMIR_ASSERT(!alignment.isMismatch(0, 4))
+
+    alignment = swnga.alignDiv(1, "TTAATAA");
+    YMIR_ASSERT2(alignment.size(), 6)
+
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 2)
+    YMIR_ASSERT(alignment.isMismatch(0, 1))
+    YMIR_ASSERT(alignment.isMismatch(0, 2))
+
+    YMIR_ASSERT2(alignment.pattern_start(1), 1)
+    YMIR_ASSERT2(alignment.text_start(1), 2)
+    YMIR_ASSERT2(alignment.len(1), 2)
+    YMIR_ASSERT(alignment.isMismatch(1, 1))
+    YMIR_ASSERT(!alignment.isMismatch(1, 2))
+
+    YMIR_ASSERT2(alignment.pattern_start(5), 1)
+    YMIR_ASSERT2(alignment.text_start(5), 6)
+    YMIR_ASSERT2(alignment.len(5), 2)
+    YMIR_ASSERT(!alignment.isMismatch(5, 1))
+    YMIR_ASSERT(!alignment.isMismatch(5, 2))
+
+    alignment = swnga.alignDiv(2, "AAGGTTGGGGGTT");
+    YMIR_ASSERT2(alignment.size(), 13 - 2 + 1 + 4)
+
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 6)
+    YMIR_ASSERT(!alignment.isMismatch(0, 1))
+    YMIR_ASSERT(!alignment.isMismatch(0, 2))
+    YMIR_ASSERT(alignment.isMismatch(0, 3))
+    YMIR_ASSERT(alignment.isMismatch(0, 4))
+    YMIR_ASSERT(!alignment.isMismatch(0, 5))
+    YMIR_ASSERT(!alignment.isMismatch(0, 6))
+
+    YMIR_ASSERT2(alignment.pattern_start(15), 1)
+    YMIR_ASSERT2(alignment.text_start(15), 12)
+    YMIR_ASSERT2(alignment.len(15), 2)
+    YMIR_ASSERT(alignment.isMismatch(15, 1))
+    YMIR_ASSERT(alignment.isMismatch(15, 2))
+
+    alignment = swnga.alignDiv(3, "ACTGACGACGGTATCTAC");
+    YMIR_ASSERT2(alignment.size(), 18 - 2 + 1 + 1)
+
+    YMIR_ASSERT2(alignment.pattern_start(17), 1)
+    YMIR_ASSERT2(alignment.text_start(17), 17)
+    YMIR_ASSERT2(alignment.len(17), 2)
 
 YMIR_TEST_END
 

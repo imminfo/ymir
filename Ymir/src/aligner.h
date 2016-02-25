@@ -578,7 +578,7 @@ namespace ymir {
                         GappedAlignmentVector *avec,
                         const VDJAlignerParameters &params = VDJAlignerParameters()) const
         {
-            // avec->addAlignment(gene, );
+            check_and_throw(false, "SWAlignerFunctor_D has not been implemented yet");
         }
 
     private:
@@ -636,6 +636,33 @@ namespace ymir {
                         const VDJAlignerParameters &params = VDJAlignerParameters()) const
         {
             // avec->addAlignment(gene, );
+            seq_len_t match_min_len = params.min_D_len;
+            seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
+            seq_len_t p_start, t_start;
+            AlignmentVectorBase::events_storage_t bitvec;
+            bitvec.reserve(p_size + 1);
+
+            for (seq_len_t pattern_i = 0; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
+                min_subsize = min(p_size - pattern_i, (int) t_size);
+                if (min_subsize >= match_min_len) {
+                    bitvec.resize(min_subsize);
+                    for (seq_len_t i = 0; i < min_subsize; ++i) {
+                        bitvec[i] = pattern[pattern_i + i] != text[i];
+                    }
+                    avec->addAlignment(gene, pattern_i + 1, 1, bitvec);
+                }
+            }
+
+            for (seq_len_t text_i = 1; text_i < t_size - match_min_len + 1; ++text_i) {
+                min_subsize = min((int) p_size, t_size - text_i);
+                if (min_subsize >= match_min_len) {
+                    bitvec.resize(min_subsize);
+                    for (seq_len_t i = 0; i < min_subsize; ++i) {
+                        bitvec[i] = pattern[i] != text[text_i + i];
+                    }
+                    avec->addAlignment(gene, 1, text_i + 1, bitvec);
+                }
+            }
         }
     };
 

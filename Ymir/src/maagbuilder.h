@@ -345,9 +345,7 @@ namespace ymir {
             }
 
             // compute V deletions
-            seq_len_t v_len = 0;
-            seg_index_t v_gene = 0;
-            seq_len_t v_end = 0;
+            seq_len_t v_len, v_gene, v_start, v_end;
 
             probs.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             if (metadata_mode) {
@@ -368,13 +366,11 @@ namespace ymir {
 
             EventClass V_DEL = clonotype.recombination() == VJ_RECOMB ? VJ_VAR_DEL : VDJ_VAR_DEL;
             for (seg_index_t v_index = 0; v_index < v_num; ++v_index) {
+
+                // probability of choosing this V gene segment
                 v_gene = clonotype.getVar(v_index);
-                v_len = _genes->V()[v_gene].sequence.size();
-                // FIXME: v_end AND seq_end to start with
-                v_end = clonotype.getVarGeneEnd(v_index);
 
                 if (clonotype.recombination() == VJ_RECOMB) {
-                    // probability of choosing this V gene segment
                     for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
                         probs(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
                                 = _param_vec->event_prob(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
@@ -383,9 +379,15 @@ namespace ymir {
                     probs(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_prob(VDJ_VAR_GEN, 0, v_gene - 1); // probability of choosing this V gene segment
                 }
 
+                // V deletions
+                v_len = _genes->V()[v_gene].sequence.size();
+                // FIXME: v_end AND seq_end to start with
+                v_start = clonotype.getVarGeneStart(v_index);
+                v_end = clonotype.getVarGeneEnd(v_index);
+
                 for (seq_len_t i = 0; i < len + 1; ++i) {
                     if (v_len - i >= 0 && i <= v_end) {
-                        probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, v_len - i); // probability of deletions
+                        probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, 1 + v_len - v_start - i); // probability of deletions
                     } else {
                         // TODO: remove this assignment because all initialised to zeros and check the speed
                         probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0; // if exceeds length of V gene segment
@@ -407,7 +409,7 @@ namespace ymir {
 
                     for (seq_len_t i = 0; i < len + 1; ++i) {
                         if (v_len - i >= 0 && i <= v_end) {
-                            events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_index(V_DEL, v_gene - 1, v_len - i);
+                            events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_index(V_DEL, v_gene - 1, 1 + v_len - v_start - i);
                         } else {
                             // TODO: remove this assignment because all initialised to zeros and check the speed
                             events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = 0;

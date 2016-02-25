@@ -473,9 +473,8 @@ namespace ymir {
                 // J deletions
                 j_start = clonotype.getJoiSeqStart(j_index);
                 j_end = clonotype.getJoiSeqEnd(j_index);
-                for (seq_len_t i = j_start; i < len + 1; ++i) {
-                    // TODO: cast to int because this is always more than zero
-                     probs(J_index_dels, j_index, i, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_len - len + i); // probability of deletions
+                for (seq_len_t i = j_start; i < j_end - j_start + 2; ++i) {
+                     probs(J_index_dels, j_index, i - 1, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, static_cast<int16_t>(1 + j_len) - static_cast<int16_t>(i)); // probability of deletions
                 }
 
 //                for (seq_len_t i = 0; i < len + 1; ++i) {
@@ -496,13 +495,8 @@ namespace ymir {
                         }
                     }
 
-                    for (seq_len_t i = 0; i < len + 1; ++i) {
-                        if (j_end - len + i >= 0 && len - i <= j_end - j_start + 1) {
-                            events(J_index_dels, j_index, i, 0) = _param_vec->event_index(J_DEL, j_gene - 1, j_len - len + i);
-                        } else {
-                            // TODO: remove this assignment because all initialised to zeros and check the speed
-                            events(J_index_dels, j_index, i, 0) = 0;
-                        }
+                    for (seq_len_t i = j_start; i < j_end - j_start + 2; ++i) {
+                        events(J_index_dels, j_index, i, 0) = _param_vec->event_index(J_DEL, j_gene - 1, static_cast<int16_t>(1 + j_len) - static_cast<int16_t>(i));
                     }
                 }
             }

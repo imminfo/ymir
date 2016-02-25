@@ -1639,7 +1639,7 @@ YMIR_TEST_START(test_swng_aligner)
     vector<string> avec1 {"V1", "V2", "V3", "V4"};
     vector<string> svec1 {"ACGTTGGGATC", "ACGT", "ACG", "TTT"};
 
-    vector<string> avec2 {"J1", "J2", "J3", "J4"};
+    vector<string> avec2 {"J1", "J2", "J3"};
     vector<string> svec2 {"TTT", "ACGTTGGGATC", "ACGT"};
 
     vector<string> avec3 {"D1", "D2", "D3"};
@@ -2981,9 +2981,11 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     alvec2.push_back("Jseg1");
     alvec2.push_back("Jseg2");
     alvec2.push_back("Jseg3");
+    alvec2.push_back("Jseg4");
     seqvec2.push_back("CCGTTT");
     seqvec2.push_back("CATT");
     seqvec2.push_back("AGGTTT");
+    seqvec2.push_back("AGGTTTGGG");
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
@@ -3009,7 +3011,8 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
             .addVarAlignment(4, 3, 1, 4)
             .addJoiAlignment(1, 2, 11, 3)
             .addJoiAlignment(2, 2, 10, 3)
-            .addJoiAlignment(3, 2, 11, 3);
+            .addJoiAlignment(3, 2, 11, 3)
+            .addJoiAlignment(4, 2, 11, 3);
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 

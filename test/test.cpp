@@ -2842,6 +2842,8 @@ YMIR_TEST_START(test_model_gene_usage)
     ProbabilisticAssemblingModel model_vdj(TEST_DATA_FOLDER + "test_vdj_model/");
     YMIR_ASSERT(model_vdj.status())
 
+    YMIR_ASSERT(false)
+
 YMIR_TEST_END
 
 
@@ -2854,90 +2856,97 @@ YMIR_TEST_START(test_model_vj_maag)
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
     YMIR_ASSERT(model.status())
 
-    // RepertoireParser parser;
+     NaiveNucParser parser;
 
-    // bool V_err, J_err;
-    // VDJRecombinationGenes vj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
-    //                                 "Jgene", TEST_DATA_FOLDER + "jgene.real.txt",
-    //                                 &V_err, &J_err);
-    // YMIR_ASSERT(V_err)
-    // YMIR_ASSERT(J_err)
+     bool V_err, J_err;
+     VDJRecombinationGenes vj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
+                                     "Jgene", TEST_DATA_FOLDER + "jgene.real.txt",
+                                     &V_err, &J_err);
+     YMIR_ASSERT(V_err)
+     YMIR_ASSERT(J_err)
 
-    // Cloneset cloneset;
-    // YMIR_ASSERT(parser.parse(TEST_DATA_FOLDER + "ymir.alpha2.txt", &cloneset, vj_genes, NUCLEOTIDE, VJ_RECOMB))
+     Cloneset cloneset;
+    YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "ymir.alpha2.txt",
+                                    &cloneset,
+                                    vj_genes,
+                                    NUCLEOTIDE,
+                                    VJ_RECOMB,
+                                    AlignmentColumnOptions()
+                                            .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                            .setJ(AlignmentColumnOptions::USE_PROVIDED)))
 
-    // MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, NUCLEOTIDE)[1];
+     MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, NUCLEOTIDE)[1];
 
-    // YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
-    // YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
-    // YMIR_ASSERT2(maag.event_index(0, 0, 1, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 0))
-    // YMIR_ASSERT2(maag.event_index(0, 0, 1, 2), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 2))
+     YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
+     YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
+     YMIR_ASSERT2(maag.event_index(0, 0, 1, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 0))
+     YMIR_ASSERT2(maag.event_index(0, 0, 1, 2), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 2))
 
-    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 0), mvec.event_index(VJ_VAR_DEL, 0, 4));
-    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 1), mvec.event_index(VJ_VAR_DEL, 0, 3));
-    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 2), mvec.event_index(VJ_VAR_DEL, 0, 2));
-    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 3), mvec.event_index(VJ_VAR_DEL, 0, 1));
-    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 4), mvec.event_index(VJ_VAR_DEL, 0, 0));
-    // YMIR_ASSERT2(maag.event_index(1, 0, 0, 5), 0)
+     YMIR_ASSERT2(maag.event_index(1, 0, 0, 0), mvec.event_index(VJ_VAR_DEL, 0, 4));
+     YMIR_ASSERT2(maag.event_index(1, 0, 0, 1), mvec.event_index(VJ_VAR_DEL, 0, 3));
+     YMIR_ASSERT2(maag.event_index(1, 0, 0, 2), mvec.event_index(VJ_VAR_DEL, 0, 2));
+     YMIR_ASSERT2(maag.event_index(1, 0, 0, 3), mvec.event_index(VJ_VAR_DEL, 0, 1));
+     YMIR_ASSERT2(maag.event_index(1, 0, 0, 4), mvec.event_index(VJ_VAR_DEL, 0, 0));
+     YMIR_ASSERT2(maag.event_index(1, 0, 0, 5), 0)
 
-    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 0), mvec.event_index(VJ_VAR_DEL, 2, 6))
-    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 1), mvec.event_index(VJ_VAR_DEL, 2, 5))
-    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 2), mvec.event_index(VJ_VAR_DEL, 2, 4))
-    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 3), mvec.event_index(VJ_VAR_DEL, 2, 3))
-    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec.event_index(VJ_VAR_DEL, 2, 2))
-    // YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec.event_index(VJ_VAR_DEL, 2, 1))
+     YMIR_ASSERT2(maag.event_index(1, 1, 0, 0), mvec.event_index(VJ_VAR_DEL, 2, 6))
+     YMIR_ASSERT2(maag.event_index(1, 1, 0, 1), mvec.event_index(VJ_VAR_DEL, 2, 5))
+     YMIR_ASSERT2(maag.event_index(1, 1, 0, 2), mvec.event_index(VJ_VAR_DEL, 2, 4))
+     YMIR_ASSERT2(maag.event_index(1, 1, 0, 3), mvec.event_index(VJ_VAR_DEL, 2, 3))
+     YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec.event_index(VJ_VAR_DEL, 2, 2))
+     YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec.event_index(VJ_VAR_DEL, 2, 1))
 
-    // YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
-    // YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), 0)
+     YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
+     YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), 0)
 
-    // YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
-    // YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), mvec.event_index(VJ_JOI_DEL, 0, 2))
-    // YMIR_ASSERT2(maag.event_index(3, 0, 2, 0), mvec.event_index(VJ_JOI_DEL, 0, 3))
-    // YMIR_ASSERT2(maag.event_index(3, 0, 3, 0), mvec.event_index(VJ_JOI_DEL, 0, 4))
-    // YMIR_ASSERT2(maag.event_index(3, 0, 4, 0), mvec.event_index(VJ_JOI_DEL, 0, 5))
-    // YMIR_ASSERT2(maag.event_index(3, 0, 5, 0), mvec.event_index(VJ_JOI_DEL, 0, 6))
+     YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
+     YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), mvec.event_index(VJ_JOI_DEL, 0, 2))
+     YMIR_ASSERT2(maag.event_index(3, 0, 2, 0), mvec.event_index(VJ_JOI_DEL, 0, 3))
+     YMIR_ASSERT2(maag.event_index(3, 0, 3, 0), mvec.event_index(VJ_JOI_DEL, 0, 4))
+     YMIR_ASSERT2(maag.event_index(3, 0, 4, 0), mvec.event_index(VJ_JOI_DEL, 0, 5))
+     YMIR_ASSERT2(maag.event_index(3, 0, 5, 0), mvec.event_index(VJ_JOI_DEL, 0, 6))
 
-    // YMIR_ASSERT2(maag.event_index(3, 2, 0, 0), mvec.event_index(VJ_JOI_DEL, 2, 1))
-    // YMIR_ASSERT2(maag.event_index(3, 2, 1, 0), mvec.event_index(VJ_JOI_DEL, 2, 2))
-    // YMIR_ASSERT2(maag.event_index(3, 2, 2, 0), mvec.event_index(VJ_JOI_DEL, 2, 3))
-    // YMIR_ASSERT2(maag.event_index(3, 2, 3, 0), mvec.event_index(VJ_JOI_DEL, 2, 4))
-    // YMIR_ASSERT2(maag.event_index(3, 2, 4, 0), mvec.event_index(VJ_JOI_DEL, 2, 5))
-    // YMIR_ASSERT2(maag.event_index(3, 2, 5, 0), mvec.event_index(VJ_JOI_DEL, 2, 6))
+     YMIR_ASSERT2(maag.event_index(3, 2, 0, 0), mvec.event_index(VJ_JOI_DEL, 2, 1))
+     YMIR_ASSERT2(maag.event_index(3, 2, 1, 0), mvec.event_index(VJ_JOI_DEL, 2, 2))
+     YMIR_ASSERT2(maag.event_index(3, 2, 2, 0), mvec.event_index(VJ_JOI_DEL, 2, 3))
+     YMIR_ASSERT2(maag.event_index(3, 2, 3, 0), mvec.event_index(VJ_JOI_DEL, 2, 4))
+     YMIR_ASSERT2(maag.event_index(3, 2, 4, 0), mvec.event_index(VJ_JOI_DEL, 2, 5))
+     YMIR_ASSERT2(maag.event_index(3, 2, 5, 0), mvec.event_index(VJ_JOI_DEL, 2, 6))
 
-    // YMIR_ASSERT2(maag.event_probability(0, 0, 0, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 0))
-    // YMIR_ASSERT2(maag.event_probability(0, 0, 0, 1), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 1))
-    // YMIR_ASSERT2(maag.event_probability(0, 0, 1, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 0))
-    // YMIR_ASSERT2(maag.event_probability(0, 0, 1, 2), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 2))
+     YMIR_ASSERT2(maag.event_probability(0, 0, 0, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 0))
+     YMIR_ASSERT2(maag.event_probability(0, 0, 0, 1), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 0, 1))
+     YMIR_ASSERT2(maag.event_probability(0, 0, 1, 0), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 0))
+     YMIR_ASSERT2(maag.event_probability(0, 0, 1, 2), mvec.event_prob(VJ_VAR_JOI_GEN, 0, 2, 2))
 
-    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 0), mvec.event_prob(VJ_VAR_DEL, 0, 4));
-    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 1), mvec.event_prob(VJ_VAR_DEL, 0, 3));
-    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 2), mvec.event_prob(VJ_VAR_DEL, 0, 2));
-    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 3), mvec.event_prob(VJ_VAR_DEL, 0, 1));
-    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 4), mvec.event_prob(VJ_VAR_DEL, 0, 0));
-    // YMIR_ASSERT2(maag.event_probability(1, 0, 0, 5), 0)
+     YMIR_ASSERT2(maag.event_probability(1, 0, 0, 0), mvec.event_prob(VJ_VAR_DEL, 0, 4));
+     YMIR_ASSERT2(maag.event_probability(1, 0, 0, 1), mvec.event_prob(VJ_VAR_DEL, 0, 3));
+     YMIR_ASSERT2(maag.event_probability(1, 0, 0, 2), mvec.event_prob(VJ_VAR_DEL, 0, 2));
+     YMIR_ASSERT2(maag.event_probability(1, 0, 0, 3), mvec.event_prob(VJ_VAR_DEL, 0, 1));
+     YMIR_ASSERT2(maag.event_probability(1, 0, 0, 4), mvec.event_prob(VJ_VAR_DEL, 0, 0));
+     YMIR_ASSERT2(maag.event_probability(1, 0, 0, 5), 0)
 
-    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 0), mvec.event_prob(VJ_VAR_DEL, 2, 6))
-    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 1), mvec.event_prob(VJ_VAR_DEL, 2, 5))
-    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 2), mvec.event_prob(VJ_VAR_DEL, 2, 4))
-    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 3), mvec.event_prob(VJ_VAR_DEL, 2, 3))
-    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 4), mvec.event_prob(VJ_VAR_DEL, 2, 2))
-    // YMIR_ASSERT2(maag.event_probability(1, 1, 0, 5), mvec.event_prob(VJ_VAR_DEL, 2, 1))
+     YMIR_ASSERT2(maag.event_probability(1, 1, 0, 0), mvec.event_prob(VJ_VAR_DEL, 2, 6))
+     YMIR_ASSERT2(maag.event_probability(1, 1, 0, 1), mvec.event_prob(VJ_VAR_DEL, 2, 5))
+     YMIR_ASSERT2(maag.event_probability(1, 1, 0, 2), mvec.event_prob(VJ_VAR_DEL, 2, 4))
+     YMIR_ASSERT2(maag.event_probability(1, 1, 0, 3), mvec.event_prob(VJ_VAR_DEL, 2, 3))
+     YMIR_ASSERT2(maag.event_probability(1, 1, 0, 4), mvec.event_prob(VJ_VAR_DEL, 2, 2))
+     YMIR_ASSERT2(maag.event_probability(1, 1, 0, 5), mvec.event_prob(VJ_VAR_DEL, 2, 1))
 
-    // YMIR_ASSERT2(maag.event_probability(2, 0, 0, 1), 0)
+     YMIR_ASSERT2(maag.event_probability(2, 0, 0, 1), 0)
 
-    // YMIR_ASSERT2(maag.event_probability(3, 0, 0, 0), 0)
-    // YMIR_ASSERT2(maag.event_probability(3, 0, 1, 0), mvec.event_prob(VJ_JOI_DEL, 0, 2))
-    // YMIR_ASSERT2(maag.event_probability(3, 0, 2, 0), mvec.event_prob(VJ_JOI_DEL, 0, 3))
-    // YMIR_ASSERT2(maag.event_probability(3, 0, 3, 0), mvec.event_prob(VJ_JOI_DEL, 0, 4))
-    // YMIR_ASSERT2(maag.event_probability(3, 0, 4, 0), mvec.event_prob(VJ_JOI_DEL, 0, 5))
-    // YMIR_ASSERT2(maag.event_probability(3, 0, 5, 0), mvec.event_prob(VJ_JOI_DEL, 0, 6))
+     YMIR_ASSERT2(maag.event_probability(3, 0, 0, 0), 0)
+     YMIR_ASSERT2(maag.event_probability(3, 0, 1, 0), mvec.event_prob(VJ_JOI_DEL, 0, 2))
+     YMIR_ASSERT2(maag.event_probability(3, 0, 2, 0), mvec.event_prob(VJ_JOI_DEL, 0, 3))
+     YMIR_ASSERT2(maag.event_probability(3, 0, 3, 0), mvec.event_prob(VJ_JOI_DEL, 0, 4))
+     YMIR_ASSERT2(maag.event_probability(3, 0, 4, 0), mvec.event_prob(VJ_JOI_DEL, 0, 5))
+     YMIR_ASSERT2(maag.event_probability(3, 0, 5, 0), mvec.event_prob(VJ_JOI_DEL, 0, 6))
 
-    // YMIR_ASSERT2(maag.event_probability(3, 2, 0, 0), mvec.event_prob(VJ_JOI_DEL, 2, 1))
-    // YMIR_ASSERT2(maag.event_probability(3, 2, 1, 0), mvec.event_prob(VJ_JOI_DEL, 2, 2))
-    // YMIR_ASSERT2(maag.event_probability(3, 2, 2, 0), mvec.event_prob(VJ_JOI_DEL, 2, 3))
-    // YMIR_ASSERT2(maag.event_probability(3, 2, 3, 0), mvec.event_prob(VJ_JOI_DEL, 2, 4))
-    // YMIR_ASSERT2(maag.event_probability(3, 2, 4, 0), mvec.event_prob(VJ_JOI_DEL, 2, 5))
-    // YMIR_ASSERT2(maag.event_probability(3, 2, 5, 0), mvec.event_prob(VJ_JOI_DEL, 2, 6))
+     YMIR_ASSERT2(maag.event_probability(3, 2, 0, 0), mvec.event_prob(VJ_JOI_DEL, 2, 1))
+     YMIR_ASSERT2(maag.event_probability(3, 2, 1, 0), mvec.event_prob(VJ_JOI_DEL, 2, 2))
+     YMIR_ASSERT2(maag.event_probability(3, 2, 2, 0), mvec.event_prob(VJ_JOI_DEL, 2, 3))
+     YMIR_ASSERT2(maag.event_probability(3, 2, 3, 0), mvec.event_prob(VJ_JOI_DEL, 2, 4))
+     YMIR_ASSERT2(maag.event_probability(3, 2, 4, 0), mvec.event_prob(VJ_JOI_DEL, 2, 5))
+     YMIR_ASSERT2(maag.event_probability(3, 2, 5, 0), mvec.event_prob(VJ_JOI_DEL, 2, 6))
 
 YMIR_TEST_END
 

@@ -384,8 +384,8 @@ namespace ymir {
                 v_start = clonotype.getVarGeneStart(v_index);
                 v_end = clonotype.getVarGeneEnd(v_index);
 
-                for (seq_len_t i = 0; i < v_end - v_start + 1; ++i) {
-                    probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, static_cast<int16_t>(1 + v_len) - static_cast<int16_t>(v_start + i)); // probability of deletions
+                for (seq_len_t i = 0; i < v_end - v_start + 2; ++i) {
+                    probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, (1 + v_len) - (v_start + i)); // probability of deletions
                 }
 
                 if (metadata_mode) {
@@ -399,8 +399,8 @@ namespace ymir {
                         events(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_index(VDJ_VAR_GEN, 0, v_gene - 1);
                     }
 
-                    for (seq_len_t i = 0; i < v_end - v_start + 1; ++i) {
-                        events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_index(V_DEL, v_gene - 1, static_cast<int16_t>(1 + v_len) - static_cast<int16_t>(v_start + i));
+                    for (seq_len_t i = 0; i < v_end - v_start + 2; ++i) {
+                        events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_index(V_DEL, v_gene - 1, (1 + v_len) - (v_start + i));
                     }
                 }
             }
@@ -432,13 +432,11 @@ namespace ymir {
 
             // find max J alignment
             seg_index_t j_num = clonotype.nJoi();
-            seq_len_t len = 0;
+            seq_len_t len = 0, j_global_start_pos = (seq_len_t) -1;
             for (int j_index = 0; j_index < j_num; ++j_index) {
                 len = std::max(len, clonotype.getJoiLen(j_index));
+                j_global_start_pos = std::min(j_global_start_pos, clonotype.getJoiGeneStart(j_index));
             }
-//            len = clonotype.sequence().size() - len + 1;
-//            cout << "len = " << len << endl;
-
 
             // add J deletions nodes
             probs.initNode(J_index_dels, j_num, len + 1, 1);
@@ -471,21 +469,11 @@ namespace ymir {
                 }
 
                 // J deletions
-                j_start = clonotype.getJoiSeqStart(j_index);
-                j_end = clonotype.getJoiSeqEnd(j_index);
-                for (seq_len_t i = j_start; i < j_end - j_start + 2; ++i) {
-                     probs(J_index_dels, j_index, i - 1, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, static_cast<int16_t>(1 + j_len) - static_cast<int16_t>(i)); // probability of deletions
+                j_start = clonotype.getJoiGeneStart(j_index);
+                j_end = clonotype.getJoiGeneEnd(j_index);
+                for (seq_len_t i = j_start - j_global_start_pos; i < len + 1; ++i) {
+                     probs(J_index_dels, j_index, i, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, i + j_global_start_pos - 1); // probability of deletions
                 }
-
-//                for (seq_len_t i = 0; i < len + 1; ++i) {
-//                    // TODO: cast to int because this is always more than zero
-//                    if (j_end - len + i >= 0 && len - i <= j_end - j_start + 1) {
-//                        probs(J_index_dels, j_index, i, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_len - len + i); // probability of deletions
-//                    } else {
-//                        // TODO: remove this assignment because all initialised to zeros and check the speed
-//                        probs(J_index_dels, j_index, i, 0) = 0; // if exceeds length of J gene segment
-//                    }
-//                }
 
                 if (metadata_mode) {
                     if (clonotype.recombination() == VDJ_RECOMB) {
@@ -495,8 +483,8 @@ namespace ymir {
                         }
                     }
 
-                    for (seq_len_t i = j_start; i < j_end - j_start + 2; ++i) {
-                        events(J_index_dels, j_index, i, 0) = _param_vec->event_index(J_DEL, j_gene - 1, static_cast<int16_t>(1 + j_len) - static_cast<int16_t>(i));
+                    for (seq_len_t i = j_start - j_global_start_pos; i < len + 1; ++i) {
+                        events(J_index_dels, j_index, i, 0) = _param_vec->event_index(J_DEL, j_gene - 1, i + j_global_start_pos - 1);
                     }
                 }
             }

@@ -432,10 +432,10 @@ namespace ymir {
 
             // find max J alignment
             seg_index_t j_num = clonotype.nJoi();
-            seq_len_t len = 0, j_global_start_pos = (seq_len_t) -1;
+            seq_len_t len = 0, seq_global_start_pos = (seq_len_t) -1;
             for (int j_index = 0; j_index < j_num; ++j_index) {
                 len = std::max(len, clonotype.getJoiLen(j_index));
-                j_global_start_pos = std::min(j_global_start_pos, clonotype.getJoiGeneStart(j_index));
+                seq_global_start_pos = std::min(seq_global_start_pos, clonotype.getJoiSeqStart(j_index));
             }
 
             // add J deletions nodes
@@ -471,8 +471,10 @@ namespace ymir {
                 // J deletions
                 j_start = clonotype.getJoiGeneStart(j_index);
                 j_end = clonotype.getJoiGeneEnd(j_index);
-                for (seq_len_t i = j_start - j_global_start_pos; i < len + 1; ++i) {
-                     probs(J_index_dels, j_index, i, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, i + j_global_start_pos - 1); // probability of deletions
+                seq_len_t shift = clonotype.getJoiSeqStart(j_index) - seq_global_start_pos;
+
+                for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index); ++i) {
+                     probs(J_index_dels, j_index, i + shift, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_start + i - 1); // probability of deletions
                 }
 
                 if (metadata_mode) {
@@ -483,8 +485,8 @@ namespace ymir {
                         }
                     }
 
-                    for (seq_len_t i = j_start - j_global_start_pos; i < len + 1; ++i) {
-                        events(J_index_dels, j_index, i, 0) = _param_vec->event_index(J_DEL, j_gene - 1, i + j_global_start_pos - 1);
+                    for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index); ++i) {
+                        events(J_index_dels, j_index, i + shift, 0) = _param_vec->event_index(J_DEL, j_gene - 1, j_start + i - 1);
                     }
                 }
             }

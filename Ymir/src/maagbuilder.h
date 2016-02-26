@@ -473,7 +473,7 @@ namespace ymir {
                 j_end = clonotype.getJoiGeneEnd(j_index);
                 seq_len_t shift = clonotype.getJoiSeqStart(j_index) - seq_global_start_pos;
 
-                for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index); ++i) {
+                for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index) + 1; ++i) {
                      probs(J_index_dels, j_index, i + shift, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_start + i - 1); // probability of deletions
                 }
 
@@ -485,7 +485,7 @@ namespace ymir {
                         }
                     }
 
-                    for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index); ++i) {
+                    for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index) + 1; ++i) {
                         events(J_index_dels, j_index, i + shift, 0) = _param_vec->event_index(J_DEL, j_gene - 1, j_start + i - 1);
                     }
                 }

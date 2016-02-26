@@ -2406,6 +2406,9 @@ YMIR_TEST_START(test_maag_vdj)
     ClonotypeBuilder cl_builder;
     /*
      D1:
+            CCGTTT
+             |||||
+            AGGTTT
        CCCGACGGTTT
              .GTTT
              .GTT.T
@@ -2425,7 +2428,7 @@ YMIR_TEST_START(test_maag_vdj)
             .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 5)
-            .addJoiAlignment(1, 2, 8, 4)
+            .addJoiAlignment(1, 3, 8, 4)
             .addJoiAlignment(2, 2, 9, 3)
             .addJoiAlignment(3, 2, 7, 5)
             .addDivAlignment(2, 2, 2, 3)
@@ -2575,7 +2578,7 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
             .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 5)
-            .addJoiAlignment(1, 2, 8, 4)
+            .addJoiAlignment(1, 3, 8, 4)
             .addJoiAlignment(2, 2, 9, 3)
             .addJoiAlignment(3, 2, 7, 5);
     cl_builder.setRecombination(VJ_RECOMB);
@@ -2703,7 +2706,7 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
             .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 5)
-            .addJoiAlignment(1, 2, 8, 4)
+            .addJoiAlignment(1, 3, 8, 4)
             .addJoiAlignment(2, 2, 9, 3)
             .addJoiAlignment(3, 2, 7, 5)
             .addDivAlignment(2, 2, 2, 3)
@@ -2988,22 +2991,22 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     alvec1.push_back("Vseg1");
     alvec1.push_back("Vseg2");
     alvec1.push_back("Vseg3");
-    alvec1.push_back("Vseg4");
+//    alvec1.push_back("Vseg4");
     seqvec1.push_back("CCCA");
     seqvec1.push_back("GGG");
     seqvec1.push_back("CCCAGG");
-    seqvec1.push_back("TTCCCAGG");
+//    seqvec1.push_back("TTCCCAGG");
 
     vector<string> alvec2;
     vector<string> seqvec2;
     alvec2.push_back("Jseg1");
     alvec2.push_back("Jseg2");
     alvec2.push_back("Jseg3");
-    alvec2.push_back("Jseg4");
+//    alvec2.push_back("Jseg4");
     seqvec2.push_back("CCGTTT");
     seqvec2.push_back("CATT");
     seqvec2.push_back("AGGTTT");
-    seqvec2.push_back("AGGTTTGGG");
+//    seqvec2.push_back("AGGTTTGGG");
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
@@ -3026,10 +3029,10 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
             .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 4)
-            .addVarAlignment(4, 3, 1, 4)
-            .addJoiAlignment(1, 2, 11, 3)
+//            .addVarAlignment(4, 3, 1, 4)
+            .addJoiAlignment(1, 2, 11, 2)
             .addJoiAlignment(2, 2, 10, 3)
-            .addJoiAlignment(3, 2, 11, 3);
+            .addJoiAlignment(3, 2, 11, 2);
 //            .addJoiAlignment(4, 2, 11, 3);
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();

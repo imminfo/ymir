@@ -68,6 +68,10 @@ namespace ymir {
 
     typedef unique_ptr<NumErrorsMMC> pNumErrorsMMC;
 
+    typedef MultiMatrixChain<bool> ErrMMC;
+
+    typedef unique_ptr<ErrMMC> pErrMMC;
+
 
     /**
     * \class MultiMatrixChain

@@ -84,28 +84,48 @@ namespace ymir {
          * \return Newly constructed MAAG.
          */
         ///@{
-        MAAG build(const Clonotype &clonotype, MetadataMode metadata_mode = NO_METADATA, ErrorMode error_mode = NO_ERRORS, SequenceType seq_type = NUCLEOTIDE) const {
+        MAAG build(const Clonotype &clonotype,
+                   MetadataMode metadata_mode = NO_METADATA,
+                   ErrorMode error_mode = NO_ERRORS,
+                   SequenceType seq_type = NUCLEOTIDE) const {
             ProbMMC probs;
             EventIndMMC events;
+            ErrMMC errors;
             vector<seq_len_t> seq_poses;
             seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
 
-            if (clonotype.recombination() == VJ_RECOMB) {
-                probs.resize(VJ_CHAIN_SIZE);
-                if (metadata_mode) { events.resize(VJ_CHAIN_SIZE); }
-            } else if (clonotype.recombination() == VDJ_RECOMB) {
-                probs.resize(VDJ_CHAIN_SIZE);
-                if (metadata_mode) { events.resize(VDJ_CHAIN_SIZE); }
+            auto resize_size = 0;
+            switch (clonotype.recombination()) {
+                case VJ_RECOMB:
+                    resize_size = VJ_CHAIN_SIZE;
+                    break;
+
+                case VDJ_RECOMB:
+                    resize_size = VDJ_CHAIN_SIZE;
+                    break;
+
+                default:
+#ifndef DNDEBUG
+                    check_and_throw(false, "MAAGBuilder: unknown recombination type.");
+#endif
             }
 
-            this->buildVariable(clonotype, probs, events, seq_poses, metadata_mode);
-            this->buildJoining(clonotype, probs, events, seq_poses, metadata_mode);
+            probs.resize(resize_size);
+            if (metadata_mode) {
+                events.resize(resize_size);
+            }
+            if (error_mode) {
+                errors.resize(resize_size);
+            }
+
+            this->buildVariable(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+            this->buildJoining(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
             if (clonotype.recombination() == VJ_RECOMB) {
-                this->buildVJinsertions(clonotype, probs, events, seq_poses, metadata_mode);
+                this->buildVJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
             } else if (clonotype.recombination() == VDJ_RECOMB) {
-                this->buildDiversity(clonotype, probs, events, seq_poses, metadata_mode);
-                this->buildVDinsertions(clonotype, probs, events, seq_poses, metadata_mode);
-                this->buildDJinsertions(clonotype, probs, events, seq_poses, metadata_mode);
+                this->buildDiversity(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+                this->buildVDinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                this->buildDJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
             }
 
             probs.finish();
@@ -231,6 +251,7 @@ namespace ymir {
                                               _param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0),
                                               _param_vec->max_VJ_ins_len(),
                                               false,
+                                              maag->has_errors(),
                                               0,
                                               v_vertices - 1,
                                               v_vertices,
@@ -252,6 +273,7 @@ namespace ymir {
                                               _param_vec->event_index(VDJ_VAR_DIV_INS_LEN, 0, 0),
                                               _param_vec->max_VD_ins_len(),
                                               false,
+                                              maag->has_errors(),
                                               0,
                                               v_vertices - 1,
                                               v_vertices,
@@ -275,6 +297,7 @@ namespace ymir {
                                               _param_vec->event_index(VDJ_DIV_JOI_INS_LEN, 0, 0),
                                               _param_vec->max_DJ_ins_len(),
                                               false,
+                                              maag->has_errors(),
                                               v_vertices + d3_vertices,
                                               v_vertices + d3_vertices + d5_vertices - 1,
                                               v_vertices + d3_vertices + d5_vertices,
@@ -334,8 +357,10 @@ namespace ymir {
         void buildVariable(const Clonotype &clonotype,
                            ProbMMC &probs,
                            EventIndMMC &events,
+                           ErrMMC &errors,
                            vector<seq_len_t> &seq_poses,
-                           bool metadata_mode) const
+                           bool metadata_mode,
+                           bool error_mode) const
         {
             // find max V alignment
             seq_len_t len = 0;
@@ -421,8 +446,10 @@ namespace ymir {
         void buildJoining(const Clonotype &clonotype,
                           ProbMMC &probs,
                           EventIndMMC &events,
+                          ErrMMC &errors,
                           vector<seq_len_t> &seq_poses,
-                          bool metadata_mode) const
+                          bool metadata_mode,
+                          bool error_mode) const
         {
             int J_index_dels = JOINING_DELETIONS_VJ_MATRIX_INDEX,
                     J_index_genes = JOINING_GENES_VDJ_MATRIX_INDEX;
@@ -509,8 +536,10 @@ namespace ymir {
         void buildDiversity(const Clonotype &clonotype,
                             ProbMMC &probs,
                             EventIndMMC &events,
+                            ErrMMC &errors,
                             vector<seq_len_t> &seq_poses,
-                            bool metadata_mode) const
+                            bool metadata_mode,
+                            bool error_mode) const
         {
             Alignment d_alignment;
 
@@ -633,7 +662,8 @@ namespace ymir {
                                ProbMMC &probs,
                                EventIndMMC &events,
                                const vector<seq_len_t> &seq_poses,
-                               bool metadata_mode) const
+                               bool metadata_mode,
+                               bool error_mode) const
         {
             InsertionModel mc(MONO_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
 
@@ -654,6 +684,7 @@ namespace ymir {
                                   _param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0),
                                   _param_vec->max_VJ_ins_len(),
                                   metadata_mode,
+                                  error_mode,
                                   0,
                                   v_vertices - 1,
                                   v_vertices,
@@ -676,7 +707,8 @@ namespace ymir {
                                ProbMMC &probs,
                                EventIndMMC &events,
                                const vector<seq_len_t> &seq_poses,
-                               bool metadata_mode) const
+                               bool metadata_mode,
+                               bool error_mode) const
         {
             InsertionModel mc(DI_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
 
@@ -697,6 +729,7 @@ namespace ymir {
                                   _param_vec->event_index(VDJ_VAR_DIV_INS_LEN, 0, 0),
                                   _param_vec->max_VD_ins_len(),
                                   metadata_mode,
+                                  error_mode,
                                   0,
                                   v_vertices - 1,
                                   v_vertices,
@@ -719,7 +752,8 @@ namespace ymir {
                                ProbMMC &probs,
                                EventIndMMC &events,
                                const vector<seq_len_t> &seq_poses,
-                               bool metadata_mode) const
+                               bool metadata_mode,
+                               bool error_mode) const
         {
             InsertionModel mc(DI_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
 
@@ -742,6 +776,7 @@ namespace ymir {
                                   _param_vec->event_index(VDJ_DIV_JOI_INS_LEN, 0, 0),
                                   _param_vec->max_DJ_ins_len(),
                                   metadata_mode,
+                                  error_mode,
                                   v_vertices + d3_vertices,
                                   v_vertices + d3_vertices + d5_vertices - 1,
                                   v_vertices + d3_vertices + d5_vertices,
@@ -776,6 +811,7 @@ namespace ymir {
                              event_ind_t null_insertion,
                              seq_len_t max_size,
                              bool metadata_mode,
+                             bool error_mode,
                              seq_len_t left_vertices_start,
                              seq_len_t left_vertices_end,
                              seq_len_t right_vertices_start,

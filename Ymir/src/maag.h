@@ -369,7 +369,8 @@ namespace ymir {
         bool has_events() const { return (bool) _events; }
 
 
-//        bool has_errors() const { return _err_alignments; }
+        // TODO: make ok has_errors() function
+        bool has_errors() const { return false; }
 
 
 //        const AlignmentsWithErrors& dgea() const {
@@ -401,7 +402,7 @@ namespace ymir {
         unique_ptr<seq_len_t[]> _seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
         seq_len_t _n_poses;
 
-        unique_ptr<std::string> _sequence;  /** Nucleotide or amino acid CDR3 sequence. */
+        unique_ptr<sequence_t> _sequence;  /** Nucleotide or amino acid CDR3 sequence. */
         SequenceType _seq_type;
 
 //        NumErrorsMMC *_errors;  /** Matrix of number of errors for each scenario event position. */

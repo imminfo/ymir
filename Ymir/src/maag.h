@@ -411,6 +411,7 @@ namespace ymir {
 //        MAAGMetadataPtr _metadata;
 
     };
+
 }
 
 

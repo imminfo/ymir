@@ -871,6 +871,8 @@ namespace ymir {
         // function for finding max V alignment
         // function for finding max J alignment
         // function for shrinking D alignment matrices, find non-zero positions, etc.
+        // make_seq_start_vec
+        // make_seq_end_vec
         // build[Mono|Di]NucInsertions <InsertionModel, SequenceType, MetadataMode>
         // general functions for assigning values (event probs / event inds) to MMC of some type.
 

@@ -33,6 +33,7 @@ class RepertoireConverter:
         self.ymir_jstart = "J start"
         self.ymir_col_sep = "\t"
         self.ymir_gene_sep = ","
+        self.ymir_inter_sep = "|"
 
         self.ymir_columns = {self.ymir_nuc: -1, self.ymir_aa: -1,
                              self.ymir_vgene: -1, self.ymir_dgene: -1, self.ymir_jgene: -1,
@@ -122,16 +123,21 @@ class RepertoireConverter:
         out_words[3] = out_words[3].replace(self.input_gene_sep, self.ymir_gene_sep)
         out_words[4] = out_words[4].replace(self.input_gene_sep, self.ymir_gene_sep)
 
-        if self._base == 0:
-            out_words[5] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[5].split(self.input_gene_sep))))
-            out_words[6] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[6].split(self.input_gene_sep))))
-            out_words[7] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[7].split(self.input_gene_sep))))
-            out_words[8] = self.ymir_gene_sep.join(map(str, map(lambda x: int(x) + 1, out_words[8].split(self.input_gene_sep))))
+        out_words[5] = self.ymir_gene_sep.join(map(str, map(lambda x: self.ymir_inter_sep.join(map(str, [1, 1, int(x) + 1 - self._base])), out_words[5].split(self.input_gene_sep))))
+
+        out_words[6] = out_words[6].replace("-1", "")
+        if not out_words[6]:
+            out_words[6] = self.ymir_col_sep
         else:
-            out_words[5] = out_words[5].replace(self.input_gene_sep, self.ymir_gene_sep)
-            out_words[6] = out_words[6].replace(self.input_gene_sep, self.ymir_gene_sep)
-            out_words[7] = out_words[7].replace(self.input_gene_sep, self.ymir_gene_sep)
-            out_words[8] = out_words[8].replace(self.input_gene_sep, self.ymir_gene_sep)
+            out_words[6] = self.ymir_gene_sep.join(map(str, map(lambda x: self.ymir_inter_sep.join(map(str, [1, 1, int(x) + 1 - self._base])), out_words[6].split(self.input_gene_sep))))
+
+        out_words[7] = out_words[7].replace("-1", "")
+        if not out_words[7]:
+            out_words[7] = self.ymir_col_sep
+        else:
+            out_words[7] = self.ymir_gene_sep.join(map(str, map(lambda x: self.ymir_inter_sep.join(map(str, [1, 1, int(x) + 1 - self._base])), out_words[7].split(self.input_gene_sep))))
+
+        out_words[8] = self.ymir_gene_sep.join(map(str, map(lambda x: self.ymir_inter_sep.join(map(str, [0, int(x) + 1 - self._base, len(out_words[0]) - int(x)])), out_words[8].split(self.input_gene_sep))))
 
         return self.ymir_col_sep.join(out_words)
 

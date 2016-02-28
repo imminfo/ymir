@@ -69,6 +69,8 @@ namespace ymir {
                     "\tunaligned Variable segments:\t" << (size_t) no_V_algn << std::endl <<
                     "\tunaligned Diversity segments:\t" << (size_t) no_D_algn << std::endl <<
                     "\tunaligned Joining segments:\t" << (size_t) no_J_algn << std::endl <<
+                    "\tbad alignment length of Variable segments (repaired):\t" << (size_t) bad_V_len << std::endl <<
+                    "\tbad alignment length of Joining segments (repaired):\t" << (size_t) bad_J_len << std::endl <<
                     "Resulting cloneset size: " << (size_t) (count_all > 0 ? count_all - 1 : 0) << std::endl;
         }
 
@@ -81,7 +83,11 @@ namespace ymir {
         void update_no_algn();
 
 
-        size_t count_all, bad_V_seg, bad_D_seg, bad_J_seg, no_V_algn, no_D_algn, no_J_algn;
+        template <GeneSegments GENE>
+        void update_bad_len();
+
+
+        size_t count_all, bad_V_seg, bad_D_seg, bad_J_seg, no_V_algn, no_D_algn, no_J_algn, bad_V_len, bad_J_len;
 
     };
 
@@ -470,6 +476,19 @@ namespace ymir {
                 getline(temp_stream, temp_str, internal_sep);
                 alignment_len = std::atoi(temp_str.c_str());
 
+                if (alignment_len > gsa[segvec[0]].sequence.size()) {
+                    alignment_len = gsa[segvec[0]].sequence.size();
+                    if (gene == VARIABLE) {
+                        ++_stats.bad_V_len;
+                    } else if (gene == JOINING) {
+                        ++_stats.bad_J_len;
+                    }
+                }
+
+                if (gene_start == 0) {
+                    gene_start = gsa[segvec[seg_order]].sequence.size() - alignment_len + 1;
+                }
+
                 _aligner.addAlignment(gene, segvec[0], gene_start, seq_start, alignment_len);
             } else {
                 while (!symbol_stream.eof()) {
@@ -486,6 +505,16 @@ namespace ymir {
 
                     getline(temp_stream, temp_str, internal_sep);
                     alignment_len = std::atoi(temp_str.c_str());
+
+                    if (alignment_len >= gsa[segvec[seg_order]].sequence.size()) {
+                        alignment_len = gsa[segvec[seg_order]].sequence.size();
+                        if (gene == VARIABLE) {
+                            ++_stats.bad_V_len;
+                        } else if (gene == JOINING) {
+                            ++_stats.bad_J_len;
+                        }
+                    }
+
                     // "0" in gene_start means that there is no information from what letter
                     // the J gene segment was started, so Ymir by default will compute it
                     // assuming that J segment is aligned at the very end of the input sequence.

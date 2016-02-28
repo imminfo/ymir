@@ -33,7 +33,8 @@ int main(int argc, char* argv[]) {
     
     std::string BENCH_DATA_FOLDER = argv[1];
 
-    RepertoireParser parser;
+
+    NaiveNucParser parser;
 
 
     //
@@ -46,14 +47,16 @@ int main(int argc, char* argv[]) {
 
     tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vj;
-    parser.parse(BENCH_DATA_FOLDER + "alpha.500k.new.txt",
-                 &cloneset_vj,
-                 vj_single_genes,
-                 NUCLEOTIDE,
-                 VJ_RECOMB,
-                 RepertoireParser::AlignmentColumnOptions()
-                         .setV(RepertoireParser::USE_PROVIDED)
-                         .setJ(RepertoireParser::USE_PROVIDED));
+    parser.openAndParse(BENCH_DATA_FOLDER + "alpha.500k.txt",
+                        &cloneset_vj,
+                        vj_single_genes,
+                        NUCLEOTIDE,
+                        VJ_RECOMB,
+                        AlignmentColumnOptions()
+                                .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                .setJ(AlignmentColumnOptions::USE_PROVIDED),
+                        VDJAlignerParameters(1, 2));
+
     tp2 = std::chrono::system_clock::now();
     vj_single_parse = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -69,15 +72,17 @@ int main(int argc, char* argv[]) {
 
     tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vdj;
-    parser.parse(BENCH_DATA_FOLDER + "beta.500k.new.txt",
-                 &cloneset_vdj,
-                 vdj_single_genes,
-                 NUCLEOTIDE,
-                 VDJ_RECOMB,
-                 RepertoireParser::AlignmentColumnOptions()
-                         .setV(RepertoireParser::USE_PROVIDED)
-                         .setJ(RepertoireParser::USE_PROVIDED)
-                         .setD(RepertoireParser::OVERWRITE));
+    parser.openAndParse(BENCH_DATA_FOLDER + "beta.500k.txt",
+                        &cloneset_vdj,
+                        vdj_single_genes,
+                        NUCLEOTIDE,
+                        VDJ_RECOMB,
+                        AlignmentColumnOptions()
+                                .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                .setJ(AlignmentColumnOptions::USE_PROVIDED)
+                                .setD(AlignmentColumnOptions::OVERWRITE),
+                        VDJAlignerParameters(1, 3));
+
     tp2 = std::chrono::system_clock::now();
     vdj_single_parse = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -103,7 +108,6 @@ int main(int argc, char* argv[]) {
     ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
 
     tp1 = std::chrono::system_clock::now();
-//    MAAGRepertoire(vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA));
     vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA);
     tp2 = std::chrono::system_clock::now();
     vdj_single_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);

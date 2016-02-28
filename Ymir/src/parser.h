@@ -404,8 +404,6 @@ namespace ymir {
                         cout << "Parsed " << (size_t) _stats.count_all << " lines" << endl;
                     }
 
-
-
                     //
                     // TODO: remove bad clonotypes here ???
                     //

@@ -35,7 +35,7 @@
 
 namespace ymir {
 
-    template <typename _Scalar>
+    template <typename _Scalar, typename _Reference>
     class MultiMatrixChain;
 
 
@@ -44,7 +44,7 @@ namespace ymir {
     *
     * \brief Class for storing chain of matrices of indices of scenario events.
     */
-    typedef MultiMatrixChain<event_ind_t> EventIndMMC;
+    typedef MultiMatrixChain<event_ind_t, event_ind_t&> EventIndMMC;
 
     typedef unique_ptr<EventIndMMC> pEventIndMMC;
 
@@ -54,7 +54,7 @@ namespace ymir {
     *
     * \brief Class for storing chain of matrices of scenario event probabilities.
     */
-    typedef MultiMatrixChain<prob_t> ProbMMC;
+    typedef MultiMatrixChain<prob_t, prob_t&> ProbMMC;
 
     typedef unique_ptr<ProbMMC> pProbMMC;
 
@@ -64,11 +64,11 @@ namespace ymir {
      *
      * \brief Class for storing a number of errors for each scenario event.
      */
-    typedef MultiMatrixChain<seq_len_t> NumErrorsMMC;
+//    typedef MultiMatrixChain<seq_len_t> NumErrorsMMC;
+//
+//    typedef unique_ptr<NumErrorsMMC> pNumErrorsMMC;
 
-    typedef unique_ptr<NumErrorsMMC> pNumErrorsMMC;
-
-    typedef MultiMatrixChain<bool> ErrMMC;
+    typedef MultiMatrixChain<bool, std::vector<bool>::reference> ErrMMC;
 
     typedef unique_ptr<ErrMMC> pErrMMC;
 
@@ -79,7 +79,7 @@ namespace ymir {
     * \brief Class for storing lists of matrices, where one node in the list (called "chain") could
     * contain more than one matrix.
     */
-    template <typename _Scalar>
+    template <typename _Scalar, typename _Reference>
     class MultiMatrixChain {
 
         friend class MAAGForwardBackwardAlgorithm;  // ):
@@ -248,14 +248,15 @@ namespace ymir {
         * \return Element at position (i,j) from matrix mat_i from node node_i.
         */
         ///@{
-        _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) {
+        _Reference operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) {
 #ifndef DNDEBUG
             if (node_i >= _chain.size()) { throw(std::runtime_error("Number of the Node is out of bounds."));}
 #endif
             return _values[_chain[node_i](mat_i, row, col)];
         }
 
-        const _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
+//        const _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
+        _Scalar operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
 #ifndef DNDEBUG
             if (node_i >= _chain.size()) { throw(std::runtime_error("Number of the Node is out of bounds."));}
 #endif
@@ -287,7 +288,7 @@ namespace ymir {
         }
 
 
-        void swap(MultiMatrixChain<_Scalar> &other) {
+        void swap(MultiMatrixChain<_Scalar, _Reference> &other) {
             _chain.swap(other._chain);
             _values.swap(other._values);
         }

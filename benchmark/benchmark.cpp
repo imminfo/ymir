@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 
     tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vj;
-    parser.openAndParse(BENCH_DATA_FOLDER + "alpha.500k.txt",
+    parser.openAndParse(BENCH_DATA_FOLDER + "alpha.250k.txt",
                         &cloneset_vj,
                         vj_single_genes,
                         NUCLEOTIDE,
@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
 
     tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vdj;
-    parser.openAndParse(BENCH_DATA_FOLDER + "beta.500k.txt",
+    parser.openAndParse(BENCH_DATA_FOLDER + "beta.250k.txt",
                         &cloneset_vdj,
                         vdj_single_genes,
                         NUCLEOTIDE,

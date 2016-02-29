@@ -94,14 +94,16 @@ namespace ymir {
             vector<seq_len_t> seq_poses;
             seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
 
-            auto resize_size = 0;
+            auto resize_size = 0, e_resize_size = 0;
             switch (clonotype.recombination()) {
                 case VJ_RECOMB:
                     resize_size = VJ_CHAIN_SIZE;
+                    e_resize_size = 2;
                     break;
 
                 case VDJ_RECOMB:
                     resize_size = VDJ_CHAIN_SIZE;
+                    e_resize_size = 3;
                     break;
 
                 default:
@@ -115,7 +117,7 @@ namespace ymir {
                 events.resize(resize_size);
             }
             if (error_mode) {
-                errors.resize(resize_size);
+                errors.resize(e_resize_size);
             }
 
             this->buildVariable(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
@@ -130,8 +132,9 @@ namespace ymir {
 
             probs.finish();
             events.finish();
+            errors.finish();
 
-            if (metadata_mode) {
+            if (error_mode && metadata_mode) {
 
                 // TODO: deal with D deletions and insertions null matrices
                 // - if the D deletions matrix contains only zeros, then remove this matrix
@@ -144,7 +147,11 @@ namespace ymir {
 
                 unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
                 copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
-                return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size(), seq_type);
+                return MAAG(probs, events, errors, clonotype.sequence(), seq_poses_arr, seq_poses.size(), seq_type);
+            } else if (metadata_mode) {
+
+            } else if (error_mode) {
+
             } else {
                 return MAAG(probs);
             }
@@ -376,6 +383,9 @@ namespace ymir {
             if (metadata_mode) {
                 events.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             }
+            if (error_mode) {
+                errors.initNode(0, v_num, 1, len + 1);
+            }
 
             if (clonotype.recombination() == VJ_RECOMB) {
                 probs.initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
@@ -426,6 +436,12 @@ namespace ymir {
 
                     for (seq_len_t i = 0; i < v_end - v_start + 2; ++i) {
                         events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_index(V_DEL, v_gene - 1, (1 + v_len) - (v_start + i));
+                    }
+                }
+
+                if (error_mode) {
+                    for (seq_len_t i = 0; i <= v_end - v_start - 1; ++i) {
+                        errors(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = clonotype.isVarMismatch(v_index, i);
                     }
                 }
             }
@@ -515,6 +531,10 @@ namespace ymir {
                     for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index) + 1; ++i) {
                         events(J_index_dels, j_index, i + shift, 0) = _param_vec->event_index(J_DEL, j_gene - 1, j_start + i - 1);
                     }
+                }
+
+                if (error_mode) {
+
                 }
             }
 
@@ -858,21 +878,18 @@ namespace ymir {
                             events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
                                     = null_insertion + insertion_len;
                         }
-                    } else {
-                        // TODO: remove this assignments because all initialised to zeros and check the speed
-                        probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0;
-                        if (metadata_mode) { events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start) = 0; }
                     }
                 }
             }
         }
 
 
+        // build<VJ_RECOMB, SAVE_METADATA, NO_ERR>
+        // put specific values (lambda) to a specific MMC
         // function for finding max V alignment
         // function for finding max J alignment
         // function for shrinking D alignment matrices, find non-zero positions, etc.
-        // make_seq_start_vec
-        // make_seq_end_vec
+        // make seq_row, seq_col, seq_start, seq_ind vector (one function?)
         // build[Mono|Di]NucInsertions <InsertionModel, SequenceType, MetadataMode>
         // general functions for assigning values (event probs / event inds) to MMC of some type.
 

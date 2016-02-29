@@ -173,7 +173,7 @@ namespace ymir {
 
 
         MAAG& operator= (const MAAG &other) {
-            _recomb == other._recomb;
+            _recomb = other._recomb;
             _chain = other._chain;
             _values = other._values;
 
@@ -367,6 +367,8 @@ namespace ymir {
         bool is_vj() const { return _recomb == VJ_RECOMB; }
 
         bool is_vdj() const { return _recomb == VDJ_RECOMB; }
+
+//        bool is_vd2j() const { return _recomb == VD2J_RECOMB; }
         ///@}
 
 

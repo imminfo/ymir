@@ -3374,7 +3374,7 @@ int main(int argc, char* argv[]) {
 
     // Tests for MAAG / MAAG builder
     YMIR_TEST(test_maag_vj())
-    YMIR_TEST(test_maag_vj_err())
+//    YMIR_TEST(test_maag_vj_err())
     YMIR_TEST(test_maag_vdj())
     YMIR_TEST(test_maag_vdj_err())
     YMIR_TEST(test_maag_builder_replace_vj())

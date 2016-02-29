@@ -51,6 +51,11 @@ namespace ymir {
             AlgorithmParameters() {}
 
 
+            bool check(const string& param_name) const {
+                return _json.get(param_name, "__NA__").asString() != "__NA__";
+            }
+
+
             AlgorithmParameters& set(const string& param_name, const Json::Value& value) {
                 _json[param_name] = value;
                 return *this;
@@ -93,6 +98,12 @@ namespace ymir {
                                           const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10)) const {
 
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
+            cout << "Murugan EM-algorithm." << endl;
+
+            if (!algo_param.check("niter")) {
+                cout << "Obligatory parameter 'check' hasn't been found, please re-run the algorithm with the supplied parameter." << endl;
+                return false;
+            }
 
             ClonesetView rep_nonc = repertoire.noncoding();
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
@@ -181,6 +192,8 @@ namespace ymir {
                 prob_summary(prob_vec, prev_ll);
                 prev_ll = loglikelihood(prob_vec);
             }
+
+            cout << endl << "Done. Resulting loglikelihood:\t" << loglikelihood(prob_vec) << endl << endl;
 
             return true;
         }

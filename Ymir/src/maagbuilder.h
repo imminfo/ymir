@@ -149,9 +149,11 @@ namespace ymir {
                 copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
                 return MAAG(probs, events, errors, clonotype.sequence(), seq_poses_arr, seq_poses.size(), seq_type);
             } else if (metadata_mode) {
-
+                unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
+                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
+                return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size(), seq_type);
             } else if (error_mode) {
-
+                return MAAG(probs, errors);
             } else {
                 return MAAG(probs);
             }
@@ -186,6 +188,7 @@ namespace ymir {
 //                }
 
                 res[i] = this->build(cloneset[i], metadata_mode);
+//                res[i] = std::move(this->build(cloneset[i], metadata_mode);
 //                this->build(cloneset[i], metadata_mode);
 
 //                tmp = this->build(cloneset[i], metadata_mode);
@@ -439,11 +442,11 @@ namespace ymir {
                     }
                 }
 
-                if (error_mode) {
-                    for (seq_len_t i = 0; i <= v_end - v_start - 1; ++i) {
-                        errors(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = clonotype.isVarMismatch(v_index, i);
-                    }
-                }
+//                if (error_mode) {
+//                    for (seq_len_t i = 1; i <= v_end - v_start - 1; ++i) {
+//                        errors(0, v_index, 0, i) = clonotype.isVarMismatch(v_index, i);
+//                    }
+//                }
             }
 
             for (seq_len_t i = 0; i <= len; ++i) { seq_poses.push_back(i); }

@@ -118,40 +118,15 @@ namespace ymir {
     protected:
 
         /**
-        * \struct Node
-        *
-        * \brief Node in the chain. Stores one or more matrices with equal size.
-        */
+         * \struct Node
+         *
+         * \brief Node in the chain. Stores one or more matrices with equal size.
+         */
         struct Node {
         public:
 
             Node() : _n(0), _start_index(0), _rows(0), _cols(0)
             { }
-
-
-            Node(size_t start_index, matrix_ind_t n, dim_t rows, dim_t cols)
-                    : _n(n), _start_index(start_index), _rows(rows), _cols(cols)
-            { }
-
-
-            Node(const Node &other)
-                    : _n(other._n),
-                      _rows(other._rows),
-                      _cols(other._cols),
-                      _start_index(other._start_index)
-            { }
-
-
-            ~Node() { }
-
-
-            Node& operator= (const Node &other) {
-                _n = other._n;
-                _rows = other._rows;
-                _cols = other._cols;
-                _start_index = other._start_index;
-                return *this;
-            }
 
 
             void init(size_t start_index, matrix_ind_t n, dim_t rows, dim_t cols) {
@@ -178,6 +153,8 @@ namespace ymir {
 
             size_t start() const { return _start_index; }
 
+            size_t n_values() const { return _n * _rows * _cols; }
+
 
         protected:
 
@@ -194,25 +171,20 @@ namespace ymir {
         }
 
 
-        MultiMatrixChain(const MultiMatrixChain &other)
-                : _chain(other._chain),
-                  _values(other._values)
-        { }
+//        MultiMatrixChain(MultiMatrixChain &) = default;
+//
+//
+//        MultiMatrixChain(MultiMatrixChain &&) = default;
+//
+//
+//        MultiMatrixChain& operator=(MultiMatrixChain &) = default;
+//
+//
+//        MultiMatrixChain& operator=(MultiMatrixChain &&) = default;
 
 
-        MultiMatrixChain(MultiMatrixChain &&other) {
-            _chain.swap(other._chain);
-            _values.swap(other._values);
-        }
-
-
-        virtual ~MultiMatrixChain() { }
-
-
-        MultiMatrixChain& operator= (const MultiMatrixChain &other) {
-            _chain = other._chain;
-            _values = other._values;
-            return *this;
+        virtual ~MultiMatrixChain()
+        {
         }
 
 
@@ -279,8 +251,9 @@ namespace ymir {
 
 
         void initNode(node_ind_t node_i, matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
+            size_t prev_node_size = _chain[node_i].n_values();
             _chain[node_i].init(_values.size(), n_matrices, rows, cols);
-            _values.resize(_values.size() + rows * cols * n_matrices, 0);
+            _values.resize(_values.size() + _chain[node_i].n_values() - prev_node_size, 0);
         }
 
 

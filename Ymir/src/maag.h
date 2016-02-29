@@ -54,20 +54,25 @@ namespace ymir {
          * \brief Default constructor.
          */
         MAAG()
-                : _events(nullptr),
-                  _sequence(nullptr),
-                  _seq_poses(nullptr),
-                  _n_poses(0),
-                  _seq_type(NUCLEOTIDE)
-        { }
+            : _recomb(UNDEF_RECOMB),
+              _events(nullptr),
+              _sequence(nullptr),
+              _seq_poses(nullptr),
+              _n_poses(0),
+              _seq_type(NUCLEOTIDE)
+        {
+        }
 
         /**
          *
          */
-        MAAG(const MAAG &other) : ProbMMC(other) {
+        MAAG(const MAAG &other)
+            : ProbMMC(other),
+              _recomb(other._recomb),
+              _n_poses(other._n_poses),
+              _seq_type(other._seq_type)
+        {
             if (other._events) { _events.reset(new EventIndMMC(*other._events)); }
-
-            _n_poses = other._n_poses;
 
             if (other._seq_poses) {
                 _seq_poses.reset(new seq_len_t[_n_poses]);
@@ -78,12 +83,12 @@ namespace ymir {
 
             if (other._sequence) { _sequence.reset(new std::string(*other._sequence)); }
             else { _sequence = nullptr; }
-
-            _seq_type = other._seq_type;
         }
 
 
         MAAG(MAAG &&other) {
+            std::swap(_recomb, other._recomb);
+
             _chain.swap(other._chain);
             _values.swap(other._values);
 
@@ -104,29 +109,39 @@ namespace ymir {
          * the full probability.
          */
         MAAG(ProbMMC &prob_mmc)
-                : _events(nullptr),
-                  _sequence(nullptr),
-                  _seq_poses(nullptr),
-                  _n_poses(0),
-                  _seq_type(NUCLEOTIDE)
+            : _recomb(prob_mmc.chainSize() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB),  // TODO: fix this
+              _events(nullptr),
+              _sequence(nullptr),
+              _seq_poses(nullptr),
+              _n_poses(0),
+              _seq_type(NUCLEOTIDE)
         {
             this->swap(prob_mmc);
+        }
+
+
+        MAAG(ProbMMC &prob_mmc, ErrMMC &err_mmc)
+            : MAAG(prob_mmc)
+        {
+            _errors.reset(new ErrMMC());
+            _errors.get()->swap(err_mmc);
         }
 
 
         /**
          * \brief Special swap constructor for MAAGs that will be used for statistical inference.
          */
-        MAAG(ProbMMC &prob_mcc,
+        MAAG(ProbMMC &prob_mmc,
              EventIndMMC &eventind_mcc,
              const std::string &sequence,
              unique_ptr<seq_len_t[]> &seq_poses,
              seq_len_t n_poses,
              SequenceType seq_type)
-                : _n_poses(n_poses),
+                : _recomb(prob_mmc.chainSize() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB),
+                  _n_poses(n_poses),
                   _seq_type(seq_type)
         {
-            this->swap(prob_mcc);
+            this->swap(prob_mmc);
 
             _events.reset(new EventIndMMC());
             _events.get()->swap(eventind_mcc);
@@ -137,6 +152,20 @@ namespace ymir {
         }
 
 
+        MAAG(ProbMMC &prob_mmc,
+             EventIndMMC &eventind_mcc,
+             ErrMMC &err_mmc,
+             const std::string &sequence,
+             unique_ptr<seq_len_t[]> &seq_poses,
+             seq_len_t n_poses,
+             SequenceType seq_type)
+            : MAAG(prob_mmc, eventind_mcc, sequence, seq_poses, n_poses, seq_type)
+        {
+            _errors.reset(new ErrMMC());
+            _errors.get()->swap(err_mmc);
+        }
+
+
         /**
          *
          */
@@ -144,6 +173,7 @@ namespace ymir {
 
 
         MAAG& operator= (const MAAG &other) {
+            _recomb == other._recomb;
             _chain = other._chain;
             _values = other._values;
 
@@ -172,28 +202,6 @@ namespace ymir {
         }
 
 
-//        void swap_maag(MAAG &other) {
-//            _chain.swap(other._chain);
-//            _values.swap(other._values);
-//
-//            EventIndMMC *tmp = other._events;
-//            other._events = _events;
-//            _events = tmp;
-//
-//            _n_poses = other._n_poses;
-//
-//            seq_len_t *tmp2 = other._seq_poses;
-//            other._seq_poses = _seq_poses;
-//            _seq_poses = tmp2;
-//
-//            std::string *tmp3 = other._sequence;
-//            other._sequence = _sequence;
-//            _sequence = tmp3;
-//
-//            _seq_type = other._seq_type;
-//        }
-
-
         /**
          * \brief Compute and return the full assembling probability of this sequence (i.e., with all gene segments alignments).
          *
@@ -206,7 +214,7 @@ namespace ymir {
          */
         ///@{
         prob_t fullProbability(event_ind_t v_index, event_ind_t j_index) const {
-            if (this->is_vj()) {
+            if (_recomb == VJ_RECOMB) {
                 // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
                 return (matrix(0, 0)(v_index, j_index) *   // P(Vi & Ji)
                         matrix(1, v_index) *               // P(#dels | Vi)
@@ -219,7 +227,7 @@ namespace ymir {
         }
 
         prob_t fullProbability(event_ind_t v_index, event_ind_t d_index, event_ind_t j_index) const {
-            if (this->is_vdj()) {
+            if (_recomb == VDJ_RECOMB) {
                 // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
                 return (matrix(0, v_index) *      // P(Vi)
                         matrix(1, v_index) *      // P(#dels | Vi)
@@ -237,7 +245,7 @@ namespace ymir {
             // choose the max full probability from all possible recombinations of V(D)J gene segment indices
             if (action == MAX_PROBABILITY) {
                 prob_t max_prob = 0, cur_prob = 0;
-                if (this->is_vj()) {
+                if (_recomb == VJ_RECOMB) {
                     for (event_ind_t v_index = 0; v_index < this->nVar(); ++v_index) {
                         for (event_ind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
                             cur_prob = this->fullProbability(v_index, j_index);
@@ -259,7 +267,7 @@ namespace ymir {
             // compute the sum of full probabilities of all possible recombinations of V(D)J gene segment indices
             else {
                 prob_t sum_prob = 0;
-                if (this->is_vj()) {
+                if (_recomb == VJ_RECOMB) {
                     for (event_ind_t v_index = 0; v_index < this->nVar(); ++v_index) {
                         for (event_ind_t j_index = 0; j_index < this->nJoi(); ++j_index) {
                             sum_prob += this->fullProbability(v_index, j_index);
@@ -294,22 +302,15 @@ namespace ymir {
         ///@}
 
 
-        ///@{
-//        segindex_t getVar(uint8_t i) { return _events ? (*_events)[0][i] : 0; }
-//        segindex_t getJoi(uint8_t i) { return _events ? (*_events)[_chain.size() - 2][i] : 0; }
-//        segindex_t getDiv(uint8_t i) { return 0; } // ???
-        ///@}
-
-
         /**
-         * \brief Access to event indices and event probabilities in the underlying matrices of the MAAG.
+         * \brief Access to event indices, event probabilities and mismatches in the underlying matrices of the MAAG.
          *
          * \param node_i Index of the node.
          * \param mat_i Index of the matrix in the node.
          * \param row Which row to choose.
          * \param col Which column to choose.
          *
-         * \return Event probability or event index. In the second case zero will be returned if no event chain matrix
+         * \return Event probability, event index or is mismatch. In the second case zero will be returned if no event chain matrix
          * is stored in this MAAG.
          */
         ///@{
@@ -319,6 +320,10 @@ namespace ymir {
 
         event_ind_t event_index(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
             return _events ? (*_events)(node_i, mat_i, row, col) : 0;
+        };
+
+        bool is_mismatch(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
+            return _errors ? (*_errors)(node_i, mat_i, row, col) : 0;
         };
         ///@}
 
@@ -354,31 +359,21 @@ namespace ymir {
 
 
         /**
-         * \brief Get is this MAAG was built from clonotype either with VJ or with VDJ recombination.
+         *
          */
         ///@{
-        bool is_vj() const { return _chain.size() == VJ_CHAIN_SIZE; }
+        Recombination recombination() const { return _recomb; }
 
-        bool is_vdj() const { return _chain.size() == VDJ_CHAIN_SIZE; }
+        bool is_vj() const { return _recomb == VJ_RECOMB; }
+
+        bool is_vdj() const { return _recomb == VDJ_RECOMB; }
         ///@}
-
-
-        Recombination recombination() const { return _chain.size() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB; }
 
 
         bool has_events() const { return (bool) _events; }
 
 
-        // TODO: make ok has_errors() function
-        bool has_errors() const { return false; }
-
-
-//        const AlignmentsWithErrors& dgea() const {
-//#ifdef YDEBUG
-//            if (!_err_alignments) { throw(std::runtime_error("Access to an alignment with errors object when it's a nullptr!")); }
-//#endif
-//            return *_err_alignments;
-//        }
+        bool has_errors() const { return (bool) _errors; }
 
 
         const std::string& sequence() const {
@@ -405,8 +400,10 @@ namespace ymir {
         unique_ptr<sequence_t> _sequence;  /** Nucleotide or amino acid CDR3 sequence. */
         SequenceType _seq_type;
 
-//        NumErrorsMMC *_errors;  /** Matrix of number of errors for each scenario event position. */
-//        prob_t _err_prob;  /** Probability of a error. */
+        pErrMMC _errors;  /** Matrix of number of errors for each scenario event position. */
+        prob_t _err_prob;  /** Probability of a error. */
+
+        Recombination _recomb;
 
 //        MAAGMetadataPtr _metadata;
 

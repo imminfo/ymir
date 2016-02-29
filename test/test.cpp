@@ -2368,6 +2368,133 @@ YMIR_TEST_START(test_maag_vj)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_maag_vj_err)
+
+    ModelParameterVector mvec = make_test_events_vj();
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1");
+    alvec1.push_back("Vseg2");
+    alvec1.push_back("Vseg3");
+    seqvec1.push_back("CCCG");
+    seqvec1.push_back("GGG");
+    seqvec1.push_back("CCCGAG");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1");
+    alvec2.push_back("Jseg2");
+    alvec2.push_back("Jseg3");
+    seqvec2.push_back("CCGTTT");
+    seqvec2.push_back("ATTT");
+    seqvec2.push_back("AGGTTT");
+
+    VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
+
+    MAAGBuilder maag_builder(mvec, genes);
+
+    NoGapAlignmentVector vec;
+    NoGapAlignmentVector::events_storage_t bits;
+    ClonotypeBuilder cl_builder;
+    // CCCGACGGTTT
+    // CCCG
+    // CCCGAG
+    // .....CCGTTT
+    // .......ATTT
+    // .....AGGTTT
+    // CCCG.AC.GGTTT
+    // poses:
+    // vs: 0-1-2-3-4-5
+    // js: 7-8-9-10-11-12
+    cl_builder.setSequence("CCCGACGGTTT").setNucleotideSeq().setRecombination(VJ_RECOMB);
+
+    bits = {0, 0, 0, 0};
+    vec.addAlignment(1, 1, 1, bits);
+    cl_builder.addVarAlignment(vec);
+
+    bits = {0, 0, 0, 0, 0, 1};
+    vec.addAlignment(1, 1, 1, bits);
+    cl_builder.addVarAlignment(vec);
+
+    bits = {1, 1, 0, 0, 0, 0};
+    vec.addAlignment(1, 3, 8, bits);
+    cl_builder.addJoiAlignment(vec);
+
+    bits = {1, 0, 0, 0};
+    vec.addAlignment(2, 2, 9, bits);
+    cl_builder.addJoiAlignment(vec);
+
+    bits = {1, 0, 0, 0, 0, 0};
+    vec.addAlignment(3, 2, 7, bits);
+    cl_builder.addJoiAlignment(vec);
+
+    Clonotype clonotype = cl_builder.buildClonotype();
+
+//    cout << "here" << endl;
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, COMPUTE_ERRORS);
+
+    YMIR_ASSERT2(maag.nVar(), 2)
+    YMIR_ASSERT2(maag.nJoi(), 3)
+    YMIR_ASSERT2(maag.nDiv(), 0)
+
+    YMIR_ASSERT(maag.has_events())
+    YMIR_ASSERT(maag.has_errors())
+
+    YMIR_ASSERT2(maag.position(0), 0)
+    YMIR_ASSERT2(maag.position(3), 3)
+    YMIR_ASSERT2(maag.position(5), 5)
+    YMIR_ASSERT2(maag.position(6), 7)
+    YMIR_ASSERT2(maag.position(8), 9)
+    YMIR_ASSERT2(maag.position(10), 11)
+    YMIR_ASSERT2(maag.position(11), 12)
+
+    YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
+    YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))
+    YMIR_ASSERT2(maag.event_index(0, 0, 1, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 0))
+    YMIR_ASSERT2(maag.event_index(0, 0, 1, 2), mvec.event_index(VJ_VAR_JOI_GEN, 0, 2, 2))
+
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 0), mvec.event_index(VJ_VAR_DEL, 0, 4));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 1), mvec.event_index(VJ_VAR_DEL, 0, 3));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 2), mvec.event_index(VJ_VAR_DEL, 0, 2));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 3), mvec.event_index(VJ_VAR_DEL, 0, 1));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 4), mvec.event_index(VJ_VAR_DEL, 0, 0));
+    YMIR_ASSERT2(maag.event_index(1, 0, 0, 5), 0)
+
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 0), mvec.event_index(VJ_VAR_DEL, 2, 6))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 1), mvec.event_index(VJ_VAR_DEL, 2, 5))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 2), mvec.event_index(VJ_VAR_DEL, 2, 4))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 3), mvec.event_index(VJ_VAR_DEL, 2, 3))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec.event_index(VJ_VAR_DEL, 2, 2))
+    YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec.event_index(VJ_VAR_DEL, 2, 1))
+
+    YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
+    YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), 0)
+
+    YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
+    YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), mvec.event_index(VJ_JOI_DEL, 0, 2))
+    YMIR_ASSERT2(maag.event_index(3, 0, 2, 0), mvec.event_index(VJ_JOI_DEL, 0, 3))
+    YMIR_ASSERT2(maag.event_index(3, 0, 3, 0), mvec.event_index(VJ_JOI_DEL, 0, 4))
+    YMIR_ASSERT2(maag.event_index(3, 0, 4, 0), mvec.event_index(VJ_JOI_DEL, 0, 5))
+    YMIR_ASSERT2(maag.event_index(3, 0, 5, 0), mvec.event_index(VJ_JOI_DEL, 0, 6))
+
+    YMIR_ASSERT2(maag.event_index(3, 1, 0, 0), 0)
+    YMIR_ASSERT2(maag.event_index(3, 1, 1, 0), 0)
+    YMIR_ASSERT2(maag.event_index(3, 1, 2, 0), mvec.event_index(VJ_JOI_DEL, 1, 1))
+    YMIR_ASSERT2(maag.event_index(3, 1, 3, 0), mvec.event_index(VJ_JOI_DEL, 1, 2))
+    YMIR_ASSERT2(maag.event_index(3, 1, 4, 0), mvec.event_index(VJ_JOI_DEL, 1, 3))
+    YMIR_ASSERT2(maag.event_index(3, 1, 5, 0), mvec.event_index(VJ_JOI_DEL, 1, 4))
+
+    YMIR_ASSERT2(maag.event_index(3, 2, 0, 0), mvec.event_index(VJ_JOI_DEL, 2, 1))
+    YMIR_ASSERT2(maag.event_index(3, 2, 1, 0), mvec.event_index(VJ_JOI_DEL, 2, 2))
+    YMIR_ASSERT2(maag.event_index(3, 2, 2, 0), mvec.event_index(VJ_JOI_DEL, 2, 3))
+    YMIR_ASSERT2(maag.event_index(3, 2, 3, 0), mvec.event_index(VJ_JOI_DEL, 2, 4))
+    YMIR_ASSERT2(maag.event_index(3, 2, 4, 0), mvec.event_index(VJ_JOI_DEL, 2, 5))
+    YMIR_ASSERT2(maag.event_index(3, 2, 5, 0), mvec.event_index(VJ_JOI_DEL, 2, 6))
+
+YMIR_TEST_END
+
+
 YMIR_TEST_START(test_maag_vdj)
 
     ModelParameterVector mvec = make_test_events_vdj();
@@ -2645,6 +2772,13 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
     YMIR_ASSERT2(maag.event_index(3, 2, 3, 0), mvec2.event_index(VJ_JOI_DEL, 2, 4))
     YMIR_ASSERT2(maag.event_index(3, 2, 4, 0), mvec2.event_index(VJ_JOI_DEL, 2, 5))
     YMIR_ASSERT2(maag.event_index(3, 2, 5, 0), mvec2.event_index(VJ_JOI_DEL, 2, 6))
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_maag_vdj_err)
+
+    YMIR_ASSERT(false)
 
 YMIR_TEST_END
 
@@ -3240,7 +3374,9 @@ int main(int argc, char* argv[]) {
 
     // Tests for MAAG / MAAG builder
     YMIR_TEST(test_maag_vj())
+    YMIR_TEST(test_maag_vj_err())
     YMIR_TEST(test_maag_vdj())
+    YMIR_TEST(test_maag_vdj_err())
     YMIR_TEST(test_maag_builder_replace_vj())
     YMIR_TEST(test_maag_builder_replace_vdj())
 

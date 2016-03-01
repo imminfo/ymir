@@ -32,6 +32,7 @@
 #include "repertoire.h"
 #include "genesegment.h"
 #include "clonotypeassembler.h"
+#include "model_parser.h"
 
 
 namespace ymir {
@@ -59,9 +60,22 @@ namespace ymir {
             _recomb = UNDEF_RECOMB;
             _status = false;    
 
-            _status = this->parseModelConfig(_model_path)
-                      && this->parseGeneSegments()
-                      && this->makeEventProbabilitiesVector();
+            this->parseModelConfig(_model_path);
+            if (_status) {
+                switch (_recomb) {
+                    case VJ_RECOMB:
+                        _parser.reset(new VJModelParser(_model_path, _config, behav));
+                        break;
+                    case VDJ_RECOMB:
+                        _parser.reset(new VDJModelParser(_model_path, _config, behav));
+                        break;
+                    default: ;
+                }
+
+                _status = _parser->parse();
+            }
+//                      && this->parseGeneSegments()
+//                      && this->makeEventProbabilitiesVector();
 
             if (_status) {
                 cout << "Model is loaded successfully." << endl;
@@ -305,6 +319,7 @@ namespace ymir {
         Json::Value _config;
         Recombination _recomb;
         string _model_path;
+        unique_ptr<ModelParser> _parser;
 
         unique_ptr<VDJRecombinationGenes> _genes;
         unique_ptr<ModelParameterVector> _param_vec;
@@ -324,20 +339,25 @@ namespace ymir {
         /**
          * \brief Parse JSON file with model parameters.
          */
-        bool parseModelConfig(const string& folderpath) {
+        void parseModelConfig(const string& folderpath) {
             string jsonpath = folderpath + "/model.json";
 
             ifstream ifs;
             ifs.open(jsonpath);
+            _status = false;
             if (ifs.is_open()) {
                 ifs >> _config;
                 if (_config.get("recombination", "undefined").asString() == "VJ") {
                     _recomb = VJ_RECOMB;
+                    _status = true;
                 } else if (_config.get("recombination", "undefined").asString() == "VDJ") {
                     _recomb = VDJ_RECOMB;
+                    _status = true;
                 } else {
                     _recomb = UNDEF_RECOMB;
+                    _status = false;
                 }
+
                 cout << "Probabilistic assembling model:\n\t" <<
                         _config.get("name", "Nameless model").asString() <<
                         "\n\t(" <<
@@ -351,85 +371,86 @@ namespace ymir {
                         "-recombination  |  " <<
                         (_config.get("hypermutations", false).asBool() ? "Sequence error model" : "No sequence error model") <<
                         endl << "\tFiles:"<< endl;
-                return true;
+
+                _status = true;
             }
+
             std::cout << "[ERROR] Probabilistic assembling model error:" << endl << "\t config .json file not found at [" << jsonpath << "]" << std::endl;
-            return false;
         }
 
 
         /**
          * \brief Parse gene segment JSON files and tables.
          */
-        bool parseGeneSegments() {
-            cout << "\tV gene seg.:     ";
-            if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
-                cout << "ERROR: no gene segments file in the model's .json." << endl;
-
-                return false;
-            } else {
-                cout << "OK" << endl;
-            }
-            string v_path = _model_path + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
-
-            cout << "\tJ gene seg.:     ";
-            if (_config.get("segments", Json::Value("")).get("joining", Json::Value("")).size() == 0) {
-                cout << "ERROR: no gene segments file in the model's .json." << endl;
-
-                return false;
-            } else {
-                cout << "OK" << endl;
-            }
-            string j_path = _model_path + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
-
-            bool vok, jok, dok = true;
-
-            if (_recomb == VJ_RECOMB) {
-                _genes.reset(new VDJRecombinationGenes("VJ.V", v_path, "VJ.J", j_path, &vok, &jok));
-            } else if (_recomb == VDJ_RECOMB) {
-                cout << "\tD gene seg.:     ";
-                if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
-                    cout << "ERROR: no gene segments file in the model's .json." << endl;
-
-                    return false;
-                } else {
-                    string d_path = _model_path + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
-                    _genes.reset(new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok));
-                    _min_D_len = _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("min.len", DEFAULT_DIV_GENE_MIN_LEN).asUInt();
-                    cout << "OK" << endl;
-                }
-            } else {
-                cout << "Undefined recombination type." << endl;
-            }
-
-            if (vok && jok && dok) {
-                _genes->appendPalindromicNucleotides(VARIABLE,
-                                                     _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
-                                                     _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("P.nuc.5'", 0).asUInt());
-                _genes->appendPalindromicNucleotides(JOINING,
-                                                     _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
-                                                     _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("P.nuc.5'", 0).asUInt());
-                if (_genes->is_vdj()) {
-                    _genes->appendPalindromicNucleotides(DIVERSITY,
-                                                         _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
-                                                         _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("P.nuc.5'", 0).asUInt());
-                }
-            }
-
-            return vok && jok && dok;
-        }
+//        bool parseGeneSegments() {
+//            cout << "\tV gene seg.:     ";
+//            if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
+//                cout << "ERROR: no gene segments file in the model's .json." << endl;
+//
+//                return false;
+//            } else {
+//                cout << "OK" << endl;
+//            }
+//            string v_path = _model_path + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
+//
+//            cout << "\tJ gene seg.:     ";
+//            if (_config.get("segments", Json::Value("")).get("joining", Json::Value("")).size() == 0) {
+//                cout << "ERROR: no gene segments file in the model's .json." << endl;
+//
+//                return false;
+//            } else {
+//                cout << "OK" << endl;
+//            }
+//            string j_path = _model_path + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
+//
+//            bool vok, jok, dok = true;
+//
+//            if (_recomb == VJ_RECOMB) {
+//                _genes.reset(new VDJRecombinationGenes("VJ.V", v_path, "VJ.J", j_path, &vok, &jok));
+//            } else if (_recomb == VDJ_RECOMB) {
+//                cout << "\tD gene seg.:     ";
+//                if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
+//                    cout << "ERROR: no gene segments file in the model's .json." << endl;
+//
+//                    return false;
+//                } else {
+//                    string d_path = _model_path + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
+//                    _genes.reset(new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok));
+//                    _min_D_len = _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("min.len", DEFAULT_DIV_GENE_MIN_LEN).asUInt();
+//                    cout << "OK" << endl;
+//                }
+//            } else {
+//                cout << "Undefined recombination type." << endl;
+//            }
+//
+//            if (vok && jok && dok) {
+//                _genes->appendPalindromicNucleotides(VARIABLE,
+//                                                     _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
+//                                                     _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+//                _genes->appendPalindromicNucleotides(JOINING,
+//                                                     _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
+//                                                     _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+//                if (_genes->is_vdj()) {
+//                    _genes->appendPalindromicNucleotides(DIVERSITY,
+//                                                         _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
+//                                                         _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+//                }
+//            }
+//
+//            return vok && jok && dok;
+//        }
 
 
         /**
          * \brief Parse files with event probabilities matrices and make ModelParameterVector.
          */
-        bool makeEventProbabilitiesVector() {
-            if (_behaviour == EMPTY) {
-                return this->createEventProbabilitiesFromScratch();
-            } else {
-                return this->parseEventProbabilitiesFromFiles();
-            }
-        }
+//        bool makeEventProbabilitiesVector() {
+//            if (_behaviour == EMPTY) {
+//                return this->createEventProbabilitiesFromScratch();
+//            } else {
+//                return this->parseEventProbabilitiesFromFiles();
+//            }
+//        }
 
 
         /**

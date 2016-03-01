@@ -2412,22 +2412,27 @@ YMIR_TEST_START(test_maag_vj_err)
     bits = {0, 0, 0, 0};
     vec.addAlignment(1, 1, 1, bits);
     cl_builder.addVarAlignment(vec);
+    vec.clear();
 
     bits = {0, 0, 0, 0, 0, 1};
-    vec.addAlignment(1, 1, 1, bits);
+    vec.addAlignment(3, 1, 1, bits);
     cl_builder.addVarAlignment(vec);
+    vec.clear();
 
     bits = {1, 1, 0, 0, 0, 0};
-    vec.addAlignment(1, 3, 8, bits);
+    vec.addAlignment(1, 1, 6, bits);
     cl_builder.addJoiAlignment(vec);
+    vec.clear();
 
     bits = {1, 0, 0, 0};
-    vec.addAlignment(2, 2, 9, bits);
+    vec.addAlignment(2, 1, 8, bits);
     cl_builder.addJoiAlignment(vec);
+    vec.clear();
 
     bits = {1, 0, 0, 0, 0, 0};
-    vec.addAlignment(3, 2, 7, bits);
+    vec.addAlignment(3, 1, 6, bits);
     cl_builder.addJoiAlignment(vec);
+    vec.clear();
 
     Clonotype clonotype = cl_builder.buildClonotype();
 
@@ -3374,7 +3379,7 @@ int main(int argc, char* argv[]) {
 
     // Tests for MAAG / MAAG builder
     YMIR_TEST(test_maag_vj())
-//    YMIR_TEST(test_maag_vj_err())
+    YMIR_TEST(test_maag_vj_err())
     YMIR_TEST(test_maag_vdj())
     YMIR_TEST(test_maag_vdj_err())
     YMIR_TEST(test_maag_builder_replace_vj())

@@ -462,11 +462,11 @@ namespace ymir {
                     }
                 }
 
-//                if (error_mode) {
-//                    for (seq_len_t i = 1; i <= v_end - v_start - 1; ++i) {
-//                        errors(0, v_index, 0, i) = clonotype.isVarMismatch(v_index, i);
-//                    }
-//                }
+                if (error_mode) {
+                    for (seq_len_t i = 1; i <= v_end - v_start - 1; ++i) {
+                        errors(0, v_index, 0, i) = clonotype.isVarMismatch(v_index, i);
+                    }
+                }
             }
 
             for (seq_len_t i = 0; i <= len; ++i) { seq_poses.push_back(i); }

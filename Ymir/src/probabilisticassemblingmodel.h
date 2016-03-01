@@ -39,6 +39,7 @@ namespace ymir {
     /**
     * \class ProbabilisticAssemblingModel
     */
+    template <Recombination R>
     class ProbabilisticAssemblingModel {
 
     public:
@@ -1356,6 +1357,16 @@ namespace ymir {
             delete container;
         }
     };
+
+
+    // specialisations for parsers and containers
+    //
+    // typedef ProbabilisticAssemblingModel<VJ_RECOMB> VJModel;
+    // typedef ProbabilisticAssemblingModel<VDJ_RECOMB> VDJModel;
+    // typedef ProbabilisticAssemblingModel<VD2J_RECOMB> VD2JModel;
+    //
+    // typename <>
+    // void ProbabilisticAssemblingModel<VJ_RECOMB>::parseDataContainer(const string &element, AbstractTDContainer *container, vector<AbstractTDContainer*> &containers) {}
 
 }
 

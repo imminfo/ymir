@@ -2465,6 +2465,12 @@ YMIR_TEST_START(test_maag_vj_err)
     YMIR_ASSERT2(maag.event_index(1, 0, 0, 3), mvec.event_index(VJ_VAR_DEL, 0, 1));
     YMIR_ASSERT2(maag.event_index(1, 0, 0, 4), mvec.event_index(VJ_VAR_DEL, 0, 0));
     YMIR_ASSERT2(maag.event_index(1, 0, 0, 5), 0)
+    YMIR_ASSERT(!maag.is_mismatch(0, 0, 0, 0))
+    YMIR_ASSERT(!maag.is_mismatch(0, 0, 0, 1))
+    YMIR_ASSERT(!maag.is_mismatch(0, 0, 0, 2))
+    YMIR_ASSERT(!maag.is_mismatch(0, 0, 0, 3))
+    YMIR_ASSERT(!maag.is_mismatch(0, 1, 0, 0))
+    YMIR_ASSERT(maag.is_mismatch(0, 1, 0, 5))
 
     YMIR_ASSERT2(maag.event_index(1, 1, 0, 0), mvec.event_index(VJ_VAR_DEL, 2, 6))
     YMIR_ASSERT2(maag.event_index(1, 1, 0, 1), mvec.event_index(VJ_VAR_DEL, 2, 5))

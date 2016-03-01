@@ -134,29 +134,49 @@ namespace ymir {
             events.finish();
             errors.finish();
 
-            if (error_mode && metadata_mode) {
+//            if (error_mode && metadata_mode) {
+//
+//                // TODO: deal with D deletions and insertions null matrices
+//                // - if the D deletions matrix contains only zeros, then remove this matrix
+//                // - if insertions matrices have columns / rows with only zero (!) events (!), then remove it
+//                // and remove the corresponding deletions rows / columns from neighbour matrices.
+//                //
+//                if (clonotype.recombination() == VDJ_RECOMB) {
+//
+//                }
+//
+//                unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
+//                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
+//                return MAAG(probs, events, errors, clonotype.sequence(), seq_poses_arr, seq_poses.size(), seq_type);
+//            } else if (metadata_mode) {
+//                unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
+//                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
+//                return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size(), seq_type);
+//            } else if (error_mode) {
+//                return MAAG(probs, errors);
+//            } else {
+//                return MAAG(probs);
+//            }
 
-                // TODO: deal with D deletions and insertions null matrices
-                // - if the D deletions matrix contains only zeros, then remove this matrix
-                // - if insertions matrices have columns / rows with only zero (!) events (!), then remove it
-                // and remove the corresponding deletions rows / columns from neighbour matrices.
-                //
-                if (clonotype.recombination() == VDJ_RECOMB) {
-
-                }
-
-                unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
-                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
-                return MAAG(probs, events, errors, clonotype.sequence(), seq_poses_arr, seq_poses.size(), seq_type);
-            } else if (metadata_mode) {
-                unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
-                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
-                return MAAG(probs, events, clonotype.sequence(), seq_poses_arr, seq_poses.size(), seq_type);
-            } else if (error_mode) {
-                return MAAG(probs, errors);
-            } else {
-                return MAAG(probs);
+            MAAG maag;
+            maag._recomb = clonotype.recombination();
+            maag._seq_type = clonotype.sequence_type();
+            maag.swap(probs);
+            if (error_mode) {
+                maag._errors = pErrMMC(new ErrMMC());
+                maag._errors->swap(errors);
             }
+            if (metadata_mode) {
+                unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
+                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
+                maag._sequence.reset(new sequence_t(clonotype.sequence()));
+                maag._seq_poses.swap(seq_poses_arr);
+                maag._n_poses = seq_poses.size();
+
+                maag._events = pEventIndMMC(new EventIndMMC());
+                maag._events->swap(events);
+            }
+            return maag;
         }
 
         MAAGRepertoire build(const ClonesetView &cloneset, MetadataMode metadata_mode = NO_METADATA, bool verbose = true) const {

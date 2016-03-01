@@ -688,17 +688,56 @@ namespace ymir {
         virtual ~ForwardBackwardAlgorithm() { }
 
 
-        event_pair_t nextEvent() {
+        void infer(const MAAG &maag) = 0;
 
+
+        event_pair_t nextEvent() {
+            if (_status) {
+                event_pair_t res = _pairs[_pairs_i];
+//                cout << res.second << " -> ";
+//                res.second = res.second / _full_prob;
+//                cout << res.second << endl;
+                ++_pairs_i;
+                return res;
+            }
+
+            _status = false;
+            return event_pair_t(0, 0);
         }
 
 
+        bool is_empty() {
+//            return _status && _pairs_i != _pairs.size();
+            if (_status) {
+                if (_pairs_i != _pairs.size()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+        bool status() const { return _status; }
+
+
+        prob_t fullProbability() const { return _full_prob; }
+
+
+        prob_t bfullProbability() const { return _back_full_prob; }
+
+
+        const vector<event_pair_t>& event_pairs() const { return _pairs; }
+
+
+        prob_t* insertion_probs() const;
+
+
     protected:
-        ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspondingly. */
-
-        virtual void forward() =0;
-
-        virtual void backward() =0;
+        pProbMMC _forward_acc, _backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspondingly. */
+        bool _status;
+        vector<event_pair_t> _pairs;
+        size_t _pairs_i;
+        prob_t _full_prob, _back_full_prob;
 
     };
 
@@ -709,6 +748,11 @@ namespace ymir {
 
 
     class VDJForwardBackward : public ForwardBackwardAlgorithm {
+
+    };
+
+
+    class VD2JForwardBackward : public ForwardBackwardAlgorithm {
 
     };
 

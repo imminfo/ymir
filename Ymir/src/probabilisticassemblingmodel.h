@@ -371,9 +371,9 @@ namespace ymir {
                         endl << "\tFiles:"<< endl;
 
                 _status = true;
+            } else {
+                std::cout << "[ERROR] Probabilistic assembling model error:" << endl << "\t config .json file not found at [" << jsonpath << "]" << std::endl;
             }
-
-            std::cout << "[ERROR] Probabilistic assembling model error:" << endl << "\t config .json file not found at [" << jsonpath << "]" << std::endl;
         }
 
 

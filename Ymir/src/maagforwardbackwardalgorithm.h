@@ -688,7 +688,7 @@ namespace ymir {
         virtual ~ForwardBackwardAlgorithm() { }
 
 
-        void infer(const MAAG &maag) = 0;
+        virtual void infer(const MAAG &maag) = 0;
 
 
         event_pair_t nextEvent() {

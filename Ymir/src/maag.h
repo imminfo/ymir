@@ -322,7 +322,7 @@ namespace ymir {
             return _events ? (*_events)(node_i, mat_i, row, col) : 0;
         };
 
-        bool is_mismatch(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
+        error_num_t errors(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
             return _errors ? (*_errors)(node_i, mat_i, row, col) : 0;
         };
         ///@}

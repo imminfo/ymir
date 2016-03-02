@@ -463,8 +463,9 @@ namespace ymir {
                 }
 
                 if (error_mode) {
-                    for (seq_len_t i = 1; i <= v_end - v_start - 1; ++i) {
-                        errors(0, v_index, 0, i) = clonotype.isVarMismatch(v_index, i);
+                    errors(0, v_index, 0, 0) = 0;
+                    for (seq_len_t i = 1; i <= clonotype.getVarLen(v_index); ++i) {
+                        errors(0, v_index, 0, i) = errors(0, v_index, 0, i-1) + clonotype.isVarMismatch(v_index, i);
                     }
                 }
             }
@@ -508,6 +509,9 @@ namespace ymir {
             probs.initNode(J_index_dels, j_num, len + 1, 1);
             if (metadata_mode) {
                 events.initNode(J_index_dels, j_num, len + 1, 1);
+            }
+            if (error_mode) {
+                errors.initNode(errors.chainSize() - 1, j_num, len + 1, 1);
             }
 
             // add J or J-D gene nodes
@@ -557,7 +561,10 @@ namespace ymir {
                 }
 
                 if (error_mode) {
-
+                    errors(errors.chainSize() - 1, j_index, len, 0) = 0;
+                    for (seq_len_t i = 1; i <= clonotype.getJoiLen(j_index); ++i) {
+                        errors(errors.chainSize() - 1, j_index, len - i, 0) = errors(errors.chainSize() - 1, j_index, len - i, 0) + clonotype.isJoiMismatch(j_index, clonotype.getJoiLen(j_index) + 1 - i);
+                    }
                 }
             }
 

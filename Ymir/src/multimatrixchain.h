@@ -64,7 +64,8 @@ namespace ymir {
      *
      * \brief Class for storing a number of errors for each scenario event.
      */
-    typedef MultiMatrixChain<seq_len_t> ErrMMC;
+    typedef seq_len_t error_num_t;
+    typedef MultiMatrixChain<error_num_t> ErrMMC;
 
     typedef unique_ptr<ErrMMC> pErrMMC;
 

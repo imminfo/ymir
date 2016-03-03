@@ -1113,6 +1113,10 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
      YMIR_ASSERT(algn.isDivMismatch(0, 0, 5))
      YMIR_ASSERT(algn.isDivMismatch(0, 0, 6))
 
+    YMIR_ASSERT2(algn.numDivMismatches(0, 0, 1, 6), 4)
+    YMIR_ASSERT2(algn.numDivMismatches(0, 0, 3, 6), 3)
+    YMIR_ASSERT2(algn.numDivMismatches(0, 0, 2, 5), 3)
+
      YMIR_ASSERT2(algn.getDivGeneStart(0, 1), 15)
      YMIR_ASSERT2(algn.getDivSeqStart(0, 1), 16)
      YMIR_ASSERT2(algn.getDivLen(0, 1), 3)
@@ -2846,7 +2850,7 @@ YMIR_TEST_START(test_maag_vdj_err)
     YMIR_ASSERT2(maag.event_index(2, 0, 0, 3), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 5))
     YMIR_ASSERT2(maag.event_index(2, 0, 2, 2), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 1))
 
-    // rows 1 2 3 4 5 | cols 3 4 5 6 7
+    // rows 1 2 3 4 5 6 7 8 | cols
     // TODO: check D deletions indices
     YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
     YMIR_ASSERT2(maag.event_index(3, 0, 0, 1), 0)
@@ -2856,8 +2860,16 @@ YMIR_TEST_START(test_maag_vdj_err)
     YMIR_ASSERT2(maag.event_index(3, 0, 3, 3), mvec.event_index(VDJ_DIV_DEL, 1, 3, 1))
     YMIR_ASSERT2(maag.event_index(3, 0, 3, 4), mvec.event_index(VDJ_DIV_DEL, 1, 3, 0))
     YMIR_ASSERT2(maag.event_index(3, 0, 4, 4), mvec.event_index(VDJ_DIV_DEL, 1, 4, 0))
+    // bits = {1, 0, 0, 0, 1, 1};
     YMIR_ASSERT2(maag.errors(1, 0, 0, 0), 1)
-    YMIR_ASSERT2(maag.errors(1, 0, 0, 0), 1)
+    YMIR_ASSERT2(maag.errors(1, 0, 0, 1), 1)
+    YMIR_ASSERT2(maag.errors(1, 0, 0, 2), 1)
+    YMIR_ASSERT2(maag.errors(1, 0, 0, 3), 1)
+    YMIR_ASSERT2(maag.errors(1, 0, 0, 4), 2)
+    YMIR_ASSERT2(maag.errors(1, 0, 0, 5), 3)
+    YMIR_ASSERT2(maag.errors(1, 0, 1, 3), 0)
+    YMIR_ASSERT2(maag.errors(1, 0, 2, 4), 1)
+    YMIR_ASSERT2(maag.errors(1, 0, 3, 5), 2)
 
     YMIR_ASSERT2(maag.errors(1, 1, 0, 0), 0)
 

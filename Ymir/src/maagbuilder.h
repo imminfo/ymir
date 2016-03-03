@@ -651,6 +651,9 @@ namespace ymir {
             if (metadata_mode) {
                 events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
             }
+            if (error_mode) {
+                errors.initNode(1, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
+            }
 
 
             seg_index_t d_index = 0, d_gene = 0;
@@ -681,6 +684,13 @@ namespace ymir {
                                                                   d_gene - 1,
                                                                   d_gene_start + left_pos - d_seq_start,
                                                                   d_len - (d_gene_end - (d_seq_end - right_pos)));
+                            }
+
+                            if (error_mode) {
+                                errors(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) =
+                                        clonotype.numDivMismatches(d_index, j,
+                                                                   d_gene_start + left_pos - d_seq_start,
+                                                                   d_gene_end - (d_seq_end - right_pos));
                             }
                         }
                     }

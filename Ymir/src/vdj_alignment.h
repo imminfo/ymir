@@ -183,6 +183,10 @@ namespace ymir {
         bool isDivMismatch(seg_index_t dgene, seg_index_t align_i, seq_len_t pos) const {
             return _alignments.isMismatch(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i, pos);
         }
+
+        error_num_t numDivMismatches(seg_index_t dgene, seg_index_t align_i, seq_len_t start, seq_len_t end) const {
+            return _alignments.numMismatches(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i, start, end);
+        }
         ///@}
 
 

@@ -26,6 +26,7 @@
 
 
 #include "alignment_vector_base.h"
+#include "multimatrixchain.h"
 
 
 namespace ymir {
@@ -72,13 +73,30 @@ namespace ymir {
         /**
          *
          */
-        bool isMismatch(seq_len_t i, seq_len_t j) const { 
+        bool isMismatch(seq_len_t i, seq_len_t j) const {
 #ifndef DNDEBUG
             if (_starts[i] + j - 1 >= _events.size()) {
                 throw(std::runtime_error("Alignment vector: mismatch index is out of bounds."));
             }
 #endif
             return _events[_starts[i] + j - 1];
+        }
+
+
+        error_num_t numMismatches(seq_len_t i, seq_len_t start, seq_len_t end) const {
+#ifndef DNDEBUG
+            if (_starts[i] + start - 1 >= _events.size()) {
+                throw(std::runtime_error("Alignment vector: start index is out of bounds."));
+            }
+            if (_starts[i] + end - 1 >= _events.size()) {
+                throw(std::runtime_error("Alignment vector: end index is out of bounds."));
+            }
+#endif
+            error_num_t res = 0;
+            for (size_t j = start; j <= end; ++j) {
+                res += static_cast<error_num_t>(_events[_starts[i] + j - 1]);
+            }
+            return res;
         }
 
     };

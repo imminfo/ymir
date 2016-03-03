@@ -1,5 +1,3 @@
-#include "src/vj_model.h"
-#include "src/vdj_model.h"
-//#include "src/vd2j_model.h"
+#include "src/probabilisticassemblingmodel.h"
 #include "src/parser.h"
 #include "src/writer.h"

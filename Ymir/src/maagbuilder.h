@@ -563,7 +563,7 @@ namespace ymir {
                 if (error_mode) {
                     errors(errors.chainSize() - 1, j_index, len, 0) = 0;
                     for (seq_len_t i = 1; i <= clonotype.getJoiLen(j_index); ++i) {
-                        errors(errors.chainSize() - 1, j_index, len - i, 0) = errors(errors.chainSize() - 1, j_index, len - i, 0) + clonotype.isJoiMismatch(j_index, clonotype.getJoiLen(j_index) + 1 - i);
+                        errors(errors.chainSize() - 1, j_index, len - i, 0) = errors(errors.chainSize() - 1, j_index, len + 1 - i, 0) + clonotype.isJoiMismatch(j_index, clonotype.getJoiLen(j_index) + 1 - i);
                     }
                 }
             }

@@ -113,6 +113,10 @@ namespace ymir {
 
         /**
          * \brief Add vectors of alignments to the builder.
+         *
+         * Add alignments to the builder. IMPORTANT NOTE: for V / J alignments each input vectors
+         * counts as a set of various V or J gene segments. For D alignments
+         * input vec counts as a set of alignments for a specific D gene segment (i.e., only one!).
          */
         ///@{
         VDJAlignmentBuilder& addVarAlignment(const NoGapAlignmentVector &vec) {

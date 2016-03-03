@@ -58,6 +58,8 @@ namespace ymir {
             no_V_algn = 0;
             no_D_algn = 0;
             no_J_algn = 0;
+            bad_V_len = 0;
+            bad_J_len = 0;
         }
 
         void print() {

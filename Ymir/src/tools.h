@@ -142,6 +142,17 @@ namespace ymir {
         return false;
     }
 
+
+    inline bool has_oof_aa_codon(const sequence_t &sequence) {
+        for (size_t i = 0; i < sequence.size(); ++i) {
+            if (sequence[i] == '~') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }
 
 #endif

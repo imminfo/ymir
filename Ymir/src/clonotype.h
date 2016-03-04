@@ -110,6 +110,33 @@ namespace ymir {
 
         SequenceType sequence_type() const { return _seq_type; }
 
+
+        bool isCoding() const {
+            if (_seq_type == NUCLEOTIDE) {
+                return !(is_out_of_frame(_sequence) || has_end_codon(_sequence));
+            } else {
+                return !has_bad_aa_codons(_sequence);
+            }
+        }
+
+
+        bool isNoncoding() const {
+            if (_seq_type == NUCLEOTIDE) {
+                return is_out_of_frame(_sequence) || has_end_codon(_sequence);
+            } else {
+                return has_bad_aa_codons(_sequence);
+            }
+        }
+
+
+        bool isOutOfFrame() const {
+            if (_seq_type == NUCLEOTIDE) {
+                return is_out_of_frame(_sequence);
+            } else {
+                return has_oof_aa_codon(_sequence);
+            }
+        }
+
     protected:
 
         Recombination _recomb;

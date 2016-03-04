@@ -811,10 +811,14 @@ YMIR_TEST_START(test_clorep)
                                       .setV(AlignmentColumnOptions::USE_PROVIDED)
                                       .setJ(AlignmentColumnOptions::USE_PROVIDED)))
 
-     YMIR_ASSERT(!has_end_codon(cr[3].sequence()))
-     YMIR_ASSERT(is_out_of_frame(cr[3].sequence()))
-     YMIR_ASSERT(has_end_codon(cr[24].sequence()))
-     YMIR_ASSERT(is_out_of_frame(cr[24].sequence()))
+    YMIR_ASSERT(!has_end_codon(cr[3].sequence()))
+    YMIR_ASSERT(cr[3].isNoncoding())
+    YMIR_ASSERT(is_out_of_frame(cr[3].sequence()))
+    YMIR_ASSERT(cr[3].isOutOfFrame())
+    YMIR_ASSERT(has_end_codon(cr[24].sequence()))
+    YMIR_ASSERT(cr[24].isNoncoding())
+    YMIR_ASSERT(is_out_of_frame(cr[24].sequence()))
+    YMIR_ASSERT(cr[24].isOutOfFrame())
 
      ClonesetView crv = cr.head(10);
      YMIR_ASSERT2(crv.size(), 10)

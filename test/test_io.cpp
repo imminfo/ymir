@@ -33,52 +33,6 @@ using namespace ymir;
 std::string TEST_DATA_FOLDER;
 
 
-YMIR_TEST_START(test_writer)
-
-     RepertoireWriter writer;
-
-     vector<string> alvec1;
-     vector<string> seqvec1;
-     alvec1.push_back("Vseg1");
-     alvec1.push_back("Vseg2");
-     alvec1.push_back("Vseg3");
-     seqvec1.push_back("CCCG");
-     seqvec1.push_back("GGG");
-     seqvec1.push_back("AGGCGAG");
-
-     vector<string> alvec2;
-     vector<string> seqvec2;
-     alvec2.push_back("Jseg1");
-     alvec2.push_back("Jseg2");
-     alvec2.push_back("Jseg3");
-     seqvec2.push_back("CCGTTT");
-     seqvec2.push_back("ATTTGG");
-     seqvec2.push_back("AGGTTT");
-
-     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
-
-     ClonotypeBuilder cl_builder;
-     // CCCG.AC.GGTTT
-     cl_builder.setSequence("CCCGACGGTTT")
-             .setNucleotideSeq()
-             .setRecombination(VJ_RECOMB)
-             .addVarAlignment(1, 1, 1, 4)
-             .addVarAlignment(3, 4, 3, 4)
-             .addJoiAlignment(1, 2, 6, 5)
-             .addJoiAlignment(2, 2, 9, 3)
-             .addJoiAlignment(3, 2, 7, 5);
-     Clonotype clonotype = cl_builder.buildClonotype();
-     vector<Clonotype> vec;
-     vec.push_back(clonotype);
-     Cloneset cloneset(vec);
-
-     YMIR_ASSERT(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset, genes))
-
-//     TODO: write a parser to test writer's output
-
-YMIR_TEST_END
-
-
 YMIR_TEST_START(test_parser_vj)
 
      NaiveNucParser parser;
@@ -249,6 +203,52 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 3)
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 4)
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(2), 5)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_writer)
+
+    RepertoireWriter writer;
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1");
+    alvec1.push_back("Vseg2");
+    alvec1.push_back("Vseg3");
+    seqvec1.push_back("CCCG");
+    seqvec1.push_back("GGG");
+    seqvec1.push_back("AGGCGAG");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1");
+    alvec2.push_back("Jseg2");
+    alvec2.push_back("Jseg3");
+    seqvec2.push_back("CCGTTT");
+    seqvec2.push_back("ATTTGG");
+    seqvec2.push_back("AGGTTT");
+
+    VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
+
+    ClonotypeBuilder cl_builder;
+    // CCCG.AC.GGTTT
+    cl_builder.setSequence("CCCGACGGTTT")
+            .setNucleotideSeq()
+            .setRecombination(VJ_RECOMB)
+            .addVarAlignment(1, 1, 1, 4)
+            .addVarAlignment(3, 4, 3, 4)
+            .addJoiAlignment(1, 2, 6, 5)
+            .addJoiAlignment(2, 2, 9, 3)
+            .addJoiAlignment(3, 2, 7, 5);
+    Clonotype clonotype = cl_builder.buildClonotype();
+    vector<Clonotype> vec;
+    vec.push_back(clonotype);
+    Cloneset cloneset(vec);
+
+    YMIR_ASSERT(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset, genes))
+
+//     TODO: write a parser to test writer's output
 
 YMIR_TEST_END
 

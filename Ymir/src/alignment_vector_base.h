@@ -63,6 +63,18 @@ namespace ymir {
         // {
         // }
 
+        bool operator==(const AlignmentVectorBase &other) {
+            return _data == other._data
+                   && _events == other._events
+                   && _starts == other._starts;
+        }
+
+        bool operator!=(const AlignmentVectorBase &other) {
+            return _data != other._data
+                   || _events != other._events
+                   || _starts != other._starts;
+        }
+
 
         void extend(const AlignmentVectorBase &other) {
             _data.reserve(_data.size() + other._data.size() + 1);

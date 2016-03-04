@@ -80,6 +80,19 @@ namespace ymir {
         }
 
 
+        bool operator==(const VDJAlignment &other) {
+            return _segments == other._segments
+                   && _alignments == other._alignments
+                   && _n_D_alignments == other._n_D_alignments;
+        }
+
+        bool operator!=(const VDJAlignment &other) {
+            return _segments != other._segments
+                   || _alignments != other._alignments
+                   || _n_D_alignments != other._n_D_alignments;
+        }
+
+
         /** 
          * \brief Get the number of alignments for the specific gene.
          */

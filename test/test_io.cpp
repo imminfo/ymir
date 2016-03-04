@@ -248,7 +248,18 @@ YMIR_TEST_START(test_writer)
 
     YMIR_ASSERT(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset, genes))
 
-//     TODO: write a parser to test writer's output
+    Cloneset cloneset2;
+    NaiveNucParser parser;
+    YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "../out.txt",
+                                    &cloneset2,
+                                    genes,
+                                    NUCLEOTIDE,
+                                    VJ_RECOMB,
+                                    AlignmentColumnOptions()
+                                            .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                            .setJ(AlignmentColumnOptions::USE_PROVIDED)))
+
+    YMIR_ASSERT(cloneset2[0] == cloneset[0])
 
 YMIR_TEST_END
 

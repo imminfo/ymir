@@ -92,7 +92,7 @@ namespace ymir {
                             CELL_FILL(seg_i, cloneset[i].nDiv(), ofs, ';', '\t')
                         }
                     } else {
-                        ofs << "\t\t";
+                        ofs << "\t";
                     }
 
                     for (auto seg_i = 0; seg_i < cloneset[i].nJoi(); ++seg_i) {

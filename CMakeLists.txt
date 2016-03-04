@@ -18,4 +18,4 @@ include_directories(/usr/local/include/)
 
 add_subdirectory(test)
 add_subdirectory(benchmark)
-add_subdirectory(scripts)
+#add_subdirectory(scripts)

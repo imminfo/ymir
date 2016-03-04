@@ -26,7 +26,8 @@ script:
  - python3 pyymir.py
 
 after_success:
- - /home/travis/build/imminfo/ymir/build/test/Test /home/travis/build/imminfo/ymir/test/data/
+ #- /home/travis/build/imminfo/ymir/build/test/Test /home/travis/build/imminfo/ymir/test/data/
+ - python3 ytest.py
 
 notifications:
   slack: imminfo:CJCtbSdFOW1w9xMoY0HxSLgY

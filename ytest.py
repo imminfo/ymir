@@ -1,4 +1,6 @@
 import os
 
 if __name__ == "__main__":
-    os.system("./build/test/Test " + os.getcwd() + '/test/data/')
+    for f in os.listdir("./build/test/"):
+        if f.find("Test_") != -1:
+            os.system(f + os.getcwd() + '/test/data/')

@@ -276,7 +276,6 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_parser_vj())
     YMIR_TEST(test_parser_vj_by_block())
     YMIR_TEST(test_parser_vdj_with_d_alignment())
-//    YMIR_TEST(test_ymir_vdj_wo_d_alignment())
     YMIR_TEST(test_writer())
 
     //**************  **************//

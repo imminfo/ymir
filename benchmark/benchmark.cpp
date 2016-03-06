@@ -122,7 +122,7 @@ int main(int argc, char* argv[]) {
     // VJ inference
     //
     tp1 = std::chrono::system_clock::now();
-    EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
+//    EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
     tp2 = std::chrono::system_clock::now();
     vj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
     // VDJ inference
     //
     tp1 = std::chrono::system_clock::now();
-    EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
+//    EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
     tp2 = std::chrono::system_clock::now();
     vdj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 

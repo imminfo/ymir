@@ -367,7 +367,7 @@ namespace ymir {
                         "\n\t" <<
                         _config.get("recombination", "undefined").asString() <<
                         "-recombination  |  " <<
-                        (_config.get("hypermutations", false).asBool() ? "Sequence error model" : "No sequence error model") <<
+                        ((_config.get("errors", 0).asDouble() == 0) ? "Sequence error model" : "No sequence error model") <<
                         endl << "\tFiles:"<< endl;
 
                 _status = true;

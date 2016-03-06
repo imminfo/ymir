@@ -126,7 +126,7 @@ namespace ymir {
         * \brief Probability of the given nucleotide sequence.
         */
         ///@{
-        prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR) const {
+        virtual prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR) const {
             return this->nucProbability<std::string::const_iterator>(sequence.cbegin(), sequence.size(), first_char);
         }
 

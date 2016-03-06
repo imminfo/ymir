@@ -770,7 +770,7 @@ namespace ymir {
                                bool metadata_mode,
                                bool error_mode) const
         {
-            InsertionModel mc(DI_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
+            InsertionModel mc(DI_NUCLEOTIDE, _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
 
             seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                     d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX);

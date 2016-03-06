@@ -3,7 +3,7 @@
   "comment": "Insert comments for this model here",
   "specimen": "human",
   "recombination": "VJ",
-  "hypermutations": false,
+  "errors": 0,
   "segments": {
     "variable": {
       "file": "trav.txt",

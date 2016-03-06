@@ -86,8 +86,11 @@ namespace ymir {
                              const vector<event_ind_t>& event_classes,
                              const vector<seq_len_t>& event_family_col_numbers,
                              const vector<prob_t>& laplace_vec = vector<prob_t>(),
+                             prob_t err_prob = 0,
                              bool do_normalise = true,
-                             const vector<seq_len_t>& d_genes_min_len = vector<seq_len_t>()) {
+                             const vector<seq_len_t>& d_genes_min_len = vector<seq_len_t>())
+            : _err_prob(err_prob)
+        {
             _recomb = vec_type;
 
             _vec = vector<prob_t>();
@@ -360,6 +363,9 @@ namespace ymir {
         inline seq_len_t D_min_len(event_ind_t d_index) const { return _d_genes_min_len[d_index - 1]; }
 
 
+        inline prob_t error_prob() const { return _err_prob; }
+
+
         /**
          * \brief Fill the vector with the given value.
          */
@@ -402,6 +408,7 @@ namespace ymir {
         vector<seq_len_t> _event_family_col_numbers;  /** Vector of the number of rows of each event family. */
         vector<prob_t> _laplace;
         vector<seq_len_t> _d_genes_min_len;
+        prob_t _err_prob;
         Recombination _recomb;
 
 

@@ -561,7 +561,7 @@ namespace ymir {
                              laplace,
                              1);
 
-                _param_vec.reset(new ModelParameterVector(VJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace));
+                _param_vec.reset(new ModelParameterVector(VJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, _config.get("errors", 0).asDouble()));
                 is_ok = true;
             }
 
@@ -873,7 +873,7 @@ namespace ymir {
                              1);
 
                 for (seg_index_t i = 1; i <= _genes->D().max(); ++i) { min_D_len_vec.push_back(_min_D_len); }
-                _param_vec.reset(new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, true, min_D_len_vec));
+                _param_vec.reset(new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, _config.get("errors", 0).asDouble(), true, min_D_len_vec));
                 is_ok = true;
             }
 

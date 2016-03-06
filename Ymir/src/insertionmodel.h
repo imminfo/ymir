@@ -27,21 +27,23 @@ namespace ymir {
         typedef unique_ptr<prob_t[]> prob_array_t;
 
 
-        InsertionModel(InsertionModelType mt) 
-            : _type(mt), _arr(new prob_t[mt == MONO_NUCLEOTIDE ? 4 : 16])
+        InsertionModel(InsertionModelType mt, prob_t err_prob = 0)
+            : _type(mt),
+              _arr(new prob_t[mt == MONO_NUCLEOTIDE ? 4 : 16]),
+              _err_prob(err_prob)
         {
         }
 
 
-        InsertionModel(InsertionModelType mt, std::vector<prob_t>::const_iterator start) 
-            : InsertionModel(mt) 
+        InsertionModel(InsertionModelType mt, std::vector<prob_t>::const_iterator start, prob_t err_prob = 0)
+            : InsertionModel(mt, err_prob)
         {
             this->updateProbabilities(start);
         }
 
 
-        InsertionModel(const event_matrix_t& mat) 
-            : InsertionModel(DI_NUCLEOTIDE) 
+        InsertionModel(const event_matrix_t& mat, prob_t err_prob = 0)
+            : InsertionModel(DI_NUCLEOTIDE, err_prob)
         {
             this->updateProbabilities(mat);
         }
@@ -49,13 +51,15 @@ namespace ymir {
 
         InsertionModel(const InsertionModel &other) 
             : _type(other._type), 
-              _arr(new prob_t[other._type == MONO_NUCLEOTIDE ? 4 : 16])
+              _arr(new prob_t[other._type == MONO_NUCLEOTIDE ? 4 : 16]),
+              _err_prob(other._err_prob)
         {
             this->updateProbabilities(other._arr.get());
         }
 
 
         InsertionModel& operator=(const InsertionModel &other) {
+            _err_prob = other._err_prob;
             if (_arr.get() != other._arr.get()) {
                 _type = other._type;
                 this->initProbabilities();
@@ -72,6 +76,7 @@ namespace ymir {
 
         void initProbabilities() {
             _arr.reset(new prob_t[_type == MONO_NUCLEOTIDE ? 4 : 16]);
+            _err_prob = 0;
         }
 
 
@@ -86,30 +91,33 @@ namespace ymir {
         * for next nucleotide.
         */
         ///@{
-        void updateProbabilities(std::vector<prob_t>::const_iterator start) {
+        void updateProbabilities(std::vector<prob_t>::const_iterator start, prob_t err_prob = 0) {
             uint8_t last = _type == MONO_NUCLEOTIDE ? 4 : 16;
             for (uint8_t i = 0; i < last; ++i, ++start) {
                 _arr[i] = *start;
             }
+            _err_prob = err_prob;
         }
 
-        void updateProbabilities(prob_t *start) {
+        void updateProbabilities(prob_t *start, prob_t err_prob = 0) {
             uint8_t last = _type == MONO_NUCLEOTIDE ? 4 : 16;
             for (uint8_t i = 0; i < last; ++i) {
                 _arr[i] = *(start + i);
             }
+            _err_prob = err_prob;
         }
 
-        void updateProbabilities(const event_matrix_t& mat) {
+        void updateProbabilities(const event_matrix_t& mat, prob_t err_prob = 0) {
 #ifndef DNDEBUG
             if (_type == MONO_NUCLEOTIDE) { throw(std::runtime_error("Can't initialise the mono-nucleotide insertion model with a matrix!")); }
 #endif
-
             for (uint8_t i = 0; i < 4; ++i) {
                 for (uint8_t j = 0; j < 4; ++j) {
                     _arr[4*i + j] = mat(i, j);
                 }
             }
+
+            _err_prob = err_prob;
         }
         ///@}
 
@@ -237,6 +245,7 @@ namespace ymir {
 
         InsertionModelType _type;
         prob_array_t _arr;  /** Representation for a std::vector (#elements = 4) or a matrix (#elements = 16) with transition probabilities; rows and cols are for A-C-G-T (sequentially). */
+        prob_t _err_prob;
 
 
         InsertionModel() 

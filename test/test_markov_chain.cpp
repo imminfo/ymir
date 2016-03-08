@@ -36,7 +36,7 @@ std::string TEST_DATA_FOLDER;
 YMIR_TEST_START(test_markovchain_nuc_mono)
 
     vector<prob_t> probs = {.1, .2, .3, .4};
-    InsertionModel m(MONO_NUCLEOTIDE, probs.begin());
+    MonoNucInsertionModel m(probs.begin());
 
     string s = "ACGT";
 
@@ -55,16 +55,16 @@ YMIR_TEST_START(test_markovchain_nuc_mono)
     YMIR_ASSERT(abs(m.nucProbability(s.substr(0, 3), NULL_CHAR)) - .006 < 1e-18)
 
     probs = {1, 0, 0, 0};
-    m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
+    m = MonoNucInsertionModel(probs.begin());
     std::default_random_engine rg;
     YMIR_ASSERT2(m.generate(5, rg), "AAAAA");
 
     probs = {0, 0, 0, 1};
-    m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
+    m = MonoNucInsertionModel(probs.begin());
     YMIR_ASSERT2(m.generate(1, rg), "T");
 
     probs = {0, 1, 0, 0};
-    m = InsertionModel(MONO_NUCLEOTIDE, probs.begin());
+    m = MonoNucInsertionModel(probs.begin());
     YMIR_ASSERT2(m.generate(3, rg), "CCC");
 
 YMIR_TEST_END
@@ -117,7 +117,7 @@ YMIR_TEST_START(test_markovchain_nuc_di)
     vec.push_back(.25);
     vec.push_back(.3);
 
-    InsertionModel mc(mat);
+    DiNucInsertionModel mc(mat);
     string s = "ACGT";
 
     // .25 * .7 * .3 * .2 = .0105
@@ -128,7 +128,7 @@ YMIR_TEST_START(test_markovchain_nuc_di)
     // .4 * .7 * .3 * .2 = .0126
     YMIR_ASSERT2(mc.nucProbability(s.begin(), 4, 'C'), .0168);
 
-    mc.updateProbabilities(vec.begin());
+    mc = DiNucInsertionModel(vec.begin());
 
     YMIR_ASSERT2(mc.nucProbability(s) - .0105, 0);
     YMIR_ASSERT2(mc.nucProbability(s.begin(), 4, 'C'), .0168);

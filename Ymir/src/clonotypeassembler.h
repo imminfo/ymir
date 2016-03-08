@@ -80,7 +80,7 @@ namespace ymir {
 
         Clonotype generate_vj(std::default_random_engine &rg) const {
             ClonotypeBuilder builder;
-            InsertionModel mc_vj(MONO_NUCLEOTIDE, _param_vec.get_iterator(_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
+            MonoNucInsertionModel mc_vj(_param_vec.get_iterator(_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
 
             std::discrete_distribution<event_ind_t> vj_genes(_param_vec.get_iterator(_param_vec.event_index(VJ_VAR_JOI_GEN, 0, 0)),
                                                              _param_vec.get_iterator(_param_vec.event_index(VJ_VAR_JOI_GEN, 0, 0)
@@ -117,8 +117,8 @@ namespace ymir {
 
         Clonotype generate_vdj(std::default_random_engine &rg) const {
             ClonotypeBuilder builder;
-            const InsertionModel mc_vd(DI_NUCLEOTIDE, _param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
-            const InsertionModel mc_dj(DI_NUCLEOTIDE, _param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
+            const DiNucInsertionModel mc_vd(_param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
+            const DiNucInsertionModel mc_dj(_param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
 
             seq_len_t ins_len_vd = std::discrete_distribution<seq_len_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 0)),
                                                                          _param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 0)

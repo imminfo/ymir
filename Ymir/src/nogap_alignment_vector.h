@@ -93,9 +93,12 @@ namespace ymir {
             }
 #endif
             error_num_t res = 0;
+            std::cout << (int) (start) << ":" << (int) (end) << std::endl;
             for (size_t j = start; j <= end; ++j) {
+                std::cout << (int) (_events[_starts[i] + j - 1]);
                 res += static_cast<error_num_t>(_events[_starts[i] + j - 1]);
             }
+            std::cout << " -> " << (int) res << std::endl;
             return res;
         }
 

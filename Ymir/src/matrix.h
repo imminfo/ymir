@@ -187,6 +187,18 @@ namespace ymir {
         }
 
 
+        std::string print() const {
+            std::string res = "";
+            for (size_t i = 0; i < _rows; ++i) {
+                for (size_t j = 0; j < _cols; ++j) {
+                    res += std::to_string((*this)(i, j)) + "\t";
+                }
+                res += "\n";
+            }
+            return res;
+        }
+
+
     protected:
 
         _Scalar *_data;

@@ -150,6 +150,7 @@ namespace ymir {
 
         bool operator==(const ModelParameterVector &other) const {
             if ((_recomb != other._recomb)
+                || (_err_prob != other._err_prob)
                 || (_vec.size() != other._vec.size())
                 || (_edges.size() != other._edges.size())
                 || (_event_classes.size() != other._event_classes.size())

@@ -632,7 +632,6 @@ YMIR_TEST_START(test_maag_vdj_err)
 
     bits = {1, 0, 0, 0};
     vec.addAlignment(2, 1, 8, bits);
-
     bits = {1, 0, 0, 0, 0, 0};
     vec.addAlignment(3, 1, 6, bits);
 

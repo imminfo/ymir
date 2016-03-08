@@ -687,6 +687,7 @@ namespace ymir {
                             }
 
                             if (error_mode) {
+                                std::cout << "pos: " << (int) (seq_row[left_pos] - 1) << " : " << (int) (seq_row[left_pos] - 1) << std::endl;
                                 errors(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) =
                                         clonotype.numDivMismatches(d_index, j,
                                                                    d_gene_start + left_pos - d_seq_start,
@@ -694,6 +695,10 @@ namespace ymir {
                             }
                         }
                     }
+                }
+
+                if (error_mode) {
+                    std::cout << errors.matrix(1, 0).print() << std::endl;
                 }
             }
 

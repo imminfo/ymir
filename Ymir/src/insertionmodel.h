@@ -116,7 +116,6 @@ namespace ymir {
                     _arr[4*i + j] = mat(i, j);
                 }
             }
-
             _err_prob = err_prob;
         }
         ///@}
@@ -126,8 +125,9 @@ namespace ymir {
         * \brief Probability of the given nucleotide sequence.
         */
         ///@{
-        virtual prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR) const {
-            return this->nucProbability<std::string::const_iterator>(sequence.cbegin(), sequence.size(), first_char);
+        prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR) const {
+//            return this->nucProbability<std::string::const_iterator>(sequence.cbegin(), sequence.size(), first_char);
+            return this->nucProbability(sequence.cbegin(), sequence.size(), first_char);
         }
 
         template <class Iterator>
@@ -140,16 +140,6 @@ namespace ymir {
                     for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
                         res *= _arr[nuc_hash(*start)];
                     }
-//                    if (std::isnan(res)) {
-//                        cout << "NAN res!!" << endl;
-//                        res = 1;
-//                        tmp = start;
-//                        for (seq_len_t i = 0; i < sequence_len; ++i, ++tmp) {
-//                            cout << "char:" << (*tmp) << " " << res << " -> ";
-//                            res *= _arr[nuc_hash(*tmp)];
-//                            cout << res << endl;
-//                        }
-//                    }
                 } else {
                     auto tmp1 = start, tmp2 = start + 1;
                     auto next = start + 1;
@@ -157,22 +147,6 @@ namespace ymir {
                     for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
                         res *= (*this)(nuc_hash(*start), nuc_hash(*next));
                     }
-//                    if (std::isnan(res)) {
-//                        tmp1 = start;
-//                        tmp2 = start + 1;
-//                        cout << "NAN res!!" << endl;
-//                        res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*tmp1));
-//                        cout << "first char: " << first_char << endl;
-//                        cout << "res1: " << res << endl;
-//                        cout << "is null char: " << (first_char == NULL_CHAR) << endl;
-//                        cout << "hash: " << ((*this)(nuc_hash(first_char), nuc_hash(*tmp1))) << endl;
-//                        cout << "res2: " << res << endl;
-//                        for (seq_len_t i = 1; i < sequence_len; ++i, ++tmp1, ++tmp2) {
-//                            cout << "char:" << (*tmp1) << ":" << (*tmp2) << " " << res << " -> ";
-//                            res *= (*this)(nuc_hash(*tmp1), nuc_hash(*tmp2));
-//                            cout << res << endl;
-//                        }
-//                    }
                 }
             }
 

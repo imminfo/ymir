@@ -115,6 +115,9 @@ namespace ymir {
         prob_t operator[](uint8_t index) const { return _arr[index]; }
         ///@}
 
+
+        prob_t err_prob() const { return _err_prob; }
+
     protected:
 
 //        InsertionModelType _type;
@@ -134,17 +137,25 @@ namespace ymir {
         * for next nucleotide.
         */
         ///@{
-        void updateProbabilities(std::vector<prob_t>::const_iterator start, prob_t err_prob = 0) {
+        void updateProbabilities(std::vector<prob_t>::const_iterator start) {
             for (uint8_t i = 0; i < _size; ++i, ++start) {
                 _arr[i] = *start;
             }
-            _err_prob = err_prob;
         }
 
-        void updateProbabilities(prob_t *start, prob_t err_prob = 0) {
+        void updateProbabilities(prob_t *start) {
             for (uint8_t i = 0; i < _size; ++i) {
                 _arr[i] = *(start + i);
             }
+        }
+
+        void updateProbabilities(std::vector<prob_t>::const_iterator start, prob_t err_prob) {
+            this->updateProbabilities(start);
+            _err_prob = err_prob;
+        }
+
+        void updateProbabilities(prob_t *start, prob_t err_prob) {
+            this->updateProbabilities(start);
             _err_prob = err_prob;
         }
         ///@}
@@ -397,12 +408,16 @@ namespace ymir {
 
     protected:
 
-        void updateProbabilitiesMatrix(const event_matrix_t& mat, prob_t err_prob = 0) {
+        void updateProbabilitiesMatrix(const event_matrix_t& mat) {
             for (uint8_t i = 0; i < 4; ++i) {
                 for (uint8_t j = 0; j < 4; ++j) {
                     _arr[4*i + j] = mat(i, j);
                 }
             }
+        }
+
+        void updateProbabilitiesMatrix(const event_matrix_t& mat, prob_t err_prob) {
+            this->updateProbabilitiesMatrix(mat);
             _err_prob = err_prob;
         }
 

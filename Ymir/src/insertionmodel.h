@@ -77,14 +77,14 @@ namespace ymir {
         * \brief Probability of the given nucleotide sequence.
         */
         ///@{
-        virtual prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR) const = 0;
+        virtual prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR, bool with_errors = false) const = 0;
 //            return this->nucProbability<std::string::const_iterator>(sequence.cbegin(), sequence.size(), first_char);
 //            return this->nucProbability(sequence.cbegin(), sequence.size(), first_char);
 //        }
 
-        virtual prob_t nucProbability(std::string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const = 0;
+        virtual prob_t nucProbability(std::string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const = 0;
 
-        virtual prob_t nucProbability(std::string::const_reverse_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const = 0;
+        virtual prob_t nucProbability(std::string::const_reverse_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const = 0;
         ///@}
 
 
@@ -191,30 +191,44 @@ namespace ymir {
         }
 
 
-        prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR) const {
-            return this->nucProbability(sequence.cbegin(), sequence.size(), first_char);
+        prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR, bool with_errors = false) const {
+            return this->nucProbability(sequence.cbegin(), sequence.size(), first_char, with_errors);
         }
 
-        prob_t nucProbability(std::string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const {
+        prob_t nucProbability(std::string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const {
             prob_t res = 1;
 
             if (sequence_len) {
                 auto tmp = start;
-                for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
-                    res *= _arr[nuc_hash(*start)];
+                if (!with_errors) {
+                    for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
+                        res *= _arr[nuc_hash(*start)];
+                    }
+                } else {
+                    prob_t element = _err_prob * (_arr[0] + _arr[1] + _arr[2] + _arr[4]);
+                    for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
+                        res *= (element + (1 - _err_prob) * _arr[nuc_hash(*start)]);
+                    }
                 }
             }
 
             return res;
         }
 
-        prob_t nucProbability(std::string::const_reverse_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const {
+        prob_t nucProbability(std::string::const_reverse_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const {
             prob_t res = 1;
 
             if (sequence_len) {
                 auto tmp = start;
-                for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
-                    res *= _arr[nuc_hash(*start)];
+                if (!with_errors) {
+                    for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
+                        res *= _arr[nuc_hash(*start)];
+                    }
+                } else {
+                    prob_t element = _err_prob * (_arr[0] + _arr[1] + _arr[2] + _arr[4]);
+                    for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
+                        res *= (element + (1 - _err_prob) * _arr[nuc_hash(*start)]);
+                    }
                 }
             }
 
@@ -288,11 +302,11 @@ namespace ymir {
         }
 
 
-        prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR) const {
+        prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR, bool with_errors = false) const {
             return this->nucProbability(sequence.cbegin(), sequence.size(), first_char);
         }
 
-        prob_t nucProbability(std::string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const {
+        prob_t nucProbability(std::string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const {
             prob_t res = 1;
 
             if (sequence_len) {
@@ -307,7 +321,7 @@ namespace ymir {
             return res;
         }
 
-        prob_t nucProbability(std::string::const_reverse_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const {
+        prob_t nucProbability(std::string::const_reverse_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const {
             prob_t res = 1;
 
             if (sequence_len) {

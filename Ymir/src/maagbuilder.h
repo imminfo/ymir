@@ -466,6 +466,9 @@ namespace ymir {
                     errors(0, v_index, 0, 0) = 0;
                     for (seq_len_t i = 1; i <= clonotype.getVarLen(v_index); ++i) {
                         errors(0, v_index, 0, i) = errors(0, v_index, 0, i-1) + clonotype.isVarMismatch(v_index, i);
+                        if (errors(0, v_index, 0, i)) {
+                            probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) *= errors(0, v_index, 0, i) * _param_vec->error_prob();
+                        }
                     }
                 }
             }
@@ -523,7 +526,7 @@ namespace ymir {
             }
 
             // compute J deletions
-            seq_len_t j_len, j_gene, j_start, j_end;
+            seq_len_t j_len, j_gene, j_start, j_end, shift;
 
             EventClass J_DEL = clonotype.recombination() == VJ_RECOMB ? VJ_JOI_DEL : VDJ_JOI_DEL;
             for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
@@ -541,7 +544,7 @@ namespace ymir {
                 // J deletions
                 j_start = clonotype.getJoiGeneStart(j_index);
                 j_end = clonotype.getJoiGeneEnd(j_index);
-                seq_len_t shift = clonotype.getJoiSeqStart(j_index) - seq_global_start_pos;
+                shift = clonotype.getJoiSeqStart(j_index) - seq_global_start_pos;
 
                 for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index) + 1; ++i) {
                      probs(J_index_dels, j_index, i + shift, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_start + i - 1); // probability of deletions
@@ -563,7 +566,12 @@ namespace ymir {
                 if (error_mode) {
                     errors(errors.chainSize() - 1, j_index, len, 0) = 0;
                     for (seq_len_t i = 1; i <= clonotype.getJoiLen(j_index); ++i) {
-                        errors(errors.chainSize() - 1, j_index, len - i, 0) = errors(errors.chainSize() - 1, j_index, len + 1 - i, 0) + clonotype.isJoiMismatch(j_index, clonotype.getJoiLen(j_index) + 1 - i);
+                        errors(errors.chainSize() - 1, j_index, len - i, 0)
+                                = errors(errors.chainSize() - 1, j_index, len + 1 - i, 0)
+                                  + clonotype.isJoiMismatch(j_index, clonotype.getJoiLen(j_index) + 1 - i);
+                        if (errors(errors.chainSize() - 1, j_index, len - i, 0)) {
+                            probs(J_index_dels, j_index, len - i, 0) *= errors(errors.chainSize() - 1, j_index, len - i, 0) * _param_vec->error_prob();
+                        }
                     }
                 }
             }
@@ -591,7 +599,7 @@ namespace ymir {
                             bool metadata_mode,
                             bool error_mode) const
         {
-            Alignment d_alignment;
+            seq_len_t min_D_len;
 
             // vector seq_start -> 0 means no such index in the matrix, 1 otherwise.
             seq_len_t seq_arr_size = clonotype.sequence().size() + 1;
@@ -603,7 +611,7 @@ namespace ymir {
             std::fill(seq_col.get(), seq_col.get() + seq_arr_size, 0);
 
             for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
-                seq_len_t min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
+                min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
 
                 for (seg_index_t j = 0; j < clonotype.numDivAlignments(d_index); ++j) {
                     seq_len_t d_seq_start = clonotype.getDivSeqStart(d_index, j),
@@ -656,8 +664,9 @@ namespace ymir {
             }
 
 
-            seg_index_t d_index = 0, d_gene = 0;
-            seq_len_t min_D_len = 0, d_len = 0;
+            seg_index_t d_index, d_gene;
+            seq_len_t d_len;
+            seq_len_t d_seq_start, d_seq_end, d_gene_start, d_gene_end;
 
             for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
                 d_gene = clonotype.getDiv(d_index);
@@ -666,10 +675,10 @@ namespace ymir {
 
                 // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
                 for (seg_index_t j = 0; j < clonotype.numDivAlignments(d_index); ++j) {
-                    seq_len_t d_seq_start = clonotype.getDivSeqStart(d_index, j),
-                              d_seq_end = clonotype.getDivSeqEnd(d_index, j);
-                    seq_len_t d_gene_start = clonotype.getDivGeneStart(d_index, j),
-                              d_gene_end = clonotype.getDivGeneEnd(d_index, j);
+                    d_seq_start = clonotype.getDivSeqStart(d_index, j);
+                    d_seq_end = clonotype.getDivSeqEnd(d_index, j);
+                    d_gene_start = clonotype.getDivGeneStart(d_index, j);
+                    d_gene_end = clonotype.getDivGeneEnd(d_index, j);
 
                     for (seq_len_t left_pos = d_seq_start; left_pos <= d_seq_end - min_D_len + 1; ++left_pos) {
                         for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_seq_end; ++right_pos) {
@@ -691,6 +700,11 @@ namespace ymir {
                                         clonotype.numDivMismatches(d_index, j,
                                                                    d_gene_start + left_pos - d_seq_start,
                                                                    d_gene_end - (d_seq_end - right_pos));
+
+                                if (errors(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)) {
+                                    probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
+                                            *= _param_vec->error_prob() * errors(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1);
+                                }
                             }
                         }
                     }

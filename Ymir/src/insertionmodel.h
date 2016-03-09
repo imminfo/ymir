@@ -312,9 +312,24 @@ namespace ymir {
             if (sequence_len) {
                 auto tmp1 = start, tmp2 = start + 1;
                 auto next = start + 1;
-                res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*start));
-                for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
-                    res *= (*this)(nuc_hash(*start), nuc_hash(*next));
+                if (!with_errors) {
+                    res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*start));
+                    for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
+                        res *= (*this)(nuc_hash(*start), nuc_hash(*next));
+                    }
+                } else {
+                    prob_t element = 0;
+                    for (auto i = 0; i < 4; ++i) {
+                        for (auto j = 0; j < 4; ++j) {
+                            element += (*this)(i, j);
+                        }
+                    }
+                    element *= _err_prob * _err_prob;
+
+                    res = (first_char == NULL_CHAR) ? .25 : (element + (1 - _err_prob * _err_prob) * (*this)(nuc_hash(first_char), nuc_hash(*start)));
+                    for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
+                        res *= (element + (1 - _err_prob * _err_prob) * (*this)(nuc_hash(*start), nuc_hash(*next)));
+                    }
                 }
             }
 
@@ -327,9 +342,24 @@ namespace ymir {
             if (sequence_len) {
                 auto tmp1 = start, tmp2 = start + 1;
                 auto next = start + 1;
-                res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*start));
-                for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
-                    res *= (*this)(nuc_hash(*start), nuc_hash(*next));
+                if (!with_errors) {
+                    res = (first_char == NULL_CHAR) ? .25 : (*this)(nuc_hash(first_char), nuc_hash(*start));
+                    for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
+                        res *= (*this)(nuc_hash(*start), nuc_hash(*next));
+                    }
+                } else {
+                    prob_t element = 0;
+                    for (auto i = 0; i < 4; ++i) {
+                        for (auto j = 0; j < 4; ++j) {
+                            element += (*this)(i, j);
+                        }
+                    }
+                    element *= _err_prob * _err_prob;
+
+                    res = (first_char == NULL_CHAR) ? .25 : (element + (1 - _err_prob * _err_prob) * (*this)(nuc_hash(first_char), nuc_hash(*start)));
+                    for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
+                        res *= (element + (1 - _err_prob * _err_prob) * (*this)(nuc_hash(*start), nuc_hash(*next)));
+                    }
                 }
             }
 

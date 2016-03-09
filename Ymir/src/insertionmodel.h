@@ -216,9 +216,8 @@ namespace ymir {
                         res *= _arr[nuc_hash(*start)];
                     }
                 } else {
-                    prob_t element = _err_prob * (_arr[0] + _arr[1] + _arr[2] + _arr[4]);
                     for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
-                        res *= (element + (1 - _err_prob) * _arr[nuc_hash(*start)]);
+                        res *= (_err_prob + (1 - _err_prob) * _arr[nuc_hash(*start)]);
                     }
                 }
             }
@@ -236,9 +235,8 @@ namespace ymir {
                         res *= _arr[nuc_hash(*start)];
                     }
                 } else {
-                    prob_t element = _err_prob * (_arr[0] + _arr[1] + _arr[2] + _arr[4]);
                     for (seq_len_t i = 0; i < sequence_len; ++i, ++start) {
-                        res *= (element + (1 - _err_prob) * _arr[nuc_hash(*start)]);
+                        res *= (_err_prob + (1 - _err_prob) * _arr[nuc_hash(*start)]);
                     }
                 }
             }
@@ -329,17 +327,10 @@ namespace ymir {
                         res *= (*this)(nuc_hash(*start), nuc_hash(*next));
                     }
                 } else {
-                    prob_t element = 0;
-                    for (auto i = 0; i < 4; ++i) {
-                        for (auto j = 0; j < 4; ++j) {
-                            element += (*this)(i, j);
-                        }
-                    }
-                    element *= _err_prob * _err_prob;
-
-                    res = (first_char == NULL_CHAR) ? .25 : (element + (1 - _err_prob * _err_prob) * (*this)(nuc_hash(first_char), nuc_hash(*start)));
+                    prob_t err2 = _err_prob * _err_prob;
+                    res = (first_char == NULL_CHAR) ? .25 : (err2 + (1 - err2) * (*this)(nuc_hash(first_char), nuc_hash(*start)));
                     for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
-                        res *= (element + (1 - _err_prob * _err_prob) * (*this)(nuc_hash(*start), nuc_hash(*next)));
+                        res *= (err2 + (1 - err2) * (*this)(nuc_hash(*start), nuc_hash(*next)));
                     }
                 }
             }
@@ -359,17 +350,10 @@ namespace ymir {
                         res *= (*this)(nuc_hash(*start), nuc_hash(*next));
                     }
                 } else {
-                    prob_t element = 0;
-                    for (auto i = 0; i < 4; ++i) {
-                        for (auto j = 0; j < 4; ++j) {
-                            element += (*this)(i, j);
-                        }
-                    }
-                    element *= _err_prob * _err_prob;
-
-                    res = (first_char == NULL_CHAR) ? .25 : (element + (1 - _err_prob * _err_prob) * (*this)(nuc_hash(first_char), nuc_hash(*start)));
+                    prob_t err2 = _err_prob * _err_prob;
+                    res = (first_char == NULL_CHAR) ? .25 : (err2 + (1 - err2) * (*this)(nuc_hash(first_char), nuc_hash(*start)));
                     for (seq_len_t i = 1; i < sequence_len; ++i, ++start, ++next) {
-                        res *= (element + (1 - _err_prob * _err_prob) * (*this)(nuc_hash(*start), nuc_hash(*next)));
+                        res *= (err2 + (1 - err2) * (*this)(nuc_hash(*start), nuc_hash(*next)));
                     }
                 }
             }

@@ -909,14 +909,11 @@ namespace ymir {
                                 last_char = sequence[seq_poses[left_vertex_i] - 1];
                             }
 
-//                            probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
-//                                    = mc.nucProbability<std::string::const_iterator>(sequence.cbegin() + seq_poses[left_vertex_i],
-//                                                                                     insertion_len,
-//                                                                                     last_char)
                             probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
                                     = mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i],
-                                                                                     insertion_len,
-                                                                                     last_char)
+                                                        insertion_len,
+                                                        last_char,
+                                                        error_mode)
                                       * (*_param_vec)[null_insertion + insertion_len];
                         } else {
                             if (seq_poses[right_vertex_i] == sequence.size() + 1) {
@@ -925,14 +922,11 @@ namespace ymir {
                                 last_char = sequence[seq_poses[right_vertex_i] - 1];
                             }
 
-//                            probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
-//                                    = mc.nucProbability<std::string::const_reverse_iterator>(sequence.crbegin() + (sequence.size() - seq_poses[right_vertex_i] + 1),
-//                                                                                             insertion_len,
-//                                                                                             last_char)
                             probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
                                     = mc.nucProbability(sequence.crbegin() + (sequence.size() - seq_poses[right_vertex_i] + 1),
-                                                                                             insertion_len,
-                                                                                             last_char)
+                                                        insertion_len,
+                                                        last_char,
+                                                        error_mode)
                                       * (*_param_vec)[null_insertion + insertion_len];
                         }
 

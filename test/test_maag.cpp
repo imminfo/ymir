@@ -581,6 +581,8 @@ YMIR_TEST_START(test_maag_vdj_err)
 
     ModelParameterVector mvec = make_test_events_vdj();
 
+    YMIR_ASSERT2(mvec.error_prob(), 0)
+
     vector<string> alvec1;
     vector<string> seqvec1;
     alvec1.push_back("Vseg1");

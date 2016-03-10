@@ -312,7 +312,7 @@ namespace ymir {
 
 
         prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR, bool with_errors = false) const {
-            return this->nucProbability(sequence.cbegin(), sequence.size(), first_char);
+            return this->nucProbability(sequence.cbegin(), sequence.size(), first_char, with_errors);
         }
 
         prob_t nucProbability(std::string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const {

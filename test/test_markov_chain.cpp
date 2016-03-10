@@ -122,25 +122,112 @@ YMIR_TEST_START(test_markovchain_nuc_di)
 
     // .25 * .7 * .3 * .2 = .0105
     YMIR_ASSERT(mc.nucProbability("") == 1);
-    YMIR_ASSERT2(mc.nucProbability(s) - .0105, 0);
-    YMIR_ASSERT(mc.nucProbability(s.begin(), 4) == .0105);
+    YMIR_ASSERT(mc.nucProbability(s) - .0105 < 1e-16);
+    YMIR_ASSERT(mc.nucProbability(s.begin(), 4) - .0105 < 1e-16);
 
     // .4 * .7 * .3 * .2 = .0126
-    YMIR_ASSERT2(mc.nucProbability(s.begin(), 4, 'C'), .0168);
+    YMIR_ASSERT(mc.nucProbability(s.begin(), 4, 'C') - .0168 < 1e-16);
 
     mc = DiNucInsertionModel(vec.begin());
 
-    YMIR_ASSERT2(mc.nucProbability(s) - .0105, 0);
-    YMIR_ASSERT2(mc.nucProbability(s.begin(), 4, 'C'), .0168);
+    YMIR_ASSERT(mc.nucProbability(s) - .0105 < 1e-18);
+    YMIR_ASSERT(mc.nucProbability(s.begin(), 4, 'C') - .0168 < 1e-16);
 
     // .25 * .25 * .1
-    YMIR_ASSERT2(mc.nucProbability(s.rbegin(), 3, '_'), .00625);
+    YMIR_ASSERT(mc.nucProbability(s.rbegin(), 3, '_') - .00625 < 1e-16);
 
 YMIR_TEST_END
 
 
 YMIR_TEST_START(test_markovchain_aa)
     YMIR_ASSERT(false)
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_markovchain_nuc_mono_err)
+
+    vector<prob_t> probs = {.1, .2, .3, .4};
+    MonoNucInsertionModel m(probs.begin(), .5);
+    YMIR_ASSERT2(m.err_prob(), .5)
+
+    string s = "ACGT";
+
+    // (.1 + .5 * (.2 + .3 + .4))
+    // * (.2 + .5 * (.1 + .3 + .4))
+    // * (.3 + .5 * (.2 + .1 + .4))
+    // * (.4 + .5 * (.2 + .3 + .1))
+    YMIR_ASSERT(abs(m.nucProbability(s.begin(), 4, NULL_CHAR, true) - 0.15015) < 1e-17)
+    YMIR_ASSERT(abs(m.nucProbability(s, NULL_CHAR, true) - 0.15015) < 1e-17)
+
+    // (.1 + .5 * (.2 + .3 + .4))
+    // * (.2 + .5 * (.1 + .3 + .4))
+    // * (.3 + .5 * (.2 + .1 + .4))
+    // * (.4 + .5 * (.2 + .3 + .1))
+    YMIR_ASSERT(abs(m.nucProbability(s.begin(), 4, 'A', true) - 0.15015) < 1e-17)
+    YMIR_ASSERT(abs(m.nucProbability(s, 'A', true) - 0.15015) < 1e-17)
+
+    // (.1 + .5 * (.2 + .3 + .4))
+    // * (.2 + .5 * (.1 + .3 + .4))
+    // * (.3 + .5 * (.2 + .1 + .4))
+    YMIR_ASSERT(abs(m.nucProbability(s.substr(0, 3), 'A', true) - 0.2145) < 1e-17)
+    YMIR_ASSERT(abs(m.nucProbability(s.substr(0, 3), NULL_CHAR, true) - 0.2145) < 1e-17)
+
+    probs = {1, 0, 0, 0};
+    m = MonoNucInsertionModel(probs.begin());
+    std::default_random_engine rg;
+    YMIR_ASSERT2(m.generate(5, rg), "AAAAA");
+
+    probs = {0, 0, 0, 1};
+    m = MonoNucInsertionModel(probs.begin());
+    YMIR_ASSERT2(m.generate(1, rg), "T");
+
+    probs = {0, 1, 0, 0};
+    m = MonoNucInsertionModel(probs.begin());
+    YMIR_ASSERT2(m.generate(3, rg), "CCC");
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_markovchain_nuc_di_err)
+
+    event_matrix_t mat;
+    mat.resize(4, 4);
+    // A
+    mat(0, 0) = .1;
+    mat(1, 0) = .4;
+    mat(2, 0) = .25;
+    mat(3, 0) = .25;
+    // C
+    mat(0, 1) = .7;
+    mat(1, 1) = .1;
+    mat(2, 1) = .1;
+    mat(3, 1) = .1;
+    // G
+    mat(0, 2) = .3;
+    mat(1, 2) = .3;
+    mat(2, 2) = .15;
+    mat(3, 2) = .25;
+    // T
+    mat(0, 3) = .1;
+    mat(1, 3) = .4;
+    mat(2, 3) = .2;
+    mat(3, 3) = .3;
+
+    DiNucInsertionModel mc(mat, .5);
+    YMIR_ASSERT2(mc.err_prob(), .5)
+
+    string s = "ACGT";
+
+    // err:    .25 * (.25 + .75 * .7) * (.25 + .75 * .3) * (.25 + .75 * .2)
+    // no err: .25 * .7 * .3 * .2 = .0105
+    YMIR_ASSERT(mc.nucProbability("", NULL_CHAR, true) == 1);
+    YMIR_ASSERT(abs(mc.nucProbability(s, NULL_CHAR, true) - 0.0368125) < 1e-15);
+    YMIR_ASSERT(abs(mc.nucProbability(s.begin(), 4, NULL_CHAR, true) - 0.0368125) < 1e-15);
+
+    // err:    (.25 + .75 * .4) * (.25 + .75 * .7) * (.25 + .75 * .3) * (.25 + .75 * .2)
+    // no err: .4 * .7 * .3 * .2 = .0126
+    YMIR_ASSERT(abs(mc.nucProbability(s.begin(), 4, 'C', true) - 0.0809875) < 1e-17);
+
 YMIR_TEST_END
 
 
@@ -167,6 +254,8 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_markovchain_nuc_mono())
     YMIR_TEST(test_markovchain_nuc_di())
     YMIR_TEST(test_markovchain_aa())
+    YMIR_TEST(test_markovchain_nuc_mono_err())
+    YMIR_TEST(test_markovchain_nuc_di_err())
 
     //**************  **************//
 

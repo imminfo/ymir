@@ -36,8 +36,8 @@ namespace ymir {
         virtual ~MAAGForwardBackwardAlgorithm() {
             if (_forward_acc) { delete _forward_acc; }
             if (_backward_acc) { delete _backward_acc; }
-            if (_nuc_arr1) { delete _nuc_arr1; }
-            if (_nuc_arr2) { delete _nuc_arr2; }
+            if (_nuc_arr1) { delete [] _nuc_arr1; }
+            if (_nuc_arr2) { delete [] _nuc_arr2; }
 //            if (_fb_acc) { delete _fb_acc; }
         }
 
@@ -83,6 +83,8 @@ namespace ymir {
         prob_t* VD_nuc_probs() { return _nuc_arr1; }
         prob_t* DJ_nuc_probs() { return _nuc_arr2; }
 
+        prob_t err_prob() { return _err_prob; }
+
     protected:
 
         bool _status;
@@ -96,6 +98,7 @@ namespace ymir {
         unordered_map<event_ind_t, prob_t> _pair_map;
 //        map<eventind_t, prob_t> _pair_map;
         prob_t *_nuc_arr1, *_nuc_arr2;
+        prob_t _err_prob;
 
 
         /**
@@ -112,6 +115,7 @@ namespace ymir {
             _backward_acc = nullptr;
             _nuc_arr1 = nullptr;
             _nuc_arr2 = nullptr;
+            _err_prob = 0;
 //            _pairs.reserve(maag._chain.size());
             if (maag._events) {
 //                _chain = maag._chain;
@@ -177,9 +181,20 @@ namespace ymir {
                             fill(temp_arr, temp_arr + 4, 0);
                             n = 0;
 
-                            for (seq_len_t pos = maag.position(left_pos) + 1; pos < maag.position(right_pos); ++pos) {
-                                temp_arr[nuc_hash(maag.sequence()[pos - 1])] += 1;
-                                ++n;
+                            if (!maag.has_errors()) {
+                                for (seq_len_t pos = maag.position(left_pos) + 1; pos < maag.position(right_pos); ++pos) {
+                                    temp_arr[nuc_hash(maag.sequence()[pos - 1])] += 1;
+                                    ++n;
+                                }
+                            } else {
+                                for (seq_len_t pos = maag.position(left_pos) + 1; pos < maag.position(right_pos); ++pos) {
+                                    temp_arr[0] += _err_prob / 3;
+                                    temp_arr[1] += _err_prob / 3;
+                                    temp_arr[2] += _err_prob / 3;
+                                    temp_arr[3] += _err_prob / 3;
+                                    temp_arr[nuc_hash(maag.sequence()[pos - 1])] += (1 - _err_prob / 3);
+                                    ++n;
+                                }
                             }
 
                             scenario_prob = (*_forward_acc)(ins_node, 0, row_i, col_i)
@@ -188,6 +203,8 @@ namespace ymir {
                             for (auto i = 0; i < 4; ++i) {
                                 nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
                             }
+
+                            _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
 
 //                            _nuc_arr1[0] /= _cur_prob;
 //                            _nuc_arr1[1] /= _cur_prob;
@@ -218,9 +235,13 @@ namespace ymir {
                                     ++n;
                                 }
 
-                                for (seq_len_t pos = maag.position(left_pos) + start_shift + 1; pos < maag.position(right_pos); ++pos) {
-                                    temp_arr[4 * nuc_hash(maag.sequence()[pos - 2]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
-                                    ++n;
+                                if (!maag.has_errors()) {
+                                    for (seq_len_t pos = maag.position(left_pos) + start_shift + 1; pos < maag.position(right_pos); ++pos) {
+                                        temp_arr[4 * nuc_hash(maag.sequence()[pos - 2]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
+                                        ++n;
+                                    }
+                                } else {
+                                    // TODO: ???
                                 }
                             } else {
                                 if (maag.position(right_pos) == maag.sequence().size() + 1) {
@@ -279,6 +300,20 @@ namespace ymir {
             for (dim_t row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
                 for (dim_t col_i = 0; col_i < maag.nodeColumns(node_i); ++col_i) {
                     this->pushEventPair(maag, node_i, maag_mat_i, row_i, col_i, fb_mat_i, row_i, col_i);
+                }
+            }
+        }
+
+        void pushEventPairsWithErrors(const MAAG &maag, node_ind_t node_i, matrix_ind_t maag_mat_i, matrix_ind_t fb_mat_i, node_ind_t err_node_i) {
+            this->pushEventPairs(maag, node_i, maag_mat_i, fb_mat_i);
+
+            if (maag.has_errors()) {
+                for (dim_t row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
+                    for (dim_t col_i = 0; col_i < maag.nodeColumns(node_i); ++col_i) {
+                        _err_prob += (*_forward_acc)(node_i, fb_mat_i, row_i, col_i)
+                                     * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i)
+                                     / maag.errors(err_node_i, fb_mat_i, row_i, col_i);
+                    }
                 }
             }
         }
@@ -438,10 +473,10 @@ namespace ymir {
                     this->pushEventPair(maag, VJ_VAR_JOI_GEN_I, 0, row_i, j_ind, 0, row_i, 0);
                 }
                 for (matrix_ind_t mat_i = 0; mat_i < maag.nVar(); ++mat_i) {
-                    this->pushEventPairs(maag, VJ_VAR_DEL_I, mat_i, mat_i);
+                    this->pushEventPairsWithErrors(maag, VJ_VAR_DEL_I, mat_i, mat_i, 0);
                 }
                 this->pushEventPairs(maag, VJ_VAR_JOI_INS_I, 0, 0);
-                this->pushEventPairs(maag, VJ_JOI_DEL_I, j_ind, 0);
+                this->pushEventPairsWithErrors(maag, VJ_JOI_DEL_I, j_ind, 0, 1);
 
                 this->inferInsertionNucleotides(maag, VJ_VAR_JOI_INS_I,
                                                 0, maag.nodeColumns(VJ_VAR_DEL_I) - 1,
@@ -504,8 +539,6 @@ namespace ymir {
                 (*_forward_acc)(VDJ_JOI_DIV_GEN_I, 0, 0, 0) +=
                         (*_forward_acc)(VDJ_JOI_DEL_I, 0, row_i, 0) * maag(VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind);
             }
-//            (*_forward_acc)(VDJ_JOI_DIV_GEN_I)(0, 0) =
-//                    (*_forward_acc)(VDJ_JOI_DEL_I).sum() * maag.matrix(VDJ_JOI_DIV_GEN_I)(j_ind, d_ind);
 
             // update the full generation probability
             _full_prob += (*_forward_acc)(VDJ_JOI_DIV_GEN_I, 0, 0, 0);
@@ -643,12 +676,12 @@ namespace ymir {
                     // add fi * bi to the accumulator
                     for (matrix_ind_t mat_i = 0; mat_i < maag.nVar(); ++mat_i) {
                         this->pushEventPairs(maag, VDJ_VAR_GEN_I, mat_i, mat_i);
-                        this->pushEventPairs(maag, VDJ_VAR_DEL_I, mat_i, mat_i);
+                        this->pushEventPairsWithErrors(maag, VDJ_VAR_DEL_I, mat_i, mat_i, 0);
                     }
                     this->pushEventPairs(maag, VDJ_VAR_DIV_INS_I, 0, 0);
-                    this->pushEventPairs(maag, VDJ_DIV_DEL_I, d_ind, 0);
+                    this->pushEventPairsWithErrors(maag, VDJ_DIV_DEL_I, d_ind, 0, 1);
                     this->pushEventPairs(maag, VDJ_DIV_JOI_INS_I, 0, 0);
-                    this->pushEventPairs(maag, VDJ_JOI_DEL_I, j_ind, 0);
+                    this->pushEventPairsWithErrors(maag, VDJ_JOI_DEL_I, j_ind, 0, 2);
                     this->pushEventPair(maag, VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind, 0, 0, 0);
 
                     seq_len_t v_vertices = maag.nodeColumns(VDJ_VAR_DEL_I),

@@ -99,7 +99,7 @@ namespace ymir {
 
         v3.push_back(8);
 
-        return ModelParameterVector(VJ_RECOMB, v1, v2, v3, v4);
+        return ModelParameterVector(VJ_RECOMB, v1, v2, v3, v4, vector<prob_t>(), 0.03);
     }
 
 
@@ -167,7 +167,7 @@ namespace ymir {
 
         v3.push_back(8);
 
-        return ModelParameterVector(VJ_RECOMB, v1, v2, v3, v4);
+        return ModelParameterVector(VJ_RECOMB, v1, v2, v3, v4, vector<prob_t>(), 0.03);
     }
 
 

@@ -2,7 +2,7 @@
   "name": "Test model for some immune receptors",
   "comment": "Cool comment about this model, yep",
   "recombination": "VDJ",
-  "hypermutations": false,
+  "errors": 0.03,
   "segments": {
     "variable": {
       "file": "vsegments.txt",

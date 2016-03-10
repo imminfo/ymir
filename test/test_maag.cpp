@@ -114,7 +114,7 @@ YMIR_TEST_START(test_mmc)
             * mat.matrix(1, 0)
             * mat.matrix(2, 0)
             * mat.matrix(3, 0)
-            * mat.matrix(4, 0))(0, 0) == 4.4)
+            * mat.matrix(4, 0))(0, 0) - 4.4 < 1e-14)
 
     YMIR_ASSERT((mat.matrix(0, 1)
             * mat.matrix(1, 1)
@@ -581,7 +581,7 @@ YMIR_TEST_START(test_maag_vdj_err)
 
     ModelParameterVector mvec = make_test_events_vdj();
 
-    YMIR_ASSERT2(mvec.error_prob(), 0)
+    YMIR_ASSERT(mvec.error_prob() != 0)
 
     vector<string> alvec1;
     vector<string> seqvec1;
@@ -808,9 +808,9 @@ YMIR_TEST_START(test_maag_vdj_err)
     // i've already tested chain products in previous tests!
     // ):<
     // also it's (A, B) not (A - B < eps) because this results are pretty precise on this toy example
-    YMIR_ASSERT2(maag.fullProbability(0, 0, 0), maag_builder.build(clonotype, NO_METADATA).fullProbability(0, 0, 0))  // error is here
-    YMIR_ASSERT2(maag.fullProbability(1, 1, 1), maag_builder.build(clonotype, NO_METADATA).fullProbability(1, 1, 1))
-    YMIR_ASSERT2(maag.fullProbability(0, 2, 2), maag_builder.build(clonotype, NO_METADATA).fullProbability(0, 2, 2))  // error is here
+    YMIR_ASSERT2(maag.fullProbability(0, 0, 0), maag_builder.build(clonotype, NO_METADATA, COMPUTE_ERRORS).fullProbability(0, 0, 0))  // error is here
+    YMIR_ASSERT2(maag.fullProbability(1, 1, 1), maag_builder.build(clonotype, NO_METADATA, COMPUTE_ERRORS).fullProbability(1, 1, 1))
+    YMIR_ASSERT2(maag.fullProbability(0, 2, 2), maag_builder.build(clonotype, NO_METADATA, COMPUTE_ERRORS).fullProbability(0, 2, 2))  // error is here
 
 YMIR_TEST_END
 

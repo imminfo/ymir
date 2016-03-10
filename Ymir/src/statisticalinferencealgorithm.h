@@ -76,7 +76,8 @@ namespace ymir {
 
         virtual bool statisticalInference(const ClonesetView &repertoire,
                                           ProbabilisticAssemblingModel &model,
-                                          const AlgorithmParameters &algo_param = AlgorithmParameters()) const =0;
+                                          const AlgorithmParameters &algo_param = AlgorithmParameters(),
+                                          ErrorMode error_mode = NO_ERRORS) const =0;
 
     };
 
@@ -95,13 +96,14 @@ namespace ymir {
          */
         virtual bool statisticalInference(const ClonesetView &repertoire,
                                           ProbabilisticAssemblingModel &model,
-                                          const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10)) const {
+                                          const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 30),
+                                          ErrorMode error_mode = NO_ERRORS) const {
 
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
             cout << "Murugan EM-algorithm." << endl;
 
             if (!algo_param.check("niter")) {
-                cout << "Obligatory parameter 'check' hasn't been found, please re-run the algorithm with the supplied parameter." << endl;
+                cout << "Obligatory parameter 'niter' hasn't been found, please re-run the algorithm with the supplied parameter." << endl;
                 return false;
             }
 
@@ -114,7 +116,7 @@ namespace ymir {
             model.updateEventProbabilitiesVector(new_param_vec);
 
             cout << "Building MAAGs..." << endl;
-            MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, NUCLEOTIDE, false);
+            MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
 
             vector<prob_t> prob_vec;
             prob_vec.resize(maag_rep.size(), 0);
@@ -142,8 +144,10 @@ namespace ymir {
 
             cout << endl << "Initial data summary:" << endl;
             prob_summary(prob_vec);
+            std::cout << model.event_probabilities().error_prob() << std::endl;
             prev_ll = loglikelihood(prob_vec);
 
+            MAAGForwardBackwardAlgorithm fb;
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
                 cout << endl << "Iteration:\t" << (size_t) iter << endl;
 
@@ -151,12 +155,14 @@ namespace ymir {
 
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
                     if (good_clonotypes[i]) {
-                        MAAGForwardBackwardAlgorithm fb(maag_rep[i]);
+                        fb.process(maag_rep[i], error_mode);
 
                         while (!fb.is_empty()) {
                             event_pair_t ep = fb.nextEvent();
                             new_param_vec[ep.first] += ep.second;
                         }
+
+                        new_param_vec.error_prob() += fb.err_prob();
 
                         if (maag_rep[i].is_vj()) {
                             new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] += fb.VJ_nuc_probs()[0];
@@ -181,6 +187,7 @@ namespace ymir {
                     }
                 }
 
+                new_param_vec.error_prob() /= maag_rep.size();
                 new_param_vec.normaliseEventFamilies();
 
                 model.updateEventProbabilitiesVector(new_param_vec);
@@ -191,6 +198,8 @@ namespace ymir {
                 }
                 prob_summary(prob_vec, prev_ll);
                 prev_ll = loglikelihood(prob_vec);
+
+                std::cout << new_param_vec.error_prob() << std::endl;
             }
 
             cout << endl << "Done. Resulting loglikelihood:\t" << loglikelihood(prob_vec) << endl << endl;

@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
                         NUCLEOTIDE,
                         VJ_RECOMB,
                         AlignmentColumnOptions()
-                                .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                .setV(AlignmentColumnOptions::OVERWRITE)
                                 .setJ(AlignmentColumnOptions::USE_PROVIDED),
                         VDJAlignerParameters(1, 2));
 
@@ -92,12 +92,12 @@ int main(int argc, char* argv[]) {
     ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA"); //, EMPTY);
 
     tp1 = std::chrono::system_clock::now();
-    vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA);
+//    vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS);
     tp2 = std::chrono::system_clock::now();
     vj_single_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
     tp1 = std::chrono::system_clock::now();
-    vj_single_model.computeFullProbabilities(cloneset_vj, NO_METADATA);
+//    vj_single_model.computeFullProbabilities(cloneset_vj, NO_METADATA, NO_ERRORS);
     tp2 = std::chrono::system_clock::now();
     vj_single_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -108,12 +108,12 @@ int main(int argc, char* argv[]) {
     ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
 
     tp1 = std::chrono::system_clock::now();
-    vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA);
+//    vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS);
     tp2 = std::chrono::system_clock::now();
     vdj_single_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
     tp1 = std::chrono::system_clock::now();
-    vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_METADATA);
+//    vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_METADATA, NO_ERRORS);
     tp2 = std::chrono::system_clock::now();
     vdj_single_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -122,7 +122,10 @@ int main(int argc, char* argv[]) {
     // VJ inference
     //
     tp1 = std::chrono::system_clock::now();
-//    EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
+    EMAlgorithm().statisticalInference(cloneset_vj,
+                                       vj_single_model,
+                                       EMAlgorithm::AlgorithmParameters().set("niter", 10),
+                                       COMPUTE_ERRORS);
     tp2 = std::chrono::system_clock::now();
     vj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -131,7 +134,9 @@ int main(int argc, char* argv[]) {
     // VDJ inference
     //
     tp1 = std::chrono::system_clock::now();
-//    EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model, EMAlgorithm::AlgorithmParameters().set("niter", 10));
+//    EMAlgorithm().statisticalInference(cloneset_vdj,
+//                                       vdj_single_model,
+//                                       EMAlgorithm::AlgorithmParameters().set("niter", 10));
     tp2 = std::chrono::system_clock::now();
     vdj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 

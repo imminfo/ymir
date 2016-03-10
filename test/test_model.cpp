@@ -128,7 +128,7 @@ YMIR_TEST_START(test_model_vj_maag)
                                             .setV(AlignmentColumnOptions::USE_PROVIDED)
                                             .setJ(AlignmentColumnOptions::USE_PROVIDED)))
 
-     MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, NUCLEOTIDE)[1];
+     MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, NO_ERRORS, NUCLEOTIDE)[1];
 
      YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
      YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))

@@ -171,7 +171,7 @@ YMIR_TEST_START(test_maag_vj)
     Clonotype clonotype = cl_builder.buildClonotype();
 
 //    cout << "here" << endl;
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
     YMIR_ASSERT2(maag.nVar(), 2)
     YMIR_ASSERT2(maag.nJoi(), 3)
@@ -474,7 +474,7 @@ YMIR_TEST_START(test_maag_vdj)
     cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
 //    cout << "V 0:" << maag.rows(0) << ":" << maag.cols(0) << endl;
 //    cout << "Vdel 1:" << maag.rows(1) << ":" << maag.cols(1) << endl;
@@ -570,9 +570,9 @@ YMIR_TEST_START(test_maag_vdj)
     // i've already tested chain products in previous tests!
     // ):<
     // also it's (A, B) not (A - B < eps) because this results are pretty precise on this toy example
-    YMIR_ASSERT2(maag.fullProbability(0, 0, 0), maag_builder.build(clonotype, NO_METADATA).fullProbability(0, 0, 0))  // error is here
-    YMIR_ASSERT2(maag.fullProbability(1, 1, 1), maag_builder.build(clonotype, NO_METADATA).fullProbability(1, 1, 1))
-    YMIR_ASSERT2(maag.fullProbability(0, 2, 2), maag_builder.build(clonotype, NO_METADATA).fullProbability(0, 2, 2))  // error is here
+    YMIR_ASSERT2(maag.fullProbability(0, 0, 0), maag_builder.build(clonotype, NO_METADATA, NO_ERRORS).fullProbability(0, 0, 0))  // error is here
+    YMIR_ASSERT2(maag.fullProbability(1, 1, 1), maag_builder.build(clonotype, NO_METADATA, NO_ERRORS).fullProbability(1, 1, 1))
+    YMIR_ASSERT2(maag.fullProbability(0, 2, 2), maag_builder.build(clonotype, NO_METADATA, NO_ERRORS).fullProbability(0, 2, 2))  // error is here
 
 YMIR_TEST_END
 
@@ -856,7 +856,7 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
     ModelParameterVector mvec2 = make_test_events_vj2();
 
@@ -990,7 +990,7 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
     cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
     ModelParameterVector mvec2 = make_test_events_vdj2();
 
@@ -1127,7 +1127,7 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
     MAAGForwardBackwardAlgorithm algo(maag);
 
@@ -1217,7 +1217,7 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
     cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA);
+    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
 //    for (int node_i = 0; node_i < maag.chainSize(); ++node_i) {
 //        for (int mat_i = 0; mat_i < maag.nodeSize(node_i); ++mat_i) {

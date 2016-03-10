@@ -85,8 +85,8 @@ namespace ymir {
          */
         ///@{
         MAAG build(const Clonotype &clonotype,
-                   MetadataMode metadata_mode = NO_METADATA,
-                   ErrorMode error_mode = NO_ERRORS,
+                   MetadataMode metadata_mode,
+                   ErrorMode error_mode,
                    SequenceType seq_type = NUCLEOTIDE) const {
             ProbMMC probs;
             EventIndMMC events;
@@ -179,7 +179,11 @@ namespace ymir {
             return maag;
         }
 
-        MAAGRepertoire build(const ClonesetView &cloneset, MetadataMode metadata_mode = NO_METADATA, bool verbose = true) const {
+        MAAGRepertoire build(const ClonesetView &cloneset,
+                             MetadataMode metadata_mode,
+                             ErrorMode error_mode,
+                             SequenceType seq_type = NUCLEOTIDE,
+                             bool verbose = true) const {
             MAAGRepertoire res;
 //            res.reserve(cloneset.size());
             res.resize(cloneset.size());
@@ -207,7 +211,7 @@ namespace ymir {
 //                    std::cout << (int) cloneset[i].numDivAlignments(1) << std::endl;
 //                }
 
-                res[i] = this->build(cloneset[i], metadata_mode);
+                res[i] = this->build(cloneset[i], metadata_mode, error_mode, seq_type);
 //                res[i] = std::move(this->build(cloneset[i], metadata_mode);
 //                this->build(cloneset[i], metadata_mode);
 
@@ -216,9 +220,12 @@ namespace ymir {
 
                 if (verbose) {
                     if ((i+1) % 50000 == 0) {
-                        cout << "Built " << (int) (i+1) << " graphs." << endl;
+                        cout << "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " graphs." << endl;
                     }
                 }
+            }
+            if (verbose) {
+                cout << "Built " << (int) (cloneset.size()) << " graphs." << endl;
             }
             return res;
         }
@@ -235,17 +242,21 @@ namespace ymir {
          * or choose the max one.
          */
         ///@{
-        prob_t buildAndCompute(const Clonotype &clonotype, bool aminoacid = false, MAAGComputeProbAction action = SUM_PROBABILITY) const {
-            return this->build(clonotype, NO_METADATA).fullProbability(action);
+        prob_t buildAndCompute(const Clonotype &clonotype,
+                               SequenceType seq_type = NUCLEOTIDE,
+                               MAAGComputeProbAction action = SUM_PROBABILITY) const {
+            return this->build(clonotype, NO_METADATA, NO_ERRORS, seq_type).fullProbability(action);
         }
 
-        vector<prob_t> buildAndCompute(const ClonesetView &cloneset, bool aminoacid = false, MAAGComputeProbAction action = SUM_PROBABILITY) const {
+        vector<prob_t> buildAndCompute(const ClonesetView &cloneset,
+                                       SequenceType seq_type = NUCLEOTIDE,
+                                       MAAGComputeProbAction action = SUM_PROBABILITY) const {
             vector<prob_t> res;
             res.reserve(cloneset.size());
 
             std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes." << std::endl;
             for (size_t i = 0; i < cloneset.size(); ++i) {
-                res.push_back(buildAndCompute(cloneset[i], aminoacid, action));
+                res.push_back(buildAndCompute(cloneset[i], seq_type, action));
                 if ((i+1) % 50000 == 0) {
                     std::cout << "Computed " << (int) (i+1) << " assembling probabilities." << std::endl;
                 }

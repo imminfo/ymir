@@ -367,6 +367,9 @@ namespace ymir {
         inline prob_t error_prob() const { return _err_prob; }
 
 
+        inline prob_t& error_prob() { return _err_prob; }
+
+
         /**
          * \brief Fill the vector with the given value.
          */

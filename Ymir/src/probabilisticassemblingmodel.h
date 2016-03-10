@@ -107,9 +107,9 @@ namespace ymir {
          * \return Vector of full assembling probabilities.
          */
         vector<prob_t> computeFullProbabilities(const ClonesetView& repertoire,
-                                                bool aminoacid = false,
+                                                SequenceType sequence_type = NUCLEOTIDE,
                                                 MAAGComputeProbAction action = SUM_PROBABILITY) const {
-            return _builder->buildAndCompute(repertoire, aminoacid, action);
+            return _builder->buildAndCompute(repertoire, sequence_type, action);
         }
 
 
@@ -124,6 +124,7 @@ namespace ymir {
          */
         MAAGRepertoire buildGraphs(const ClonesetView &repertoire,
                                    MetadataMode save_metadata = SAVE_METADATA,
+                                   ErrorMode error_mode = NO_ERRORS,
                                    SequenceType sequence_type = NUCLEOTIDE,
                                    bool verbose = true) const {
 #ifndef DNDEBUG
@@ -131,7 +132,7 @@ namespace ymir {
                 throw(std::runtime_error("Can't build graphs due to a model's failed status!"));
             }
 #endif
-            return _builder->build(repertoire, save_metadata, verbose);
+            return _builder->build(repertoire, save_metadata, error_mode, sequence_type, verbose);
         }
 
 

@@ -59,20 +59,31 @@ namespace ymir {
             _back_full_prob = 0;
             _err_prob = 0;
             ErrorMode _err_mode = error_mode;
-            if (maag._events) {
-                _status = true;
-                if (maag.recombination() == VJ_RECOMB) {
-                    fill(_nuc_arr1, _nuc_arr1 + 4, 0);
-                    this->forward_backward_vj(maag);
-                } else if (maag.recombination() == VDJ_RECOMB) {
-                    fill(_nuc_arr1, _nuc_arr1 + 16, 0);
-                    fill(_nuc_arr2, _nuc_arr2 + 16, 0);
-                    this->forward_backward_vdj(maag);
+
+            if (_err_mode == COMPUTE_ERRORS && !maag.has_errors()) {
+                cerr << "MAAG forward-backward algorithm error: no error matrix has been found in the input MAAG." << endl;
+                _status = false;
+                return false;
+            } else {
+                if (maag.has_events()) {
+                    _status = true;
+                    if (maag.recombination() == VJ_RECOMB) {
+                        fill(_nuc_arr1, _nuc_arr1 + 4, 0);
+                        this->forward_backward_vj(maag);
+                    } else if (maag.recombination() == VDJ_RECOMB) {
+                        fill(_nuc_arr1, _nuc_arr1 + 16, 0);
+                        fill(_nuc_arr2, _nuc_arr2 + 16, 0);
+                        this->forward_backward_vdj(maag);
+                    } else {
+                        cerr << "MAAG forward-backward algorithm error: unknown recombination type." << endl;
+                        _status = false;
+                    }
                 } else {
-                    cerr << "MAAG forward-backward algorithm error: unknown recombination type." << endl;
+                    cerr << "MAAG forward-backward algorithm error: no event matrix has been found in the input MAAG." << endl;
                     _status = false;
                 }
             }
+
             return _status;
         }
 
@@ -177,7 +188,7 @@ namespace ymir {
                             fill(temp_arr, temp_arr + 4, 0);
                             n = 0;
 
-                            if (!maag.has_errors()) {
+                            if (_err_mode == NO_ERRORS) {
                                 for (seq_len_t pos = maag.position(left_pos) + 1; pos < maag.position(right_pos); ++pos) {
                                     temp_arr[nuc_hash(maag.sequence()[pos - 1])] += 1;
                                     ++n;
@@ -231,7 +242,7 @@ namespace ymir {
                                     ++n;
                                 }
 
-                                if (!maag.has_errors()) {
+                                if (_err_mode == NO_ERRORS) {
                                     for (seq_len_t pos = maag.position(left_pos) + start_shift + 1; pos < maag.position(right_pos); ++pos) {
                                         temp_arr[4 * nuc_hash(maag.sequence()[pos - 2]) + nuc_hash(maag.sequence()[pos - 1])] += 1;
                                         ++n;
@@ -303,7 +314,7 @@ namespace ymir {
         void pushEventPairsWithErrors(const MAAG &maag, node_ind_t node_i, matrix_ind_t maag_mat_i, matrix_ind_t fb_mat_i, node_ind_t err_node_i) {
             this->pushEventPairs(maag, node_i, maag_mat_i, fb_mat_i);
 
-            if (maag.has_errors()) {
+            if (_err_mode == COMPUTE_ERRORS) {
                 for (dim_t row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(node_i); ++col_i) {
                         _err_prob += (*_forward_acc)(node_i, fb_mat_i, row_i, col_i)

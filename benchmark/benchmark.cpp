@@ -6,7 +6,7 @@
 #define _BENCHMARK_H_
 
 
-#define YMIR_BENCHMARK(expr) {}
+#define YMIR_BENCHMARK(expr, time_var) { time_var = std::chrono::system_clock::now(); \ }
 
 
 #include <chrono>
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
                         NUCLEOTIDE,
                         VJ_RECOMB,
                         AlignmentColumnOptions()
-                                .setV(AlignmentColumnOptions::OVERWRITE)
+                                .setV(AlignmentColumnOptions::USE_PROVIDED)
                                 .setJ(AlignmentColumnOptions::USE_PROVIDED),
                         VDJAlignerParameters(1, 2));
 

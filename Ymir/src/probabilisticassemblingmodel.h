@@ -123,8 +123,8 @@ namespace ymir {
          * \return Set of MAAGs.
          */
         MAAGRepertoire buildGraphs(const ClonesetView &repertoire,
-                                   MetadataMode save_metadata = SAVE_METADATA,
-                                   ErrorMode error_mode = NO_ERRORS,
+                                   MetadataMode save_metadata,
+                                   ErrorMode error_mode,
                                    SequenceType sequence_type = NUCLEOTIDE,
                                    bool verbose = true) const {
 #ifndef DNDEBUG

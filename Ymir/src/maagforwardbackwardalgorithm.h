@@ -31,7 +31,8 @@ namespace ymir {
         MAAGForwardBackwardAlgorithm()
             : _pairs_i(0),
               _status(false),
-              _vectorised(false)
+              _vectorised(false),
+              _err_prob(0)
         {
         }
 

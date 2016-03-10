@@ -348,11 +348,35 @@ namespace ymir {
 
                     } else {
                         // or just replace all event probabilities with the new ones
-                        for (int mat_i = 0; mat_i < maag->nodeSize(node_i); ++mat_i) {
-                            for (int row_i = 0; row_i < maag->nodeRows(node_i); ++row_i) {
-                                for (int col_i = 0; col_i < maag->nodeColumns(node_i); ++col_i) {
-                                    (*maag)(node_i, mat_i, row_i, col_i) =
-                                            (*_param_vec)[maag->event_index(node_i, mat_i, row_i, col_i)];
+                        if (!maag->has_errors()) {
+                            for (int mat_i = 0; mat_i < maag->nodeSize(node_i); ++mat_i) {
+                                for (int row_i = 0; row_i < maag->nodeRows(node_i); ++row_i) {
+                                    for (int col_i = 0; col_i < maag->nodeColumns(node_i); ++col_i) {
+                                        (*maag)(node_i, mat_i, row_i, col_i) =
+                                                (*_param_vec)[maag->event_index(node_i, mat_i, row_i, col_i)];
+                                    }
+                                }
+                            }
+                        } else {
+                            int err_node_i = 0;
+                            if (maag->is_vj()) {
+                                err_node_i = node_i == JOINING_DELETIONS_VJ_MATRIX_INDEX ? 1 : 0;
+                            } else {
+                                if (node_i != VARIABLE_DELETIONS_MATRIX_INDEX) {
+                                    if (node_i == JOINING_DELETIONS_VDJ_MATRIX_INDEX) {
+                                        err_node_i = 2;
+                                    } else {
+                                        err_node_i = 1;
+                                    }
+                                }
+                            }
+                            for (int mat_i = 0; mat_i < maag->nodeSize(node_i); ++mat_i) {
+                                for (int row_i = 0; row_i < maag->nodeRows(node_i); ++row_i) {
+                                    for (int col_i = 0; col_i < maag->nodeColumns(node_i); ++col_i) {
+                                        (*maag)(node_i, mat_i, row_i, col_i) =
+                                                (*_param_vec)[maag->event_index(node_i, mat_i, row_i, col_i)]
+                                                * _param_vec->error_prob() * maag->errors(err_node_i, mat_i, row_i, col_i);
+                                    }
                                 }
                             }
                         }

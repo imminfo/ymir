@@ -377,6 +377,8 @@ namespace ymir {
 
         bool has_errors() const { return (bool) _errors; }
 
+        prob_t error_prob() const { return _err_prob; }
+
 
         const std::string& sequence() const {
 #ifndef DNDEBUG

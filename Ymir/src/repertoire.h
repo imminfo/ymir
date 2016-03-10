@@ -150,6 +150,11 @@ namespace ymir {
         };
 
 
+        void shuffle() {
+
+        }
+
+
     protected:
 
         SharedClonotypeVectorPtr _source;

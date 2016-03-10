@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
     std::string BENCH_DATA_FOLDER = argv[1];
 
 
-    NaiveNucParser parser;
+    CDR3NucParser parser;
 
 
     //
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
                         NUCLEOTIDE,
                         VJ_RECOMB,
                         AlignmentColumnOptions()
-                                .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                .setV(AlignmentColumnOptions::OVERWRITE)
                                 .setJ(AlignmentColumnOptions::USE_PROVIDED),
                         VDJAlignerParameters(1, 2));
 
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
     tp1 = std::chrono::system_clock::now();
     EMAlgorithm().statisticalInference(cloneset_vj,
                                        vj_single_model,
-                                       EMAlgorithm::AlgorithmParameters().set("niter", 10),
+                                       EMAlgorithm::AlgorithmParameters().set("niter", 30),
                                        COMPUTE_ERRORS);
     tp2 = std::chrono::system_clock::now();
     vj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);

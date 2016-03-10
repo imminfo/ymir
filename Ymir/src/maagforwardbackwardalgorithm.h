@@ -28,17 +28,52 @@ namespace ymir {
     public:
 
 
-        MAAGForwardBackwardAlgorithm(const MAAG &maag) {
-            init_and_process(maag);
+        MAAGForwardBackwardAlgorithm()
+            : _pairs_i(0),
+              _status(false),
+              _vectorised(false)
+        {
         }
 
 
-        virtual ~MAAGForwardBackwardAlgorithm() {
-            if (_forward_acc) { delete _forward_acc; }
-            if (_backward_acc) { delete _backward_acc; }
-            if (_nuc_arr1) { delete [] _nuc_arr1; }
-            if (_nuc_arr2) { delete [] _nuc_arr2; }
-//            if (_fb_acc) { delete _fb_acc; }
+        MAAGForwardBackwardAlgorithm(const MAAG &maag, ErrorMode error_mode = NO_ERRORS) {
+            process(maag, error_mode);
+        }
+
+
+        virtual ~MAAGForwardBackwardAlgorithm()
+        {
+        }
+
+
+        /**
+         *
+         */
+        bool process(const MAAG &maag, ErrorMode error_mode = NO_ERRORS) {
+            _pairs_i = 0;
+            _status = false;
+            _vectorised = false;
+            _pairs.resize(0);
+            _pairs.reserve(maag._chain.size() + 10);
+            _full_prob = 0;
+            _back_full_prob = 0;
+            _err_prob = 0;
+            ErrorMode _err_mode = error_mode;
+            if (maag._events) {
+                _status = true;
+                if (maag.recombination() == VJ_RECOMB) {
+                    fill(_nuc_arr1, _nuc_arr1 + 4, 0);
+                    this->forward_backward_vj(maag);
+                } else if (maag.recombination() == VDJ_RECOMB) {
+                    fill(_nuc_arr1, _nuc_arr1 + 16, 0);
+                    fill(_nuc_arr2, _nuc_arr2 + 16, 0);
+                    this->forward_backward_vdj(maag);
+                } else {
+                    cerr << "MAAG forward-backward algorithm error: unknown recombination type." << endl;
+                    _status = false;
+                }
+            }
+            return _status;
         }
 
 
@@ -89,55 +124,16 @@ namespace ymir {
 
         bool _status;
         bool _vectorised;
-        ProbMMC *_forward_acc, *_backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspond. */
+        pProbMMC _forward_acc, _backward_acc;  /** Temporary MMC for storing forward and backward probabilities correspond. */
         prob_t _full_prob;  /** Full generation probability of the input MAAG. */
         prob_t _back_full_prob;  /** Full generation probability of the input MAAG obtained with backward algorithm. Just for testing purposes. */
 
         vector<event_pair_t> _pairs;
         size_t _pairs_i;
         unordered_map<event_ind_t, prob_t> _pair_map;
-//        map<eventind_t, prob_t> _pair_map;
-        prob_t *_nuc_arr1, *_nuc_arr2;
+        prob_t _nuc_arr1[16], _nuc_arr2[16];
         prob_t _err_prob;
-
-
-        /**
-         *
-         */
-        bool init_and_process(const MAAG &maag) {
-            _pairs_i = 0;
-            _status = false;
-            _vectorised = false;
-            _pairs.resize(0);
-            _full_prob = 0;
-            _back_full_prob = 0;
-            _forward_acc = nullptr;
-            _backward_acc = nullptr;
-            _nuc_arr1 = nullptr;
-            _nuc_arr2 = nullptr;
-            _err_prob = 0;
-//            _pairs.reserve(maag._chain.size());
-            if (maag._events) {
-//                _chain = maag._chain;
-//                _events = maag._events;
-                _status = true;
-                if (maag.recombination() == VJ_RECOMB) {
-                    _nuc_arr1 = new prob_t[4];
-                    fill(_nuc_arr1, _nuc_arr1 + 4, 0);
-                    this->forward_backward_vj(maag);
-                } else if (maag.recombination() == VDJ_RECOMB) {
-                    _nuc_arr1 = new prob_t[16];
-                    _nuc_arr2 = new prob_t[16];
-                    fill(_nuc_arr1, _nuc_arr1 + 16, 0);
-                    fill(_nuc_arr2, _nuc_arr2 + 16, 0);
-                    this->forward_backward_vdj(maag);
-                } else {
-                    cerr << "MAAG forward-backward algorithm error: unknown recombination type." << endl;
-                    _status = false;
-                }
-            }
-            return _status;
-        }
+        ErrorMode _err_mode;
 
 
         /**
@@ -352,7 +348,7 @@ namespace ymir {
 
         // make a matrix chain with forward probabilities for VJ receptors
         void forward_vj(const MAAG &maag, event_ind_t j_ind) {
-            this->fillZero(_forward_acc);
+            this->fillZero(_forward_acc.get());
 
             // VJ probabilities for the fixed J
             for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_VAR_JOI_GEN_I); ++row_i) {
@@ -399,7 +395,7 @@ namespace ymir {
 
         // make a matrix chain with backward probabilities for VJ receptors
         void backward_vj(const MAAG &maag, event_ind_t j_ind) {
-            this->fillZero(_backward_acc);
+            this->fillZero(_backward_acc.get());
 
             // J deletions
             for (dim_t row_i = 0; row_i < maag.nodeRows(VJ_JOI_DEL_I); ++row_i) {
@@ -440,7 +436,7 @@ namespace ymir {
 
         // compute all forward-backward probabilities
         void forward_backward_vj(const MAAG &maag) {
-            _forward_acc = new ProbMMC();
+            _forward_acc.reset(new ProbMMC());
             _forward_acc->resize(maag.chainSize());
             // VJ probabilities (for fixed J in future)
             _forward_acc->initNode(VJ_VAR_JOI_GEN_I, 1, maag.nodeRows(VJ_VAR_JOI_GEN_I), 1);
@@ -451,7 +447,7 @@ namespace ymir {
             // J deletions (for fixed J in future)
             _forward_acc->initNode(VJ_JOI_DEL_I, 1, maag.nodeRows(VJ_JOI_DEL_I), 1);
 
-            _backward_acc = new ProbMMC();
+            _backward_acc.reset(new ProbMMC());
             _backward_acc->resize(maag.chainSize());
             // VJ probabilities (for fixed J in future)
             _backward_acc->initNode(VJ_VAR_JOI_GEN_I, 1, maag.nodeRows(VJ_VAR_JOI_GEN_I), 1);
@@ -500,7 +496,7 @@ namespace ymir {
                 // We have already stored in _forward_acc fi for this D, so we don't
                 // need to recompute entire _forward_acc, we just need to recompute
                 // J deletions and J genes fi.
-                this->fillZero(_forward_acc, VDJ_DIV_DEL_I);
+                this->fillZero(_forward_acc.get(), VDJ_DIV_DEL_I);
 
                 // D deletions
                 for (dim_t row_i = 0; row_i < maag.nodeRows(VDJ_DIV_DEL_I); ++row_i) {
@@ -523,7 +519,7 @@ namespace ymir {
                 }
 
             } else {
-                this->fillZero(_forward_acc, VDJ_JOI_DEL_I);
+                this->fillZero(_forward_acc.get(), VDJ_JOI_DEL_I);
             }
 
             // J deletions
@@ -547,7 +543,7 @@ namespace ymir {
 
         // make a matrix chain with backward probabilities for VDJ receptors
         void backward_vdj(const MAAG &maag, event_ind_t d_ind, event_ind_t j_ind) {
-            this->fillZero(_backward_acc);
+            this->fillZero(_backward_acc.get());
 
             // J-D pairs
             (*_backward_acc)(VDJ_JOI_DIV_GEN_I, 0, 0, 0) = 1;
@@ -603,7 +599,7 @@ namespace ymir {
 
 
         void forward_backward_vdj(const MAAG &maag) {
-            _forward_acc = new ProbMMC();
+            _forward_acc.reset(new ProbMMC());
             _forward_acc->resize(maag.chainSize());
             // V genes - fi which is constant for all J-D pairs
             _forward_acc->initNode(VDJ_VAR_GEN_I, maag.nodeSize(VDJ_VAR_GEN_I), 1, 1);
@@ -621,7 +617,7 @@ namespace ymir {
 //            _forward_acc->initNode(VDJ_JOI_DIV_GEN_I, 1, maag.nodeRows(VDJ_JOI_DIV_GEN_I), 1);
             _forward_acc->initNode(VDJ_JOI_DIV_GEN_I, 1, 1, 1);
 
-            _backward_acc = new ProbMMC();
+            _backward_acc.reset(new ProbMMC());
             _backward_acc->resize(maag.chainSize());
             // V genes
             _backward_acc->initNode(VDJ_VAR_GEN_I, maag.nodeSize(VDJ_VAR_GEN_I), 1, 1);
@@ -641,7 +637,7 @@ namespace ymir {
 
             // Because fi for V genes, V deletions and VD insertions are constant for all
             // pairs of J-D, we compute them here.
-            this->fillZero(_forward_acc);
+            this->fillZero(_forward_acc.get());
             // V genes and deletions
             for (event_ind_t v_ind = 0; v_ind < maag.nVar(); ++v_ind) {
                 // gene probability
@@ -704,9 +700,6 @@ namespace ymir {
 
             this->vectorise_pair_map(maag);
         }
-
-
-        MAAGForwardBackwardAlgorithm() { }
 
     };
 

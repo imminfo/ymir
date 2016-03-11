@@ -61,15 +61,21 @@ namespace ymir {
         /**
          * \brief Constructor for the builder from given vector with event probabilities and gene segments.
          */
-        MAAGBuilder(const ModelParameterVector &param_vec, const VDJRecombinationGenes &genes) : MAAG() {
-            _param_vec = new ModelParameterVector(param_vec);
-            _genes = new VDJRecombinationGenes(genes);
+        MAAGBuilder(const ModelParameterVector &param_vec, const VDJRecombinationGenes &genes)
+            : MAAG(),
+              _param_vec(new ModelParameterVector(param_vec)),
+              _genes(new VDJRecombinationGenes(genes))
+        {
         }
 
 
-        virtual ~MAAGBuilder() {
-            if (_param_vec) { delete _param_vec; }
-            if (_genes) { delete _genes; }
+        virtual ~MAAGBuilder()
+        {
+        }
+
+
+        void updateModelParameterVector(const ModelParameterVector &param_vec) {
+            *(_param_vec.get()) = param_vec;
         }
 
 
@@ -400,8 +406,8 @@ namespace ymir {
 
     protected:
 
-        ModelParameterVector *_param_vec;  // or just copy it?
-        VDJRecombinationGenes *_genes; // copy this too?
+        unique_ptr<ModelParameterVector> _param_vec;  // or just copy it?
+        unique_ptr<VDJRecombinationGenes> _genes; // copy this too?
 
 
         /**

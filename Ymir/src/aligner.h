@@ -394,11 +394,11 @@ namespace ymir {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
             vec.reserve(min(p_size, t_size) + 1);
-            seq_len_t score = 0;
+            alignment_score_t score = 0;
 
             for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
                 vec.push_back(pattern[i] != text[i]);
-                score += pattern[i] == text[i] ? params.score.v_score.match : params.score.v_score.mism;
+                score += pattern[i] == text[i] ? params.score.v_score.match : (params.score.v_score.mism - params.score.v_score.acc_mism*(pattern[i] != text[i]));
             }
 
             if (score >= params.threshold.v_threshold) {
@@ -454,11 +454,11 @@ namespace ymir {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
             vec.reserve(min(p_size, t_size) + 1);
-            seq_len_t score = 0;
+            alignment_score_t score = 0;
 
             for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
                 vec.insert(vec.begin(), pattern[p_size - i - 1] != text[t_size - i - 1]);
-                score += pattern[p_size - i - 1] == text[t_size - i - 1] ? params.score.j_score.match : params.score.j_score.mism;
+                score += pattern[p_size - i - 1] == text[t_size - i - 1] ? params.score.j_score.match : (params.score.j_score.mism - params.score.j_score.acc_mism*(pattern[p_size - i - 1] != text[t_size - i - 1]));
             }
 
             if (score >= params.threshold.j_threshold) {
@@ -554,7 +554,7 @@ namespace ymir {
 
             for (seq_len_t col_i = 0; col_i < text.size(); ++col_i) {
                 for (seq_len_t row_i = 0; row_i < pattern.size(); ++row_i) {
-                    mat.score(row_i + 1, col_i + 1) = std::max({mat.score(row_i, col_i) + (text[col_i] == pattern[row_i] ? params.score.v_score.match : params.score.v_score.mism), 0});
+                    mat.score(row_i + 1, col_i + 1) = std::max({mat.score(row_i, col_i) + (text[col_i] == pattern[row_i] ? params.score.v_score.match : params.score.v_score.mism), .0});
                 }
             }
 
@@ -611,7 +611,7 @@ namespace ymir {
 
             for (seq_len_t col_i = 0; col_i < text.size(); ++col_i) {
                 for (seq_len_t row_i = 0; row_i < pattern.size(); ++row_i) {
-                    mat.score(row_i + 1, col_i + 1) = std::max({mat.score(row_i, col_i) + (text[col_i] == pattern[row_i] ? params.score.j_score.match : params.score.j_score.mism), 0});
+                    mat.score(row_i + 1, col_i + 1) = std::max({mat.score(row_i, col_i) + (text[col_i] == pattern[row_i] ? params.score.j_score.match : params.score.j_score.mism), .0});
                 }
             }
 

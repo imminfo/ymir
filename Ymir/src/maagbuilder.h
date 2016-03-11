@@ -166,7 +166,7 @@ namespace ymir {
 //                return MAAG(probs);
 //            }
 
-//                std::cout << clonotype.toString() << std::endl;
+                std::cout << clonotype.toString() << std::endl;
 
                 MAAG maag;
                 maag._recomb = clonotype.recombination();
@@ -198,37 +198,11 @@ namespace ymir {
                              SequenceType seq_type = NUCLEOTIDE,
                              bool verbose = true) const {
             MAAGRepertoire res;
-//            res.reserve(cloneset.size());
-            res.resize(cloneset.size());
-            MAAG tmp;
+            res.reserve(cloneset.size());
+//            res.resize(cloneset.size());
             for (size_t i = 0; i < cloneset.size(); ++i) {
-//                if (i == 16832 || i == 24887 || i == 33103 || i == 75283 || i == 106965 || i == 113878) {
-//                    std::cout << "bad clonotype" << std::endl;
-//                    std::cout << cloneset[i].toString() << std::endl;
-//                }
-//                if (i != 1080 && i != 3586) {
-//                    continue;
-//                }
-//                std::cout << (int) i << std::endl;
-//                res.push_back(MAAG(&(this->build(cloneset[i], metadata_mode))));
-//                res.push_back(this->build(cloneset[i], metadata_mode));
-//                if (i == 3586 || i == 1080) {
-//                    std::cout << (int) i << std::endl;
-//                    std::cout << cloneset[i].sequence() << std::endl;
-//                    std::cout << (int) cloneset[i].nVar()<< std::endl;
-//                    std::cout << (int) cloneset[i].nDiv()<< std::endl;
-//                    std::cout << (int) cloneset[i].nJoi()<< std::endl;
-//                    std::cout << (int) cloneset[i].getVarAlignment(0).gene_start() << std::endl;
-//                    std::cout << (int) cloneset[i].getVarAlignment(0).seq_start() << std::endl;
-//                    std::cout << (int) cloneset[i].getVarAlignment(0).length() << std::endl;
-//                    std::cout << (int) cloneset[i].getJoiAlignment(0).gene_start() << std::endl;
-//                    std::cout << (int) cloneset[i].getJoiAlignment(0).seq_start() << std::endl;
-//                    std::cout << (int) cloneset[i].getJoiAlignment(0).length() << std::endl;
-//                    std::cout << (int) cloneset[i].numDivAlignments(0) << std::endl;
-//                    std::cout << (int) cloneset[i].numDivAlignments(1) << std::endl;
-//                }
-
-                res[i] = this->build(cloneset[i], metadata_mode, error_mode, seq_type);
+                res.push_back(this->build(cloneset[i], metadata_mode, error_mode, seq_type));
+//                res[i] = this->build(cloneset[i], metadata_mode, error_mode, seq_type);
 //                res[i] = std::move(this->build(cloneset[i], metadata_mode);
 //                this->build(cloneset[i], metadata_mode);
 

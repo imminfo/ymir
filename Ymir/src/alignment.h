@@ -39,7 +39,7 @@ namespace ymir {
      *
      * \brief Type for scores of gene segments alignments to input sequences.
      */
-    typedef int16_t alignment_score_t;
+    typedef double alignment_score_t;
 
 
     /**

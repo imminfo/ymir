@@ -52,7 +52,9 @@ namespace ymir {
 
     public:
 
-        ClonesetView() : _source(new ClonotypeVector()) {
+        ClonesetView()
+            : _source(new ClonotypeVector())
+        {
             _shifts.resize(0);
         }
 
@@ -150,8 +152,21 @@ namespace ymir {
         };
 
 
-        void shuffle() {
+        ClonesetView shuffle() {
+            std::default_random_engine generator;
+            std::uniform_int_distribution<size_t> distribution(0, this->size());
 
+            std::vector<size_t> indices(this->size());
+            for (size_t i = 0; i < this->size(); ++i) {
+                indices[i] = distribution(generator);
+            }
+
+            return this->subvec(indices);
+        }
+
+
+        ClonesetView sample(size_t n) {
+            return this->shuffle().head(n);
         }
 
 

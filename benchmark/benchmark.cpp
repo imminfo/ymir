@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
     tp1 = std::chrono::system_clock::now();
     EMAlgorithm().statisticalInference(cloneset_vj,
                                        vj_single_model,
-                                       EMAlgorithm::AlgorithmParameters().set("niter", 30),
+                                       EMAlgorithm::AlgorithmParameters().set("niter", 50),
                                        COMPUTE_ERRORS);
 //                                       COMPUTE_ERRORS);
 //    BlockEMAlgorithm().statisticalInference(cloneset_vj,

@@ -188,6 +188,9 @@ namespace ymir {
                             fill(temp_arr, temp_arr + 4, 0);
                             n = 0;
 
+                            scenario_prob = (*_forward_acc)(ins_node, 0, row_i, col_i)
+                                            * (*_backward_acc)(back_node, 0, row_i, col_i);
+
                             if (_err_mode == NO_ERRORS) {
                                 for (seq_len_t pos = maag.position(left_pos) + 1; pos < maag.position(right_pos); ++pos) {
                                     temp_arr[nuc_hash(maag.sequence()[pos - 1])] += 1;
@@ -202,21 +205,13 @@ namespace ymir {
                                     temp_arr[nuc_hash(maag.sequence()[pos - 1])] += (1 - _err_prob / 3);
                                     ++n;
                                 }
-                            }
 
-                            scenario_prob = (*_forward_acc)(ins_node, 0, row_i, col_i)
-                                            * (*_backward_acc)(back_node, 0, row_i, col_i);
+                                _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
+                            }
 
                             for (auto i = 0; i < 4; ++i) {
                                 nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
                             }
-
-//                            _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
-
-//                            _nuc_arr1[0] /= _cur_prob;
-//                            _nuc_arr1[1] /= _cur_prob;
-//                            _nuc_arr1[2] /= _cur_prob;
-//                            _nuc_arr1[3] /= _cur_prob;
                         }
                     }
                 }
@@ -230,6 +225,9 @@ namespace ymir {
                             fill(temp_arr, temp_arr + 16, 0);
                             n = 0;
                             start_shift = 0;
+
+                            scenario_prob = (*_forward_acc)(ins_node, 0, row_i, col_i)
+                                            * (*_backward_acc)(back_node, 0, row_i, col_i);
 
                             if (!reversed) {
                                 if (maag.position(left_pos) == 0) {
@@ -248,6 +246,8 @@ namespace ymir {
                                     }
                                 } else {
                                     // TODO: ???
+
+                                    _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
                                 }
                             } else {
                                 if (maag.position(right_pos) == maag.sequence().size() + 1) {
@@ -263,10 +263,9 @@ namespace ymir {
                                     temp_arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 2])] += 1;
                                     ++n;
                                 }
-                            }
 
-                            scenario_prob = (*_forward_acc)(ins_node, 0, row_i, col_i)
-                                            * (*_backward_acc)(back_node, 0, row_i, col_i);
+                                // TODO: not-errors and errors here
+                            }
 
                             for (auto i = 0; i < 16; ++i) {
                                 nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;

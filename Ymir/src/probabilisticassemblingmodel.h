@@ -195,7 +195,7 @@ namespace ymir {
          *
          * \param vec Vector with new event probabilities.
          */
-        void updateEventProbabilitiesVector(const ModelParameterVector &vec) {
+        void updateModelParameterVector(const ModelParameterVector &vec) {
 #ifndef DNDEBUG
             if (_param_vec->recombination() != vec.recombination()) {
                 throw(std::runtime_error("Model parameter vectors are not comparable due to different recombination types!"));
@@ -207,8 +207,8 @@ namespace ymir {
 #endif
 
             *_param_vec = vec;
-            this->make_builder();
-            this->make_assembler();
+            _builder->updateModelParameterVector(vec);
+            _generator->updateModelParameterVector(vec);
         }
 
 

@@ -32,6 +32,11 @@ namespace ymir {
         virtual ~ClonotypeAssembler() { }
 
 
+        void updateModelParameterVector(const ModelParameterVector &param_vec) {
+            _param_vec = param_vec;
+        }
+
+
         /**
          *
          */

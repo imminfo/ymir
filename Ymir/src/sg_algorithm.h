@@ -29,17 +29,17 @@ namespace ymir {
             // shuffle input data at each step
             // subvec
 
-            vector<size_t> indices;
+            std::vector<size_t> indices;
             size_t start_i;
             size_t block_size = algo_param["block.size"].asUInt();
 //            prob_t step = algo_param["block.size"].asDouble();
             ModelParameterVector new_param_vec = model.event_probabilities();
-            vector<bool> changed(new_param_vec.size(), false);
+            std::vector<bool> changed(new_param_vec.size(), false);
 
             ClonesetView rep_nonc = repertoire.noncoding().shuffle();
             auto maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
 
-            vector<prob_t> prob_vec(maag_rep.size(), 0);
+            std::vector<prob_t> prob_vec(maag_rep.size(), 0);
             prob_t prev_ll = 0;
 
             MAAGForwardBackwardAlgorithm fb;

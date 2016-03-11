@@ -56,10 +56,12 @@ namespace ymir {
         MAAG()
             : _recomb(UNDEF_RECOMB),
               _events(nullptr),
+              _errors(nullptr),
               _sequence(nullptr),
               _seq_poses(nullptr),
               _n_poses(0),
-              _seq_type(NUCLEOTIDE)
+              _seq_type(NUCLEOTIDE),
+              _err_prob(0)
         {
             _values.reserve(1);
         }
@@ -71,10 +73,11 @@ namespace ymir {
             : ProbMMC(other),
               _recomb(other._recomb),
               _n_poses(other._n_poses),
-              _seq_type(other._seq_type)
+              _seq_type(other._seq_type),
+              _events(other._events ? new EventIndMMC(*other._events) : nullptr),
+              _errors(other._errors ? new ErrMMC(*other._errors) : nullptr),
+              _err_prob(other._err_prob)
         {
-            if (other._events) { _events.reset(new EventIndMMC(*other._events)); }
-
             if (other._seq_poses) {
                 _seq_poses.reset(new seq_len_t[_n_poses]);
                 std::copy(other._seq_poses.get(), other._seq_poses.get() + _n_poses, _seq_poses.get());
@@ -95,12 +98,13 @@ namespace ymir {
 
             _events.swap(other._events);
 
-            std::swap(_n_poses, other._n_poses);
+            _errors.swap(other._errors);
+            std::swap(_err_prob, other._err_prob);
 
+            std::swap(_n_poses, other._n_poses);
             _seq_poses.swap(other._seq_poses);
 
             _sequence.swap(other._sequence);
-
             std::swap(_seq_type, other._seq_type);
         }
 
@@ -109,62 +113,62 @@ namespace ymir {
          * \brief Special swap constructor for MAAGs that will be used only for computation of
          * the full probability.
          */
-        MAAG(ProbMMC &prob_mmc)
-            : _recomb(prob_mmc.chainSize() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB),  // TODO: fix this
-              _events(nullptr),
-              _sequence(nullptr),
-              _seq_poses(nullptr),
-              _n_poses(0),
-              _seq_type(NUCLEOTIDE)
-        {
-            this->swap(prob_mmc);
-        }
-
-
-        MAAG(ProbMMC &prob_mmc, ErrMMC &err_mmc)
-            : MAAG(prob_mmc)
-        {
-            _errors.reset(new ErrMMC());
-            _errors.get()->swap(err_mmc);
-        }
+//        MAAG(ProbMMC &prob_mmc)
+//            : _recomb(prob_mmc.chainSize() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB),  // TODO: fix this
+//              _events(nullptr),
+//              _sequence(nullptr),
+//              _seq_poses(nullptr),
+//              _n_poses(0),
+//              _seq_type(NUCLEOTIDE)
+//        {
+//            this->swap(prob_mmc);
+//        }
+//
+//
+//        MAAG(ProbMMC &prob_mmc, ErrMMC &err_mmc)
+//            : MAAG(prob_mmc)
+//        {
+//            _errors.reset(new ErrMMC());
+//            _errors.get()->swap(err_mmc);
+//        }
 
 
         /**
          * \brief Special swap constructor for MAAGs that will be used for statistical inference.
          */
-        MAAG(ProbMMC &prob_mmc,
-             EventIndMMC &eventind_mcc,
-             const std::string &sequence,
-             unique_ptr<seq_len_t[]> &seq_poses,
-             seq_len_t n_poses,
-             SequenceType seq_type)
-                : _recomb(prob_mmc.chainSize() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB),
-                  _n_poses(n_poses),
-                  _seq_type(seq_type)
-        {
-            this->swap(prob_mmc);
-
-            _events.reset(new EventIndMMC());
-            _events.get()->swap(eventind_mcc);
-
-            _sequence.reset(new std::string(sequence));
-
-            _seq_poses.swap(seq_poses);
-        }
-
-
-        MAAG(ProbMMC &prob_mmc,
-             EventIndMMC &eventind_mcc,
-             ErrMMC &err_mmc,
-             const std::string &sequence,
-             unique_ptr<seq_len_t[]> &seq_poses,
-             seq_len_t n_poses,
-             SequenceType seq_type)
-            : MAAG(prob_mmc, eventind_mcc, sequence, seq_poses, n_poses, seq_type)
-        {
-            _errors.reset(new ErrMMC());
-            _errors.get()->swap(err_mmc);
-        }
+//        MAAG(ProbMMC &prob_mmc,
+//             EventIndMMC &eventind_mcc,
+//             const std::string &sequence,
+//             unique_ptr<seq_len_t[]> &seq_poses,
+//             seq_len_t n_poses,
+//             SequenceType seq_type)
+//                : _recomb(prob_mmc.chainSize() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB),
+//                  _n_poses(n_poses),
+//                  _seq_type(seq_type)
+//        {
+//            this->swap(prob_mmc);
+//
+//            _events.reset(new EventIndMMC());
+//            _events.get()->swap(eventind_mcc);
+//
+//            _sequence.reset(new std::string(sequence));
+//
+//            _seq_poses.swap(seq_poses);
+//        }
+//
+//
+//        MAAG(ProbMMC &prob_mmc,
+//             EventIndMMC &eventind_mcc,
+//             ErrMMC &err_mmc,
+//             const std::string &sequence,
+//             unique_ptr<seq_len_t[]> &seq_poses,
+//             seq_len_t n_poses,
+//             SequenceType seq_type)
+//            : MAAG(prob_mmc, eventind_mcc, sequence, seq_poses, n_poses, seq_type)
+//        {
+//            _errors.reset(new ErrMMC());
+//            _errors.get()->swap(err_mmc);
+//        }
 
 
         /**
@@ -178,10 +182,17 @@ namespace ymir {
             _chain = other._chain;
             _values = other._values;
 
+            if (other._errors) {
+                _errors.reset(new ErrMMC(*other._errors));
+            } else {
+                _errors.reset();
+            }
+            _err_prob = other._err_prob;
+
             if (other._events) {
                 _events.reset(new EventIndMMC(*other._events));
             }
-            else { _events = nullptr; }
+            else { _events.reset(); }
 
             _n_poses = other._n_poses;
 
@@ -195,7 +206,7 @@ namespace ymir {
             if (other._sequence) {
                 _sequence.reset(new std::string(*other._sequence));
             }
-            else { _sequence = nullptr; }
+            else { _sequence.reset(); }
 
             _seq_type = other._seq_type;
 

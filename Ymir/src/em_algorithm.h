@@ -42,7 +42,7 @@ namespace ymir {
                 return false;
             }
 
-            ClonesetView rep_nonc = repertoire.noncoding().shuffle();
+            ClonesetView rep_nonc = repertoire.noncoding().head(15000);
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
             ModelParameterVector new_param_vec = model.event_probabilities();
@@ -73,9 +73,10 @@ namespace ymir {
 
                 new_param_vec.fill(0);
 
+                tp1 = std::chrono::system_clock::now();
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
                     if (i % 25000 == 0) {
-                        cout << "Processed " << (int) i << " / " << (int) maag_rep.size() << " MAAGs.\t" << std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) << " sec." << endl;
+                        cout << "Processed " << (int) i << " / " << (int) maag_rep.size() << " MAAGs.\t" << (std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - std::chrono::system_clock::to_time_t(tp1)) << " sec." << endl;
                     }
                     if (good_clonotypes[i]) {
                         if(!this->updateTempVec(fb, maag_rep[i], new_param_vec, error_mode)) {

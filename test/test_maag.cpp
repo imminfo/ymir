@@ -307,6 +307,7 @@ YMIR_TEST_START(test_maag_vj_err)
     YMIR_ASSERT2(maag.nJoi(), 3)
     YMIR_ASSERT2(maag.nDiv(), 0)
 
+    YMIR_ASSERT(clonotype.is_good())
     YMIR_ASSERT(maag.has_events())
     YMIR_ASSERT(maag.has_errors())
 

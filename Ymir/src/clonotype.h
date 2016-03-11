@@ -54,7 +54,8 @@ namespace ymir {
                 : VDJAlignment(segments, alignments, n_D_alignments),
                   _sequence(sequence),
                   _seq_type(seq_type),
-                  _recomb(recomb)
+                  _recomb(recomb),
+                  _good(segments[0] && segments[1] && ((segments[2] && recomb == VDJ_RECOMB) || recomb) == VJ_RECOMB)
         {
         }
 
@@ -66,7 +67,8 @@ namespace ymir {
                 : VDJAlignment(alignment),
                   _sequence(sequence),
                   _seq_type(seq_type),
-                  _recomb(recomb)
+                  _recomb(recomb),
+                  _good(alignment.nVar() && alignment.nJoi() && ((alignment.nDiv() && recomb == VDJ_RECOMB) || recomb) == VJ_RECOMB)
         {
         }
 
@@ -137,6 +139,17 @@ namespace ymir {
             }
         }
 
+        std::string toString() const {
+            std::string res = "";
+            res += this->nuc_sequence() + "\t";
+            res += "V:" + std::to_string(_segments[0]) + "\t";
+            res += "D:" + std::to_string(_segments[2]) + "\t";
+            res += "J:" + std::to_string(_segments[1]);
+            return res;
+        }
+
+        bool is_good() const { return _good; }
+
     protected:
 
         Recombination _recomb;
@@ -144,6 +157,8 @@ namespace ymir {
         SequenceType _seq_type;
 
         sequence_t _sequence; //* CDR3 or full nucleotide or amino acid sequence of a clone. */
+
+        bool _good;
 
 
         /**

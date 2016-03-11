@@ -94,51 +94,53 @@ namespace ymir {
                    MetadataMode metadata_mode,
                    ErrorMode error_mode,
                    SequenceType seq_type = NUCLEOTIDE) const {
-            ProbMMC probs;
-            EventIndMMC events;
-            ErrMMC errors;
-            vector<seq_len_t> seq_poses;
-            seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
+            if (clonotype.is_good())
+            {
+                ProbMMC probs;
+                EventIndMMC events;
+                ErrMMC errors;
+                vector<seq_len_t> seq_poses;
+                seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
 
-            auto resize_size = 0, e_resize_size = 0;
-            switch (clonotype.recombination()) {
-                case VJ_RECOMB:
-                    resize_size = VJ_CHAIN_SIZE;
-                    e_resize_size = 2;
-                    break;
+                auto resize_size = 0, e_resize_size = 0;
+                switch (clonotype.recombination()) {
+                    case VJ_RECOMB:
+                        resize_size = VJ_CHAIN_SIZE;
+                        e_resize_size = 2;
+                        break;
 
-                case VDJ_RECOMB:
-                    resize_size = VDJ_CHAIN_SIZE;
-                    e_resize_size = 3;
-                    break;
+                    case VDJ_RECOMB:
+                        resize_size = VDJ_CHAIN_SIZE;
+                        e_resize_size = 3;
+                        break;
 
-                default:
+                    default:
 #ifndef DNDEBUG
-                    check_and_throw(false, "MAAGBuilder: unknown recombination type.");
+                        check_and_throw(false, "MAAGBuilder: unknown recombination type.");
 #endif
-            }
+                }
 
-            probs.resize(resize_size);
-            if (metadata_mode) {
-                events.resize(resize_size);
-            }
-            if (error_mode) {
-                errors.resize(e_resize_size);
-            }
+                probs.resize(resize_size);
+                if (metadata_mode) {
+                    events.resize(resize_size);
+                }
+                if (error_mode) {
+                    errors.resize(e_resize_size);
+                }
 
-            this->buildVariable(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
-            this->buildJoining(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
-            if (clonotype.recombination() == VJ_RECOMB) {
-                this->buildVJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
-            } else if (clonotype.recombination() == VDJ_RECOMB) {
-                this->buildDiversity(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
-                this->buildVDinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
-                this->buildDJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
-            }
+                this->buildVariable(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+                this->buildJoining(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+                if (clonotype.recombination() == VJ_RECOMB) {
+                    this->buildVJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                } else if (clonotype.recombination() == VDJ_RECOMB) {
+                    this->buildDiversity(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+                    this->buildVDinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                    this->buildDJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                }
 
-            probs.finish();
-            events.finish();
-            errors.finish();
+                probs.finish();
+                events.finish();
+                errors.finish();
 
 //            if (error_mode && metadata_mode) {
 //
@@ -164,25 +166,30 @@ namespace ymir {
 //                return MAAG(probs);
 //            }
 
-            MAAG maag;
-            maag._recomb = clonotype.recombination();
-            maag._seq_type = clonotype.sequence_type();
-            maag.swap(probs);
-            if (error_mode) {
-                maag._errors.reset(new ErrMMC());
-                maag._errors->swap(errors);
-            }
-            if (metadata_mode) {
-                unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
-                copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
-                maag._sequence.reset(new sequence_t(clonotype.sequence()));
-                maag._seq_poses.swap(seq_poses_arr);
-                maag._n_poses = seq_poses.size();
+//                std::cout << clonotype.toString() << std::endl;
 
-                maag._events.reset(new EventIndMMC());
-                maag._events->swap(events);
+                MAAG maag;
+                maag._recomb = clonotype.recombination();
+                maag._seq_type = clonotype.sequence_type();
+                maag.swap(probs);
+                if (error_mode) {
+                    maag._errors.reset(new ErrMMC());
+                    maag._errors->swap(errors);
+                }
+                if (metadata_mode) {
+                    unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
+                    copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
+                    maag._sequence.reset(new sequence_t(clonotype.sequence()));
+                    maag._seq_poses.swap(seq_poses_arr);
+                    maag._n_poses = seq_poses.size();
+
+                    maag._events.reset(new EventIndMMC());
+                    maag._events->swap(events);
+                }
+                return maag;
+            } else {
+                return MAAG();
             }
-            return maag;
         }
 
         MAAGRepertoire build(const ClonesetView &cloneset,
@@ -195,6 +202,10 @@ namespace ymir {
             res.resize(cloneset.size());
             MAAG tmp;
             for (size_t i = 0; i < cloneset.size(); ++i) {
+//                if (i == 16832 || i == 24887 || i == 33103 || i == 75283 || i == 106965 || i == 113878) {
+//                    std::cout << "bad clonotype" << std::endl;
+//                    std::cout << cloneset[i].toString() << std::endl;
+//                }
 //                if (i != 1080 && i != 3586) {
 //                    continue;
 //                }

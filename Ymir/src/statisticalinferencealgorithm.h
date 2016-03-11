@@ -100,10 +100,11 @@ namespace ymir {
                                           ErrorMode error_mode = NO_ERRORS) const {
 
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
-            cout << "\tMurugan EM-algorithm." << endl;
+            cout << "\tMurugan EM-algorithm.";
             if (error_mode == COMPUTE_ERRORS) {
-                cout << "\t(with sequence errors)" << endl;
+                cout << "\t(with sequence errors)";
             }
+            std::cout << std::endl;
 
             if (!algo_param.check("niter")) {
                 cout << "Obligatory parameter 'niter' hasn't been found, please re-run the algorithm with the supplied parameter." << endl;
@@ -129,26 +130,39 @@ namespace ymir {
             cout << "Computing full assembling probabilities..." << endl;
             vector<bool> good_clonotypes;
             good_clonotypes.resize(maag_rep.size(), true);
-            int removed = 0;
+            int removed = 0, zero_prob = 0, no_alignments = 0;
             for (size_t i = 0; i < maag_rep.size(); ++i) {
-                prob_vec[i] = maag_rep[i].fullProbability();
-                if (std::isnan(prob_vec[i]) || prob_vec[i] == 0) {
+                if (repertoire[i].is_good()) {
+                    prob_vec[i] = maag_rep[i].fullProbability();
+                    if (std::isnan(prob_vec[i]) || prob_vec[i] == 0) {
+                        good_clonotypes[i] = false;
+                        ++removed;
+                        ++zero_prob;
+                    }
+                } else {
                     good_clonotypes[i] = false;
                     ++removed;
+                    ++no_alignments;
                 }
             }
 
             if (removed) {
                 cout << "Removed " << (int) removed
                      << " error-probability clonotypes. Check your minimal Diversity gene length to align and other parameters to make sure it won't happen again in the future." << endl;
+                cout << "\tZero probabilities:\t" << (int) zero_prob << std::endl;
+                cout << "\tZBad alignments:\t" << (int) no_alignments << std::endl;
             } else {
                 cout << "No clonotypes with error probabilities has been found. It's good in case you don't know." << std::endl;
             }
+
+            return false;
 
             cout << endl << "Initial data summary:" << endl;
             prob_summary(prob_vec);
             std::cout << model.event_probabilities().error_prob() << std::endl;
             prev_ll = loglikelihood(prob_vec);
+
+            // {16832, 24887, 33103, 75283, 106965, 113878}
 
             MAAGForwardBackwardAlgorithm fb;
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
@@ -158,7 +172,9 @@ namespace ymir {
 
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
                     if (good_clonotypes[i]) {
-                        fb.process(maag_rep[i], error_mode);
+                        if (!fb.process(maag_rep[i], error_mode)) {
+                            cout << "bad MAAG: " << (int) i << endl;
+                        }
 
                         while (!fb.is_empty()) {
                             event_pair_t ep = fb.nextEvent();

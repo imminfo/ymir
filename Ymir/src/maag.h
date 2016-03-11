@@ -61,6 +61,7 @@ namespace ymir {
               _n_poses(0),
               _seq_type(NUCLEOTIDE)
         {
+            _values.reserve(1);
         }
 
         /**
@@ -243,6 +244,10 @@ namespace ymir {
 
         prob_t fullProbability(MAAGComputeProbAction action = SUM_PROBABILITY) const {
             // choose the max full probability from all possible recombinations of V(D)J gene segment indices
+            if (_recomb == UNDEF_RECOMB) {
+                return 0;
+            }
+
             if (action == MAX_PROBABILITY) {
                 prob_t max_prob = 0, cur_prob = 0;
                 if (_recomb == VJ_RECOMB) {

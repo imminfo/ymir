@@ -54,8 +54,8 @@ int main(int argc, char* argv[]) {
                         VJ_RECOMB,
                         AlignmentColumnOptions()
                                 .setV(AlignmentColumnOptions::OVERWRITE)
-                                .setJ(AlignmentColumnOptions::USE_PROVIDED),
-                        VDJAlignerParameters(1, 2));
+                                .setJ(AlignmentColumnOptions::OVERWRITE),
+                        VDJAlignerParameters(2));
 
     tp2 = std::chrono::system_clock::now();
     vj_single_parse = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
@@ -72,16 +72,16 @@ int main(int argc, char* argv[]) {
 
     tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vdj;
-    parser.openAndParse(BENCH_DATA_FOLDER + "beta.250k.txt",
-                        &cloneset_vdj,
-                        vdj_single_genes,
-                        NUCLEOTIDE,
-                        VDJ_RECOMB,
-                        AlignmentColumnOptions()
-                                .setV(AlignmentColumnOptions::USE_PROVIDED)
-                                .setJ(AlignmentColumnOptions::USE_PROVIDED)
-                                .setD(AlignmentColumnOptions::OVERWRITE),
-                        VDJAlignerParameters(1, 3));
+//    parser.openAndParse(BENCH_DATA_FOLDER + "beta.250k.txt",
+//                        &cloneset_vdj,
+//                        vdj_single_genes,
+//                        NUCLEOTIDE,
+//                        VDJ_RECOMB,
+//                        AlignmentColumnOptions()
+//                                .setV(AlignmentColumnOptions::USE_PROVIDED)
+//                                .setJ(AlignmentColumnOptions::USE_PROVIDED)
+//                                .setD(AlignmentColumnOptions::OVERWRITE),
+//                        VDJAlignerParameters(1, 3));
 
     tp2 = std::chrono::system_clock::now();
     vdj_single_parse = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
@@ -122,10 +122,15 @@ int main(int argc, char* argv[]) {
     // VJ inference
     //
     tp1 = std::chrono::system_clock::now();
-    EMAlgorithm().statisticalInference(cloneset_vj,
+//    EMAlgorithm().statisticalInference(cloneset_vj,
+//                                       vj_single_model,
+//                                       EMAlgorithm::AlgorithmParameters().set("niter", 30),
+//                                       NO_ERRORS);
+//                                       COMPUTE_ERRORS);
+    BlockEMAlgorithm().statisticalInference(cloneset_vj,
                                        vj_single_model,
-                                       EMAlgorithm::AlgorithmParameters().set("niter", 30),
-                                       COMPUTE_ERRORS);
+                                       EMAlgorithm::AlgorithmParameters().set("niter", 30).set("block.size", 2000),
+                                       NO_ERRORS);
     tp2 = std::chrono::system_clock::now();
     vj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 

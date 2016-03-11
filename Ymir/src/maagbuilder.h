@@ -196,7 +196,9 @@ namespace ymir {
                              MetadataMode metadata_mode,
                              ErrorMode error_mode,
                              SequenceType seq_type = NUCLEOTIDE,
-                             bool verbose = true) const {
+                             bool verbose = true) const
+        {
+            std::cout << "Building " << (size_t) cloneset.size() << " MAAGs..." << std::endl;
             MAAGRepertoire res;
             res.reserve(cloneset.size());
 //            res.resize(cloneset.size());
@@ -211,12 +213,12 @@ namespace ymir {
 
                 if (verbose) {
                     if ((i+1) % 50000 == 0) {
-                        cout << "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " graphs." << endl;
+                        cout << "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;
                     }
                 }
             }
             if (verbose) {
-                cout << "Built " << (int) (cloneset.size()) << " graphs." << endl;
+                cout << "Built " << (int) (cloneset.size()) << " MAAGs." << endl;
             }
             return res;
         }

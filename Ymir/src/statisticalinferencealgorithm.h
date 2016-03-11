@@ -25,6 +25,9 @@
 #define _STATISTICALINFERENCEALGORITHM_H
 
 
+#include <chrono>
+#include <ctime>
+
 #include "probabilisticassemblingmodel.h"
 #include "maagforwardbackwardalgorithm.h"
 #include "tools.h"
@@ -151,7 +154,7 @@ namespace ymir {
                 return false;
             }
 
-            ClonesetView rep_nonc = repertoire.noncoding();
+            ClonesetView rep_nonc = repertoire.noncoding().shuffle();
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
             ModelParameterVector new_param_vec = model.event_probabilities();
@@ -175,8 +178,7 @@ namespace ymir {
             std::cout << model.event_probabilities().error_prob() << std::endl;
             prev_ll = loglikelihood(prob_vec);
 
-            // {16832, 24887, 33103, 75283, 106965, 113878}
-
+            std::chrono::system_clock::time_point tp1, tp2;
             MAAGForwardBackwardAlgorithm fb;
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
                 cout << endl << "Iteration:\t" << (size_t) iter << endl;
@@ -185,7 +187,7 @@ namespace ymir {
 
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
                     if (i % 25000 == 0) {
-                        cout << "Processed " << (int) i << " / " << (int) maag_rep.size() << " MAAGs." << endl;
+                        cout << "Processed " << (int) i << " / " << (int) maag_rep.size() << " MAAGs.\t" << std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) << " sec." << endl;
                     }
                     if (good_clonotypes[i]) {
                         if(!this->updateTempVec(fb, maag_rep[i], new_param_vec, error_mode)) {
@@ -244,6 +246,8 @@ namespace ymir {
                     }
                 }
             }
+
+            return true;
         }
 
 
@@ -290,10 +294,11 @@ namespace ymir {
             vector<size_t> indices;
             size_t start_i;
             size_t block_size = algo_param["block.size"].asUInt();
+//            prob_t step = algo_param["block.size"].asDouble();
             ModelParameterVector new_param_vec = model.event_probabilities();
             vector<bool> changed(new_param_vec.size(), false);
 
-            ClonesetView rep_nonc = repertoire.noncoding();
+            ClonesetView rep_nonc = repertoire.noncoding().shuffle();
             auto maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
 
             vector<prob_t> prob_vec(maag_rep.size(), 0);
@@ -411,32 +416,6 @@ namespace ymir {
 
     };
 
-
-    /**
-    * \class OnlineEMAlgorithm
-    *
-    * \brief Implementation of the online EM-algorithm for statistical inference of assembling model parameters.
-    */
-    class OnlineEMAlgorithm : public StatisticalInferenceAlgorithm {
-    public:
-
-        virtual bool statisticalInference(const ClonesetView& repertoire,
-                                          ProbabilisticAssemblingModel & model,
-                                          const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10).set("step", .001),
-                                          ErrorMode error_mode = NO_ERRORS) const
-        {
-            // shuffle input data at each step
-            // subvec
-
-//            for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
-//                for (size_t maag_i = start_i; maag_i < start_i + algo_param[""])
-//            }
-        }
-
-//        vector<size_t> getRandomIndices(size_t size) {
-//
-//        }
-    };
 }
 
 #endif

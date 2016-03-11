@@ -25,93 +25,16 @@
 #define _ALIGNER_H_
 
 
-#include "genesegment.h"
+#include "aligner_parameters.h"
 #include "alignment_matrix.h"
 #include "clonotype_builder.h"
+#include "genesegment.h"
 
 
 using namespace std;
 
 
 namespace ymir {
-
-
-    /**
-     *
-     */
-    struct AlignmentEventScore {
-
-        /**
-         *
-         */
-        AlignmentEventScore(alignment_score_t match_,
-                            alignment_score_t mism_,
-                            alignment_score_t indel_)
-            : match(match_), mism(mism_), indel(indel_)
-        {
-        }
-
-
-        alignment_score_t match, mism, indel;
-
-    };
-
-
-    /**
-     * \struct VDJAlignerParameters
-     */
-    struct VDJAlignerParameters {
-
-
-        static const alignment_score_t default_thr = 1;
-
-
-        static const seq_len_t default_minlen = 3;
-
-
-        VDJAlignerParameters() 
-            : threshold(default_thr), 
-              min_D_len(default_minlen),
-              v_score(AlignmentEventScore(1, -1, -3)),
-              d_score(AlignmentEventScore(1, -1, -3)),
-              j_score(AlignmentEventScore(1, -1, -3))
-        {
-        }
-
-
-        VDJAlignerParameters(alignment_score_t thr, seq_len_t minlen) 
-            : threshold(thr), 
-              min_D_len(minlen),
-              v_score(AlignmentEventScore(1, -1, -3)),
-              d_score(AlignmentEventScore(1, -1, -3)),
-              j_score(AlignmentEventScore(1, -1, -3))
-        {                
-        }
-
-
-        VDJAlignerParameters(alignment_score_t thr,
-                             seq_len_t minlen,
-                             AlignmentEventScore v_score_,
-                             AlignmentEventScore d_score_,
-                             AlignmentEventScore j_score_)
-                : threshold(thr),
-                  min_D_len(minlen),
-                  v_score(v_score_),
-                  d_score(d_score_),
-                  j_score(j_score_)
-        {
-        }
-
-
-
-        alignment_score_t threshold; ///
-        seq_len_t min_D_len; ///
-        AlignmentEventScore v_score, d_score, j_score;
-
-    private:
-
-    };
-
 
     /**
      * \class VDJAlignerBase
@@ -471,12 +394,16 @@ namespace ymir {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
             vec.reserve(min(p_size, t_size) + 1);
+            seq_len_t score = 0;
 
             for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
                 vec.push_back(pattern[i] != text[i]);
+                score += pattern[i] == text[i] ? params.score.v_score.match : params.score.v_score.mism;
             }
 
-            avec->addAlignment(gene, 1, 1, vec);
+            if (score >= params.threshold.v_threshold) {
+                avec->addAlignment(gene, 1, 1, vec);
+            }
         }
     };
 
@@ -487,11 +414,11 @@ namespace ymir {
                         NoGapAlignmentVector *avec, 
                         const VDJAlignerParameters &params = VDJAlignerParameters()) const 
         {
-             seq_len_t match_min_len = params.min_D_len;
-             seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
-             seq_len_t p_start, t_start;
-             AlignmentVectorBase::events_storage_t bitvec;
-             bitvec.reserve(p_size + 1);
+            seq_len_t match_min_len = params.min_D_len;
+            seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
+            seq_len_t p_start, t_start;
+            AlignmentVectorBase::events_storage_t bitvec;
+            bitvec.reserve(p_size + 1);
 
             for (seq_len_t pattern_i = 0; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
                 min_subsize = min(p_size - pattern_i, (int) t_size);
@@ -527,12 +454,16 @@ namespace ymir {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
             vec.reserve(min(p_size, t_size) + 1);
+            seq_len_t score = 0;
 
             for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
                 vec.insert(vec.begin(), pattern[p_size - i - 1] != text[t_size - i - 1]);
+                score += pattern[p_size - i - 1] == text[t_size - i - 1] ? params.score.j_score.match : params.score.j_score.mism;
             }
 
-            avec->addAlignment(gene, p_size - min(t_size, p_size) + 1, t_size - min(t_size, p_size) + 1, vec);
+            if (score >= params.threshold.j_threshold) {
+                avec->addAlignment(gene, p_size - min(t_size, p_size) + 1, t_size - min(t_size, p_size) + 1, vec);
+            }
         }
     };
     ///@}
@@ -623,7 +554,7 @@ namespace ymir {
 
             for (seq_len_t col_i = 0; col_i < text.size(); ++col_i) {
                 for (seq_len_t row_i = 0; row_i < pattern.size(); ++row_i) {
-                    mat.score(row_i + 1, col_i + 1) = std::max({mat.score(row_i, col_i) + (text[col_i] == pattern[row_i] ? params.v_score.match : params.v_score.mism), 0});
+                    mat.score(row_i + 1, col_i + 1) = std::max({mat.score(row_i, col_i) + (text[col_i] == pattern[row_i] ? params.score.v_score.match : params.score.v_score.mism), 0});
                 }
             }
 
@@ -680,7 +611,7 @@ namespace ymir {
 
             for (seq_len_t col_i = 0; col_i < text.size(); ++col_i) {
                 for (seq_len_t row_i = 0; row_i < pattern.size(); ++row_i) {
-                    mat.score(row_i + 1, col_i + 1) = std::max({mat.score(row_i, col_i) + (text[col_i] == pattern[row_i] ? params.j_score.match : params.j_score.mism), 0});
+                    mat.score(row_i + 1, col_i + 1) = std::max({mat.score(row_i, col_i) + (text[col_i] == pattern[row_i] ? params.score.j_score.match : params.score.j_score.mism), 0});
                 }
             }
 

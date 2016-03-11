@@ -158,7 +158,7 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
                                       .setV(AlignmentColumnOptions::USE_PROVIDED)
                                       .setJ(AlignmentColumnOptions::USE_PROVIDED)
                                       .setD(AlignmentColumnOptions::OVERWRITE),
-                                    VDJAlignerParameters(1, 3)))
+                                    VDJAlignerParameters(3)))
 
     YMIR_ASSERT2(cr.size(), 1)
     YMIR_ASSERT2(cr[0].sequence(), "CCCGACGGTTT")
@@ -198,7 +198,7 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
                                             .setV(AlignmentColumnOptions::USE_PROVIDED)
                                             .setJ(AlignmentColumnOptions::USE_PROVIDED)
                                             .setD(AlignmentColumnOptions::OVERWRITE),
-                                    VDJAlignerParameters(1, 2)))
+                                    VDJAlignerParameters(2)))
 //     this is if default gene len is equal to 2
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(0), 3)
     YMIR_ASSERT2( (int) cr[0].numDivAlignments(1), 4)

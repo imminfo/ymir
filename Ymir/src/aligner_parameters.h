@@ -141,6 +141,14 @@ namespace ymir {
         }
 
 
+        VDJAlignerParameters(seq_len_t minlen,
+                             VDJAlignmentEventScore score_)
+                : min_D_len(minlen),
+                  score(score_)
+        {
+        }
+
+
 
         VDJAlignerParameters(seq_len_t minlen,
                              VDJAlignmentEventScore score_,

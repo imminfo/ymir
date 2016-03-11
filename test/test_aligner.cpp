@@ -53,7 +53,7 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
-    NaiveCDR3NucleotideAligner nna(genes, VDJAlignerParameters(1, 3));
+    NaiveCDR3NucleotideAligner nna(genes, VDJAlignerParameters(3));
 
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").pattern_start(0), 1)
@@ -91,7 +91,7 @@ YMIR_TEST_START(test_naive_cdr3_nuc_aligner)
 
     YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").size(), 0)
 
-    NaiveCDR3NucleotideAligner nna2(genes, VDJAlignerParameters(1, 2));
+    NaiveCDR3NucleotideAligner nna2(genes, VDJAlignerParameters(2));
     YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").size(), 2)
     YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").pattern_start(0), 1)
     YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").text_start(0), 3)
@@ -133,7 +133,7 @@ YMIR_TEST_START(test_cdr3_nuc_aligner)
 
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
-    CDR3NucleotideAligner nna(genes, VDJAlignerParameters(1, 3));
+    CDR3NucleotideAligner nna(genes, VDJAlignerParameters(3));
 
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").text_start(0), 1)
     YMIR_ASSERT2(nna.alignVar(1, "ACGT").pattern_start(0), 1)
@@ -193,7 +193,7 @@ YMIR_TEST_START(test_cdr3_nuc_aligner)
 
     YMIR_ASSERT2(nna.alignDiv(1, "TTAATAA").size(), 0)
 
-    CDR3NucleotideAligner nna2(genes, VDJAlignerParameters(1, 2));
+    CDR3NucleotideAligner nna2(genes, VDJAlignerParameters(2));
 
     YMIR_ASSERT2(nna2.alignDiv(1, "TTAATAA").size(), 6)
 
@@ -335,12 +335,12 @@ YMIR_TEST_START(test_sw_aligner)
     vector<string> svec3 {"AA", "AACCTT", "ACT"};
 
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
-
-    SmithWatermanNoGapAligner swa(genes, VDJAlignerParameters(1,
-                                                              3,
-                                                              AlignmentEventScore(1, -1, -3),
-                                                              AlignmentEventScore(2, -1, -1),
-                                                              AlignmentEventScore(3, -2, -3)));
+//
+//    SmithWatermanNoGapAligner swa(genes, VDJAlignerParameters(1,
+//                                                              3,
+//                                                              AlignmentEventScore(1, -1, -3),
+//                                                              AlignmentEventScore(2, -1, -1),
+//                                                              AlignmentEventScore(3, -2, -3)));
 
 
 YMIR_TEST_END
@@ -407,11 +407,10 @@ YMIR_TEST_START(test_swng_aligner)
 
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
-    SmithWatermanNoGapAligner swnga(genes, VDJAlignerParameters(1,
-                                                                2,
-                                                                AlignmentEventScore(3, -1, -3),
-                                                                AlignmentEventScore(2, -1, -1),
-                                                                AlignmentEventScore(3, -2, -3)));
+    SmithWatermanNoGapAligner swnga(genes, VDJAlignerParameters(2,
+                                                                VDJAlignmentEventScore(AlignmentEventScore(3, -1, -3),
+                                                                                       AlignmentEventScore(2, -1, -1),
+                                                                                       AlignmentEventScore(3, -2, -3))));
 
     sequence_t pattern;
     NoGapAlignmentVector alignment;

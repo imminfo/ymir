@@ -367,7 +367,7 @@ namespace ymir {
         inline prob_t error_prob() const { return _err_prob; }
 
 
-        inline prob_t& error_prob() { return _err_prob; }
+        inline prob_t set_error_prob(prob_t val) { _err_prob = val; }
 
 
         /**

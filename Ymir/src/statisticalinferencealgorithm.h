@@ -101,7 +101,9 @@ namespace ymir {
 
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
             cout << "\tMurugan EM-algorithm." << endl;
-            if (error_mode == COMPUTE_ERRORS) { cout << "\t(with sequence errors)" << endl; }
+            if (error_mode == COMPUTE_ERRORS) {
+                cout << "\t(with sequence errors)" << endl;
+            }
 
             if (!algo_param.check("niter")) {
                 cout << "Obligatory parameter 'niter' hasn't been found, please re-run the algorithm with the supplied parameter." << endl;
@@ -114,7 +116,7 @@ namespace ymir {
             ModelParameterVector new_param_vec = model.event_probabilities();
             new_param_vec.fill(1);
             new_param_vec.normaliseEventFamilies();
-            model.updateEventProbabilitiesVector(new_param_vec);
+            model.updateModelParameterVector(new_param_vec);
 
             cout << "Building MAAGs..." << endl;
             MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
@@ -163,7 +165,7 @@ namespace ymir {
                             new_param_vec[ep.first] += ep.second;
                         }
 
-                        if (error_mode) { new_param_vec.error_prob() += fb.err_prob(); }
+                        if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() + fb.err_prob()); }
 
                         if (maag_rep[i].is_vj()) {
                             new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] += fb.VJ_nuc_probs()[0];
@@ -188,10 +190,10 @@ namespace ymir {
                     }
                 }
 
-                if (error_mode) { new_param_vec.error_prob() /= (maag_rep.size() - removed); }
+                if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() / (maag_rep.size() - removed)); }
                 new_param_vec.normaliseEventFamilies();
 
-                model.updateEventProbabilitiesVector(new_param_vec);
+                model.updateModelParameterVector(new_param_vec);
                 model.updateEventProbabilities(&maag_rep);
 
                 for (size_t i = 0; i < maag_rep.size(); ++i) {

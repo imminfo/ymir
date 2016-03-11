@@ -394,11 +394,14 @@ namespace ymir {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
             vec.reserve(min(p_size, t_size) + 1);
-            alignment_score_t score = 0;
+            alignment_score_t score = 0, val;
 
-            for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
+            vec.push_back(pattern[0] != text[0]);
+            for (seq_len_t i = 1; i < min(p_size, t_size); ++i) {
                 vec.push_back(pattern[i] != text[i]);
-                score += pattern[i] == text[i] ? params.score.v_score.match : (params.score.v_score.mism - params.score.v_score.acc_mism*(pattern[i] != text[i]));
+//                val = pattern[i] == text[i] ? params.score.v_score.match : (params.score.v_score.mism - params.score.v_score.acc_mism*(pattern[i] != text[i]));
+                val = pattern[i] == text[i] ? (params.score.v_score.match + params.score.v_score.acc_match * (pattern[i - 1] == text[i - 1])) : params.score.v_score.mism;
+                score += val;
             }
 
             if (score >= params.threshold.v_threshold) {
@@ -454,11 +457,17 @@ namespace ymir {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             NoGapAlignment::events_storage_t vec;
             vec.reserve(min(p_size, t_size) + 1);
-            alignment_score_t score = 0;
+            alignment_score_t score = 0, val;
 
-            for (seq_len_t i = 0; i < min(p_size, t_size); ++i) {
+            vec.insert(vec.begin(), pattern[p_size - 1] != text[t_size - 1]);
+            for (seq_len_t i = 1; i < min(p_size, t_size); ++i) {
                 vec.insert(vec.begin(), pattern[p_size - i - 1] != text[t_size - i - 1]);
-                score += pattern[p_size - i - 1] == text[t_size - i - 1] ? params.score.j_score.match : (params.score.j_score.mism - params.score.j_score.acc_mism*(pattern[p_size - i - 1] != text[t_size - i - 1]));
+//                val = pattern[p_size - i - 1] == text[t_size - i - 1] ? params.score.j_score.match : (params.score.j_score.mism - params.score.j_score.acc_mism*(pattern[p_size - i - 1] != text[t_size - i - 1]));
+                score += pattern[p_size - i - 1] == text[t_size - i - 1] ? (params.score.j_score.match + params.score.j_score.acc_match * (pattern[p_size - i] == text[t_size - i])) : params.score.j_score.mism;
+//                if (score + val < params.threshold.j_threshold && i >= ) {
+//                    break;
+//                }
+//                score += val;
             }
 
             if (score >= params.threshold.j_threshold) {

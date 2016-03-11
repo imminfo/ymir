@@ -32,28 +32,29 @@ namespace ymir {
             : match(match_),
               mism(mism_),
               indel(indel_),
-              acc_mism(1.5)
+              acc_match(2),
+              acc_mism(1.7)
         {
         }
 
 
-        alignment_score_t match, mism, indel, acc_mism;
+        alignment_score_t match, mism, indel, acc_match, acc_mism;
 
     };
 
 
     struct VDJAlignmentEventScore {
 
-        constexpr static const alignment_score_t default_v_match = 2;
-        constexpr static const alignment_score_t default_v_mism = -3;
+        constexpr static const alignment_score_t default_v_match = 3;
+        constexpr static const alignment_score_t default_v_mism = -2.5;
         constexpr static const alignment_score_t default_v_indel = -3;
 
         constexpr static const alignment_score_t default_d_match = 2;
         constexpr static const alignment_score_t default_d_mism = -3;
         constexpr static const alignment_score_t default_d_indel = -3;
 
-        constexpr static const alignment_score_t default_j_match = 2;
-        constexpr static const alignment_score_t default_j_mism = -3;
+        constexpr static const alignment_score_t default_j_match = 3;
+        constexpr static const alignment_score_t default_j_mism = -2.5;
         constexpr static const alignment_score_t default_j_indel = -3;
 
 
@@ -89,9 +90,9 @@ namespace ymir {
 
     struct VDJAlignmentScoreThreshold {
 
-        constexpr static const alignment_score_t default_v_threshold = 20;
+        constexpr static const alignment_score_t default_v_threshold = 25;
         constexpr static const alignment_score_t default_d_threshold = 20;
-        constexpr static const alignment_score_t default_j_threshold = 20;
+        constexpr static const alignment_score_t default_j_threshold = 25;
 
         VDJAlignmentScoreThreshold()
             : v_threshold(default_v_threshold),

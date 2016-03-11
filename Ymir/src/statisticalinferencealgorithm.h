@@ -155,8 +155,6 @@ namespace ymir {
                 cout << "No clonotypes with error probabilities has been found. It's good in case you don't know." << std::endl;
             }
 
-            return false;
-
             cout << endl << "Initial data summary:" << endl;
             prob_summary(prob_vec);
             std::cout << model.event_probabilities().error_prob() << std::endl;

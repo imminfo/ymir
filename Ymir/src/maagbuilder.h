@@ -166,7 +166,7 @@ namespace ymir {
 //                return MAAG(probs);
 //            }
 
-                std::cout << clonotype.toString() << std::endl;
+//                std::cout << clonotype.toString() << std::endl;
 
                 MAAG maag;
                 maag._recomb = clonotype.recombination();

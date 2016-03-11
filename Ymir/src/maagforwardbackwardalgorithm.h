@@ -59,7 +59,7 @@ namespace ymir {
             _full_prob = 0;
             _back_full_prob = 0;
             _err_prob = 0;
-            ErrorMode _err_mode = error_mode;
+            _err_mode = error_mode;
 
             if (_err_mode == COMPUTE_ERRORS && !maag.has_errors()) {
                 cerr << "MAAG forward-backward algorithm error: no error matrix has been found in the input MAAG." << endl;
@@ -169,7 +169,7 @@ namespace ymir {
                                        prob_t *nuc_arr, bool reversed = false) {
             node_ind_t forw_node = ins_node - 1, back_node = ins_node;
             prob_t scenario_prob = 0;
-            prob_t *temp_arr = nullptr;
+            prob_t temp_arr[16];
             uint n = 0;
             seq_len_t left_pos, right_pos, start_shift;
 
@@ -179,7 +179,6 @@ namespace ymir {
 //#endif
 
             if (maag.is_vj()) {
-                temp_arr = new prob_t[4];
                 for (dim_t row_i = 0; row_i < maag.nodeRows(ins_node); ++row_i) {
                     left_pos = left_start_pos + row_i;
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
@@ -212,7 +211,7 @@ namespace ymir {
                                 nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
                             }
 
-                            _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
+//                            _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
 
 //                            _nuc_arr1[0] /= _cur_prob;
 //                            _nuc_arr1[1] /= _cur_prob;
@@ -222,7 +221,6 @@ namespace ymir {
                     }
                 }
             } else {
-                temp_arr = new prob_t[16];
                 for (dim_t row_i = 0; row_i < maag.nodeRows(ins_node); ++row_i) {
                     left_pos = left_start_pos + row_i;
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(ins_node); ++col_i) {
@@ -277,8 +275,6 @@ namespace ymir {
                     }
                 }
             }
-
-            delete [] temp_arr;
         }
 
 
@@ -295,10 +291,6 @@ namespace ymir {
                     _pair_map[event_index] = 0;
                 }
                 _pair_map[event_index] += prob_value;
-
-//                if (std::isnan(prob_value)) {
-//                    1 + 1;
-//                }
             }
         }
 
@@ -322,9 +314,11 @@ namespace ymir {
             if (_err_mode == COMPUTE_ERRORS) {
                 for (dim_t row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(node_i); ++col_i) {
-                        _err_prob += (*_forward_acc)(node_i, fb_mat_i, row_i, col_i)
-                                     * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i)
-                                     / maag.errors(err_node_i, fb_mat_i, row_i, col_i);
+                        if (maag.errors(err_node_i, fb_mat_i, row_i, col_i)) {
+                            _err_prob += (*_forward_acc)(node_i, fb_mat_i, row_i, col_i)
+                                         * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i)
+                                         / maag.errors(err_node_i, fb_mat_i, row_i, col_i);
+                        }
                     }
                 }
             }

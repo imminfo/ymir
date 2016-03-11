@@ -169,7 +169,7 @@ namespace ymir {
             maag._seq_type = clonotype.sequence_type();
             maag.swap(probs);
             if (error_mode) {
-                maag._errors = pErrMMC(new ErrMMC());
+                maag._errors.reset(new ErrMMC());
                 maag._errors->swap(errors);
             }
             if (metadata_mode) {
@@ -179,7 +179,7 @@ namespace ymir {
                 maag._seq_poses.swap(seq_poses_arr);
                 maag._n_poses = seq_poses.size();
 
-                maag._events = pEventIndMMC(new EventIndMMC());
+                maag._events.reset(new EventIndMMC());
                 maag._events->swap(events);
             }
             return maag;

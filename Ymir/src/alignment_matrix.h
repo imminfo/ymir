@@ -12,7 +12,6 @@
 
 #include "nogap_alignment_vector.h"
 #include "gapped_alignment_vector.h"
-#include "types.h"
 
 
 namespace ymir {

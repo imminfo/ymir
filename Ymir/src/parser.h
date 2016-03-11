@@ -64,7 +64,7 @@ namespace ymir {
 
         void print() {
             std::cout <<
-                    "Parsing complete. Parsed " << (size_t) count_all << " lines, clonotype errors:" << std::endl <<
+                    "Parsing complete. Parsed " << (size_t) count_all << " lines, found clonotypes with:" << std::endl <<
                     "\tunrecognised V segments:\t" << (size_t) bad_V_seg << std::endl <<
                     "\tunrecognised D segments:\t" << (size_t) bad_D_seg << std::endl <<
                     "\tunrecognised J segments:\t" << (size_t) bad_J_seg << std::endl <<
@@ -544,6 +544,11 @@ namespace ymir {
 
 
     typedef RepertoireParser<SmithWatermanAligner> SWParser;
+
+
+//    typedef RepertoireFileParser<NoGapAlignmentVector> RepertoireParser;
+//
+//    typedef RepertoireFileParser<GappedAlignmentVector> ErrorCorrectingParser;
 
 }
 

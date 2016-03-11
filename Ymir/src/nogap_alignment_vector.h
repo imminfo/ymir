@@ -75,7 +75,14 @@ namespace ymir {
          */
         bool isMismatch(seq_len_t i, seq_len_t j) const {
 #ifndef DNDEBUG
+            check_and_throw(_events.size() == 0, "Alignment vector: no errors stored in the vector.");
+
             if (_starts[i] + j - 1 >= _events.size()) {
+                std::cout << (int) _starts.size() << std::endl;
+                std::cout << (int) i << std::endl;
+                std::cout << (int) _starts[i] << std::endl;
+                std::cout << (int) j << std::endl;
+                std::cout << (int) _events.size() << std::endl;
                 throw(std::runtime_error("Alignment vector: mismatch index is out of bounds."));
             }
 #endif
@@ -85,6 +92,8 @@ namespace ymir {
 
         error_num_t numMismatches(seq_len_t i, seq_len_t start, seq_len_t end) const {
 #ifndef DNDEBUG
+            check_and_throw(_events.size() == 0, "Alignment vector: no errors stored in the vector.");
+
             if (_starts[i] + start - 1 >= _events.size()) {
                 throw(std::runtime_error("Alignment vector: start index is out of bounds."));
             }

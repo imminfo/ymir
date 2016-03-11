@@ -77,17 +77,19 @@ namespace ymir {
 
 
         void extend(const AlignmentVectorBase &other) {
-            _data.reserve(_data.size() + other._data.size() + 1);
-            _data.insert(_data.end(), other._data.begin(), other._data.end());
+            if (other.size()) {
+                _data.reserve(_data.size() + other._data.size() + 1);
+                _data.insert(_data.end(), other._data.begin(), other._data.end());
 
-            _starts.reserve(_starts.size() + other._starts.size() + 1);
-            size_t events_size = _events.size();
-            for (size_t i = 0; i < other._starts.size(); ++i) {
-                _starts.push_back(events_size + other._starts[i]);
+                _starts.reserve(_starts.size() + other._starts.size() + 1);
+                size_t events_size = _events.size();
+                for (size_t i = 0; i < other._starts.size(); ++i) {
+                    _starts.push_back(events_size + other._starts[i]);
+                }
+
+                _events.reserve(_events.size() + other._events.size() + 1);
+                _events.insert(_events.end(), other._events.begin(), other._events.end());
             }
-
-            _events.reserve(_events.size() + other._events.size() + 1);
-            _events.insert(_events.end(), other._events.begin(), other._events.end());
         }
 
 

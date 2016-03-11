@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
     EMAlgorithm().statisticalInference(cloneset_vj,
                                        vj_single_model,
                                        EMAlgorithm::AlgorithmParameters().set("niter", 30),
-                                       NO_ERRORS);
+                                       COMPUTE_ERRORS);
 //                                       COMPUTE_ERRORS);
 //    BlockEMAlgorithm().statisticalInference(cloneset_vj,
 //                                       vj_single_model,

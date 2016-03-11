@@ -54,7 +54,7 @@ namespace ymir {
             _pairs_i = 0;
             _status = false;
             _vectorised = false;
-            _pairs.resize(0);
+            _pairs.clear();
             _pairs.reserve(maag._chain.size() + 10);
             _full_prob = 0;
             _back_full_prob = 0;
@@ -295,6 +295,10 @@ namespace ymir {
                     _pair_map[event_index] = 0;
                 }
                 _pair_map[event_index] += prob_value;
+
+//                if (std::isnan(prob_value)) {
+//                    1 + 1;
+//                }
             }
         }
 

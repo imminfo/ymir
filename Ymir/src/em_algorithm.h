@@ -42,7 +42,7 @@ namespace ymir {
                 return false;
             }
 
-            ClonesetView rep_nonc = repertoire.noncoding().head(15000);
+            ClonesetView rep_nonc = repertoire.noncoding().head(50000);
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
             ModelParameterVector new_param_vec = model.event_probabilities();
@@ -111,6 +111,10 @@ namespace ymir {
             while (!fb.is_empty()) {
                 event_pair_t ep = fb.nextEvent();
                 new_param_vec[ep.first] += ep.second;
+
+                if (std::isnan(ep.second)) {
+                    return false;
+                }
             }
 
             if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() + fb.err_prob()); }

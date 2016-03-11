@@ -114,7 +114,7 @@ namespace ymir {
                 cout << "Removed " << (int) removed
                 << " error-probability clonotypes. Check your minimal Diversity gene length to align and other parameters to make sure it won't happen again in the future." << endl;
                 cout << "\tZero probabilities:\t" << (int) zero_prob << std::endl;
-                cout << "\tBad alignments:\t" << (int) no_alignments << std::endl;
+                cout << "\tBad alignments:\t" << (int) no_alignments << " (nullified)" << std::endl;
             } else {
                 cout << "No clonotypes with error probabilities has been found. It's good in case you don't know." << std::endl;
             }

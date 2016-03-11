@@ -57,6 +57,8 @@ namespace ymir {
 
     public:
         
+        static const size_t verbose_step = 10000;
+        
 
         /**
          * \brief Constructor for the builder from given vector with event probabilities and gene segments.
@@ -198,7 +200,10 @@ namespace ymir {
                              SequenceType seq_type = NUCLEOTIDE,
                              bool verbose = true) const
         {
-            std::cout << "Building " << (size_t) cloneset.size() << " MAAGs..." << std::endl;
+            if (verbose) {
+                std::cout << "Building " << (size_t) cloneset.size() << " MAAGs..." << std::endl;
+            }
+
             MAAGRepertoire res;
 //            res.reserve(cloneset.size());
             res.resize(cloneset.size());
@@ -211,15 +216,15 @@ namespace ymir {
 //                tmp = this->build(cloneset[i], metadata_mode);
 //                res[i].swap_maag(this->build(cloneset[i], metadata_mode));
 
-                if (verbose) {
-                    if ((i+1) % 50000 == 0) {
-                        cout << "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;
-                    }
+                if (verbose && (i+1) % verbose_step == 0) {
+                    cout << "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;
                 }
             }
+
             if (verbose) {
                 cout << "Built " << (int) (cloneset.size()) << " MAAGs." << endl;
             }
+
             return res;
         }
         ///@}
@@ -243,17 +248,27 @@ namespace ymir {
 
         vector<prob_t> buildAndCompute(const ClonesetView &cloneset,
                                        SequenceType seq_type = NUCLEOTIDE,
-                                       MAAGComputeProbAction action = SUM_PROBABILITY) const {
+                                       MAAGComputeProbAction action = SUM_PROBABILITY,
+                                       bool verbose = true) const
+        {
             vector<prob_t> res;
             res.reserve(cloneset.size());
 
-            std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes." << std::endl;
+            if (verbose) {
+                std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes." << std::endl;
+            }
+
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 res.push_back(buildAndCompute(cloneset[i], seq_type, action));
-                if ((i+1) % 50000 == 0) {
-                    std::cout << "Computed " << (int) (i+1) << " assembling probabilities." << std::endl;
+                if (verbose && (i+1) % verbose_step == 0) {
+                    std::cout << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
                 }
             }
+
+            if (verbose) {
+                std::cout << "Computed " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
+            }
+
             return res;
         }
         ///@}
@@ -368,9 +383,13 @@ namespace ymir {
                                 for (int mat_i = 0; mat_i < maag->nodeSize(node_i); ++mat_i) {
                                     for (int row_i = 0; row_i < maag->nodeRows(node_i); ++row_i) {
                                         for (int col_i = 0; col_i < maag->nodeColumns(node_i); ++col_i) {
-                                            (*maag)(node_i, mat_i, row_i, col_i) =
-                                                    (*_param_vec)[maag->event_index(node_i, mat_i, row_i, col_i)]
-                                                    * _param_vec->error_prob() * maag->errors(err_node_i, mat_i, row_i, col_i);
+                                            if (maag->errors(err_node_i, mat_i, row_i, col_i)) {
+                                                (*maag)(node_i, mat_i, row_i, col_i) =
+                                                        (*_param_vec)[maag->event_index(node_i, mat_i, row_i, col_i)]
+                                                        * _param_vec->error_prob() * maag->errors(err_node_i, mat_i, row_i, col_i);
+                                            } else {
+                                                (*maag)(node_i, mat_i, row_i, col_i) = (*_param_vec)[maag->event_index(node_i, mat_i, row_i, col_i)];
+                                            }
                                         }
                                     }
                                 }
@@ -390,14 +409,20 @@ namespace ymir {
             }
         }
 
-        void updateEventProbabilities(MAAGRepertoire *repertoire, bool verbose = false) const {
+        void updateEventProbabilities(MAAGRepertoire *repertoire, bool verbose = true) const {
+            if (verbose) {
+                std::cout << "Updating " << (size_t) repertoire->size() << " MAAGs..." << std::endl;
+            }
+
             for (size_t i = 0; i < repertoire->size(); ++i) {
-                this->updateEventProbabilities(&*(repertoire->begin() + i));  // facepalm
-                if (verbose) {
-                    if ((i+1) % 50000 == 0) {
-                        cout << "Updated " << (int) (i+1) << " graphs." << endl;
-                    }
+                this->updateEventProbabilities(&(*repertoire)[i]);
+                if (verbose && (i+1) % verbose_step == 0) {
+                    cout << "Updated " << (size_t) (i+1) << " / " << (size_t) repertoire->size() << " MAAGs." << endl;
                 }
+            }
+
+            if (verbose) {
+                cout << "Updated " << (int) (repertoire->size()) << " MAAGs." << endl;
             }
         }
         ///@}

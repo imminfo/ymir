@@ -214,6 +214,27 @@ namespace ymir {
         }
 
 
+        MAAG& operator=(MAAG &&other) {
+            std::swap(_recomb, other._recomb);
+
+            _chain.swap(other._chain);
+            _values.swap(other._values);
+
+            _events.swap(other._events);
+
+            _errors.swap(other._errors);
+            std::swap(_err_prob, other._err_prob);
+
+            std::swap(_n_poses, other._n_poses);
+            _seq_poses.swap(other._seq_poses);
+
+            _sequence.swap(other._sequence);
+            std::swap(_seq_type, other._seq_type);
+
+            return *this;
+        }
+
+
         /**
          * \brief Compute and return the full assembling probability of this sequence (i.e., with all gene segments alignments).
          *

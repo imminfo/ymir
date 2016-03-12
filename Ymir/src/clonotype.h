@@ -55,7 +55,7 @@ namespace ymir {
                   _sequence(sequence),
                   _seq_type(seq_type),
                   _recomb(recomb),
-                  _good(segments[0] && segments[1] && ((segments[2] && recomb == VDJ_RECOMB) || recomb) == VJ_RECOMB)
+                  _good(segments[0] && segments[1] && ((segments[2] && recomb == VDJ_RECOMB) || recomb == VJ_RECOMB))
         {
         }
 
@@ -68,7 +68,7 @@ namespace ymir {
                   _sequence(sequence),
                   _seq_type(seq_type),
                   _recomb(recomb),
-                  _good(alignment.nVar() && alignment.nJoi() && ((alignment.nDiv() && recomb == VDJ_RECOMB) || recomb) == VJ_RECOMB)
+                  _good(alignment.nVar() && alignment.nJoi() && ((alignment.nDiv() && recomb == VDJ_RECOMB) || recomb == VJ_RECOMB))
         {
         }
 

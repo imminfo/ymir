@@ -57,7 +57,7 @@ namespace ymir {
 
     public:
         
-        static const size_t verbose_step = 10000;
+//        static const size_t verbose_step = 10000;
         
 
         /**
@@ -200,8 +200,11 @@ namespace ymir {
                              SequenceType seq_type = NUCLEOTIDE,
                              bool verbose = true) const
         {
+            size_t verbose_step;
+
             if (verbose) {
                 std::cout << "Building " << (size_t) cloneset.size() << " MAAGs..." << std::endl;
+                verbose_step = cloneset.size() / 10;
             }
 
             MAAGRepertoire res;
@@ -246,9 +249,11 @@ namespace ymir {
         {
             vector<prob_t> res;
             res.reserve(cloneset.size());
+            size_t verbose_step;
 
             if (verbose) {
                 std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes." << std::endl;
+                verbose_step = cloneset.size() / 10;
             }
 
             for (size_t i = 0; i < cloneset.size(); ++i) {
@@ -372,7 +377,7 @@ namespace ymir {
                                 }
                             }
 
-                            if (node_i != 0 || (maag->is_vdj() && node_i != JOINING_GENES_VDJ_MATRIX_INDEX)) {
+                            if (node_i != 0 && (maag->is_vdj() && node_i != JOINING_GENES_VDJ_MATRIX_INDEX)) {
                                 for (int mat_i = 0; mat_i < maag->nodeSize(node_i); ++mat_i) {
                                     for (int row_i = 0; row_i < maag->nodeRows(node_i); ++row_i) {
                                         for (int col_i = 0; col_i < maag->nodeColumns(node_i); ++col_i) {
@@ -403,8 +408,11 @@ namespace ymir {
         }
 
         void updateEventProbabilities(MAAGRepertoire *repertoire, bool verbose = true) const {
+            size_t verbose_step;
+
             if (verbose) {
                 std::cout << "Updating " << (size_t) repertoire->size() << " MAAGs..." << std::endl;
+                verbose_step = repertoire->size() / 10;
             }
 
             for (size_t i = 0; i < repertoire->size(); ++i) {

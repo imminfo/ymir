@@ -140,6 +140,8 @@ namespace ymir {
 
             size_t operator() (matrix_ind_t mat, dim_t row, dim_t column) const {
 #ifndef DNDEBUG
+                if (!(mat >= 0 && mat < _n)) { throw(std::runtime_error("Matrix index check failed!")); }
+
                 if (!(row >= 0 && row < _rows && column >= 0 && column < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
 #endif
                 return _start_index + mat * (_rows * _cols) + row * _cols + column;

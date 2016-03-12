@@ -14,8 +14,13 @@
 
 namespace ymir {
 
+    class AbstractInsertionModel;
+    class MonoNucInsertionModel;
+    class DiNucInsertionModel;
+
+
     /**
-    * \class InsertionModel
+    * \class AbstractInsertionModel
     *
     * \brief Class for representing VJ / VD / DJ insertions models - either a mono-nucleotide or a di-nucleotide model.
     */

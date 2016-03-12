@@ -166,7 +166,8 @@ namespace ymir {
         void inferInsertionNucleotides(const MAAG &maag, node_ind_t ins_node,
                                        seq_len_t left_start_pos, seq_len_t left_end_pos,
                                        seq_len_t right_start_pos, seq_len_t right_end_pos,
-                                       prob_t *nuc_arr, bool reversed = false) {
+                                       prob_t *nuc_arr, bool reversed = false)
+        {
             node_ind_t forw_node = ins_node - 1, back_node = ins_node;
             prob_t scenario_prob = 0;
             prob_t temp_arr[16];
@@ -245,7 +246,13 @@ namespace ymir {
                                         ++n;
                                     }
                                 } else {
-                                    // TODO: ???
+                                    for (seq_len_t pos = maag.position(left_pos) + start_shift + 1; pos < maag.position(right_pos); ++pos) {
+                                        for (int i = 0; i < 16; ++i) {
+                                            temp_arr[0] += _err_prob * _err_prob / 15;
+                                        }
+                                        temp_arr[4 * nuc_hash(maag.sequence()[pos - 2]) + nuc_hash(maag.sequence()[pos - 1])] += (1 - _err_prob * _err_prob / 15);
+                                        ++n;
+                                    }
 
                                     _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
                                 }
@@ -259,12 +266,22 @@ namespace ymir {
                                     ++n;
                                 }
 
-                                for (seq_len_t pos = maag.position(right_pos) - start_shift; pos > maag.position(left_pos) + 1; --pos) {
-                                    temp_arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 2])] += 1;
-                                    ++n;
-                                }
+                                if (_err_mode == NO_ERRORS) {
+                                    for (seq_len_t pos = maag.position(right_pos) - start_shift; pos > maag.position(left_pos) + 1; --pos) {
+                                        temp_arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 2])] += 1;
+                                        ++n;
+                                    }
+                                } else {
+                                    for (seq_len_t pos = maag.position(right_pos) - start_shift; pos > maag.position(left_pos) + 1; --pos) {
+                                        for (int i = 0; i < 16; ++i) {
+                                            temp_arr[0] += _err_prob * _err_prob / 15;
+                                        }
+                                        temp_arr[4 * nuc_hash(maag.sequence()[pos - 1]) + nuc_hash(maag.sequence()[pos - 2])] += (1 - _err_prob * _err_prob / 15);
+                                        ++n;
+                                    }
 
-                                // TODO: not-errors and errors here
+                                    _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
+                                }
                             }
 
                             for (auto i = 0; i < 16; ++i) {

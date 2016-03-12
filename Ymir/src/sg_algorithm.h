@@ -11,19 +11,20 @@
 
 namespace ymir {
 
-    class BlockEMAlgorithm;
+    class SGAlgorithm;
+
 
     /**
     * \class BlockEMAlgorithm
     *
     * \brief Implementation of the online EM-algorithm for statistical inference of assembling model parameters.
     */
-    class BlockEMAlgorithm : public EMAlgorithm {
+    class SGAlgorithm : public EMAlgorithm {
     public:
 
         virtual bool statisticalInference(const ClonesetView& repertoire,
                                           ProbabilisticAssemblingModel & model,
-                                          const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10).set("block.size", 2000),
+                                          const AlgorithmParameters& algo_param = AlgorithmParameters().set("niter", 10).set("block.size", 2000).set("pre-build", false),
                                           ErrorMode error_mode = NO_ERRORS) const
         {
             // shuffle input data at each step
@@ -32,7 +33,7 @@ namespace ymir {
             std::vector<size_t> indices;
             size_t start_i;
             size_t block_size = algo_param["block.size"].asUInt();
-//            prob_t step = algo_param["step.size"].asDouble();
+//            prob_t alpha = algo_param["alpha"].asDouble(); // step(k) = (k + 2)^(-alpha), .5 < alpha <= 1
             ModelParameterVector new_param_vec = model.event_probabilities();
             std::vector<bool> changed(new_param_vec.size(), false);
 

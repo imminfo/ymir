@@ -6,7 +6,7 @@
 #define _BENCHMARK_H_
 
 
-#define YMIR_BENCHMARK(expr, time_var) { time_var = std::chrono::system_clock::now(); \ }
+#define YMIR_BENCHMARK(descr, expr, time_var) { time_var = std::chrono::system_clock::now(); \ }
 
 
 #include <chrono>
@@ -126,11 +126,6 @@ int main(int argc, char* argv[]) {
                                        vj_single_model,
                                        EMAlgorithm::AlgorithmParameters().set("niter", 50),
                                        COMPUTE_ERRORS);
-//                                       COMPUTE_ERRORS);
-//    BlockEMAlgorithm().statisticalInference(cloneset_vj,
-//                                       vj_single_model,
-//                                       EMAlgorithm::AlgorithmParameters().set("niter", 30).set("block.size", 2000),
-//                                       NO_ERRORS);
     tp2 = std::chrono::system_clock::now();
     vj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 
@@ -141,7 +136,8 @@ int main(int argc, char* argv[]) {
     tp1 = std::chrono::system_clock::now();
 //    EMAlgorithm().statisticalInference(cloneset_vdj,
 //                                       vdj_single_model,
-//                                       EMAlgorithm::AlgorithmParameters().set("niter", 10));
+//                                       EMAlgorithm::AlgorithmParameters().set("niter", 10),
+//                                       COMPUTE_ERRORS);
     tp2 = std::chrono::system_clock::now();
     vdj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 

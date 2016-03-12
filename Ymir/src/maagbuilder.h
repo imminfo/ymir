@@ -205,16 +205,9 @@ namespace ymir {
             }
 
             MAAGRepertoire res;
-//            res.reserve(cloneset.size());
             res.resize(cloneset.size());
             for (size_t i = 0; i < cloneset.size(); ++i) {
-//                res.push_back(this->build(cloneset[i], metadata_mode, error_mode, seq_type));
                 res[i] = this->build(cloneset[i], metadata_mode, error_mode, seq_type);
-//                res[i] = std::move(this->build(cloneset[i], metadata_mode);
-//                this->build(cloneset[i], metadata_mode);
-
-//                tmp = this->build(cloneset[i], metadata_mode);
-//                res[i].swap_maag(this->build(cloneset[i], metadata_mode));
 
                 if (verbose && (i+1) % verbose_step == 0) {
                     cout << "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;

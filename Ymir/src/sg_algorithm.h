@@ -32,7 +32,7 @@ namespace ymir {
             std::vector<size_t> indices;
             size_t start_i;
             size_t block_size = algo_param["block.size"].asUInt();
-//            prob_t step = algo_param["block.size"].asDouble();
+//            prob_t step = algo_param["step.size"].asDouble();
             ModelParameterVector new_param_vec = model.event_probabilities();
             std::vector<bool> changed(new_param_vec.size(), false);
 

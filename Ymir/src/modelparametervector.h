@@ -378,7 +378,7 @@ namespace ymir {
             for (size_t i = 1; i < _vec.size(); ++i) {
                 _vec[i] = val;
             }
-            _err_prob = 0;
+            _err_prob = (val > 1e-15) ? .1 : 0;
         }
 
 

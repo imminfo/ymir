@@ -105,11 +105,14 @@ You can test Ymir with running
 
 For benchmarks you need to download benchmark files (if you haven't download `Source_code_FULL.zip`):
 
-    curl -sL https://github.com/imminfo/ymir/releases/download/v1.0-pre3/benchmark-files.zip > benchmark-files.zip 
-    unzip benchmark-files.zip
-    rm benchmark-files.zip 
-    mv benchmark-files/ ./benchmark/data/
-    rm -r benchmark-files
+    curl -sL https://github.com/imminfo/ymir/releases/download/v2.0-bench/benchmark-alpha-full.tgz > benchmark-alpha-full.tgz
+    curl -sL https://github.com/imminfo/ymir/releases/download/v2.0-bench/benchmark-beta-full.tgz > benchmark-beta-full.tgz
+    gunzip benchmark-alpha-full.tgz
+    gunzip benchmark-beta-full.tgz
+    mv benchmark-alpha-full/* ./benchmark/data/
+    mv benchmark-beta-full/* ./benchmark/data/
+    rm -r benchmark-alpha-full
+    rm -r benchmark-beta-full
     
 To run benchmarks execute
     

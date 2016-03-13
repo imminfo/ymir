@@ -59,7 +59,7 @@ namespace ymir {
                     this->updateTempVec(fb, maag_rep[indices[maag_i]], new_param_vec, changed, error_mode);
                 }
 
-                this->updateModel(model, new_param_vec, maag_rep, prob_vec, prev_ll, changed, error_mode);
+                this->updateModel(model, new_param_vec, maag_rep, prob_vec, prev_ll, changed, /*exp(alpha * log(iter + 2))*/ error_mode);
 
                 // update starting index
                 start_i += block_size;
@@ -127,6 +127,7 @@ namespace ymir {
                          vector<prob_t> &prob_vec,
                          prob_t &prev_ll,
                          vector<bool> &changed,
+//                         prob_t step_k,
                          ErrorMode error_mode) const
         {
             if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() / (maag_rep.size())); }
@@ -137,6 +138,9 @@ namespace ymir {
                 if (!changed[i]) {
                     new_param_vec[i] = model.event_probabilities()[i];
                 }
+//                else {
+//                    new_param_vec[i] = (1 - step_k) * model.event_probabilities()[i] + step_k * model.event_probabilities()[i];
+//                }
             }
 
             model.updateModelParameterVector(new_param_vec);

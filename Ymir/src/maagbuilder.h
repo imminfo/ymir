@@ -212,13 +212,13 @@ namespace ymir {
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 res[i] = this->build(cloneset[i], metadata_mode, error_mode, seq_type);
 
-                if (verbose && (i+1) % verbose_step == 0) {
-                    cout << "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;
+                if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
+                    cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "<< "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;
                 }
             }
 
             if (verbose) {
-                cout << "Built " << (int) (cloneset.size()) << " MAAGs." << endl;
+                cout << "[100%] Built " << (int) (cloneset.size()) << " MAAGs." << endl;
             }
 
             return res;
@@ -260,13 +260,13 @@ namespace ymir {
 
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 res.push_back(buildAndCompute(cloneset[i], error_mode, seq_type, action));
-                if (verbose && (i+1) % verbose_step == 0) {
-                    std::cout << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
+                if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
+                    std::cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] " << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
                 }
             }
 
             if (verbose) {
-                std::cout << "Computed " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
+                std::cout << "[100%] Computed " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
             }
 
             return res;
@@ -419,13 +419,13 @@ namespace ymir {
 
             for (size_t i = 0; i < repertoire->size(); ++i) {
                 this->updateEventProbabilities(&(*repertoire)[i]);
-                if (verbose && (i+1) % verbose_step == 0) {
-                    cout << "Updated " << (size_t) (i+1) << " / " << (size_t) repertoire->size() << " MAAGs." << endl;
+                if (verbose && (i+1) % verbose_step == 0 && (i+1) != repertoire->size()) {
+                    cout << "[" << (int) ((100*(i+1)) / repertoire->size()) << "%] " << "Updated " << (size_t) (i+1) << " / " << (size_t) repertoire->size() << " MAAGs." << endl;
                 }
             }
 
             if (verbose) {
-                cout << "Updated " << (int) (repertoire->size()) << " MAAGs." << endl;
+                cout << "[100%] Updated " << (int) (repertoire->size()) << " MAAGs." << endl;
             }
         }
         ///@}

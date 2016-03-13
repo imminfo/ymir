@@ -42,7 +42,7 @@ namespace ymir {
                 return false;
             }
 
-            ClonesetView rep_nonc = repertoire.noncoding().shuffle().head(20000); // error here
+            ClonesetView rep_nonc = repertoire.noncoding().sample(30000);
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
             ModelParameterVector new_param_vec = model.event_probabilities();

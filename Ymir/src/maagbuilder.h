@@ -237,12 +237,14 @@ namespace ymir {
          */
         ///@{
         prob_t buildAndCompute(const Clonotype &clonotype,
+                               ErrorMode error_mode,
                                SequenceType seq_type = NUCLEOTIDE,
                                MAAGComputeProbAction action = SUM_PROBABILITY) const {
-            return this->build(clonotype, NO_METADATA, NO_ERRORS, seq_type).fullProbability(action);
+            return this->build(clonotype, NO_METADATA, error_mode, seq_type).fullProbability(action);
         }
 
         vector<prob_t> buildAndCompute(const ClonesetView &cloneset,
+                                       ErrorMode error_mode,
                                        SequenceType seq_type = NUCLEOTIDE,
                                        MAAGComputeProbAction action = SUM_PROBABILITY,
                                        bool verbose = true) const
@@ -257,7 +259,7 @@ namespace ymir {
             }
 
             for (size_t i = 0; i < cloneset.size(); ++i) {
-                res.push_back(buildAndCompute(cloneset[i], seq_type, action));
+                res.push_back(buildAndCompute(cloneset[i], error_mode, seq_type, action));
                 if (verbose && (i+1) % verbose_step == 0) {
                     std::cout << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
                 }

@@ -6,9 +6,6 @@
 #define _BENCHMARK_H_
 
 
-#define YMIR_BENCHMARK(descr, expr, time_var) { time_var = std::chrono::system_clock::now(); \ }
-
-
 #include <chrono>
 #include <ctime>
 
@@ -16,6 +13,9 @@
 
 
 using namespace ymir;
+
+
+#define YMIR_BENCHMARK(time_var, expr) { tp1 = std::chrono::system_clock::now(); expr; tp2 = std::chrono::system_clock::now(); time_var = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1); }
 
 
 int main(int argc, char* argv[]) {
@@ -45,20 +45,17 @@ int main(int argc, char* argv[]) {
                                    "Jgene",
                                    BENCH_DATA_FOLDER + "traj.txt");
 
-    tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vj;
-//    parser.openAndParse(BENCH_DATA_FOLDER + "alpha.250k.txt",
-//                        &cloneset_vj,
-//                        vj_single_genes,
-//                        NUCLEOTIDE,
-//                        VJ_RECOMB,
-//                        AlignmentColumnOptions()
-//                                .setV(AlignmentColumnOptions::OVERWRITE)
-//                                .setJ(AlignmentColumnOptions::OVERWRITE),
-//                        VDJAlignerParameters(2));
-
-    tp2 = std::chrono::system_clock::now();
-    vj_single_parse = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+    YMIR_BENCHMARK(vj_single_parse,
+                   parser.openAndParse(BENCH_DATA_FOLDER + "alpha.250k.txt",
+                                       &cloneset_vj,
+                                       vj_single_genes,
+                                       NUCLEOTIDE,
+                                       VJ_RECOMB,
+                                       AlignmentColumnOptions()
+                                               .setV(AlignmentColumnOptions::OVERWRITE)
+                                               .setJ(AlignmentColumnOptions::OVERWRITE),
+                                       VDJAlignerParameters(2)))
 
     //
     // TCR beta chain repertoire - VDJ recombination
@@ -70,36 +67,26 @@ int main(int argc, char* argv[]) {
                                     "Dgene",
                                     BENCH_DATA_FOLDER + "trbd.txt");
 
-    tp1 = std::chrono::system_clock::now();
     Cloneset cloneset_vdj;
-    parser.openAndParse(BENCH_DATA_FOLDER + "beta.250k.txt",
-                        &cloneset_vdj,
-                        vdj_single_genes,
-                        NUCLEOTIDE,
-                        VDJ_RECOMB,
-                        AlignmentColumnOptions()
-                                .setV(AlignmentColumnOptions::OVERWRITE)
-                                .setJ(AlignmentColumnOptions::OVERWRITE)
-                                .setD(AlignmentColumnOptions::OVERWRITE),
-                        VDJAlignerParameters(3));
-
-    tp2 = std::chrono::system_clock::now();
-    vdj_single_parse = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+    YMIR_BENCHMARK(vdj_single_parse,
+                   parser.openAndParse(BENCH_DATA_FOLDER + "beta.250k.txt",
+                                       &cloneset_vdj,
+                                       vdj_single_genes,
+                                       NUCLEOTIDE,
+                                       VDJ_RECOMB,
+                                       AlignmentColumnOptions()
+                                               .setV(AlignmentColumnOptions::OVERWRITE)
+                                               .setJ(AlignmentColumnOptions::OVERWRITE)
+                                               .setD(AlignmentColumnOptions::OVERWRITE),
+                                       VDJAlignerParameters(3)))
 
     //
     // VJ MAAG
     //
     ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA"); //, EMPTY);
 
-    tp1 = std::chrono::system_clock::now();
-//    vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS);
-    tp2 = std::chrono::system_clock::now();
-    vj_single_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
-
-    tp1 = std::chrono::system_clock::now();
-//    vj_single_model.computeFullProbabilities(cloneset_vj, NO_METADATA, NO_ERRORS);
-    tp2 = std::chrono::system_clock::now();
-    vj_single_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+    YMIR_BENCHMARK(vj_single_meta, vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS))
+    YMIR_BENCHMARK(vj_single_prob, vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS, NUCLEOTIDE))
 
 
     //
@@ -107,15 +94,8 @@ int main(int argc, char* argv[]) {
     //
     ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
 
-    tp1 = std::chrono::system_clock::now();
-//    vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS);
-    tp2 = std::chrono::system_clock::now();
-    vdj_single_meta = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
-
-    tp1 = std::chrono::system_clock::now();
-//    vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_METADATA, NO_ERRORS);
-    tp2 = std::chrono::system_clock::now();
-    vdj_single_prob = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+    YMIR_BENCHMARK(vdj_single_meta, vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS))
+    YMIR_BENCHMARK(vdj_single_prob, vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS, NUCLEOTIDE))
 
 
     //
@@ -134,10 +114,10 @@ int main(int argc, char* argv[]) {
     // VDJ inference
     //
     tp1 = std::chrono::system_clock::now();
-    EMAlgorithm().statisticalInference(cloneset_vdj,
-                                       vdj_single_model,
-                                       EMAlgorithm::AlgorithmParameters().set("niter", 10),
-                                       COMPUTE_ERRORS);
+//    EMAlgorithm().statisticalInference(cloneset_vdj,
+//                                       vdj_single_model,
+//                                       EMAlgorithm::AlgorithmParameters().set("niter", 20),
+//                                       COMPUTE_ERRORS);
     tp2 = std::chrono::system_clock::now();
     vdj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
 

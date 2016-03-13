@@ -107,9 +107,10 @@ namespace ymir {
          * \return Vector of full assembling probabilities.
          */
         vector<prob_t> computeFullProbabilities(const ClonesetView& repertoire,
+                                                ErrorMode error_mode,
                                                 SequenceType sequence_type = NUCLEOTIDE,
                                                 MAAGComputeProbAction action = SUM_PROBABILITY) const {
-            return _builder->buildAndCompute(repertoire, sequence_type, action);
+            return _builder->buildAndCompute(repertoire, error_mode, sequence_type, action);
         }
 
 

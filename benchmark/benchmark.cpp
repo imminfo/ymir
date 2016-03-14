@@ -15,11 +15,13 @@
 using namespace ymir;
 
 
-#define YMIR_BENCHMARK(time_var, expr) { tp1 = std::chrono::system_clock::now(); expr; tp2 = std::chrono::system_clock::now(); time_var = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1); }
+#define YMIR_BENCHMARK(descr, expr) { tp1 = std::chrono::system_clock::now(); expr; tp2 = std::chrono::system_clock::now(); timepoints.emplace_back(descr, std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1)); }
 
 
 int main(int argc, char* argv[]) {
     std::chrono::system_clock::time_point tp1, tp2;
+
+    std::vector< std::pair<std::string, size_t> > timepoints;
     
     time_t vj_single_parse, vdj_single_parse,
             vj_single_prob, vj_single_meta,
@@ -36,6 +38,9 @@ int main(int argc, char* argv[]) {
 
     CDR3NucParser parser;
 
+    string input_alpha_file = "alpha.250k.txt";
+    string input_beta_file = "beta.500k.txt";
+
 
     //
     // TCR alpha chain repertoire - VJ recombination
@@ -46,15 +51,13 @@ int main(int argc, char* argv[]) {
                                    BENCH_DATA_FOLDER + "traj.txt");
 
     Cloneset cloneset_vj;
-    YMIR_BENCHMARK(vj_single_parse,
-                   parser.openAndParse(BENCH_DATA_FOLDER + "alpha.250k.txt",
+    YMIR_BENCHMARK("Parsing VJ",
+                   parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file,
                                        &cloneset_vj,
                                        vj_single_genes,
                                        NUCLEOTIDE,
                                        VJ_RECOMB,
-                                       AlignmentColumnOptions()
-                                               .setV(AlignmentColumnOptions::OVERWRITE)
-                                               .setJ(AlignmentColumnOptions::OVERWRITE),
+                                       AlignmentColumnOptions(AlignmentColumnOptions::USE_PROVIDED, AlignmentColumnOptions::USE_PROVIDED),
                                        VDJAlignerParameters(2)))
 
     //
@@ -68,16 +71,16 @@ int main(int argc, char* argv[]) {
                                     BENCH_DATA_FOLDER + "trbd.txt");
 
     Cloneset cloneset_vdj;
-    YMIR_BENCHMARK(vdj_single_parse,
-                   parser.openAndParse(BENCH_DATA_FOLDER + "beta.250k.txt",
+    YMIR_BENCHMARK("Parsing VDJ",
+                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
                                        &cloneset_vdj,
                                        vdj_single_genes,
                                        NUCLEOTIDE,
                                        VDJ_RECOMB,
                                        AlignmentColumnOptions()
-                                               .setV(AlignmentColumnOptions::OVERWRITE)
-                                               .setJ(AlignmentColumnOptions::OVERWRITE)
-                                               .setD(AlignmentColumnOptions::OVERWRITE),
+                                               .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                               .setD(AlignmentColumnOptions::OVERWRITE)
+                                               .setJ(AlignmentColumnOptions::USE_PROVIDED),
                                        VDJAlignerParameters(3)))
 
     //
@@ -85,8 +88,8 @@ int main(int argc, char* argv[]) {
     //
     ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA"); //, EMPTY);
 
-    YMIR_BENCHMARK(vj_single_meta, vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS))
-    YMIR_BENCHMARK(vj_single_prob, vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS, NUCLEOTIDE))
+//    YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS))
+//    YMIR_BENCHMARK("VJ prob", vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS, NUCLEOTIDE))
 
 
     //
@@ -94,32 +97,43 @@ int main(int argc, char* argv[]) {
     //
     ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
 
-    YMIR_BENCHMARK(vdj_single_meta, vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS))
-    YMIR_BENCHMARK(vdj_single_prob, vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS, NUCLEOTIDE))
+//    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS))
+//    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS, NUCLEOTIDE))
 
 
     //
     // VJ inference
     //
-    tp1 = std::chrono::system_clock::now();
-//    EMAlgorithm().statisticalInference(cloneset_vj,
-//                                       vj_single_model,
-//                                       EMAlgorithm::AlgorithmParameters().set("niter", 50),
-//                                       COMPUTE_ERRORS);
-    tp2 = std::chrono::system_clock::now();
-    vj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+    // 10 - -4005118.35
+//    EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model);
+//                                       EMAlgorithm::AlgorithmParameters().set("niter", 10),
+//                                       NO_ERRORS);
+    // 10 - -4036068.19
+    //
+//    SGAlgorithm().statisticalInference(cloneset_vj, vj_single_model);
+//                                       EMAlgorithm::AlgorithmParameters().set("niter", 20));
+//                                       NO_ERRORS);
 
 
     //
     // VDJ inference
     //
-    tp1 = std::chrono::system_clock::now();
-//    EMAlgorithm().statisticalInference(cloneset_vdj,
-//                                       vdj_single_model,
-//                                       EMAlgorithm::AlgorithmParameters().set("niter", 20),
-//                                       COMPUTE_ERRORS);
-    tp2 = std::chrono::system_clock::now();
-    vdj_single_infer = std::chrono::system_clock::to_time_t(tp2)- std::chrono::system_clock::to_time_t(tp1);
+    YMIR_BENCHMARK("VDJ EM",
+                   EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
+                                                      EMAlgorithm::AlgorithmParameters()
+                                                              .set("niter", 4)
+                                                              .set("sample", 50000),
+                                                      NO_ERRORS))
+
+    YMIR_BENCHMARK("VDJ SG",
+                   SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
+                                                      SGAlgorithm::AlgorithmParameters()
+                                                              .set("niter", 10)
+                                                              .set("block.size", 5000)
+                                                              .set("alpha", .6)
+                                                              .set("prebuild", false)
+                                                              .set("sample", 50000),
+                                                      NO_ERRORS))
 
 
     //
@@ -127,35 +141,12 @@ int main(int argc, char* argv[]) {
     //
     cout << "========================" << endl << "Results:" << endl;
 
-    cout << endl;
-    cout << "TCR alpha repertoire:\tsingle V-J alignment" << endl;
-    cout << "TCR beta repertoire:\tsingle V-J alignment, all D alignments" << endl;
+    for (size_t i = 0; i < timepoints.size(); ++i) {
+        cout << timepoints[i].first << ":\t" << timepoints[i].second << endl;
+    }
 
-    cout << "Parsing VJ, seconds:\t" << vj_single_parse << endl;
-    cout << "Parsing VDJ, seconds:\t" << vdj_single_parse << endl;
+    cout << endl << "========================" << endl;
 
-    cout << "VJ MAAG computing, seconds:\t" << vj_single_prob << endl;
-    cout << "VJ MAAG metadata, seconds:\t" << vj_single_meta << endl;
-    cout << "VJ inference 10 iter, seconds:\t" << vj_single_infer << endl;
-
-    cout << "VDJ MAAG computing, seconds:\t" << vdj_single_prob << endl;
-    cout << "VDJ MAAG metadata, seconds:\t" << vdj_single_meta << endl;
-    cout << "VDJ inference 10 iter, seconds:\t" << vdj_single_infer << endl;
-
-    cout << endl;
-    cout << "TCR alpha repertoire:\tall good V-J alignments" << endl;
-    cout << "TCR beta repertoire:\tall good V-J alignments, all D alignments" << endl;
-
-    cout << "Parsing VJ, seconds:\t" << vj_good_parse << endl;
-    cout << "Parsing VDJ, seconds:\t" << vdj_good_parse << endl;
-
-    cout << "VJ MAAG computing, seconds:\t" << vj_good_prob << endl;
-    cout << "VJ MAAG metadata, seconds:\t" << vj_good_meta << endl;
-    cout << "VJ inference 10 iter, seconds:\t" << vj_good_infer << endl;
-
-    cout << "VDJ MAAG computing, seconds:\t" << vdj_good_prob << endl;
-    cout << "VDJ MAAG metadata, seconds:\t" << vdj_good_meta << endl;
-    cout << "VDJ inference 10 iter, seconds:\t" << vdj_good_infer << endl;
 
     return 0;
 }

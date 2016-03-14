@@ -140,8 +140,8 @@ namespace ymir {
         /**
          * \brief Update event probabilities in the given MAAG repertoire with new ones.
          */
-        void updateEventProbabilities(MAAGRepertoire *repertoire) {
-            _builder->updateEventProbabilities(repertoire);
+        void updateEventProbabilities(MAAGRepertoire *repertoire, bool verbose = true) {
+            _builder->updateEventProbabilities(repertoire, verbose);
         }
 
 

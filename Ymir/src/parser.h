@@ -120,6 +120,18 @@ namespace ymir {
         AlignmentColumnOptions() {}
 
 
+        AlignmentColumnOptions(Action V, Action J)
+            : align_V(V), align_J(J)
+        {
+        }
+
+
+        AlignmentColumnOptions(Action V, Action D, Action J)
+            : align_V(V), align_D(D), align_J(J)
+        {
+        }
+
+
         AlignmentColumnOptions& setV(Action action) {
             this->align_V = action;
             return *this;

@@ -28,7 +28,7 @@ namespace ymir {
          */
         virtual bool statisticalInference(const ClonesetView &repertoire,
                                           ProbabilisticAssemblingModel &model,
-                                          const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10),
+                                          const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10).set("sample", 50000),
                                           ErrorMode error_mode = NO_ERRORS) const {
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
             cout << "\tMurugan EM-algorithm.";
@@ -37,13 +37,15 @@ namespace ymir {
             }
             std::cout << std::endl;
 
-            if (!algo_param.check("niter")) {
-                cout << "Obligatory parameter 'niter' hasn't been found, please re-run the algorithm with the supplied parameter." << endl;
+            if (!algo_param.check("niter") && !algo_param.check("sample")) {
                 return false;
             }
 
-            ClonesetView rep_nonc = repertoire.noncoding().shuffle().head(20000); // error here
+
+            size_t sample = algo_param["sample"].asUInt();
+            ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
+
 
             ModelParameterVector new_param_vec = model.event_probabilities();
             new_param_vec.fill(1);

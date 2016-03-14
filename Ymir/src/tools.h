@@ -103,7 +103,8 @@ namespace ymir {
 
         std::cout << "Loglikelihood:\t" << std::setprecision(9) << loglikelihood(prob_vec);
         if (prev_ll) {
-            if (loglikelihood(prob_vec) > prev_ll) { std::cout << " (grows)"; }
+            if (abs(loglikelihood(prob_vec) - prev_ll) < 1e-5) { std::cout << " (exact)"; }
+            else if (loglikelihood(prob_vec) > prev_ll) { std::cout << " (grows)"; }
             else { std::cout << " (drops)"; }
         }
         std::cout << std::endl;

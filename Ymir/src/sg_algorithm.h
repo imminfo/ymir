@@ -22,15 +22,15 @@ namespace ymir {
     class SGAlgorithm : public EMAlgorithm {
     public:
 
-        virtual bool statisticalInference(const ClonesetView& repertoire,
-                                          ProbabilisticAssemblingModel & model,
-                                          const AlgorithmParameters& algo_param = AlgorithmParameters()
-                                                  .set("niter", 10)
-                                                  .set("block.size", 5000)
-                                                  .set("alpha", .6)
-                                                  .set("prebuild", false)
-                                                  .set("sample", 50000),
-                                          ErrorMode error_mode = NO_ERRORS) const
+        virtual std::vector<prob_t> statisticalInference(const ClonesetView& repertoire,
+                                                         ProbabilisticAssemblingModel & model,
+                                                         const AlgorithmParameters& algo_param = AlgorithmParameters()
+                                                                 .set("niter", 10)
+                                                                 .set("block.size", 5000)
+                                                                 .set("alpha", .6)
+                                                                 .set("prebuild", false)
+                                                                 .set("sample", 50000),
+                                                         ErrorMode error_mode = NO_ERRORS) const
         {
             // shuffle input data at each step
             // subvec -4008648.1
@@ -44,7 +44,7 @@ namespace ymir {
 
 
             if (!algo_param.check("niter") && !algo_param.check("block.size") && !algo_param.check("alpha") && !algo_param.check("sample")) {
-                return false;
+                return std::vector<prob_t>();
             }
 
             std::cout << "#iterations:\t" << (size_t) algo_param["niter"].asUInt() << std::endl;
@@ -52,6 +52,7 @@ namespace ymir {
             std::cout << "alpha:\t" << (size_t) algo_param["block.size"].asUInt() << std::endl;
             std::cout << "prebuild:\t" << (size_t) algo_param["prebuild"].asBool() << std::endl;
 
+            std::vector<prob_t> logLvec;
 
             size_t sample = algo_param["sample"].asUInt();
             ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
@@ -87,6 +88,12 @@ namespace ymir {
             }
             std::random_shuffle(indices.begin(), indices.end());
 
+            cout << endl << "Initial data summary:" << endl;
+            prob_summary(prob_vec);
+            std::cout << model.event_probabilities().error_prob() << std::endl;
+            prev_ll = loglikelihood(prob_vec);
+            logLvec.push_back(prev_ll);
+
             MAAGForwardBackwardAlgorithm fb;
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
                 if (start_i + block_size > indices.size()) {
@@ -109,7 +116,11 @@ namespace ymir {
                 }
 
                 this->updateModel(model, new_param_vec, maag_rep, prob_vec, prev_ll, changed, exp(-alpha * log(iter + 2)), error_mode);
+
+                logLvec.push_back(prev_ll);
             }
+
+            return logLvec;
         }
 
     protected:

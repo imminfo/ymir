@@ -18,11 +18,34 @@ using namespace ymir;
 #define YMIR_BENCHMARK(descr, expr) { tp1 = std::chrono::system_clock::now(); expr; tp2 = std::chrono::system_clock::now(); timepoints.emplace_back(descr, std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1)); }
 
 
+void write_vec(std::string filename, const std::vector<prob_t> &logLvec) {
+    std::ofstream stream(filename);
+    for (size_t i = 0; i < logLvec.size(); ++i) {
+        stream << logLvec[i] << endl;
+    }
+}
+
+
+//void infer_vdj_em(string descr, int niter, int sample, ErrorMode error_mode) {
+//    YMIR_BENCHMARK(descr,
+//                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
+//                                                      EMAlgorithm::AlgorithmParameters()
+//                                                              .set("niter", niter)
+//                                                              .set("sample", sample),
+//                                                      error_mode))
+//    write_vec("/Users/vdn/Projects/ymir/benchmark/log/vdj_em_niter_" + to_string(niter)
+//              + "_sample_" + to_string(sample)
+//              + "_err_" + to_string(error_mode) +  ".txt", logLvec);
+//}
+
+
 int main(int argc, char* argv[]) {
     std::chrono::system_clock::time_point tp1, tp2;
 
     std::vector< std::pair<std::string, size_t> > timepoints;
-    
+
+    std::vector<prob_t> logLvec;
+
     time_t vj_single_parse, vdj_single_parse,
             vj_single_prob, vj_single_meta,
             vj_single_infer, vdj_single_prob,
@@ -39,7 +62,7 @@ int main(int argc, char* argv[]) {
     CDR3NucParser parser;
 
     string input_alpha_file = "alpha.250k.txt";
-    string input_beta_file = "beta.500k.txt";
+    string input_beta_file = "beta.250k.txt";
 
 
     //
@@ -118,22 +141,39 @@ int main(int argc, char* argv[]) {
     //
     // VDJ inference
     //
-    YMIR_BENCHMARK("VDJ EM",
-                   EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
-                                                      EMAlgorithm::AlgorithmParameters()
-                                                              .set("niter", 4)
-                                                              .set("sample", 50000),
-                                                      NO_ERRORS))
+    int niter, sample, block;
+    double alpha;
+    niter = 4;
+    sample = 50000;
+    ErrorMode error_mode = NO_ERRORS;
+//    YMIR_BENCHMARK("VDJ EM",
+//                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
+//                                                      EMAlgorithm::AlgorithmParameters()
+//                                                              .set("niter", niter)
+//                                                              .set("sample", sample),
+//                                                      error_mode))
+    write_vec("/Users/vdn/Projects/ymir/benchmark/log/vdj_em_niter_" + to_string(niter)
+              + "_sample_" + to_string(sample)
+              + "_err_" + to_string(error_mode) +  ".txt", logLvec);
 
+    niter = 1;
+    block = 5000;
+    alpha = .6;
+    sample = 50000;
     YMIR_BENCHMARK("VDJ SG",
-                   SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
+                   logLvec = SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
                                                       SGAlgorithm::AlgorithmParameters()
-                                                              .set("niter", 10)
-                                                              .set("block.size", 5000)
-                                                              .set("alpha", .6)
+                                                              .set("niter", niter)
+                                                              .set("block.size", block)
+                                                              .set("alpha", alpha)
                                                               .set("prebuild", false)
-                                                              .set("sample", 50000),
-                                                      NO_ERRORS))
+                                                              .set("sample", sample),
+                                                                error_mode))
+    write_vec("/Users/vdn/Projects/ymir/benchmark/log/vdj_sg_niter_" + to_string(niter)
+              + "_block_" + to_string(block)
+              + "_alpha_" + to_string(alpha)
+              + "_sample_" + to_string(sample)
+              + "_err_" + to_string(error_mode) + ".txt", logLvec);
 
 
     //

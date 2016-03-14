@@ -79,10 +79,10 @@ namespace ymir {
 
         virtual ~StatisticalInferenceAlgorithm() { }
 
-        virtual bool statisticalInference(const ClonesetView &repertoire,
-                                          ProbabilisticAssemblingModel &model,
-                                          const AlgorithmParameters &algo_param = AlgorithmParameters(),
-                                          ErrorMode error_mode = NO_ERRORS) const =0;
+        virtual std::vector<prob_t> statisticalInference(const ClonesetView &repertoire,
+                                                         ProbabilisticAssemblingModel &model,
+                                                         const AlgorithmParameters &algo_param = AlgorithmParameters(),
+                                                         ErrorMode error_mode = NO_ERRORS) const = 0;
 
 
         void filterOut(const ClonesetView &rep_nonc,

@@ -18,6 +18,26 @@ using namespace ymir;
 #define YMIR_BENCHMARK(descr, expr) { tp1 = std::chrono::system_clock::now(); expr; tp2 = std::chrono::system_clock::now(); timepoints.emplace_back(descr, std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1)); }
 
 
+#define RUN_VJ_INFERENCE(niter, sample) {}
+
+
+#define RUN_VDJ_INFERENCE(niter, block, alpha, sample) { YMIR_BENCHMARK("VDJ SG", \
+logLvec = SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model, \
+                                             SGAlgorithm::AlgorithmParameters() \
+                                                     .set("niter", niter) \
+                                                     .set("block.size", block) \
+                                                     .set("alpha", alpha) \
+                                                     .set("prebuild", false) \
+                                                     .set("sample", sample), \
+                                             error_mode)) \
+write_vec("/Users/vdn/Projects/ymir/benchmark/log/vdj_sg_niter_" + to_string(niter) \
++ "_block_" + to_string(block) \
++ "_alpha_" + to_string(alpha) \
++ "_sample_" + to_string(sample) \
++ "_err_" + to_string(error_mode) + ".txt", logLvec); \
+  }
+
+
 void write_vec(std::string filename, const std::vector<prob_t> &logLvec) {
     std::ofstream stream(filename);
     for (size_t i = 0; i < logLvec.size(); ++i) {
@@ -160,21 +180,22 @@ int main(int argc, char* argv[]) {
     block = 5000;
     alpha = .6;
     sample = 50000;
-    YMIR_BENCHMARK("VDJ SG",
-                   logLvec = SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
-                                                      SGAlgorithm::AlgorithmParameters()
-                                                              .set("niter", niter)
-                                                              .set("block.size", block)
-                                                              .set("alpha", alpha)
-                                                              .set("prebuild", false)
-                                                              .set("sample", sample),
-                                                                error_mode))
-    write_vec("/Users/vdn/Projects/ymir/benchmark/log/vdj_sg_niter_" + to_string(niter)
-              + "_block_" + to_string(block)
-              + "_alpha_" + to_string(alpha)
-              + "_sample_" + to_string(sample)
-              + "_err_" + to_string(error_mode) + ".txt", logLvec);
+//    YMIR_BENCHMARK("VDJ SG",
+//                   logLvec = SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
+//                                                      SGAlgorithm::AlgorithmParameters()
+//                                                              .set("niter", niter)
+//                                                              .set("block.size", block)
+//                                                              .set("alpha", alpha)
+//                                                              .set("prebuild", false)
+//                                                              .set("sample", sample),
+//                                                                error_mode))
+//    write_vec("/Users/vdn/Projects/ymir/benchmark/log/vdj_sg_niter_" + to_string(niter)
+//              + "_block_" + to_string(block)
+//              + "_alpha_" + to_string(alpha)
+//              + "_sample_" + to_string(sample)
+//              + "_err_" + to_string(error_mode) + ".txt", logLvec);
 
+    RUN_VDJ_INFERENCE(niter, block, alpha, sample)
 
     //
     // Results

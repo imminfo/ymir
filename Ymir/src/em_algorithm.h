@@ -26,10 +26,10 @@ namespace ymir {
         /**
          *
          */
-        virtual bool statisticalInference(const ClonesetView &repertoire,
-                                          ProbabilisticAssemblingModel &model,
-                                          const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10),
-                                          ErrorMode error_mode = NO_ERRORS) const {
+        virtual std::vector<prob_t> statisticalInference(const ClonesetView &repertoire,
+                                                         ProbabilisticAssemblingModel &model,
+                                                         const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10).set("sample", 50000),
+                                                         ErrorMode error_mode = NO_ERRORS) const {
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
             cout << "\tMurugan EM-algorithm.";
             if (error_mode == COMPUTE_ERRORS) {
@@ -37,13 +37,17 @@ namespace ymir {
             }
             std::cout << std::endl;
 
-            if (!algo_param.check("niter")) {
-                cout << "Obligatory parameter 'niter' hasn't been found, please re-run the algorithm with the supplied parameter." << endl;
-                return false;
+            if (!algo_param.check("niter") && !algo_param.check("sample")) {
+                return std::vector<prob_t>();
             }
 
-            ClonesetView rep_nonc = repertoire.noncoding().sample(30000);
+
+            size_t sample = algo_param["sample"].asUInt();
+            ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
+
+            std::vector<prob_t> logLvec;
+
 
             ModelParameterVector new_param_vec = model.event_probabilities();
             new_param_vec.fill(1);
@@ -66,6 +70,7 @@ namespace ymir {
             prob_summary(prob_vec);
             std::cout << model.event_probabilities().error_prob() << std::endl;
             prev_ll = loglikelihood(prob_vec);
+            logLvec.push_back(prev_ll);
 
             std::chrono::system_clock::time_point tp1, tp2;
             MAAGForwardBackwardAlgorithm fb;
@@ -90,11 +95,12 @@ namespace ymir {
 
                 std::cout << new_param_vec.error_prob() << std::endl;
 
+                logLvec.push_back(prev_ll);
             }
 
             cout << endl << "Done. Resulting loglikelihood:\t" << loglikelihood(prob_vec) << endl << endl;
 
-            return true;
+            return logLvec;
         }
 
 

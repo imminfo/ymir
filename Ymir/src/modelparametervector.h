@@ -314,8 +314,9 @@ namespace ymir {
         * \brief Normalise each event family to have sum equal to 1.
         */
         void normaliseEventFamilies() {
+            prob_t prob_sum;
             for (event_ind_t i = 2; i < _edges.size(); ++i) {
-                prob_t prob_sum = _laplace[i-1] * (_edges[i] - _edges[i-1]);
+                prob_sum = _laplace[i-1] * (_edges[i] - _edges[i-1]);
                 for (event_ind_t j = _edges[i-1]; j < _edges[i]; ++j) {
                     prob_sum += _vec[j];
                 }

@@ -53,7 +53,11 @@ namespace ymir {
 
 
             bool check(const string& param_name) const {
-                return _json.get(param_name, "__NA__").asString() != "__NA__";
+                if (_json.get(param_name, "__NA__").asString() == "__NA__") {
+                    cout << "Obligatory parameter '" << param_name << "' hasn't been found, please re-run the algorithm with the supplied parameter." << endl;
+                    return false;
+                }
+                return true;
             }
 
 
@@ -75,10 +79,10 @@ namespace ymir {
 
         virtual ~StatisticalInferenceAlgorithm() { }
 
-        virtual bool statisticalInference(const ClonesetView &repertoire,
-                                          ProbabilisticAssemblingModel &model,
-                                          const AlgorithmParameters &algo_param = AlgorithmParameters(),
-                                          ErrorMode error_mode = NO_ERRORS) const =0;
+        virtual std::vector<prob_t> statisticalInference(const ClonesetView &repertoire,
+                                                         ProbabilisticAssemblingModel &model,
+                                                         const AlgorithmParameters &algo_param = AlgorithmParameters(),
+                                                         ErrorMode error_mode = NO_ERRORS) const = 0;
 
 
         void filterOut(const ClonesetView &rep_nonc,

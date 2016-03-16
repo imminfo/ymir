@@ -210,8 +210,12 @@ namespace ymir {
                                 _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
                             }
 
+//                            std::cout << "nucs" << std::endl;
                             for (auto i = 0; i < 4; ++i) {
+//                                std::cout << nuc_arr[i] << ":" << temp_arr[i] << ":" << scenario_prob << ":" << (int) n << std::endl;
                                 nuc_arr[i] += (temp_arr[i] * scenario_prob) / n;
+//                                std::cout << nuc_arr[i] << std::endl;
+//                                check_and_throw(std::isnan(nuc_arr[i]), "nan in nucs");
                             }
                         }
                     }

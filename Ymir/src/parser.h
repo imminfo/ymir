@@ -120,6 +120,18 @@ namespace ymir {
         AlignmentColumnOptions() {}
 
 
+        AlignmentColumnOptions(Action V, Action J)
+            : align_V(V), align_J(J)
+        {
+        }
+
+
+        AlignmentColumnOptions(Action V, Action D, Action J)
+            : align_V(V), align_D(D), align_J(J)
+        {
+        }
+
+
         AlignmentColumnOptions& setV(Action action) {
             this->align_V = action;
             return *this;
@@ -220,6 +232,7 @@ namespace ymir {
                 _stats.print();
                 _stats.reset();
                 _status = false;
+                _stream.close();
                 return false;
             }
 
@@ -248,6 +261,7 @@ namespace ymir {
             if (this->open(filepath, gene_segments, seq_type, recomb, opts, params)) {
                 this->parse(cloneset);
                 _stats.print();
+                _stream.close();
                 return true;
             }
 

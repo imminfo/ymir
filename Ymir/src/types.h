@@ -36,6 +36,10 @@
 
 #include "jsoncpp.cpp"
 
+#ifdef USE_OMP
+#include "omp.h"
+#endif
+
 #include "matrix.h"
 
 //#include "Eigen/Dense"

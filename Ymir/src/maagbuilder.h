@@ -56,9 +56,9 @@ namespace ymir {
     class MAAGBuilder : protected MAAG {
 
     public:
-
+        
 //        static const size_t verbose_step = 10000;
-
+        
 
         /**
          * \brief Constructor for the builder from given vector with event probabilities and gene segments.
@@ -98,9 +98,9 @@ namespace ymir {
                    SequenceType seq_type = NUCLEOTIDE) const {
             if (clonotype.is_good())
             {
-                pProbMMC probs(new ProbMMC());
-                pEventIndMMC events;
-                pErrMMC errors;
+                ProbMMC probs;
+                EventIndMMC events;
+                ErrMMC errors;
                 vector<seq_len_t> seq_poses;
                 seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
 
@@ -122,24 +122,22 @@ namespace ymir {
 #endif
                 }
 
-                probs->resize(resize_size);
+                probs.resize(resize_size);
                 if (metadata_mode) {
-                    events.reset(new EventIndMMC());
-                    events->resize(resize_size);
+                    events.resize(resize_size);
                 }
                 if (error_mode) {
-                    errors.reset(new ErrMMC());
-                    errors->resize(e_resize_size);
+                    errors.resize(e_resize_size);
                 }
 
-                this->buildVariable(clonotype, probs.get(), events.get(), errors.get(), seq_poses, metadata_mode, error_mode);
-                this->buildJoining(clonotype, probs.get(), events.get(), errors.get(), seq_poses, metadata_mode, error_mode);
+                this->buildVariable(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+                this->buildJoining(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
                 if (clonotype.recombination() == VJ_RECOMB) {
-                    this->buildVJinsertions(clonotype, probs.get(), events.get(), seq_poses, metadata_mode, error_mode);
+                    this->buildVJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
                 } else if (clonotype.recombination() == VDJ_RECOMB) {
-                    this->buildDiversity(clonotype, probs.get(), events.get(), errors.get(), seq_poses, metadata_mode, error_mode);
-                    this->buildVDinsertions(clonotype, probs.get(), events.get(), seq_poses, metadata_mode, error_mode);
-                    this->buildDJinsertions(clonotype, probs.get(), events.get(), seq_poses, metadata_mode, error_mode);
+                    this->buildDiversity(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+                    this->buildVDinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                    this->buildDJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
                 }
 
 //            if (error_mode && metadata_mode) {
@@ -168,20 +166,20 @@ namespace ymir {
 
 //                std::cout << clonotype.toString() << std::endl;
 
+                probs.finish();
+
                 MAAG maag;
                 maag._recomb = clonotype.recombination();
                 maag._seq_type = clonotype.sequence_type();
-
-                probs->finish();
-                maag.swap(*probs);
-
+                maag.swap(probs);
                 if (error_mode) {
-                    errors->finish();
-//                    maag._errors.reset(new ErrMMC());
-                    maag._errors.swap(errors);
+                    errors.finish();
+
+                    maag._errors.reset(new ErrMMC());
+                    maag._errors->swap(errors);
                 }
                 if (metadata_mode) {
-                    events->finish();
+                    events.finish();
 
                     unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
                     copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
@@ -189,8 +187,8 @@ namespace ymir {
                     maag._seq_poses.swap(seq_poses_arr);
                     maag._n_poses = seq_poses.size();
 
-//                    maag._events.reset(new EventIndMMC());
-                    maag._events.swap(events);
+                    maag._events.reset(new EventIndMMC());
+                    maag._events->swap(events);
                 }
                 return maag;
             } else {
@@ -213,12 +211,21 @@ namespace ymir {
 
             MAAGRepertoire res;
             res.resize(cloneset.size());
+#ifdef USE_OMP
+#if OMP_THREADS == -1
+            #pragma omp parallel for 
+#else
+            #pragma omp parallel for  num_threads(OMP_THREADS)
+#endif
+#endif
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 res[i] = this->build(cloneset[i], metadata_mode, error_mode, seq_type);
 
+#ifndef USE_OMP
                 if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
                     cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "<< "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;
                 }
+#endif
             }
 
             if (verbose) {
@@ -262,11 +269,21 @@ namespace ymir {
                 verbose_step = cloneset.size() / 10;
             }
 
+#ifdef USE_OMP
+#if OMP_THREADS == -1
+            #pragma omp parallel for 
+#else
+            #pragma omp parallel for  num_threads(OMP_THREADS)
+#endif
+#endif
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 res.push_back(buildAndCompute(cloneset[i], error_mode, seq_type, action));
+
+#ifndef USE_OMP
                 if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
                     std::cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] " << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
                 }
+#endif
             }
 
             if (verbose) {
@@ -297,8 +314,8 @@ namespace ymir {
                                 j_vertices = maag->nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
 
                         this->buildInsertions(maag->sequence(),
-                                              maag,
-                                              maag->_events.get(),
+                                              *maag,
+                                              *maag->_events,
                                               seq_poses_vec,
                                               VarJoi_INSERTIONS_MATRIX_INDEX,
                                               _param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0),
@@ -319,8 +336,8 @@ namespace ymir {
                                 d3_vertices = maag->nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
 
                         this->buildInsertions(maag->sequence(),
-                                              maag,
-                                              maag->_events.get(),
+                                              *maag,
+                                              *maag->_events,
                                               seq_poses_vec,
                                               VarDiv_INSERTIONS_MATRIX_INDEX,
                                               _param_vec->event_index(VDJ_VAR_DIV_INS_LEN, 0, 0),
@@ -343,8 +360,8 @@ namespace ymir {
                                 j_vertices = maag->nodeRows(JOINING_DELETIONS_VDJ_MATRIX_INDEX);
 
                         this->buildInsertions(maag->sequence(),
-                                              maag,
-                                              maag->_events.get(),
+                                              *maag,
+                                              *maag->_events,
                                               seq_poses_vec,
                                               DivJoi_INSERTIONS_MATRIX_INDEX,
                                               _param_vec->event_index(VDJ_DIV_JOI_INS_LEN, 0, 0),
@@ -421,11 +438,21 @@ namespace ymir {
                 verbose_step = repertoire->size() / 10;
             }
 
+#ifdef USE_OMP
+#if OMP_THREADS == -1
+            #pragma omp parallel for 
+#else
+            #pragma omp parallel for  num_threads(OMP_THREADS)
+#endif
+#endif
             for (size_t i = 0; i < repertoire->size(); ++i) {
                 this->updateEventProbabilities(&(*repertoire)[i]);
+
+#ifndef USE_OMP
                 if (verbose && (i+1) % verbose_step == 0 && (i+1) != repertoire->size()) {
                     cout << "[" << (int) ((100*(i+1)) / repertoire->size()) << "%] " << "Updated " << (size_t) (i+1) << " / " << (size_t) repertoire->size() << " MAAGs." << endl;
                 }
+#endif
             }
 
             if (verbose) {
@@ -457,9 +484,9 @@ namespace ymir {
         * \param metadata_mode Boolean if build should be full.
         */
         void buildVariable(const Clonotype &clonotype,
-                           ProbMMC *probs,
-                           EventIndMMC *events,
-                           ErrMMC *errors,
+                           ProbMMC &probs,
+                           EventIndMMC &events,
+                           ErrMMC &errors,
                            vector<seq_len_t> &seq_poses,
                            MetadataMode metadata_mode,
                            ErrorMode error_mode) const
@@ -474,23 +501,23 @@ namespace ymir {
             // compute V deletions
             seq_len_t v_len, v_gene, v_start, v_end;
 
-            probs->initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
+            probs.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             if (metadata_mode) {
-                events->initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
+                events.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
             }
             if (error_mode) {
-                errors->initNode(0, v_num, 1, len + 1);
+                errors.initNode(0, v_num, 1, len + 1);
             }
 
             if (clonotype.recombination() == VJ_RECOMB) {
-                probs->initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
+                probs.initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
                 if (metadata_mode) {
-                    events->initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
+                    events.initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
                 }
             } else if (clonotype.recombination() == VDJ_RECOMB) {
-                probs->initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
+                probs.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
                 if (metadata_mode) {
-                    events->initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
+                    events.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
                 }
             }
 
@@ -502,11 +529,11 @@ namespace ymir {
 
                 if (clonotype.recombination() == VJ_RECOMB) {
                     for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
-                        probs->at(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
+                        probs(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
                                 = _param_vec->event_prob(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
                     }
                 } else if (clonotype.recombination() == VDJ_RECOMB) {
-                    probs->at(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_prob(VDJ_VAR_GEN, 0, v_gene - 1); // probability of choosing this V gene segment
+                    probs(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_prob(VDJ_VAR_GEN, 0, v_gene - 1); // probability of choosing this V gene segment
                 }
 
                 // V deletions
@@ -515,31 +542,31 @@ namespace ymir {
                 v_end = clonotype.getVarGeneEnd(v_index);
 
                 for (seq_len_t i = 0; i < v_end - v_start + 2; ++i) {
-                    probs->at(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, (1 + v_len) - (v_start + i)); // probability of deletions
+                    probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, (1 + v_len) - (v_start + i)); // probability of deletions
                 }
 
                 if (metadata_mode) {
                     if (clonotype.recombination() == VJ_RECOMB) {
                         // probability of choosing this V gene segment
                         for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
-                            events->at(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
+                            events(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
                                     = _param_vec->event_index(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
                         }
                     } else if (clonotype.recombination() == VDJ_RECOMB) {
-                        events->at(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_index(VDJ_VAR_GEN, 0, v_gene - 1);
+                        events(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_index(VDJ_VAR_GEN, 0, v_gene - 1);
                     }
 
                     for (seq_len_t i = 0; i < v_end - v_start + 2; ++i) {
-                        events->at(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_index(V_DEL, v_gene - 1, (1 + v_len) - (v_start + i));
+                        events(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_index(V_DEL, v_gene - 1, (1 + v_len) - (v_start + i));
                     }
                 }
 
                 if (error_mode) {
-                    errors->at(0, v_index, 0, 0) = 0;
+                    errors(0, v_index, 0, 0) = 0;
                     for (seq_len_t i = 1; i <= clonotype.getVarLen(v_index); ++i) {
-                        errors->at(0, v_index, 0, i) = errors->at(0, v_index, 0, i-1) + clonotype.isVarMismatch(v_index, i);
-                        if (errors->at(0, v_index, 0, i)) {
-                            probs->at(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) *= errors->at(0, v_index, 0, i) * _param_vec->error_prob();
+                        errors(0, v_index, 0, i) = errors(0, v_index, 0, i-1) + clonotype.isVarMismatch(v_index, i);
+                        if (errors(0, v_index, 0, i)) {
+                            probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) *= errors(0, v_index, 0, i) * _param_vec->error_prob();
                         }
                     }
                 }
@@ -559,9 +586,9 @@ namespace ymir {
         * \param metadata_mode Boolean if build should be full.
         */
         void buildJoining(const Clonotype &clonotype,
-                          ProbMMC *probs,
-                          EventIndMMC *events,
-                          ErrMMC *errors,
+                          ProbMMC &probs,
+                          EventIndMMC &events,
+                          ErrMMC &errors,
                           vector<seq_len_t> &seq_poses,
                           MetadataMode metadata_mode,
                           ErrorMode error_mode) const
@@ -581,19 +608,19 @@ namespace ymir {
             }
 
             // add J deletions nodes
-            probs->initNode(J_index_dels, j_num, len + 1, 1);
+            probs.initNode(J_index_dels, j_num, len + 1, 1);
             if (metadata_mode) {
-                events->initNode(J_index_dels, j_num, len + 1, 1);
+                events.initNode(J_index_dels, j_num, len + 1, 1);
             }
             if (error_mode) {
-                errors->initNode(errors->chainSize() - 1, j_num, len + 1, 1);
+                errors.initNode(errors.chainSize() - 1, j_num, len + 1, 1);
             }
 
             // add J or J-D gene nodes
             if (clonotype.recombination() == VDJ_RECOMB) {
-                probs->initNode(J_index_genes, 1, j_num, clonotype.nDiv());
+                probs.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
                 if (metadata_mode) {
-                    events->initNode(J_index_genes, 1, j_num, clonotype.nDiv());
+                    events.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
                 }
             }
 
@@ -608,7 +635,7 @@ namespace ymir {
 
                 if (clonotype.recombination() == VDJ_RECOMB) {
                     for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
-                        probs->at(J_index_genes, 0, j_index, d_index)
+                        probs(J_index_genes, 0, j_index, d_index)
                                 = _param_vec->event_prob(VDJ_JOI_DIV_GEN, 0, j_gene - 1, clonotype.getDiv(d_index) - 1); // probability of choosing this J gene segment with other D genes
                     }
                 }
@@ -619,30 +646,30 @@ namespace ymir {
                 shift = clonotype.getJoiSeqStart(j_index) - seq_global_start_pos;
 
                 for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index) + 1; ++i) {
-                     probs->at(J_index_dels, j_index, i + shift, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_start + i - 1); // probability of deletions
+                     probs(J_index_dels, j_index, i + shift, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_start + i - 1); // probability of deletions
                 }
 
                 if (metadata_mode) {
                     if (clonotype.recombination() == VDJ_RECOMB) {
                         for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
-                            events->at(J_index_genes, 0, j_index, d_index)
+                            events(J_index_genes, 0, j_index, d_index)
                                     = _param_vec->event_index(VDJ_JOI_DIV_GEN, 0, j_gene - 1, clonotype.getDiv(d_index) - 1); // probability of choosing this J gene segment with other D genes
                         }
                     }
 
                     for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index) + 1; ++i) {
-                        events->at(J_index_dels, j_index, i + shift, 0) = _param_vec->event_index(J_DEL, j_gene - 1, j_start + i - 1);
+                        events(J_index_dels, j_index, i + shift, 0) = _param_vec->event_index(J_DEL, j_gene - 1, j_start + i - 1);
                     }
                 }
 
                 if (error_mode) {
-                    errors->at(errors->chainSize() - 1, j_index, len, 0) = 0;
+                    errors(errors.chainSize() - 1, j_index, len, 0) = 0;
                     for (seq_len_t i = 1; i <= clonotype.getJoiLen(j_index); ++i) {
-                        errors->at(errors->chainSize() - 1, j_index, len - i, 0)
-                                = errors->at(errors->chainSize() - 1, j_index, len + 1 - i, 0)
+                        errors(errors.chainSize() - 1, j_index, len - i, 0)
+                                = errors(errors.chainSize() - 1, j_index, len + 1 - i, 0)
                                   + clonotype.isJoiMismatch(j_index, clonotype.getJoiLen(j_index) + 1 - i);
-                        if (errors->at(errors->chainSize() - 1, j_index, len - i, 0)) {
-                            probs->at(J_index_dels, j_index, len - i, 0) *= errors->at(errors->chainSize() - 1, j_index, len - i, 0) * _param_vec->error_prob();
+                        if (errors(errors.chainSize() - 1, j_index, len - i, 0)) {
+                            probs(J_index_dels, j_index, len - i, 0) *= errors(errors.chainSize() - 1, j_index, len - i, 0) * _param_vec->error_prob();
                         }
                     }
                 }
@@ -664,9 +691,9 @@ namespace ymir {
         * \param metadata_mode Boolean if build should be full.
         */
         void buildDiversity(const Clonotype &clonotype,
-                            ProbMMC *probs,
-                            EventIndMMC *events,
-                            ErrMMC *errors,
+                            ProbMMC &probs,
+                            EventIndMMC &events,
+                            ErrMMC &errors,
                             vector<seq_len_t> &seq_poses,
                             MetadataMode metadata_mode,
                             ErrorMode error_mode) const
@@ -727,12 +754,12 @@ namespace ymir {
                 seq_col_nonzeros += seq_col[i] != 0;
             }
 
-            probs->initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
+            probs.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
             if (metadata_mode) {
-                events->initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
+                events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
             }
             if (error_mode) {
-                errors->initNode(1, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
+                errors.initNode(1, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
             }
 
 
@@ -754,13 +781,13 @@ namespace ymir {
 
                     for (seq_len_t left_pos = d_seq_start; left_pos <= d_seq_end - min_D_len + 1; ++left_pos) {
                         for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_seq_end; ++right_pos) {
-                            probs->at(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
+                            probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                     = _param_vec->event_prob(VDJ_DIV_DEL,
                                                              d_gene - 1,
                                                              d_gene_start + left_pos - d_seq_start,
                                                              d_len - (d_gene_end - (d_seq_end - right_pos)));
                             if (metadata_mode) {
-                                events->at(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
+                                events(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                         = _param_vec->event_index(VDJ_DIV_DEL,
                                                                   d_gene - 1,
                                                                   d_gene_start + left_pos - d_seq_start,
@@ -768,14 +795,14 @@ namespace ymir {
                             }
 
                             if (error_mode) {
-                                errors->at(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) =
+                                errors(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) =
                                         clonotype.numDivMismatches(d_index, j,
                                                                    d_gene_start + left_pos - d_seq_start,
                                                                    d_gene_end - (d_seq_end - right_pos));
 
-                                if (errors->at(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)) {
-                                    probs->at(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
-                                            *= _param_vec->error_prob() * errors->at(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1);
+                                if (errors(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)) {
+                                    probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
+                                            *= _param_vec->error_prob() * errors(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1);
                                 }
                             }
                         }
@@ -791,7 +818,7 @@ namespace ymir {
 
             // Note! insert diversity gene seq poses BEFORE joining gene seq poses
             seq_poses.reserve(seq_poses.size() + D35_poses.size() + 2);  // +2 -> just in case (:
-            seq_poses.insert(seq_poses.begin() + probs->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX), D35_poses.begin(), D35_poses.end());
+            seq_poses.insert(seq_poses.begin() + probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX), D35_poses.begin(), D35_poses.end());
         }
 
 
@@ -805,21 +832,21 @@ namespace ymir {
         * \param metadata_mode Boolean if build should be full.
         */
         void buildVJinsertions(const Clonotype &clonotype,
-                               ProbMMC *probs,
-                               EventIndMMC *events,
+                               ProbMMC &probs,
+                               EventIndMMC &events,
                                const vector<seq_len_t> &seq_poses,
                                MetadataMode metadata_mode,
                                ErrorMode error_mode) const
         {
             MonoNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
 
-            seq_len_t v_vertices = probs->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
-                    j_vertices = probs->nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
+            seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                    j_vertices = probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
 
-            probs->initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
+            probs.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
 
             if (metadata_mode) {
-                events->initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
+                events.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
             }
 
             this->buildInsertions(clonotype.sequence(),
@@ -850,21 +877,21 @@ namespace ymir {
         * \param metadata_mode Boolean if build should be full.
         */
         void buildVDinsertions(const Clonotype &clonotype,
-                               ProbMMC *probs,
-                               EventIndMMC *events,
+                               ProbMMC &probs,
+                               EventIndMMC &events,
                                const vector<seq_len_t> &seq_poses,
                                MetadataMode metadata_mode,
                                ErrorMode error_mode) const
         {
             DiNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
 
-            seq_len_t v_vertices = probs->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
-                    d3_vertices = probs->nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
+            seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                    d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
 
-            probs->initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d3_vertices);
+            probs.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d3_vertices);
 
             if (metadata_mode) {
-                events->initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d3_vertices);
+                events.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d3_vertices);
             }
 
             this->buildInsertions(clonotype.sequence(),
@@ -895,23 +922,23 @@ namespace ymir {
         * \param metadata_mode Boolean if build should be full.
         */
         void buildDJinsertions(const Clonotype &clonotype,
-                               ProbMMC *probs,
-                               EventIndMMC *events,
+                               ProbMMC &probs,
+                               EventIndMMC &events,
                                const vector<seq_len_t> &seq_poses,
                                MetadataMode metadata_mode,
                                ErrorMode error_mode) const
         {
             DiNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
 
-            seq_len_t v_vertices = probs->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
-                    d3_vertices = probs->nodeRows(DIVERSITY_GENES_MATRIX_INDEX),
-                    d5_vertices = probs->nodeColumns(DIVERSITY_GENES_MATRIX_INDEX),
-                    j_vertices = probs->nodeRows(JOINING_DELETIONS_VDJ_MATRIX_INDEX);
+            seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                    d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX),
+                    d5_vertices = probs.nodeColumns(DIVERSITY_GENES_MATRIX_INDEX),
+                    j_vertices = probs.nodeRows(JOINING_DELETIONS_VDJ_MATRIX_INDEX);
 
-            probs->initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d5_vertices, j_vertices);
+            probs.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d5_vertices, j_vertices);
 
             if (metadata_mode) {
-                events->initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d5_vertices, j_vertices);
+                events.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d5_vertices, j_vertices);
             }
 
             this->buildInsertions(clonotype.sequence(),
@@ -950,8 +977,8 @@ namespace ymir {
          * \param mc Insertion model that uses for generation of N nucleotides.
         */
         void buildInsertions(const string &sequence,
-                             ProbMMC *probs,
-                             EventIndMMC *events,
+                             ProbMMC &probs,
+                             EventIndMMC &events,
                              const vector<seq_len_t> &seq_poses,
                              ProbMMC::node_ind_t ins_node_index,
                              event_ind_t null_insertion,
@@ -981,7 +1008,7 @@ namespace ymir {
                                 last_char = sequence[seq_poses[left_vertex_i] - 1];
                             }
 
-                            probs->at(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
+                            probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
                                     = mc.nucProbability(sequence.cbegin() + seq_poses[left_vertex_i],
                                                         insertion_len,
                                                         last_char,
@@ -994,7 +1021,7 @@ namespace ymir {
                                 last_char = sequence[seq_poses[right_vertex_i] - 1];
                             }
 
-                            probs->at(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
+                            probs(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
                                     = mc.nucProbability(sequence.crbegin() + (sequence.size() - seq_poses[right_vertex_i] + 1),
                                                         insertion_len,
                                                         last_char,
@@ -1003,7 +1030,7 @@ namespace ymir {
                         }
 
                         if (metadata_mode) {
-                            events->at(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
+                            events(ins_node_index, 0, left_vertex_i - left_vertices_start, right_vertex_i - right_vertices_start)
                                     = null_insertion + insertion_len;
                         }
                     }

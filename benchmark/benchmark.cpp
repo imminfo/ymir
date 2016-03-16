@@ -42,7 +42,7 @@ logLvec = SGAlgorithm().statisticalInference(cloneset, model, \
                                                      .set("prebuild", false) \
                                                      .set("sample", sample), \
                                              error_mode)) \
-temp_str = std::string("/Users/vdn/Projects/ymir/benchmark/log/") + descr + "_sg_niter_" + to_string(niter) \
+temp_str = std::string("~/ymir/benchmark/log/") + descr + "_sg_niter_" + to_string(niter) \
 + "_block_" + to_string(block) \
 + "_alpha_" + to_string(alpha) \
 + "_K_" + to_string(K) \
@@ -139,18 +139,18 @@ int main(int argc, char* argv[]) {
                                     "Dgene",
                                     BENCH_DATA_FOLDER + "trbd.txt");
 
-    Cloneset cloneset_vdj;
-    YMIR_BENCHMARK("Parsing VDJ",
-                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
-                                       &cloneset_vdj,
-                                       vdj_single_genes,
-                                       NUCLEOTIDE,
-                                       VDJ_RECOMB,
-                                       AlignmentColumnOptions()
-                                               .setV(AlignmentColumnOptions::USE_PROVIDED)
-                                               .setD(AlignmentColumnOptions::OVERWRITE)
-                                               .setJ(AlignmentColumnOptions::USE_PROVIDED),
-                                       VDJAlignerParameters(3)))
+//    Cloneset cloneset_vdj;
+//    YMIR_BENCHMARK("Parsing VDJ",
+//                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
+//                                       &cloneset_vdj,
+//                                       vdj_single_genes,
+//                                       NUCLEOTIDE,
+//                                       VDJ_RECOMB,
+//                                       AlignmentColumnOptions()
+//                                               .setV(AlignmentColumnOptions::USE_PROVIDED)
+//                                               .setD(AlignmentColumnOptions::OVERWRITE)
+//                                               .setJ(AlignmentColumnOptions::USE_PROVIDED),
+//                                       VDJAlignerParameters(3)))
 
     //
     // VJ MAAG

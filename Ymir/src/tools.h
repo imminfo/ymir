@@ -86,7 +86,20 @@ namespace ymir {
 
     prob_t loglikelihood(const std::vector<prob_t> &vec, prob_t laplace = 1e-80) {
         prob_t res = 0;
-        for (size_t i = 0; i < vec.size(); ++i) { res += log10((vec[i] + laplace)); } // what to do in case of high precision numbers?
+        for (size_t i = 0; i < vec.size(); ++i) {
+//            res += log10((vec[i] + laplace));
+
+            if (vec[i] && !std::isnan(vec[i])) {
+                res += log10(vec[i]);
+            }
+
+//            if ((vec[i] > 1e-60) && !std::isnan(vec[i])) {
+//                res += log10(vec[i]);
+//            }
+        } // what to do in case of high precision numbers?
+        // w/ laplace and w/o zero check -77603.267; -100500.399
+        // w/o laplace and w/ zero check -23443.267; -46340.3987
+        // w/o laplace and w/ eps check  -23443.267; -46340.3987
         return res;
     }
 

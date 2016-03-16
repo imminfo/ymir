@@ -28,6 +28,7 @@ namespace ymir {
                                                                  .set("niter", 10)
                                                                  .set("block.size", 5000)
                                                                  .set("alpha", .6)
+                                                                 .set("K", 2.)
                                                                  .set("prebuild", false)
                                                                  .set("sample", 50000),
                                                          ErrorMode error_mode = NO_ERRORS) const
@@ -49,7 +50,8 @@ namespace ymir {
 
             std::cout << "#iterations:\t" << (size_t) algo_param["niter"].asUInt() << std::endl;
             std::cout << "block size:\t" << (size_t) algo_param["block.size"].asUInt() << std::endl;
-            std::cout << "alpha:\t" << (size_t) algo_param["block.size"].asUInt() << std::endl;
+            std::cout << "alpha:\t" << (double) algo_param["alpha"].asDouble() << std::endl;
+            std::cout << "K:\t" << (double) algo_param["K"].asDouble() << std::endl;
             std::cout << "prebuild:\t" << (size_t) algo_param["prebuild"].asBool() << std::endl;
 
             std::vector<prob_t> logLvec;
@@ -62,6 +64,7 @@ namespace ymir {
             size_t start_i = rep_nonc.size();
             size_t block_size = algo_param["block.size"].asUInt();
             prob_t alpha = algo_param["alpha"].asDouble(); // step(k) = (k + 2)^(-alpha), .5 < alpha <= 1
+            prob_t Kparam = algo_param["K"].asDouble(); // step(k) = (k + 2)^(-alpha), .5 < alpha <= 1
             ModelParameterVector new_param_vec = model.event_probabilities();
             new_param_vec.fill(1);
 //            new_param_vec.set_error_prob(.003);
@@ -115,7 +118,7 @@ namespace ymir {
                     this->updateTempVec(fb, maag_rep[indices[maag_i]], new_param_vec, changed, error_mode);
                 }
 
-                this->updateModel(model, new_param_vec, maag_rep, prob_vec, prev_ll, changed, exp(-alpha * log(iter + 2)), error_mode);
+                this->updateModel(model, new_param_vec, maag_rep, prob_vec, prev_ll, changed, exp(-alpha * log(iter + Kparam)), error_mode);
 
                 logLvec.push_back(prev_ll);
             }

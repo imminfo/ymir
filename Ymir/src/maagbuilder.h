@@ -211,9 +211,9 @@ namespace ymir {
             res.resize(cloneset.size());
 #ifdef USE_OMP
 #if OMP_THREADS == -1
-            #pragma omp parallel
+            #pragma omp parallel for 
 #else
-            #pragma omp parallel num_threads(OMP_THREADS)
+            #pragma omp parallel for  num_threads(OMP_THREADS)
 #endif
 #endif
             for (size_t i = 0; i < cloneset.size(); ++i) {
@@ -269,9 +269,9 @@ namespace ymir {
 
 #ifdef USE_OMP
 #if OMP_THREADS == -1
-            #pragma omp parallel
+            #pragma omp parallel for 
 #else
-            #pragma omp parallel num_threads(OMP_THREADS)
+            #pragma omp parallel for  num_threads(OMP_THREADS)
 #endif
 #endif
             for (size_t i = 0; i < cloneset.size(); ++i) {
@@ -438,9 +438,9 @@ namespace ymir {
 
 #ifdef USE_OMP
 #if OMP_THREADS == -1
-            #pragma omp parallel
+            #pragma omp parallel for 
 #else
-            #pragma omp parallel num_threads(OMP_THREADS)
+            #pragma omp parallel for  num_threads(OMP_THREADS)
 #endif
 #endif
             for (size_t i = 0; i < repertoire->size(); ++i) {

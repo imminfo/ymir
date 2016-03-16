@@ -209,12 +209,21 @@ namespace ymir {
 
             MAAGRepertoire res;
             res.resize(cloneset.size());
+#ifdef USE_OMP
+#if OMP_THREADS == -1
+            #pragma omp parallel
+#else
+            #pragma omp parallel num_threads(OMP_THREADS)
+#endif
+#endif
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 res[i] = this->build(cloneset[i], metadata_mode, error_mode, seq_type);
 
+#ifndef USE_OMP
                 if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
                     cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "<< "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;
                 }
+#endif
             }
 
             if (verbose) {
@@ -258,11 +267,21 @@ namespace ymir {
                 verbose_step = cloneset.size() / 10;
             }
 
+#ifdef USE_OMP
+#if OMP_THREADS == -1
+            #pragma omp parallel
+#else
+            #pragma omp parallel num_threads(OMP_THREADS)
+#endif
+#endif
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 res.push_back(buildAndCompute(cloneset[i], error_mode, seq_type, action));
+
+#ifndef USE_OMP
                 if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
                     std::cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] " << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
                 }
+#endif
             }
 
             if (verbose) {
@@ -417,11 +436,21 @@ namespace ymir {
                 verbose_step = repertoire->size() / 10;
             }
 
+#ifdef USE_OMP
+#if OMP_THREADS == -1
+            #pragma omp parallel
+#else
+            #pragma omp parallel num_threads(OMP_THREADS)
+#endif
+#endif
             for (size_t i = 0; i < repertoire->size(); ++i) {
                 this->updateEventProbabilities(&(*repertoire)[i]);
+
+#ifndef USE_OMP
                 if (verbose && (i+1) % verbose_step == 0 && (i+1) != repertoire->size()) {
                     cout << "[" << (int) ((100*(i+1)) / repertoire->size()) << "%] " << "Updated " << (size_t) (i+1) << " / " << (size_t) repertoire->size() << " MAAGs." << endl;
                 }
+#endif
             }
 
             if (verbose) {

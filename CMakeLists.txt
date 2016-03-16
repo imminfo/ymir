@@ -2,9 +2,16 @@ cmake_minimum_required(VERSION 2.8.4)
 
 project(Ymir)
 
-#set(CMAKE_C_COMPILER /Users/vdn/Downloads/clang-llvm/bin/clang)
-#set(CMAKE_CXX_COMPILER /Users/vdn/Downloads/clang-llvm/bin/clang++)
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libomp")
+
+set(USE_OMP NO CACHE BOOL "Use OpenMP or not.")
+
+if (USE_OMP)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+endif()
+
+
+set(OMP_THREADS -1 CACHE STRING "Number of OpenMP threads to use.")
+
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")

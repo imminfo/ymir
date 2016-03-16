@@ -248,21 +248,6 @@ namespace ymir {
 #endif
             return _values[_chain[node_i](mat_i, row, col)];
         }
-
-        _Scalar& at(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) {
-#ifndef DNDEBUG
-            if (node_i >= _chain.size()) { throw(std::runtime_error("Number of the Node is out of bounds."));}
-#endif
-            return _values[_chain[node_i](mat_i, row, col)];
-        }
-
-//        const _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
-        _Scalar at(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
-#ifndef DNDEBUG
-            if (node_i >= _chain.size()) { throw(std::runtime_error("Number of the Node is out of bounds."));}
-#endif
-            return _values[_chain[node_i](mat_i, row, col)];
-        }
         ///@}
 
 

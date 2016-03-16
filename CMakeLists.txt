@@ -3,14 +3,15 @@ cmake_minimum_required(VERSION 2.8.4)
 project(Ymir)
 
 
-set(USE_OMP NO CACHE BOOL "Use OpenMP or not.")
-
 if (USE_OMP)
+    if (NOT DEFINED OMP_THREADS)
+        set(OMP_THREADS -1)
+    endif()
+
+    add_definitions(-DOMP_THREADS=${OMP_THREADS})
+
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 endif()
-
-
-set(OMP_THREADS -1 CACHE STRING "Number of OpenMP threads to use.")
 
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")

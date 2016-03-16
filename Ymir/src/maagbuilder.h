@@ -140,10 +140,6 @@ namespace ymir {
                     this->buildDJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
                 }
 
-                probs.finish();
-                events.finish();
-                errors.finish();
-
 //            if (error_mode && metadata_mode) {
 //
 //                // TODO: deal with D deletions and insertions null matrices
@@ -170,15 +166,21 @@ namespace ymir {
 
 //                std::cout << clonotype.toString() << std::endl;
 
+                probs.finish();
+
                 MAAG maag;
                 maag._recomb = clonotype.recombination();
                 maag._seq_type = clonotype.sequence_type();
                 maag.swap(probs);
                 if (error_mode) {
+                    errors.finish();
+
                     maag._errors.reset(new ErrMMC());
                     maag._errors->swap(errors);
                 }
                 if (metadata_mode) {
+                    events.finish();
+
                     unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
                     copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
                     maag._sequence.reset(new sequence_t(clonotype.sequence()));

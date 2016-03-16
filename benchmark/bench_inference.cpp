@@ -1,15 +1,11 @@
 //
-// Created by Vadim N. on 18/03/2015.
+// Created by Vadim N. on 16/03/2016.
 //
-
-#ifndef _BENCHMARK_H_
-#define _BENCHMARK_H_
-
 
 #include "benchutils.h"
 
-
 int main(int argc, char* argv[]) {
+
     std::chrono::system_clock::time_point tp1, tp2;
 
     std::vector< std::pair<std::string, size_t> > timepoints;
@@ -27,7 +23,7 @@ int main(int argc, char* argv[]) {
             vj_good_prob, vj_good_meta,
             vj_good_infer, vdj_good_prob,
             vdj_good_meta, vdj_good_infer;
-    
+
     std::string BENCH_DATA_FOLDER = argv[1];
 
 
@@ -41,9 +37,9 @@ int main(int argc, char* argv[]) {
     // TCR alpha chain repertoire - VJ recombination
     //
     VDJRecombinationGenes vj_single_genes("Vgene",
-                                   BENCH_DATA_FOLDER + "trav.txt",
-                                   "Jgene",
-                                   BENCH_DATA_FOLDER + "traj.txt");
+                                          BENCH_DATA_FOLDER + "trav.txt",
+                                          "Jgene",
+                                          BENCH_DATA_FOLDER + "traj.txt");
 
     Cloneset cloneset_vj;
     YMIR_BENCHMARK("Parsing VJ",
@@ -83,35 +79,14 @@ int main(int argc, char* argv[]) {
     //
     ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA", EMPTY);
 
-//    YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS))
-//    YMIR_BENCHMARK("VJ prob", vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS, NUCLEOTIDE))
-
-
     //
     // VDJ MAAG
     //
 //    ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
 
-//    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS))
-//    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS, NUCLEOTIDE))
-
 
     //
-    // VJ inference
-    //
-    // 10 - -4005118.35
-//    EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model);
-//                                       EMAlgorithm::AlgorithmParameters().set("niter", 10),
-//                                       NO_ERRORS);
-    // 10 - -4036068.19
-    //
-//    SGAlgorithm().statisticalInference(cloneset_vj, vj_single_model);
-//                                       EMAlgorithm::AlgorithmParameters().set("niter", 20));
-//                                       NO_ERRORS);
-
-
-    //
-    // VDJ inference
+    // Inference
     //
     vector<int> vec_sample = {10000, 25000, 50000, 100000, 150000};
     vec_sample = {100000};
@@ -145,59 +120,4 @@ int main(int argc, char* argv[]) {
         }
     }
 
-//    niter = 30;
-//    block = 5000;
-//    alpha = .6;
-//    sample = 100000;
-//    RUN_SG_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, niter, block, alpha, sample, error_mode)
-//
-//    niter = 30;
-//    block = 5000;
-//    alpha = .6;
-//    sample = 100000;
-
-//    RUN_EM_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, niter, sample, error_mode)
-//    RUN_SG_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, niter, block, alpha, sample, error_mode)
-
-
-//    YMIR_BENCHMARK("VDJ EM",
-//                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
-//                                                      EMAlgorithm::AlgorithmParameters()
-//                                                              .set("niter", niter)
-//                                                              .set("sample", sample),
-//                                                      error_mode))
-//    write_vec("/Users/vdn/Projects/ymir/benchmark/log/vdj_em_niter_" + to_string(niter)
-//              + "_sample_" + to_string(sample)
-//              + "_err_" + to_string(error_mode) +  ".txt", logLvec);
-
-//    YMIR_BENCHMARK("VDJ SG",
-//                   logLvec = SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
-//                                                      SGAlgorithm::AlgorithmParameters()
-//                                                              .set("niter", niter)
-//                                                              .set("block.size", block)
-//                                                              .set("alpha", alpha)
-//                                                              .set("prebuild", false)
-//                                                              .set("sample", sample),
-//                                                                error_mode))
-//    write_vec("/Users/vdn/Projects/ymir/benchmark/log/vdj_sg_niter_" + to_string(niter)
-//              + "_block_" + to_string(block)
-//              + "_alpha_" + to_string(alpha)
-//              + "_sample_" + to_string(sample)
-//              + "_err_" + to_string(error_mode) + ".txt", logLvec);
-
-    //
-    // Results
-    //
-    cout << "========================" << endl << "Results:" << endl;
-
-    for (size_t i = 0; i < timepoints.size(); ++i) {
-        cout << timepoints[i].first << ":\t" << timepoints[i].second << endl;
-    }
-
-    cout << endl << "========================" << endl;
-
-
-    return 0;
 }
-
-#endif //_BENCHMARK_H_

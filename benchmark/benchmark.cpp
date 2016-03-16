@@ -202,9 +202,9 @@ int main(int argc, char* argv[]) {
 
 //    RUN_EM_INFERENCE(string("vj"), cloneset_vj, vj_single_model, niter, sample, error_mode)
 //    RUN_EM_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, niter, sample, error_mode)
-    for(auto val_sample: vec_sample) {
-        RUN_EM_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 30, val_sample, error_mode)
-    }
+//    for(auto val_sample: vec_sample) {
+//        RUN_EM_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 30, val_sample, error_mode)
+//    }
 
     for(auto val_sample: vec_sample) {
         for(auto val_block: vec_block) {

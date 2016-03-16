@@ -122,6 +122,7 @@ namespace ymir {
                     this->updateTempVec(fb, maag_rep[indices[maag_i]], new_param_vec, changed, error_mode);
                 }
 
+                std::cout << new_param_vec.error_prob() << std::endl;
                 this->updateModel(model, new_param_vec, maag_rep, prob_vec, prev_ll, changed, pow(beta*iter + Kparam, -alpha), error_mode);
 
                 logLvec.push_back(prev_ll);

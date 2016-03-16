@@ -95,6 +95,7 @@ int main(int argc, char* argv[]) {
     vector<double> vec_alpha = {.5, .6, .7, .8, .9};
     vector<double> vec_beta =  {.1, .3, .7, 1, 1.5, 5};
     vector<double> vec_K =     {1, 1.5, 2, 3};
+    vec_K = {2, 3};
     ErrorMode error_mode = COMPUTE_ERRORS;
 
 //    int niter, sample, block;

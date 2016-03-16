@@ -190,6 +190,7 @@ int main(int argc, char* argv[]) {
     vector<int> vec_sample = {10000, 25000, 50000, 100000, 150000};
     vec_sample = {100000};
     vector<int> vec_block = {100, 500, 1000, 2000, 5000, 10000};
+    vec_block = {2000, 5000, 10000};
     vector<double> vec_alpha = {.5, .6, .7, .8, .9};
     vector<double> vec_K = {1, 2, 2.5, 3, 5, 7};
     ErrorMode error_mode = COMPUTE_ERRORS;

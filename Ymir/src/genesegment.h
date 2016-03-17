@@ -251,6 +251,7 @@ namespace ymir {
             : _V(new GeneSegmentAlphabet(VARIABLE, v_segments_name, v_segments_file, is_V_ok)),
               _J(new GeneSegmentAlphabet(JOINING, j_segments_name, j_segments_file, is_J_ok))
         {
+            _D = nullptr;
         }
 
 
@@ -270,6 +271,7 @@ namespace ymir {
             : _V(new GeneSegmentAlphabet(VARIABLE, V_name, V_alleles, V_sequences)),
               _J(new GeneSegmentAlphabet(JOINING, J_name, J_alleles, J_sequences))
         {
+            _D = nullptr;
         }
 
 
@@ -287,30 +289,43 @@ namespace ymir {
             : _V(new GeneSegmentAlphabet(*other._V)),
               _J(new GeneSegmentAlphabet(*other._J))
         {
+
+            delete _D;
             if (other._D) {
-                _D.reset(new GeneSegmentAlphabet(*other._D));
+                _D = new GeneSegmentAlphabet(*other._D);
+//                _D.reset(new GeneSegmentAlphabet(*other._D));
             } else {
-                _D.release();
+                _D = nullptr;
+//                _D.release();
             }
         }
 
 
         VDJRecombinationGenes& operator=(const VDJRecombinationGenes &other) {
-            _V.reset(new GeneSegmentAlphabet(other.V()));
-            _J.reset(new GeneSegmentAlphabet(other.J()));
+//            _V.reset(new GeneSegmentAlphabet(other.V()));
+//            _J.reset(new GeneSegmentAlphabet(other.J()));
+            delete _V;
+            delete _J;
+            delete _D;
 
-            std::cout << "???" << std::endl;
+            _V = new GeneSegmentAlphabet(other.V());
+            _J = new GeneSegmentAlphabet(other.J());
+
             if (other._D) {
-                _D.reset(new GeneSegmentAlphabet(other.D()));
+                _D = new GeneSegmentAlphabet(*other._D);
+//                _D.reset(new GeneSegmentAlphabet(other.D()));
             } else {
-                _D.release();
+//                _D.release();
+                _D = nullptr;
             }
-            std::cout << "???" << std::endl;
         }
 
 
         ~VDJRecombinationGenes()
         {
+            delete _V;
+            delete _J;
+            delete _D;
         }
 
 
@@ -361,7 +376,8 @@ namespace ymir {
 
     protected:
 
-        GSA_ptr _V, _J, _D;
+//        GSA_ptr _V, _J, _D;
+        GeneSegmentAlphabet *_V, *_J, *_D;
 
     };
 }

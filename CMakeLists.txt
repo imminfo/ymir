@@ -15,7 +15,7 @@ project(Ymir)
 #endif()
 #
 #add_definitions(-DOMP_THREADS=-1)
-#set(CMAKE_CXX_COMPILER "/usr/local/Cellar/clang-omp/2015-04-01/bin/clang-omp++")
+#
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp")
 
 # /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++

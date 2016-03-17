@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 #include "math.h"
-#include <iomanip>
 
 #include "types.h"
 //#include "repertoire.h"

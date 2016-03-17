@@ -91,8 +91,8 @@ int main(int argc, char* argv[]) {
     //
     vector<int> vec_sample = {10000, 25000, 50000, 100000, 150000};
     vec_sample = {100000};
-    vector<int> vec_block = {500, 1000}; //, 2000, 5000, 10000};
-    vec_block = {2000, 5000, 10000};
+    vector<int> vec_block = {500, 1000, 2000, 5000, 10000}; //, 2000, 5000, 10000};
+//    vec_block = {2000, 5000, 10000};
     vector<double> vec_alpha = {.5, .6, .7, .8, .9};
     vector<double> vec_beta =  {.1, .3, .7, 1, 1.5, 5};
     vector<double> vec_K =     {1, 1.5, 2, 3};
@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
             for (auto val_alpha: vec_alpha) {
                 for (auto val_beta: vec_beta) {
                     for (auto val_K: vec_K) {
-                        RUN_SG_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 30, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
+                        RUN_SG_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 15, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
                     }
                 }
             }

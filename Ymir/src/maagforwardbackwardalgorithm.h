@@ -130,7 +130,7 @@ namespace ymir {
         prob_t* VD_nuc_probs() { return _nuc_arr1; }
         prob_t* DJ_nuc_probs() { return _nuc_arr2; }
 
-        prob_t err_prob() { return _err_prob * _full_prob; }
+        prob_t err_prob() { return _err_prob / _full_prob; }
 
     protected:
 
@@ -207,7 +207,7 @@ namespace ymir {
                                     ++n;
                                 }
 
-                                _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
+                                _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1);
                             }
 
 //                            std::cout << "nucs" << std::endl;
@@ -258,7 +258,7 @@ namespace ymir {
                                         ++n;
                                     }
 
-                                    _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
+                                    _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1);
                                 }
                             } else {
                                 if (maag.position(right_pos) == maag.sequence().size() + 1) {
@@ -284,7 +284,7 @@ namespace ymir {
                                         ++n;
                                     }
 
-                                    _err_prob += scenario_prob / (maag.position(right_pos) - maag.position(left_pos) - 1);
+                                    _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1);
                                 }
                             }
 
@@ -337,7 +337,7 @@ namespace ymir {
                         if (maag.errors(err_node_i, fb_mat_i, row_i, col_i)) {
                             _err_prob += (*_forward_acc)(node_i, fb_mat_i, row_i, col_i)
                                          * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i)
-                                         / maag.errors(err_node_i, fb_mat_i, row_i, col_i);
+                                         * maag.errors(err_node_i, fb_mat_i, row_i, col_i);
                         }
                     }
                 }

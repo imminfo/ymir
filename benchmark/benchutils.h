@@ -34,7 +34,7 @@ write_vec(temp_str + ".pars.txt", model); \
 
 
 #define RUN_SG_INFERENCE(descr, cloneset, model, niter, block, alpha, beta, K, sample, error_mode) { YMIR_BENCHMARK(descr, \
-logLvec = SGAlgorithm().statisticalInference(cloneset, model, \
+logLvec = SGAlgorithm().statisticalInference(cloneset, model, prob_vec, good_clonotypes, \
                                              SGAlgorithm::AlgorithmParameters() \
                                                      .set("niter", niter) \
                                                      .set("block.size", block) \

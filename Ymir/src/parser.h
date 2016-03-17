@@ -244,6 +244,7 @@ namespace ymir {
             ClonotypeVector clonevec;
             clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
 
+            std::cout << "!!!" << std::endl;
             this->parseRepertoire(clonevec, max_clonotype_count);
             cloneset->swap(clonevec);
 

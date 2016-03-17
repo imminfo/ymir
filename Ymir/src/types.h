@@ -124,61 +124,6 @@ namespace ymir {
     using std::unique_ptr;
 
 
-    /**
-     * \struct d_alignment_t
-     *
-     * \brief 1-based alignment of a gene segment sequence to a reference sequence without indels.
-     */
-    class Alignment {
-
-    public:
-
-        Alignment()
-                : _gene_start(0), _seq_start(0), _len(0)
-        { }
-
-
-        Alignment(seq_len_t gene_start, seq_len_t seq_start, seq_len_t alignment_length)
-                : _gene_start(gene_start), _seq_start(seq_start), _len(alignment_length)
-        { }
-
-
-        Alignment(seq_len_t *p)
-                : _gene_start(*p), _seq_start(*(p + 1)), _len(*(p + 2))
-        { }
-
-
-        ///@{
-        seq_len_t gene_start() const { return _gene_start; }
-
-        seq_len_t gene_end() const { return _gene_start + _len - 1; }
-
-        seq_len_t seq_start() const { return _seq_start; }
-
-        seq_len_t seq_end() const { return _seq_start + _len - 1; }
-
-        seq_len_t length() const { return _len; }
-        ///@}
-
-
-        bool operator==(const Alignment& other) {
-            return this->_gene_start == other._gene_start
-                   && this->_seq_start == other._seq_start
-                   && this->_len == other._len;
-        }
-
-
-        bool operator!=(const Alignment& other) {
-            return !((*this) == other);
-        }
-
-    private:
-
-        seq_len_t _gene_start, _seq_start, _len;
-
-    };
-
-
     typedef std::pair<event_ind_t, prob_t> event_pair_t;
 
 

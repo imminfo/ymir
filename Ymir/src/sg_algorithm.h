@@ -72,7 +72,7 @@ namespace ymir {
             prob_t Kparam = algo_param["K"].asDouble(); // step(k) = (k + 2)^(-alpha), .5 < alpha <= 1
             ModelParameterVector new_param_vec = model.event_probabilities();
             new_param_vec.fill(1);
-////            new_param_vec.set_error_prob(.003);
+            new_param_vec.set_error_prob(.0003);
             new_param_vec.normaliseEventFamilies();
             model.updateModelParameterVector(new_param_vec);
 
@@ -120,21 +120,21 @@ namespace ymir {
                 new_param_vec.fill(0);
 
                 for (size_t maag_i = start_i; maag_i < std::min(indices.size(), start_i + block_size); ++maag_i) {
-                    cout << "start of the iteration" << endl;
+//                    cout << "start of the iteration" << endl;
                     // compute marginal probabilities for this block
                     // and update the temporary model parameter vector
-                    std::cout << (size_t) maag_i << " / " << (size_t) (std::min(indices.size(), start_i + block_size)) << std::endl;
+//                    std::cout << (size_t) maag_i << " / " << (size_t) (std::min(indices.size(), start_i + block_size)) << std::endl;
 //                    std::cout << (size_t) indices[maag_i] << std::endl;
-                    std::cout << (size_t) indices[maag_i] << std::endl;
-                    std::cout << rep_nonc[indices[maag_i]].toString() << std::endl;
-                    std::cout << rep_nonc[indices[maag_i]].is_good() << std::endl;
-                    std::cout << good_clonotypes[indices[maag_i]] << std::endl;
-                    std::cout << prob_vec[indices[maag_i]] << std::endl;
-                    std::cout << maag_rep[indices[maag_i]].has_errors() << std::endl;
-                    std::cout << maag_rep[indices[maag_i]].has_events() << std::endl;
+//                    std::cout << (size_t) indices[maag_i] << std::endl;
+//                    std::cout << rep_nonc[indices[maag_i]].toString() << std::endl;
+//                    std::cout << rep_nonc[indices[maag_i]].is_good() << std::endl;
+//                    std::cout << good_clonotypes[indices[maag_i]] << std::endl;
+//                    std::cout << prob_vec[indices[maag_i]] << std::endl;
+//                    std::cout << maag_rep[indices[maag_i]].has_errors() << std::endl;
+//                    std::cout << maag_rep[indices[maag_i]].has_events() << std::endl;
                     this->updateTempVec(fb, maag_rep[indices[maag_i]], new_param_vec, changed, error_mode);
 //                    return vector<prob_t>();
-                    cout << "end of the iteration" << endl;
+//                    cout << "end of the iteration" << endl;
                 }
 
                 std::cout << "Err:" << new_param_vec.error_prob() << std::endl;
@@ -159,7 +159,7 @@ namespace ymir {
                 return false;
             }
 
-            std::cout << "passed 1" << std::endl;
+//            std::cout << "passed 1" << std::endl;
 
             event_pair_t ep;
             while (!fb.is_empty()) {
@@ -168,7 +168,7 @@ namespace ymir {
                 changed[ep.first] = true;
             }
 
-            std::cout << "passed 2" << std::endl;
+//            std::cout << "passed 2" << std::endl;
 
             if (error_mode) {
                 new_param_vec.set_error_prob(new_param_vec.error_prob() + fb.err_prob());
@@ -206,7 +206,7 @@ namespace ymir {
                 }
             }
 
-            std::cout << "passed 3" << std::endl;
+//            std::cout << "passed 3" << std::endl;
         }
 
 
@@ -219,7 +219,8 @@ namespace ymir {
                          prob_t step_k,
                          ErrorMode error_mode) const
         {
-            if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() / maag_rep.size()); }
+//            if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() / maag_rep.size()); }
+            if (error_mode) { new_param_vec.set_error_prob(.0003); }
 
             new_param_vec.normaliseEventFamilies();
 

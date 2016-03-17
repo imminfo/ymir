@@ -154,12 +154,16 @@ namespace ymir {
                 return false;
             }
 
+            std::cout << "passed 1" << std::endl;
+
             event_pair_t ep;
             while (!fb.is_empty()) {
                 ep = fb.nextEvent();
                 new_param_vec[ep.first] += ep.second;
                 changed[ep.first] = true;
             }
+
+            std::cout << "passed 2" << std::endl;
 
             if (error_mode) {
                 new_param_vec.set_error_prob(new_param_vec.error_prob() + fb.err_prob());
@@ -196,6 +200,8 @@ namespace ymir {
                     }
                 }
             }
+
+            std::cout << "passed 3" << std::endl;
         }
 
 

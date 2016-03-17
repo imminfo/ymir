@@ -221,7 +221,7 @@ namespace ymir {
         prob_t& operator[] (event_ind_t gl_event_index) {
 #ifndef DNDEBUG
             if (gl_event_index >= _vec.size()) {
-                throw(std::runtime_error("Index is out of bounds."));
+                throw(std::runtime_error("Index " + std::to_string(gl_event_index) + " is out of bounds."));
             }
 #endif
             return _vec[gl_event_index];
@@ -399,9 +399,11 @@ namespace ymir {
 
         seq_len_t n_columns(EventClass event_class, event_ind_t event_family = 0) const {
 #ifndef DNDEBUG
-            if (event_class >= _event_classes.size()
-                || (_event_classes[event_class] + event_family) >= _event_family_col_numbers.size()) {
-                throw(std::runtime_error("Index is out of bounds."));
+            if (event_class >= _event_classes.size()) {
+                throw(std::runtime_error("Wrong event class " + std::to_string(event_class)));
+            }
+            if ((_event_classes[event_class] + event_family) >= _event_family_col_numbers.size()) {
+                throw(std::runtime_error("Index " + std::to_string(_event_classes[event_class] + event_family) + " is out of bounds."));
             }
 #endif
             return _event_family_col_numbers[_event_classes[event_class] + event_family];

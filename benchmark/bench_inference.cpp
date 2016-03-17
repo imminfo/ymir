@@ -110,33 +110,33 @@ int main(int argc, char* argv[]) {
 //        RUN_EM_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 30, val_sample, error_mode)
 //    }
 
-    ModelParameterVector new_param_vec = vj_single_model.event_probabilities();
-    new_param_vec.fill(1);
-    new_param_vec.normaliseEventFamilies();
-    vj_single_model.updateModelParameterVector(new_param_vec);
-
-    auto rep_nonc = cloneset_vj.noncoding().sample(100000);
-    auto maag_rep = vj_single_model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
-    vector<prob_t> prob_vec(maag_rep.size(), 0);
-
-    vector<bool> good_clonotypes(maag_rep.size(), true);
-    for (size_t i = 0; i < maag_rep.size(); ++i) {
-        if (rep_nonc[i].is_good()) {
-            prob_vec[i] = maag_rep[i].fullProbability();
-            if (std::isnan(prob_vec[i]) || prob_vec[i] == 0) {
-                good_clonotypes[i] = false;
-            }
-        } else {
-            good_clonotypes[i] = false;
-        }
-    }
+//    ModelParameterVector new_param_vec = vj_single_model.event_probabilities();
+//    new_param_vec.fill(1);
+//    new_param_vec.normaliseEventFamilies();
+//    vj_single_model.updateModelParameterVector(new_param_vec);
+//
+//    auto rep_nonc = cloneset_vj.noncoding().sample(2500);
+//    auto maag_rep = vj_single_model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
+//    vector<prob_t> prob_vec(maag_rep.size(), 0);
+//
+//    vector<bool> good_clonotypes(maag_rep.size(), true);
+//    for (size_t i = 0; i < maag_rep.size(); ++i) {
+//        if (rep_nonc[i].is_good()) {
+//            prob_vec[i] = maag_rep[i].fullProbability();
+//            if (std::isnan(prob_vec[i]) || prob_vec[i] == 0) {
+//                good_clonotypes[i] = false;
+//            }
+//        } else {
+//            good_clonotypes[i] = false;
+//        }
+//    }
 
     for(auto val_sample: vec_sample) {
         for(auto val_block: vec_block) {
             for (auto val_alpha: vec_alpha) {
                 for (auto val_beta: vec_beta) {
                     for (auto val_K: vec_K) {
-                        RUN_SG_INFERENCE(string("vj"), maag_rep, vj_single_model, 15, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
+                        RUN_SG_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 15, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
                     }
                 }
             }

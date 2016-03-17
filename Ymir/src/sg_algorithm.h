@@ -22,8 +22,8 @@ namespace ymir {
     class SGAlgorithm : public EMAlgorithm {
     public:
 
-        virtual std::vector<prob_t> statisticalInference(/*const ClonesetView& repertoire,*/ MAAGRepertoire &maag_rep,
-                                                         ProbabilisticAssemblingModel & model, vector<prob_t> prob_vec, vector<bool> good_clonotypes,
+        virtual std::vector<prob_t> statisticalInference(const ClonesetView& repertoire,
+                                                         ProbabilisticAssemblingModel & model,
                                                          const AlgorithmParameters& algo_param = AlgorithmParameters()
                                                                  .set("niter", 10)
                                                                  .set("block.size", 5000)
@@ -50,21 +50,22 @@ namespace ymir {
                 return std::vector<prob_t>();
             }
 
-            std::cout << "#iterations:\t" << (size_t) algo_param["niter"].asUInt() << std::endl;
-            std::cout << "block size:\t" << (size_t) algo_param["block.size"].asUInt() << std::endl;
-            std::cout << "alpha:\t" << (double) algo_param["alpha"].asDouble() << std::endl;
-            std::cout << "beta:\t" << (double) algo_param["beta"].asDouble() << std::endl;
-            std::cout << "K:\t" << (double) algo_param["K"].asDouble() << std::endl;
-            std::cout << "prebuild:\t" << (size_t) algo_param["prebuild"].asBool() << std::endl;
+            std::cout << "\t -- #iterations: " << (size_t) algo_param["niter"].asUInt() << std::endl;
+            std::cout << "\t -- block size:  " << (size_t) algo_param["block.size"].asUInt() << std::endl;
+            std::cout << "\t -- alpha:       " << (double) algo_param["alpha"].asDouble() << std::endl;
+            std::cout << "\t -- beta:        " << (double) algo_param["beta"].asDouble() << std::endl;
+//            std::cout << "\t -- gamma:       " << (double) algo_param["gamma"].asDouble() << std::endl;
+            std::cout << "\t -- K:           " << (double) algo_param["K"].asDouble() << std::endl;
+            std::cout << "\t -- prebuild:    " << (size_t) algo_param["prebuild"].asBool() << std::endl;
 
             std::vector<prob_t> logLvec;
 
             size_t sample = algo_param["sample"].asUInt();
-//            ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
-//            cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
+            ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
+            cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
 
-            size_t start_i = maag_rep.size();
+            size_t start_i = rep_nonc.size();
             size_t block_size = algo_param["block.size"].asUInt();
             prob_t alpha = algo_param["alpha"].asDouble(); // step(k) = (k + 2)^(-alpha), .5 < alpha <= 1
             prob_t beta = algo_param["beta"].asDouble();
@@ -77,15 +78,16 @@ namespace ymir {
 
             std::vector<bool> changed(new_param_vec.size(), false);
 
-//            auto maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
+            auto maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
+            std::cout << "MAAG rep size" << (size_t) maag_rep.size() << std::endl;
 
-//            std::vector<prob_t> prob_vec(maag_rep.size(), 0);
+            std::vector<prob_t> prob_vec(maag_rep.size(), 0);
             prob_t prev_ll = 0;
 
-//            cout << "Computing full assembling probabilities..." << endl;
-//            vector<bool> good_clonotypes;
-//            size_t removed, zero_prob, no_alignments;
-//            this->filterOut(rep_nonc, maag_rep, prob_vec, good_clonotypes, removed, zero_prob, no_alignments);
+            cout << "Computing full assembling probabilities..." << endl;
+            vector<bool> good_clonotypes;
+            size_t removed, zero_prob, no_alignments;
+            this->filterOut(rep_nonc, maag_rep, prob_vec, good_clonotypes, removed, zero_prob, no_alignments);
 
             std::vector<size_t> indices;
             for (size_t i = 0; i < maag_rep.size(); ++i) {
@@ -119,10 +121,12 @@ namespace ymir {
                 for (size_t maag_i = start_i; maag_i < std::min(indices.size(), start_i + block_size); ++maag_i) {
                     // compute marginal probabilities for this block
                     // and update the temporary model parameter vector
+//                    std::cout << (size_t) maag_i << " / " << (size_t) (std::min(indices.size(), start_i + block_size)) << std::endl;
+//                    std::cout << (size_t) indices[maag_i] << std::endl;
                     this->updateTempVec(fb, maag_rep[indices[maag_i]], new_param_vec, changed, error_mode);
                 }
 
-                std::cout << new_param_vec.error_prob() << std::endl;
+                std::cout << "Err:" << new_param_vec.error_prob() << std::endl;
                 this->updateModel(model, new_param_vec, maag_rep, prob_vec, prev_ll, changed, pow(beta*iter + Kparam, -alpha), error_mode);
 
                 logLvec.push_back(prev_ll);
@@ -140,16 +144,20 @@ namespace ymir {
                            ErrorMode error_mode) const
         {
             if (!fb.process(maag, error_mode)) {
+                std::cout << "error in temp vec" << std::endl;
                 return false;
             }
 
+            event_pair_t ep;
             while (!fb.is_empty()) {
-                event_pair_t ep = fb.nextEvent();
+                ep = fb.nextEvent();
                 new_param_vec[ep.first] += ep.second;
                 changed[ep.first] = true;
             }
 
-            if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() + fb.err_prob()); }
+            if (error_mode) {
+                new_param_vec.set_error_prob(new_param_vec.error_prob() + fb.err_prob());
+            }
 
             if (maag.is_vj()) {
 //                if (std::isnan(fb.VJ_nuc_probs()[0])) { cout << "A" << endl; check_and_throw(std::isnan(fb.VJ_nuc_probs()[0]), "123"); }
@@ -194,7 +202,7 @@ namespace ymir {
                          prob_t step_k,
                          ErrorMode error_mode) const
         {
-//            if (error_mode) { new_param_vec.set_error_prob(step_k * model.event_probabilities().error_prob() + (1 - step_k) * new_param_vec.error_prob()); }
+            if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() / maag_rep.size()); }
 
             new_param_vec.normaliseEventFamilies();
 

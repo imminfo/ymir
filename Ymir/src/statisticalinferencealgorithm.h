@@ -99,9 +99,15 @@ namespace ymir {
             zero_prob = 0;
             no_alignments = 0;
 
+#ifdef USE_OMP
+#pragma omp parallel for
+#endif
+            for (size_t i = 0; i < maag_rep.size(); ++i) {
+                prob_vec[i] = maag_rep[i].fullProbability();
+            }
+
             for (size_t i = 0; i < maag_rep.size(); ++i) {
                 if (rep_nonc[i].is_good()) {
-                    prob_vec[i] = maag_rep[i].fullProbability();
                     if (std::isnan(prob_vec[i]) || prob_vec[i] == 0) {
                         good_clonotypes[i] = false;
                         ++removed;

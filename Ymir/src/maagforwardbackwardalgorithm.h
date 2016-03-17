@@ -130,7 +130,7 @@ namespace ymir {
         prob_t* VD_nuc_probs() { return _nuc_arr1; }
         prob_t* DJ_nuc_probs() { return _nuc_arr2; }
 
-        prob_t err_prob() { return _err_prob; }
+        prob_t err_prob() { return _err_prob * _full_prob; }
 
     protected:
 

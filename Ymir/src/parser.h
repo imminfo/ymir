@@ -194,7 +194,7 @@ namespace ymir {
                   Recombination recomb,
                   AlignmentColumnOptions opts = AlignmentColumnOptions().setV(AlignmentColumnOptions::USE_PROVIDED).setJ(AlignmentColumnOptions::USE_PROVIDED).setD(AlignmentColumnOptions::OVERWRITE),
                   VDJAlignerParameters params = VDJAlignerParameters()) {
-            _stream.close();
+            if (_stream.is_open()) { _stream.close(); }
 
             _status = false;
             _read_header = true;
@@ -261,7 +261,7 @@ namespace ymir {
             if (this->open(filepath, gene_segments, seq_type, recomb, opts, params)) {
                 this->parse(cloneset);
                 _stats.print();
-                _stream.close();
+                if (_stream.is_open()) { _stream.close(); }
                 return true;
             }
 

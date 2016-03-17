@@ -248,6 +248,7 @@ namespace ymir {
     class VDJRecombinationGenes {
 
         typedef unique_ptr<GeneSegmentAlphabet> GSA_ptr;
+
     public:
 
 
@@ -292,9 +293,10 @@ namespace ymir {
         }
 
 
-        VDJRecombinationGenes(const VDJRecombinationGenes &other) {
-            _V.reset(new GeneSegmentAlphabet(*other._V));
-            _J.reset(new GeneSegmentAlphabet(*other._J));
+        VDJRecombinationGenes(const VDJRecombinationGenes &other)
+            : _V(new GeneSegmentAlphabet(*other._V)),
+              _J(new GeneSegmentAlphabet(*other._J))
+        {
             if (other._D) {
                 _D.reset(new GeneSegmentAlphabet(*other._D));
             } else {
@@ -304,10 +306,10 @@ namespace ymir {
 
 
         VDJRecombinationGenes& operator=(const VDJRecombinationGenes &other) {
-            _V.reset(new GeneSegmentAlphabet(*other._V));
-            _J.reset(new GeneSegmentAlphabet(*other._J));
+            _V.reset(new GeneSegmentAlphabet(other.V()));
+            _J.reset(new GeneSegmentAlphabet(other.J()));
             if (other._D) {
-                _D.reset(new GeneSegmentAlphabet(*other._D));
+                _D.reset(new GeneSegmentAlphabet(other.D()));
             } else {
                 _D.release();
             }
@@ -350,7 +352,8 @@ namespace ymir {
 
         bool write(const std::string& v_segments_file = "vsegments.txt",
                 const std::string& j_segments_file = "jsegments.txt",
-                const std::string& d_segments_file = "dsegments.txt") const {
+                const std::string& d_segments_file = "dsegments.txt") const
+        {
             if (this->_V->write(v_segments_file)) {
                 if (this->_J->write(j_segments_file)) {
                     if (!this->is_vdj()) {

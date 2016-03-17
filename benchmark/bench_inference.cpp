@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
 
     std::string BENCH_DATA_FOLDER = argv[1];
 
+    std::cout << "Data folder:\t[" << BENCH_DATA_FOLDER << "]" << endl;
 
     CDR3NucParser parser;
 
@@ -40,7 +41,7 @@ int main(int argc, char* argv[]) {
                                           BENCH_DATA_FOLDER + "trav.txt",
                                           "Jgene",
                                           BENCH_DATA_FOLDER + "traj.txt");
-
+//
     Cloneset cloneset_vj;
     YMIR_BENCHMARK("Parsing VJ",
                    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file,
@@ -54,25 +55,25 @@ int main(int argc, char* argv[]) {
     //
     // TCR beta chain repertoire - VDJ recombination
     //
-//    VDJRecombinationGenes vdj_single_genes("Vgene",
-//                                    BENCH_DATA_FOLDER + "trbv.txt",
-//                                    "Jgene",
-//                                    BENCH_DATA_FOLDER + "trbj.txt",
-//                                    "Dgene",
-//                                    BENCH_DATA_FOLDER + "trbd.txt");
+    VDJRecombinationGenes vdj_single_genes("Vgene",
+                                    BENCH_DATA_FOLDER + "trbv.txt",
+                                    "Jgene",
+                                    BENCH_DATA_FOLDER + "trbj.txt",
+                                    "Dgene",
+                                    BENCH_DATA_FOLDER + "trbd.txt");
 
-//    Cloneset cloneset_vdj;
-//    YMIR_BENCHMARK("Parsing VDJ",
-//                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
-//                                       &cloneset_vdj,
-//                                       vdj_single_genes,
-//                                       NUCLEOTIDE,
-//                                       VDJ_RECOMB,
-//                                       AlignmentColumnOptions()
-//                                               .setV(AlignmentColumnOptions::USE_PROVIDED)
-//                                               .setD(AlignmentColumnOptions::OVERWRITE)
-//                                               .setJ(AlignmentColumnOptions::USE_PROVIDED),
-//                                       VDJAlignerParameters(3)))
+    Cloneset cloneset_vdj;
+    YMIR_BENCHMARK("Parsing VDJ",
+                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
+                                       &cloneset_vdj,
+                                       vdj_single_genes,
+                                       NUCLEOTIDE,
+                                       VDJ_RECOMB,
+                                       AlignmentColumnOptions()
+                                               .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                               .setD(AlignmentColumnOptions::OVERWRITE)
+                                               .setJ(AlignmentColumnOptions::USE_PROVIDED),
+                                       VDJAlignerParameters(3)))
 
     //
     // VJ MAAG

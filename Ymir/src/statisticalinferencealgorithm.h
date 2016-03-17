@@ -108,7 +108,7 @@ namespace ymir {
 
             for (size_t i = 0; i < maag_rep.size(); ++i) {
                 if (rep_nonc[i].is_good()) {
-                    if (std::isnan(prob_vec[i]) || prob_vec[i] == 0) {
+                    if (std::isnan(prob_vec[i]) || (std::abs(prob_vec[i]) < 1e-80) || (std::abs(prob_vec[i]) >= 1)) {
                         good_clonotypes[i] = false;
                         ++removed;
                         ++zero_prob;

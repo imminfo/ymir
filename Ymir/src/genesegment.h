@@ -299,11 +299,13 @@ namespace ymir {
             _V.reset(new GeneSegmentAlphabet(other.V()));
             _J.reset(new GeneSegmentAlphabet(other.J()));
 
+            std::cout << "???" << std::endl;
             if (other._D) {
                 _D.reset(new GeneSegmentAlphabet(other.D()));
             } else {
                 _D.release();
             }
+            std::cout << "???" << std::endl;
         }
 
 

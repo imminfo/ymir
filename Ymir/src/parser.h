@@ -232,7 +232,9 @@ namespace ymir {
                 _stats.print();
                 _stats.reset();
                 _status = false;
+                std::cout << "!!!" << std::endl;
                 _stream.close();
+                std::cout << "!!!" << std::endl;
                 return false;
             }
 
@@ -244,7 +246,6 @@ namespace ymir {
             ClonotypeVector clonevec;
             clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
 
-            std::cout << "!!!" << std::endl;
             this->parseRepertoire(clonevec, max_clonotype_count);
             cloneset->swap(clonevec);
 

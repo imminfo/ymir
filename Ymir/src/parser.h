@@ -213,8 +213,11 @@ namespace ymir {
                 _recomb = recomb;
                 _opts = opts;
                 _status = true;
+                std::cout << "!!!" << std::endl;
                 _aligner.set_genes(_genes);
+                std::cout << "!!!" << std::endl;
                 _aligner.set_parameters(params);
+                std::cout << "!!!" << std::endl;
                 return true;
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
@@ -232,9 +235,7 @@ namespace ymir {
                 _stats.print();
                 _stats.reset();
                 _status = false;
-                std::cout << "!!!" << std::endl;
                 _stream.close();
-                std::cout << "!!!" << std::endl;
                 return false;
             }
 

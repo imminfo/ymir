@@ -425,6 +425,9 @@ namespace ymir {
         }
 
 
+        seq_len_t n_poses() const { return _n_poses; }
+
+
         SequenceType sequence_type() const { return _seq_type; }
 
         dim_t rows(node_ind_t node_i) const { return this->nodeRows(node_i); }

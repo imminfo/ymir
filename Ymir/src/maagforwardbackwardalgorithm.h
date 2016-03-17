@@ -207,7 +207,7 @@ namespace ymir {
                                     ++n;
                                 }
 
-                                _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1);
+                                _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1) / maag.n_poses();
                             }
 
 //                            std::cout << "nucs" << std::endl;
@@ -258,7 +258,7 @@ namespace ymir {
                                         ++n;
                                     }
 
-                                    _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1);
+                                    _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1) / maag.n_poses();
                                 }
                             } else {
                                 if (maag.position(right_pos) == maag.sequence().size() + 1) {
@@ -284,7 +284,7 @@ namespace ymir {
                                         ++n;
                                     }
 
-                                    _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1);
+                                    _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1) / maag.n_poses();
                                 }
                             }
 
@@ -337,7 +337,7 @@ namespace ymir {
                         if (maag.errors(err_node_i, fb_mat_i, row_i, col_i)) {
                             _err_prob += (*_forward_acc)(node_i, fb_mat_i, row_i, col_i)
                                          * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i)
-                                         * maag.errors(err_node_i, fb_mat_i, row_i, col_i);
+                                         * (maag.errors(err_node_i, fb_mat_i, row_i, col_i) / maag.n_poses());
                         }
                     }
                 }

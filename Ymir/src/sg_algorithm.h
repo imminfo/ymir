@@ -123,6 +123,8 @@ namespace ymir {
                     // and update the temporary model parameter vector
 //                    std::cout << (size_t) maag_i << " / " << (size_t) (std::min(indices.size(), start_i + block_size)) << std::endl;
 //                    std::cout << (size_t) indices[maag_i] << std::endl;
+                    std::cout << (size_t) indices[maag_i] << std::endl;
+                    std::cout << rep_nonc[indices[maag_i]].toString() << std::endl;
                     this->updateTempVec(fb, maag_rep[indices[maag_i]], new_param_vec, changed, error_mode);
                 }
 

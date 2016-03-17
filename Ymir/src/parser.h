@@ -208,16 +208,16 @@ namespace ymir {
             _stream.open(filepath);
             if (_stream.good()) {
                 std::cout << "Open [" << filepath << "] for reading" << endl;
+                std::cout << "!!!" << std::endl;
                 _genes = gene_segments;
+                std::cout << "!!!" << std::endl;
                 _seq_type = seq_type;
+                std::cout << "!!!" << std::endl;
                 _recomb = recomb;
                 _opts = opts;
                 _status = true;
-                std::cout << "!!!" << std::endl;
                 _aligner.set_genes(_genes);
-                std::cout << "!!!" << std::endl;
                 _aligner.set_parameters(params);
-                std::cout << "!!!" << std::endl;
                 return true;
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;

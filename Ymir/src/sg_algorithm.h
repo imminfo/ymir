@@ -22,8 +22,8 @@ namespace ymir {
     class SGAlgorithm : public EMAlgorithm {
     public:
 
-        virtual std::vector<prob_t> statisticalInference(const ClonesetView& repertoire,
-                                                         ProbabilisticAssemblingModel & model,
+        virtual std::vector<prob_t> statisticalInference(/*const ClonesetView& repertoire,*/ MAAGRepertoire &maag_rep,
+                                                         ProbabilisticAssemblingModel & model, vector<prob_t> prob_vec, vector<bool> good_clonotypes,
                                                          const AlgorithmParameters& algo_param = AlgorithmParameters()
                                                                  .set("niter", 10)
                                                                  .set("block.size", 5000)
@@ -60,35 +60,35 @@ namespace ymir {
             std::vector<prob_t> logLvec;
 
             size_t sample = algo_param["sample"].asUInt();
-            ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
-            cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
+//            ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
+//            cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
 
-            size_t start_i = rep_nonc.size();
+            size_t start_i = maag_rep.size();
             size_t block_size = algo_param["block.size"].asUInt();
             prob_t alpha = algo_param["alpha"].asDouble(); // step(k) = (k + 2)^(-alpha), .5 < alpha <= 1
             prob_t beta = algo_param["beta"].asDouble();
             prob_t Kparam = algo_param["K"].asDouble(); // step(k) = (k + 2)^(-alpha), .5 < alpha <= 1
             ModelParameterVector new_param_vec = model.event_probabilities();
             new_param_vec.fill(1);
-//            new_param_vec.set_error_prob(.003);
+////            new_param_vec.set_error_prob(.003);
             new_param_vec.normaliseEventFamilies();
             model.updateModelParameterVector(new_param_vec);
 
             std::vector<bool> changed(new_param_vec.size(), false);
 
-            auto maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
+//            auto maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
 
-            std::vector<prob_t> prob_vec(maag_rep.size(), 0);
+//            std::vector<prob_t> prob_vec(maag_rep.size(), 0);
             prob_t prev_ll = 0;
 
-            cout << "Computing full assembling probabilities..." << endl;
-            vector<bool> good_clonotypes;
-            size_t removed, zero_prob, no_alignments;
-            this->filterOut(rep_nonc, maag_rep, prob_vec, good_clonotypes, removed, zero_prob, no_alignments);
+//            cout << "Computing full assembling probabilities..." << endl;
+//            vector<bool> good_clonotypes;
+//            size_t removed, zero_prob, no_alignments;
+//            this->filterOut(rep_nonc, maag_rep, prob_vec, good_clonotypes, removed, zero_prob, no_alignments);
 
             std::vector<size_t> indices;
-            for (size_t i = 0; i < rep_nonc.size(); ++i) {
+            for (size_t i = 0; i < maag_rep.size(); ++i) {
                 if (good_clonotypes[i]) {
                     indices.push_back(i);
                 }
@@ -194,7 +194,7 @@ namespace ymir {
                          prob_t step_k,
                          ErrorMode error_mode) const
         {
-            if (error_mode) { new_param_vec.set_error_prob(step_k * model.event_probabilities().error_prob() + (1 - step_k) * new_param_vec.error_prob()); }
+//            if (error_mode) { new_param_vec.set_error_prob(step_k * model.event_probabilities().error_prob() + (1 - step_k) * new_param_vec.error_prob()); }
 
             new_param_vec.normaliseEventFamilies();
 

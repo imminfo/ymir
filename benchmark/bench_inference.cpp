@@ -55,25 +55,25 @@ int main(int argc, char* argv[]) {
     //
     // TCR beta chain repertoire - VDJ recombination
     //
-    VDJRecombinationGenes vdj_single_genes("Vgene",
-                                    BENCH_DATA_FOLDER + "trbv.txt",
-                                    "Jgene",
-                                    BENCH_DATA_FOLDER + "trbj.txt",
-                                    "Dgene",
-                                    BENCH_DATA_FOLDER + "trbd.txt");
-
-    Cloneset cloneset_vdj;
-    YMIR_BENCHMARK("Parsing VDJ",
-                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
-                                       &cloneset_vdj,
-                                       vdj_single_genes,
-                                       NUCLEOTIDE,
-                                       VDJ_RECOMB,
-                                       AlignmentColumnOptions()
-                                               .setV(AlignmentColumnOptions::USE_PROVIDED)
-                                               .setD(AlignmentColumnOptions::OVERWRITE)
-                                               .setJ(AlignmentColumnOptions::USE_PROVIDED),
-                                       VDJAlignerParameters(3)))
+//    VDJRecombinationGenes vdj_single_genes("Vgene",
+//                                    BENCH_DATA_FOLDER + "trbv.txt",
+//                                    "Jgene",
+//                                    BENCH_DATA_FOLDER + "trbj.txt",
+//                                    "Dgene",
+//                                    BENCH_DATA_FOLDER + "trbd.txt");
+//
+//    Cloneset cloneset_vdj;
+//    YMIR_BENCHMARK("Parsing VDJ",
+//                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
+//                                       &cloneset_vdj,
+//                                       vdj_single_genes,
+//                                       NUCLEOTIDE,
+//                                       VDJ_RECOMB,
+//                                       AlignmentColumnOptions()
+//                                               .setV(AlignmentColumnOptions::USE_PROVIDED)
+//                                               .setD(AlignmentColumnOptions::OVERWRITE)
+//                                               .setJ(AlignmentColumnOptions::USE_PROVIDED),
+//                                       VDJAlignerParameters(3)))
 
     //
     // VJ MAAG
@@ -93,6 +93,7 @@ int main(int argc, char* argv[]) {
     vec_sample = {100000};
     vector<int> vec_block = {500, 1000, 2000, 5000, 10000}; //, 2000, 5000, 10000};
 //    vec_block = {2000, 5000, 10000};
+    vec_block = {std::stoi(argv[2])};
     vector<double> vec_alpha = {.5, .6, .7, .8, .9};
     vector<double> vec_beta =  {.1, .3, .7, 1, 1.5, 5};
     vector<double> vec_K =     {1, 1.5, 2, 3};
@@ -109,12 +110,33 @@ int main(int argc, char* argv[]) {
 //        RUN_EM_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 30, val_sample, error_mode)
 //    }
 
+    ModelParameterVector new_param_vec = vj_single_model.event_probabilities();
+    new_param_vec.fill(1);
+    new_param_vec.normaliseEventFamilies();
+    vj_single_model.updateModelParameterVector(new_param_vec);
+
+    auto rep_nonc = cloneset_vj.noncoding().sample(100000);
+    auto maag_rep = vj_single_model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
+    vector<prob_t> prob_vec(maag_rep.size(), 0);
+
+    vector<bool> good_clonotypes(maag_rep.size(), true);
+    for (size_t i = 0; i < maag_rep.size(); ++i) {
+        if (rep_nonc[i].is_good()) {
+            prob_vec[i] = maag_rep[i].fullProbability();
+            if (std::isnan(prob_vec[i]) || prob_vec[i] == 0) {
+                good_clonotypes[i] = false;
+            }
+        } else {
+            good_clonotypes[i] = false;
+        }
+    }
+
     for(auto val_sample: vec_sample) {
         for(auto val_block: vec_block) {
             for (auto val_alpha: vec_alpha) {
                 for (auto val_beta: vec_beta) {
                     for (auto val_K: vec_K) {
-                        RUN_SG_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 15, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
+                        RUN_SG_INFERENCE(string("vj"), maag_rep, vj_single_model, 15, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
                     }
                 }
             }

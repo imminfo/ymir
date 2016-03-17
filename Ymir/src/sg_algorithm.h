@@ -129,6 +129,9 @@ namespace ymir {
                     std::cout << rep_nonc[indices[maag_i]].toString() << std::endl;
                     std::cout << rep_nonc[indices[maag_i]].is_good() << std::endl;
                     std::cout << good_clonotypes[indices[maag_i]] << std::endl;
+                    std::cout << prob_vec[indices[maag_i]] << std::endl;
+                    std::cout << maag_rep[indices[maag_i]].has_errors() << std::endl;
+                    std::cout << maag_rep[indices[maag_i]].has_events() << std::endl;
                     this->updateTempVec(fb, maag_rep[indices[maag_i]], new_param_vec, changed, error_mode);
 //                    return vector<prob_t>();
                     cout << "end of the iteration" << endl;

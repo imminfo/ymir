@@ -2,30 +2,30 @@ cmake_minimum_required(VERSION 2.8.4)
 
 project(Ymir)
 
-#add_definitions(-DUSE_OMP)
-#
-#if (USE_OMP)
-#    if (NOT DEFINED OMP_THREADS)
-#        set(OMP_THREADS -1)
-#    endif()
-#
-#    add_definitions(-DOMP_THREADS=${OMP_THREADS})
-#
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-#endif()
-#
-#add_definitions(-DOMP_THREADS=-1)
-#
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp")
+add_definitions(-DUSE_OMP)
+
+if (USE_OMP)
+    if (NOT DEFINED OMP_THREADS)
+        set(OMP_THREADS -1)
+    endif()
+
+    add_definitions(-DOMP_THREADS=${OMP_THREADS})
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+endif()
+
+add_definitions(-DOMP_THREADS=-1)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++11 -fopenmp")
 
 # /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
 # /usr/local/Cellar/clang-omp/2015-04-01/bin/clang-omp++
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-endif()
+#if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+#endif()
 
 include_directories(include)
 include_directories(/usr/local/include/)

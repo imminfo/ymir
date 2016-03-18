@@ -55,8 +55,8 @@ namespace ymir {
                 return std::vector<prob_t>();
             }
 
-            bool prebuild = algo_param.get("prebuild", false).asBool();
-            bool recompute_all = algo_param.get("recompute.all", false).asBool();
+//            bool prebuild = algo_param.get("prebuild", false).asBool();
+//            bool recompute_all = algo_param.get("recompute.all", false).asBool();
 
             std::cout << "\t -- #iterations: " << (size_t) algo_param["niter"].asUInt() << std::endl;
             std::cout << "\t -- block size:  " << (size_t) algo_param["block.size"].asUInt() << std::endl;
@@ -64,16 +64,16 @@ namespace ymir {
             std::cout << "\t -- beta:        " << (double) algo_param["beta"].asDouble() << std::endl;
 //            std::cout << "\t -- gamma:       " << (double) algo_param["gamma"].asDouble() << std::endl;
             std::cout << "\t -- K:           " << (double) algo_param["K"].asDouble() << std::endl;
-            std::cout << "\t -- prebuild:    " << (size_t) algo_param["prebuild"].asBool() << std::endl;
-            std::cout << "\t -- recomp. logL:" << (size_t) algo_param["recompute.all"].asBool() << std::endl;
+//            std::cout << "\t -- prebuild:    " << (size_t) algo_param["prebuild"].asBool() << std::endl;
+//            std::cout << "\t -- recomp. logL:" << (size_t) algo_param["recompute.all"].asBool() << std::endl;
 
             std::vector<prob_t> logLvec;
 
 
             size_t sample = algo_param["sample"].asUInt();
-            ClonesetView rep_nonc = repertoire.noncoding();
+            ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
 
-            rep_nonc = rep_nonc.sample(algo_param.get("sample", (Json::Value::UInt64) rep_nonc.size()).asUInt64()); // TODO: CHECK IS IT OK TO ASSIGN TO ITSELF?
+//            rep_nonc = rep_nonc.sample(algo_param.get("sample", (Json::Value::UInt64) rep_nonc.size()).asUInt64()); // TODO: CHECK IS IT OK TO ASSIGN TO ITSELF?
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
 

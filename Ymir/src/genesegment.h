@@ -342,13 +342,13 @@ namespace ymir {
             std::cout << "Assigned " << std::to_string(_V->size()) << " V alleles." << std::endl;
             std::cout << "Assigned " << std::to_string(_J->size()) << " J alleles." << std::endl;
 
-            // if (other._D) {
-            //     _D.reset(new GeneSegmentAlphabet(*other._D));
-            //     std::cout << "Assigned " << std::to_string(_D->size()) << " D alleles." << std::endl;
-            // } else {
-            //     _D.release();
-            //     std::cout << "Assigned 0 D alleles." << std::endl;
-            // }
+            if (other._D) {
+                _D.reset(new GeneSegmentAlphabet(*other._D));
+                std::cout << "Assigned " << std::to_string(_D->size()) << " D alleles." << std::endl;
+            } else {
+                _D.release();
+                std::cout << "Assigned 0 D alleles." << std::endl;
+            }
        }
 
 

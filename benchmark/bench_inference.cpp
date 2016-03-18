@@ -3,7 +3,7 @@
 //
 
 // #include "benchutils.h"
-#include "genesegment.h"
+#include <Inference>
 
 int main(int argc, char* argv[]) {
 

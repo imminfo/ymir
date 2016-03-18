@@ -338,19 +338,19 @@ namespace ymir {
 
 
        VDJRecombinationGenes& operator=(const VDJRecombinationGenes &other) {
-            _V.reset(new GeneSegmentAlphabet(other.V()));
-            _J.reset(new GeneSegmentAlphabet(other.J()));
+            // _V.reset(new GeneSegmentAlphabet(other.V()));
+            // _J.reset(new GeneSegmentAlphabet(other.J()));
 
-            std::cout << "Assigned " << std::to_string(_V->size()) << " V alleles." << std::endl;
-            std::cout << "Assigned " << std::to_string(_J->size()) << " J alleles." << std::endl;
+            // std::cout << "Assigned " << std::to_string(_V->size()) << " V alleles." << std::endl;
+            // std::cout << "Assigned " << std::to_string(_J->size()) << " J alleles." << std::endl;
 
-            if (other._D) {
-                _D.reset(new GeneSegmentAlphabet(other.D()));
-                std::cout << "Assigned " << std::to_string(_D->size()) << " D alleles." << std::endl;
-            } else {
-                _D.release();
-                std::cout << "Assigned 0 D alleles." << std::endl;
-            }
+            // if (other._D) {
+            //     _D.reset(new GeneSegmentAlphabet(other.D()));
+            //     std::cout << "Assigned " << std::to_string(_D->size()) << " D alleles." << std::endl;
+            // } else {
+            //     _D.release();
+            //     std::cout << "Assigned 0 D alleles." << std::endl;
+            // }
        }
 
 

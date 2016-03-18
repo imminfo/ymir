@@ -73,7 +73,7 @@ namespace ymir {
             size_t sample = algo_param["sample"].asUInt();
             ClonesetView rep_nonc = repertoire.noncoding();
 
-            rep_nonc = rep_nonc.sample(algo_param.get("sample", (uint64_t) rep_nonc.size()).asUInt64()); // TODO: CHECK IS IT OK TO ASSIGN TO ITSELF?
+            rep_nonc = rep_nonc.sample(algo_param.get("sample", (Json::Value::UInt64) rep_nonc.size()).asUInt64()); // TODO: CHECK IS IT OK TO ASSIGN TO ITSELF?
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
 

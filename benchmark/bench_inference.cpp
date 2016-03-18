@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 
     std::vector<prob_t> logLvec;
 
-    // std::string temp_str;
+    std::string temp_str;
 
     // time_t vj_single_parse, vdj_single_parse,
     //         vj_single_prob, vj_single_meta,

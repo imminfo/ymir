@@ -336,6 +336,12 @@ namespace ymir {
             }
        }
 
+       ~VDJRecombinationGenes() {
+            std::cout << _V.get() << std::endl;
+            std::cout << _D.get() << std::endl;
+            std::cout << _J.get() << std::endl;
+       }
+
 
        VDJRecombinationGenes& operator=(const VDJRecombinationGenes &other) {
             // _V.reset(new GeneSegmentAlphabet(other.V()));

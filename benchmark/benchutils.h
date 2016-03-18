@@ -16,7 +16,7 @@ using namespace ymir;
 using namespace std;
 
 
-#define YMIR_BENCHMARK(descr, expr) { tp1 = std::chrono::system_clock::now(); expr; tp2 = std::chrono::system_clock::now(); timepoints.emplace_back(descr, std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1)); }
+#define YMIR_BENCHMARK(descr, expr) { tp1 = std::chrono::system_clock::now(); expr; tp2 = std::chrono::system_clock::now(); timepoints.push_back(std::pair<std::string, size_t>(descr, std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))); }
 
 
 #define RUN_EM_INFERENCE(descr, cloneset, model, niter, sample, error_mode) { YMIR_BENCHMARK(descr, \

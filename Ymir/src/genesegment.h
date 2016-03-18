@@ -304,40 +304,28 @@ namespace ymir {
         }
 
 
-//        VDJRecombinationGenes(const VDJRecombinationGenes &other)
-//            : _V(new GeneSegmentAlphabet(*other._V)),
-//              _J(new GeneSegmentAlphabet(*other._J))
-//        {
-//
-//            delete _D;
-//            if (other._D) {
-//                _D = new GeneSegmentAlphabet(*other._D);
-////                _D->reset(new GeneSegmentAlphabet(*other._D));
-//            } else {
-//                _D = nullptr;
-////                _D->release();
-//            }
-//        }
+       VDJRecombinationGenes(const VDJRecombinationGenes &other)
+           : _V(new GeneSegmentAlphabet(*other._V)),
+             _J(new GeneSegmentAlphabet(*other._J))
+       {
+            _D->release();
+            if (other._D) {
+                _D->reset(new GeneSegmentAlphabet(*other._D));
+            }
+       }
 
 
-//        VDJRecombinationGenes& operator=(const VDJRecombinationGenes &other) {
-//            _V->reset(new GeneSegmentAlphabet(other.V()));
-//            _J->reset(new GeneSegmentAlphabet(other.J()));
-//            delete _V;
-//            delete _J;
-//            delete _D;
-//
-//            _V = new GeneSegmentAlphabet(other.V());
-//            _J = new GeneSegmentAlphabet(other.J());
-//
-//            if (other._D) {
-//                _D = new GeneSegmentAlphabet(*other._D);
-////                _D->reset(new GeneSegmentAlphabet(other.D()));
-//            } else {
-////                _D->release();
-//                _D = nullptr;
-//            }
-//        }
+       VDJRecombinationGenes& operator=(const VDJRecombinationGenes &other) {
+            _V->reset(new GeneSegmentAlphabet(other.V()));
+            _J->reset(new GeneSegmentAlphabet(other.J()));
+
+            if (*this != other) {
+                _D->release();
+                if (other._D) {
+                    _D->reset(new GeneSegmentAlphabet(*other._D));
+                }
+            }
+       }
 
 
         ~VDJRecombinationGenes()

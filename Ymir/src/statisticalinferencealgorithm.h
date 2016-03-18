@@ -61,7 +61,7 @@ namespace ymir {
             }
 
 
-            void setIfNot(const string& param_name, const Json::Value& value) const {
+            void setIfNot(const string& param_name, const Json::Value& value) {
                 if (_json.get(param_name, "__NA__").asString() == "__NA__") {
                     _json[param_name] = value;
                 }

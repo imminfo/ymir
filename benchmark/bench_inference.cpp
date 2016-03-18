@@ -47,9 +47,9 @@ int main(int argc, char* argv[]) {
                                           "/home/vadim/ymir/benchmark/data/traj.txt");
 
 
-    VDJRecombinationGenes vj_single_genes2(vj_single_genes);
-    // VDJRecombinationGenes vj_single_genes3 = vj_single_genes;
-    // vj_single_genes2 = vj_single_genes;
+    // VDJRecombinationGenes vj_single_genes2(vj_single_genes);
+    VDJRecombinationGenes vj_single_genes3;
+    vj_single_genes3 = vj_single_genes;
 
 
 //     string input_alpha_file = "alpha.250k.txt";

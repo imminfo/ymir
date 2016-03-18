@@ -61,8 +61,8 @@ namespace ymir {
         };
 
 
-        GeneSegmentAlphabet() {
-            this->addGeneSegment("other", "", 0);
+        GeneSegmentAlphabet() 
+        {
         }
 
 
@@ -70,8 +70,8 @@ namespace ymir {
          *
          */
         GeneSegmentAlphabet(GeneSegments gene_segment, const std::string& name, const std::string& filepath, bool *is_ok = nullptr)
-                : _name(name) {
-            this->addGeneSegment("other", "", 0);
+                : _name(name) 
+        {
             bool res = this->read(filepath);
             if (is_ok) {
                 *is_ok = res;
@@ -85,7 +85,6 @@ namespace ymir {
 
             this->_vec.reserve(alleles.size());
 
-            this->addGeneSegment("other", "", 0);
             for (size_t i = 0; i < alleles.size(); i++) {
                 this->addGeneSegment(alleles[i], sequences[i], i + 1);
             }
@@ -101,13 +100,19 @@ namespace ymir {
 
 
         const GeneSegment& operator[] (seg_index_t index) const {
-            if (index < _vec.size()) { return _vec[index]; }
-            return _vec[0];
+#ifndef DNDEBUG
+            check_and_throw(index == 0 || index > _vec.size(), 
+                            "Gene segment alphabet [" + _name + "] error:\tindex " + std::to_string(index) + "is out of bounds");
+#endif
+            return _vec[index - 1];
         }
 
         const GeneSegment& operator[] (const std::string& name) const {
-            if (_map.find(name) != _map.end()) { return _vec[_map.at(name)]; }
-            return _vec[0];
+#ifndef DNDEBUG
+            check_and_throw(_map.find(name) == _map.end(), 
+                            "Gene segment alphabet [" + _name + "] error:\tcan't find allele " + name);
+#endif
+            return _vec[_map.at(name)];
         }
 
 
@@ -150,14 +155,19 @@ namespace ymir {
         * \brief Save segment alphabet to the given file as a tab-separated table with 3 columns.
         */
         bool write(const std::string& filepath) const {
+            if (filepath.empty()) {
+                std::cout << "Gene segment alphabet [" << this->_name << "] error:" << std::endl << "\tinput file name is an empty string" << std::endl;
+                return false;
+            }
+
             std::ofstream ofs;
             ofs.open(filepath);
 
             if (ofs.is_open()) {
                 ofs << this->_name << '\t' << "Sequences" << std::endl;
-                for (seg_index_t i = 1; i < this->_vec.size(); ++i) {
-                    ofs << this->_vec[i].allele << '\t' << this->_vec[i].orig_sequence;
-                    if (i != this->_vec.size() - 1) {
+                for (seg_index_t i = 0; i < this->_vec.size(); ++i) {
+                    ofs << _vec[i].allele << '\t' << _vec[i].orig_sequence;
+                    if (i != _vec.size() - 1) {
                         ofs << std::endl;
                     }
                 }
@@ -171,6 +181,11 @@ namespace ymir {
 
 
         bool read(const std::string& filepath) {
+            if (filepath.empty()) {
+                std::cout << "Gene segment alphabet [" << this->_name << "] error:" << std::endl << "\tinput file name is an empty string" << std::endl;
+                return false;
+            }
+                
             std::ifstream ifs;
             ifs.open(filepath);
 
@@ -198,7 +213,7 @@ namespace ymir {
                     }
                 }
             } else {
-                std::cerr << "Gene segment alphabet [" << this->_name << "] error:" << std::endl << "\tinput file [" << filepath << "] not found" << std::endl;
+                std::cout << "Gene segment alphabet [" << this->_name << "] error:" << std::endl << "\tinput file [" << filepath << "] not found" << std::endl;
                 return false;
             }
 
@@ -227,8 +242,12 @@ namespace ymir {
 
 
         void addGeneSegment(const std::string& name, const std::string& seq, seg_index_t index) {
-            this->_map[name] = index;
-            this->_vec.push_back(GeneSegment(name, seq, index));
+            if (name.empty() || seq.empty()) {
+                std::cout << "Gene segment alphabet [" << this->_name << "] warning:" << std::endl << "\tempty string for name or sequence. Skipping." << std::endl;
+            } else {
+                this->_map[name] = index - 1;
+                this->_vec.push_back(GeneSegment(name, seq, index));
+            }
         }
 
     };
@@ -293,17 +312,17 @@ namespace ymir {
 //            delete _D;
 //            if (other._D) {
 //                _D = new GeneSegmentAlphabet(*other._D);
-////                _D.reset(new GeneSegmentAlphabet(*other._D));
+////                _D->reset(new GeneSegmentAlphabet(*other._D));
 //            } else {
 //                _D = nullptr;
-////                _D.release();
+////                _D->release();
 //            }
 //        }
 
 
 //        VDJRecombinationGenes& operator=(const VDJRecombinationGenes &other) {
-//            _V.reset(new GeneSegmentAlphabet(other.V()));
-//            _J.reset(new GeneSegmentAlphabet(other.J()));
+//            _V->reset(new GeneSegmentAlphabet(other.V()));
+//            _J->reset(new GeneSegmentAlphabet(other.J()));
 //            delete _V;
 //            delete _J;
 //            delete _D;
@@ -313,9 +332,9 @@ namespace ymir {
 //
 //            if (other._D) {
 //                _D = new GeneSegmentAlphabet(*other._D);
-////                _D.reset(new GeneSegmentAlphabet(other.D()));
+////                _D->reset(new GeneSegmentAlphabet(other.D()));
 //            } else {
-////                _D.release();
+////                _D->release();
 //                _D = nullptr;
 //            }
 //        }
@@ -329,18 +348,18 @@ namespace ymir {
         }
 
 
-        bool is_vdj() const { return this->_D.size() != 1; }
+        bool is_vdj() const { return this->_D->size() != 1; }
 
 
         /**
          *
          */
         ///@{
-        const GeneSegmentAlphabet& V() const { return this->_V; }
+        const GeneSegmentAlphabet& V() const { return *_V; }
 
-        const GeneSegmentAlphabet& J() const { return this->_J; }
+        const GeneSegmentAlphabet& J() const { return *_J; }
 
-        const GeneSegmentAlphabet& D() const { return this->_D; }
+        const GeneSegmentAlphabet& D() const { return *_D; }
         ///@}
 
 
@@ -349,25 +368,25 @@ namespace ymir {
         */
         void appendPalindromicNucleotides(GeneSegments gene, seq_len_t from_5_end = 4, seq_len_t from_3_end = 4) {
             if (gene == VARIABLE) {
-                this->_V.appendPalindromicNucleotides(from_5_end, from_3_end);
+                this->_V->appendPalindromicNucleotides(from_5_end, from_3_end);
             } else if (gene == JOINING) {
-                this->_J.appendPalindromicNucleotides(from_5_end, from_3_end);
+                this->_J->appendPalindromicNucleotides(from_5_end, from_3_end);
             } else if (gene == DIVERSITY) {
-                this->_D.appendPalindromicNucleotides(from_5_end, from_3_end);
+                this->_D->appendPalindromicNucleotides(from_5_end, from_3_end);
             }
         }
 
 
         bool write(const std::string& v_segments_file = "vsegments.txt",
-                const std::string& j_segments_file = "jsegments.txt",
-                const std::string& d_segments_file = "dsegments.txt") const
+                   const std::string& j_segments_file = "jsegments.txt",
+                   const std::string& d_segments_file = "dsegments.txt") const
         {
-            if (this->_V.write(v_segments_file)) {
-                if (this->_J.write(j_segments_file)) {
+            if (this->_V->write(v_segments_file)) {
+                if (this->_J->write(j_segments_file)) {
                     if (!this->is_vdj()) {
                         return true;
                     } else {
-                        return this->_D.write(d_segments_file);
+                        return this->_D->write(d_segments_file);
                     }
                 }
             }
@@ -376,8 +395,7 @@ namespace ymir {
 
     protected:
 
-//        GSA_ptr _V, _J, _D;
-        GeneSegmentAlphabet _V, _J, _D;
+       GSA_ptr _V, _J, _D;
 
     };
 }

@@ -362,11 +362,26 @@ namespace ymir {
          *
          */
         ///@{
-        const GeneSegmentAlphabet& V() const { return *_V; }
+        const GeneSegmentAlphabet& V() const { 
+#ifndef DNDEBUG
+            check_and_throw((bool) _V, "V pointer is null");
+#endif
+            return *_V;
+        }
 
-        const GeneSegmentAlphabet& J() const { return *_J; }
+        const GeneSegmentAlphabet& J() const { 
+#ifndef DNDEBUG
+            check_and_throw((bool) _J, "J pointer is null");
+#endif
+            return *_J;
+        }
 
-        const GeneSegmentAlphabet& D() const { return *_D; }
+        const GeneSegmentAlphabet& D() const { 
+#ifndef DNDEBUG
+            check_and_throw((bool) _D, "D pointer is null");
+#endif
+            return *_D;
+        }
         ///@}
 
 

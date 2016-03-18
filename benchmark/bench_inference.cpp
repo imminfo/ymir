@@ -17,24 +17,21 @@ int main(int argc, char* argv[]) {
 
     std::vector<prob_t> logLvec;
 
-    std::string temp_str;
+    // std::string temp_str;
 
-    time_t vj_single_parse, vdj_single_parse,
-            vj_single_prob, vj_single_meta,
-            vj_single_infer, vdj_single_prob,
-            vdj_single_meta, vdj_single_infer;
+    // time_t vj_single_parse, vdj_single_parse,
+    //         vj_single_prob, vj_single_meta,
+    //         vj_single_infer, vdj_single_prob,
+    //         vdj_single_meta, vdj_single_infer;
 
-    time_t vj_good_parse, vdj_good_parse,
-            vj_good_prob, vj_good_meta,
-            vj_good_infer, vdj_good_prob,
-            vdj_good_meta, vdj_good_infer;
+    // time_t vj_good_parse, vdj_good_parse,
+    //         vj_good_prob, vj_good_meta,
+    //         vj_good_infer, vdj_good_prob,
+    //         vdj_good_meta, vdj_good_infer;
 
     std::string BENCH_DATA_FOLDER = argv[1];
 
     std::cout << "Data folder:\t[" << BENCH_DATA_FOLDER << "]" << endl;
-
-    string input_alpha_file = "alpha.250k.txt";
-    string input_beta_file = "beta.250k.txt";
 
 
     //
@@ -50,9 +47,12 @@ int main(int argc, char* argv[]) {
     vj_single_genes2 = vj_single_genes;
 
 
+    string input_alpha_file = "alpha.250k.txt";
+    string input_beta_file = "beta.250k.txt";
+
     CDR3NucParser parser;
     Cloneset cloneset_vj;
-    
+
     YMIR_BENCHMARK("Parsing VJ",
                    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file,
                                        &cloneset_vj,

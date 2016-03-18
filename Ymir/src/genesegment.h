@@ -320,14 +320,14 @@ namespace ymir {
 
 
        VDJRecombinationGenes(const VDJRecombinationGenes &other)
-           : _V(new GeneSegmentAlphabet(*other._V)),
-             _J(new GeneSegmentAlphabet(*other._J))
+           : _V(new GeneSegmentAlphabet(other.V())),
+             _J(new GeneSegmentAlphabet(other.J()))
        {
             std::cout << "Copied " << std::to_string(_V->size()) << " V alleles." << std::endl;
             std::cout << "Copied " << std::to_string(_J->size()) << " J alleles." << std::endl;
 
             if (other._D) {
-                _D.reset(new GeneSegmentAlphabet(*other._D));
+                _D.reset(new GeneSegmentAlphabet(other.D()));
                 std::cout << "Copied " << std::to_string(_D->size()) << " D alleles." << std::endl;
             } else {
                 std::cout << "Copied 0 D alleles." << std::endl;

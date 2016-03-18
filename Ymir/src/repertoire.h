@@ -55,7 +55,6 @@ namespace ymir {
         ClonesetView()
             : _source(new ClonotypeVector())
         {
-            _shifts.resize(0);
         }
 
 
@@ -64,15 +63,6 @@ namespace ymir {
             : _source(pvec), _shifts(shifts) 
         {
         }
-
-
-        ClonesetView(const ClonesetView& other) 
-            : _source(other._source), _shifts(other._shifts)
-        {
-        }
-
-
-        virtual ~ClonesetView() { }
 
 
         ///@{
@@ -183,8 +173,8 @@ namespace ymir {
     public:
 
 
-        Cloneset() : ClonesetView() {
-            _shifts.resize(0);  // TODO: error here? how do we access elements then?
+        Cloneset() : ClonesetView()
+        {
         }
 
 
@@ -192,9 +182,6 @@ namespace ymir {
         Cloneset(ClonotypeVector& vec) {
             this->swap(vec);
         }
-
-
-        virtual ~Cloneset() { }
 
 
         void swap(ClonotypeVector& vec) {

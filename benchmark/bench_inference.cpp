@@ -33,9 +33,9 @@ int main(int argc, char* argv[]) {
     //         vj_good_infer, vdj_good_prob,
     //         vdj_good_meta, vdj_good_infer;
 
-    // std::string BENCH_DATA_FOLDER = argv[1];
+    std::string BENCH_DATA_FOLDER = argv[1];
 
-    // std::cout << "Data folder:\t[" << BENCH_DATA_FOLDER << "]" << endl;
+    std::cout << "Data folder:\t[" << BENCH_DATA_FOLDER << "]" << endl;
 
 
     //

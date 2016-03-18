@@ -333,7 +333,7 @@ namespace ymir {
                 _D.reset(new GeneSegmentAlphabet(other.D()));
                 std::cout << "Copied " << std::to_string(_D->size()) << " D alleles." << std::endl;
             } else {
-                std::cout << "Copied 0 D alleles." << std::endl;
+                std::cout << "No D supplied." << std::endl;
             }
        }
 

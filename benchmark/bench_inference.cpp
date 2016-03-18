@@ -33,18 +33,18 @@ int main(int argc, char* argv[]) {
     //         vj_good_infer, vdj_good_prob,
     //         vdj_good_meta, vdj_good_infer;
 
-    std::string BENCH_DATA_FOLDER = argv[1];
+    // std::string BENCH_DATA_FOLDER = argv[1];
 
-    std::cout << "Data folder:\t[" << BENCH_DATA_FOLDER << "]" << endl;
+    // std::cout << "Data folder:\t[" << BENCH_DATA_FOLDER << "]" << endl;
 
 
     //
     // TCR alpha chain repertoire - VJ recombination
     //
     VDJRecombinationGenes vj_single_genes("Vgene",
-                                          BENCH_DATA_FOLDER + "trav.txt",
+                                          "/home/vadim/ymir/benchmark/data/trav.txt",
                                           "Jgene",
-                                          BENCH_DATA_FOLDER + "traj.txt");
+                                          "/home/vadim/ymir/benchmark/data/traj.txt");
 
 
     VDJRecombinationGenes vj_single_genes2(vj_single_genes);

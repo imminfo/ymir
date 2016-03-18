@@ -337,6 +337,7 @@ namespace ymir {
        }
 
        ~VDJRecombinationGenes() {
+        std::cout << "he he" << std::endl;
             std::cout << _V.get() << std::endl;
             std::cout << _D.get() << std::endl;
             std::cout << _J.get() << std::endl;

@@ -33,8 +33,6 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Data folder:\t[" << BENCH_DATA_FOLDER << "]" << endl;
 
-    CDR3NucParser parser;
-
     string input_alpha_file = "alpha.250k.txt";
     string input_beta_file = "beta.250k.txt";
 
@@ -49,12 +47,12 @@ int main(int argc, char* argv[]) {
 
 
     VDJRecombinationGenes vj_single_genes2;
-    // VDJRecombinationGenes vj_single_genes3(vj_single_genes);
     vj_single_genes2 = vj_single_genes;
-    // vj_single_genes3 = vj_single_genes;
 
-//
+
+    CDR3NucParser parser;
     Cloneset cloneset_vj;
+    
     YMIR_BENCHMARK("Parsing VJ",
                    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file,
                                        &cloneset_vj,

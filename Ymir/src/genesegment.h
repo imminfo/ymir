@@ -119,7 +119,7 @@ namespace ymir {
         seg_index_t size() const { return this->_vec.size(); }
 
 
-        seg_index_t max() const { return this->_vec.size() - 1; }
+        seg_index_t max() const { return this->_vec.size(); }
 
 
         /**
@@ -131,10 +131,7 @@ namespace ymir {
         */
         void appendPalindromicNucleotides(seq_len_t from_5_end, seq_len_t from_3_end) {
             std::string seq_5_end = "", seq_3_end = "";
-            for (auto i = 1; i < _vec.size(); ++i) {
-
-                // checks for _vec sequences' length ?
-
+            for (auto i = 0; i < _vec.size(); ++i) {
                 seq_5_end = "";
                 for (auto left_i = 0; left_i < from_5_end; ++ left_i) {
                     seq_5_end = complement(_vec[i].orig_sequence[left_i]) + seq_5_end;

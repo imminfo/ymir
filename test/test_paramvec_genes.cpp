@@ -365,8 +365,7 @@ YMIR_TEST_START(test_genesegmentalphabet)
     GeneSegmentAlphabet gsa(VARIABLE, "testseg", alvec1, seqvec1);
 
     YMIR_ASSERT(gsa.name() == "testseg")
-    YMIR_ASSERT(gsa.size() == 4)
-    YMIR_ASSERT(gsa[0].sequence.size() == gsa["other"].sequence.size())
+    YMIR_ASSERT(gsa.size() == 3)
     YMIR_ASSERT(gsa[1].sequence == "ACT")
     YMIR_ASSERT(gsa[3].sequence == gsa["Vseg3"].sequence)
 
@@ -408,12 +407,8 @@ YMIR_TEST_START(test_vdjgenes2)
     VDJRecombinationGenes vdjgens("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
     YMIR_ASSERT(!vdjgens.is_vdj())
-    YMIR_ASSERT(vdjgens.V().size() == 4)
-    YMIR_ASSERT(vdjgens.J().size() == 4)
-    YMIR_ASSERT2(vdjgens.V()["RANDOM"].index, 0)
-    YMIR_ASSERT2(vdjgens.V()[100].index, 0)
-    YMIR_ASSERT2(vdjgens.J()["RANDOM2"].index, 0)
-    YMIR_ASSERT2(vdjgens.J()[100].index, 0)
+    YMIR_ASSERT(vdjgens.V().size() == 3)
+    YMIR_ASSERT(vdjgens.J().size() == 3)
     YMIR_ASSERT(vdjgens.V()["Vseg1"].sequence == vdjgens.V()[1].sequence)
     YMIR_ASSERT(vdjgens.J()["Jseg2"].sequence == vdjgens.J()[2].sequence)
 YMIR_TEST_END
@@ -446,9 +441,9 @@ YMIR_TEST_START(test_vdjgenes3)
     VDJRecombinationGenes vdjgens("VA", alvec1, seqvec1, "JA", alvec2, seqvec2, "DA", alvec3, seqvec3);
 
     YMIR_ASSERT(vdjgens.is_vdj())
-    YMIR_ASSERT(vdjgens.V().size() == 3)
-    YMIR_ASSERT(vdjgens.J().size() == 3)
-    YMIR_ASSERT(vdjgens.D().size() == 4)
+    YMIR_ASSERT(vdjgens.V().size() == 2)
+    YMIR_ASSERT(vdjgens.J().size() == 2)
+    YMIR_ASSERT(vdjgens.D().size() == 3)
     YMIR_ASSERT(vdjgens.V()["Vseg1"].sequence == vdjgens.V()[1].sequence)
     YMIR_ASSERT(vdjgens.J()["Jseg2"].sequence == vdjgens.J()[2].sequence)
     YMIR_ASSERT(vdjgens.D()["Dseg3"].sequence == "AAAC")
@@ -464,8 +459,7 @@ YMIR_TEST_START(test_genesegmentalphabet_read)
     YMIR_ASSERT(ok)
 
     YMIR_ASSERT(gsa.name() == "testseg")
-    YMIR_ASSERT(gsa.size() == 4)
-    YMIR_ASSERT(gsa[0].sequence.size() == gsa["other"].sequence.size())
+    YMIR_ASSERT(gsa.size() == 3)
     YMIR_ASSERT(gsa[1].sequence == "ACT")
     YMIR_ASSERT(gsa[3].sequence == gsa["Vseg3"].sequence)
 
@@ -476,8 +470,7 @@ YMIR_TEST_START(test_genesegmentalphabet_read)
     GeneSegmentAlphabet gsa1(VARIABLE, "testseg", TEST_DATA_FOLDER + "vgene_towrite.txt");
 
     YMIR_ASSERT(gsa1.name() == "testseg")
-    YMIR_ASSERT(gsa1.size() == 4)
-    YMIR_ASSERT(gsa1[0].sequence.size() == gsa1["other"].sequence.size())
+    YMIR_ASSERT(gsa1.size() == 3)
     YMIR_ASSERT(gsa1[1].sequence == "ACT")
     YMIR_ASSERT(gsa1[3].sequence == gsa1["Vseg3"].sequence)
 YMIR_TEST_END
@@ -490,9 +483,9 @@ YMIR_TEST_START(test_vdjgenes_read)
 
     // assert read
     YMIR_ASSERT(vdjgens.is_vdj())
-    YMIR_ASSERT(vdjgens.V().size() == 4)
-    YMIR_ASSERT(vdjgens.J().size() == 3)
-    YMIR_ASSERT(vdjgens.D().size() == 4)
+    YMIR_ASSERT(vdjgens.V().size() == 3)
+    YMIR_ASSERT(vdjgens.J().size() == 2)
+    YMIR_ASSERT(vdjgens.D().size() == 3)
     YMIR_ASSERT(vdjgens.V()["Vseg1"].sequence == vdjgens.V()[1].sequence)
     YMIR_ASSERT(vdjgens.J()["Jseg2"].sequence == vdjgens.J()[2].sequence)
     YMIR_ASSERT(vdjgens.D()["Dseg3"].sequence == "AAAC")
@@ -507,9 +500,9 @@ YMIR_TEST_START(test_vdjgenes_read)
             , "Dgene", TEST_DATA_FOLDER + "dgene_towrite.txt");
 
     YMIR_ASSERT(vdjgens1.is_vdj())
-    YMIR_ASSERT(vdjgens1.V().size() == 4)
-    YMIR_ASSERT(vdjgens1.J().size() == 3)
-    YMIR_ASSERT(vdjgens1.D().size() == 4)
+    YMIR_ASSERT(vdjgens1.V().size() == 3)
+    YMIR_ASSERT(vdjgens1.J().size() == 2)
+    YMIR_ASSERT(vdjgens1.D().size() == 3)
     YMIR_ASSERT(vdjgens1.V()["Vseg1"].sequence == vdjgens1.V()[1].sequence)
     YMIR_ASSERT(vdjgens1.J()["Jseg2"].sequence == vdjgens1.J()[2].sequence)
     YMIR_ASSERT(vdjgens1.D()["Dseg3"].sequence == "AAAC")

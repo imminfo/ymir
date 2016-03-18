@@ -354,11 +354,6 @@ namespace ymir {
        }
 
 
-        ~VDJRecombinationGenes()
-        {
-        }
-
-
         bool is_vdj() const { return (bool) _D; }
 
 

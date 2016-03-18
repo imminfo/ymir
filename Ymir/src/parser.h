@@ -209,12 +209,16 @@ namespace ymir {
             if (_stream.good()) {
                 std::cout << "Open [" << filepath << "] for reading" << endl;
                 _genes = gene_segments;
+                std::cout << "-- gene segments assigned to the parser" << endl;
                 _seq_type = seq_type;
                 _recomb = recomb;
                 _opts = opts;
+                std::cout << "-- options assigned" << endl;
                 _status = true;
                 _aligner.set_genes(_genes);
+                std::cout << "-- gene segments assigned to the aligner" << endl;
                 _aligner.set_parameters(params);
+                std::cout << "-- parameters assigned to the aligner" << endl;
                 return true;
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;

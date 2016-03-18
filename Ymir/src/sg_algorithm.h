@@ -31,7 +31,7 @@ namespace ymir {
                                                                  .set("beta", 1.)
                                                                  .set("K", 2.)
                                                                  .set("prebuild", false)
-                                                                 .set("recompute.all", true)
+                                                                 .set("recompute.all", false)
                                                                  .set("sample", 50000),
                                                          ErrorMode error_mode = NO_ERRORS) const
         {
@@ -46,9 +46,17 @@ namespace ymir {
             std::cout << std::endl;
 
 
-            if (!algo_param.check("niter") && !algo_param.check("block.size") && !algo_param.check("alpha") && !algo_param.check("sample")) {
+            if (!algo_param.check("niter") 
+                && !algo_param.check("block.size") 
+                && !algo_param.check("alpha") 
+                && !algo_param.check("beta") 
+                && !algo_param.check("K"))
+            {
                 return std::vector<prob_t>();
             }
+
+            algo_param.setIfNot("prebuild", false);
+            algo_param.setIfNot("recompute.all", false);
 
             std::cout << "\t -- #iterations: " << (size_t) algo_param["niter"].asUInt() << std::endl;
             std::cout << "\t -- block size:  " << (size_t) algo_param["block.size"].asUInt() << std::endl;
@@ -57,11 +65,17 @@ namespace ymir {
 //            std::cout << "\t -- gamma:       " << (double) algo_param["gamma"].asDouble() << std::endl;
             std::cout << "\t -- K:           " << (double) algo_param["K"].asDouble() << std::endl;
             std::cout << "\t -- prebuild:    " << (size_t) algo_param["prebuild"].asBool() << std::endl;
+            std::cout << "\t -- recomp. logL:" << (size_t) algo_param["recompute.all"].asBool() << std::endl;
 
             std::vector<prob_t> logLvec;
+            
 
             size_t sample = algo_param["sample"].asUInt();
-            ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
+            ClonesetView rep_nonc = repertoire.noncoding();
+
+            algo_param.setIfNot("sample", rep_nonc.size());
+
+            rep_nonc = rep_nonc.sample(sample); // TODO: CHECK IS IT OK TO ASSIGN TO ITSELF?
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
 

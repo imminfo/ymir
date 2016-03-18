@@ -46,6 +46,13 @@ int main(int argc, char* argv[]) {
                                           BENCH_DATA_FOLDER + "trav.txt",
                                           "Jgene",
                                           BENCH_DATA_FOLDER + "traj.txt");
+
+
+    VDJRecombinationGenes vj_single_genes2 = vj_single_genes;
+    VDJRecombinationGenes vj_single_genes3(vj_single_genes);
+    vj_single_genes2 = vj_single_genes3;
+    vj_single_genes3 = vj_single_genes;
+
 //
     Cloneset cloneset_vj;
     YMIR_BENCHMARK("Parsing VJ",

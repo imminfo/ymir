@@ -69,8 +69,11 @@ namespace ymir {
         /**
          *
          */
-        GeneSegmentAlphabet(GeneSegments gene_segment, const std::string& name, const std::string& filepath, bool *is_ok = nullptr)
-                : _name(name) 
+        GeneSegmentAlphabet(GeneSegments gene_segment, 
+                            const std::string& name, 
+                            const std::string& filepath, 
+                            bool *is_ok = nullptr)
+            : _name(name) 
         {
             bool res = this->read(filepath);
             if (is_ok) {
@@ -80,20 +83,25 @@ namespace ymir {
         }
 
 
-        GeneSegmentAlphabet(GeneSegments gene_segment, const std::string& name, const std::vector<std::string>& alleles, const std::vector<std::string>& sequences) {
+        GeneSegmentAlphabet(GeneSegments gene_segment, 
+                            const std::string& name,       
+                            const std::vector<std::string>& alleles, 
+                            const std::vector<std::string>& sequences) {
             this->_name = name;
 
-            this->_vec.reserve(alleles.size());
+            if (alleles.size() != sequences.size()) {
+                std::cout << "Gene segment alphabet [" << this->_name << "] warning:" << std::endl << "\talleles and sequences vectors have different sizes" << std::endl;
+            }
 
-            for (size_t i = 0; i < alleles.size(); i++) {
+            size_t min_size = std::min(alleles.size(), sequences.size());
+            this->_vec.reserve(min_size);
+
+            for (size_t i = 0; i < min_size; i++) {
                 this->addGeneSegment(alleles[i], sequences[i], i + 1);
             }
 
             _gene_segment = gene_segment;
         }
-
-
-        ~GeneSegmentAlphabet() {}
 
 
         const std::string& name() const { return this->_name; }
@@ -269,6 +277,8 @@ namespace ymir {
             : _V(new GeneSegmentAlphabet(VARIABLE, v_segments_name, v_segments_file, is_V_ok)),
               _J(new GeneSegmentAlphabet(JOINING, j_segments_name, j_segments_file, is_J_ok))
         {
+            std::cout << "Loaded " << std::to_string(_V->size()) << " V alleles." << std::endl;
+            std::cout << "Loaded " << std::to_string(_J->size()) << " J alleles." << std::endl;
         }
 
 
@@ -280,6 +290,9 @@ namespace ymir {
               _J(new GeneSegmentAlphabet(JOINING, j_segments_name, j_segments_file, is_J_ok)),
               _D(new GeneSegmentAlphabet(DIVERSITY, d_segments_name, d_segments_file, is_D_ok))
         {
+            std::cout << "Loaded " << std::to_string(_V->size()) << " V alleles." << std::endl;
+            std::cout << "Loaded " << std::to_string(_D->size()) << " D alleles." << std::endl;
+            std::cout << "Loaded " << std::to_string(_J->size()) << " J alleles." << std::endl;
         }
 
 
@@ -288,6 +301,8 @@ namespace ymir {
             : _V(new GeneSegmentAlphabet(VARIABLE, V_name, V_alleles, V_sequences)),
               _J(new GeneSegmentAlphabet(JOINING, J_name, J_alleles, J_sequences))
         {
+            std::cout << "Loaded " << std::to_string(_V->size()) << " V alleles." << std::endl;
+            std::cout << "Loaded " << std::to_string(_J->size()) << " J alleles." << std::endl;
         }
 
 
@@ -298,6 +313,9 @@ namespace ymir {
               _J(new GeneSegmentAlphabet(JOINING, J_name, J_alleles, J_sequences)),
               _D(new GeneSegmentAlphabet(DIVERSITY, D_name, D_alleles, D_sequences))
         {
+            std::cout << "Loaded " << std::to_string(_V->size()) << " V alleles." << std::endl;
+            std::cout << "Loaded " << std::to_string(_D->size()) << " D alleles." << std::endl;
+            std::cout << "Loaded " << std::to_string(_J->size()) << " J alleles." << std::endl;
         }
 
 

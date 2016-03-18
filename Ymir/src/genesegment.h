@@ -195,6 +195,7 @@ namespace ymir {
             ifs.open(filepath);
 
             if (ifs.is_open()) {
+                std::cout << "Gene segment alphabet [" << this->_name << "] reading input file [" << filepath << "]" << std::endl;
                 std::stringstream line_stream;
                 std::string line, gene_name, gene_seq;
                 bool header = false;
@@ -334,13 +335,6 @@ namespace ymir {
             } else {
                 std::cout << "Copied 0 D alleles." << std::endl;
             }
-       }
-
-       ~VDJRecombinationGenes() {
-        std::cout << "he he" << std::endl;
-            std::cout << _V.get() << std::endl;
-            std::cout << _D.get() << std::endl;
-            std::cout << _J.get() << std::endl;
        }
 
 

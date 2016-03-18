@@ -55,8 +55,8 @@ namespace ymir {
                 return std::vector<prob_t>();
             }
 
-            algo_param.setIfNot("prebuild", false);
-            algo_param.setIfNot("recompute.all", false);
+            bool prebuild = algo_param.get("prebuild", false).asBool();
+            bool recompute_all = algo_param.get("recompute.all", false).asBool();
 
             std::cout << "\t -- #iterations: " << (size_t) algo_param["niter"].asUInt() << std::endl;
             std::cout << "\t -- block size:  " << (size_t) algo_param["block.size"].asUInt() << std::endl;
@@ -68,14 +68,12 @@ namespace ymir {
             std::cout << "\t -- recomp. logL:" << (size_t) algo_param["recompute.all"].asBool() << std::endl;
 
             std::vector<prob_t> logLvec;
-            
+
 
             size_t sample = algo_param["sample"].asUInt();
             ClonesetView rep_nonc = repertoire.noncoding();
 
-            algo_param.setIfNot("sample", rep_nonc.size());
-
-            rep_nonc = rep_nonc.sample(sample); // TODO: CHECK IS IT OK TO ASSIGN TO ITSELF?
+            rep_nonc = rep_nonc.sample(algo_param.get("sample", (uint64_t) rep_nonc.size()).asUInt64()); // TODO: CHECK IS IT OK TO ASSIGN TO ITSELF?
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
 

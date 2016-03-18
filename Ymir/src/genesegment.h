@@ -339,6 +339,7 @@ namespace ymir {
 
 
        VDJRecombinationGenes& operator=(const VDJRecombinationGenes &other) {
+        std::cout << "he he" << std::endl;
             // _V.reset(new GeneSegmentAlphabet(other.V()));
             // _J.reset(new GeneSegmentAlphabet(other.J()));
 

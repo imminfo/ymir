@@ -323,9 +323,14 @@ namespace ymir {
            : _V(new GeneSegmentAlphabet(*other._V)),
              _J(new GeneSegmentAlphabet(*other._J))
        {
-            _D.release();
+            std::cout << "Copied " << std::to_string(_V->size()) << " V alleles." << std::endl;
+            std::cout << "Copied " << std::to_string(_J->size()) << " J alleles." << std::endl;
+
             if (other._D) {
                 _D.reset(new GeneSegmentAlphabet(*other._D));
+                std::cout << "Copied " << std::to_string(_D->size()) << " D alleles." << std::endl;
+            } else {
+                std::cout << "Copied 0 D alleles." << std::endl;
             }
        }
 
@@ -334,10 +339,15 @@ namespace ymir {
             _V.reset(new GeneSegmentAlphabet(other.V()));
             _J.reset(new GeneSegmentAlphabet(other.J()));
 
+            std::cout << "Assigned " << std::to_string(_V->size()) << " V alleles." << std::endl;
+            std::cout << "Assigned " << std::to_string(_J->size()) << " J alleles." << std::endl;
+
             if (other._D) {
                 _D.reset(new GeneSegmentAlphabet(*other._D));
+                std::cout << "Assigned " << std::to_string(_D->size()) << " D alleles." << std::endl;
             } else {
                 _D.release();
+                std::cout << "Assigned 0 D alleles." << std::endl;
             }
        }
 

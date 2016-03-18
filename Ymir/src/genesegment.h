@@ -346,7 +346,7 @@ namespace ymir {
                 _D.reset(new GeneSegmentAlphabet(*other._D));
                 std::cout << "Assigned " << std::to_string(_D->size()) << " D alleles." << std::endl;
             } else {
-                _D.release();
+                // _D.release();
                 std::cout << "Assigned 0 D alleles." << std::endl;
             }
        }

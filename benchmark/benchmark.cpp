@@ -10,6 +10,12 @@
 
 
 int main(int argc, char* argv[]) {
+
+    if (argc < 2) {
+      std::cout << "Please re-run the script with the data folder path supplied." << std::endl;
+      return 1;
+    }
+
     std::chrono::system_clock::time_point tp1, tp2;
 
     std::vector< std::pair<std::string, size_t> > timepoints;

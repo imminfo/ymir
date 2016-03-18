@@ -3,6 +3,7 @@
 //
 
 // #include "benchutils.h"
+#include "genesegment.h"
 
 int main(int argc, char* argv[]) {
 

@@ -41,10 +41,10 @@ int main(int argc, char* argv[]) {
     //
     // TCR alpha chain repertoire - VJ recombination
     //
-    VDJRecombinationGenes vj_single_genes("Vgene",
-                                          "/home/vadim/ymir/benchmark/data/trav.txt",
-                                          "Jgene",
-                                          "/home/vadim/ymir/benchmark/data/traj.txt");
+    VDJRecombinationGenes vj_single_genes(string("Vgene"),
+                                          string("/home/vadim/ymir/benchmark/data/trav.txt"),
+                                          string("Jgene"),
+                                          string("/home/vadim/ymir/benchmark/data/traj.txt"));
 
 
     // VDJRecombinationGenes vj_single_genes2(vj_single_genes);

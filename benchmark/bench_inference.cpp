@@ -71,8 +71,8 @@ int main(int argc, char* argv[]) {
                                    BENCH_DATA_FOLDER + "trbj.txt",
                                    "Dgene",
                                    BENCH_DATA_FOLDER + "trbd.txt");
-//
-//    Cloneset cloneset_vdj;
+
+   Cloneset cloneset_vdj;
    YMIR_BENCHMARK("Parsing VDJ",
                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
                                       &cloneset_vdj,

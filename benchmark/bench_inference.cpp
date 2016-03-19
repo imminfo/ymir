@@ -100,7 +100,8 @@ int main(int argc, char* argv[]) {
     //
     vector<int> vec_sample = {10000, 25000, 50000, 100000, 150000};
     // vec_sample = { 100000 };
-    int val_sample = cloneset_vdj.noncoding().size();
+    // int val_sample = cloneset_vdj.noncoding().size();
+    int val_sample = 100000;
     vector<int> vec_block = {500, 1000, 2000, 5000, 10000}; //, 2000, 5000, 10000};
 //    vec_block = {2000, 5000, 10000};
     vec_block = { std::stoi(argv[2]) };

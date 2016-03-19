@@ -353,6 +353,7 @@ namespace ymir {
             //     _D.release();
             //     std::cout << "Assigned 0 D alleles." << std::endl;
             // }
+        return *this;
        }
 
 

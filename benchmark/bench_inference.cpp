@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
     //
     vector<int> vec_sample = {10000, 25000, 50000, 100000, 150000};
     // vec_sample = { 100000 };
-    size_t val_sample = cloneset_vdj.noncoding.size();
+    int val_sample = cloneset_vdj.noncoding.size();
     vector<int> vec_block = {500, 1000, 2000, 5000, 10000}; //, 2000, 5000, 10000};
 //    vec_block = {2000, 5000, 10000};
     vec_block = { std::stoi(argv[2]) };
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
                 for (auto val_beta: vec_beta) {
                     for (auto val_K: vec_K) {
                         // RUN_SG_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 40, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
-                        RUN_SG_INFERENCE(string("vj"), cloneset_vdj, vdj_single_model, 40, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
+                        RUN_SG_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, 40, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
                     }
                 }
             }

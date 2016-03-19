@@ -2,8 +2,7 @@
 // Created by Vadim N. on 16/03/2016.
 //
 
-// #include "benchutils.h"
-#include <Inference>
+#include "benchutils.h"
 
 using namespace ymir;
 using namespace std;

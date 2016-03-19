@@ -340,7 +340,7 @@ namespace ymir {
 
        VDJRecombinationGenes& operator=(const VDJRecombinationGenes &other) {
             _V.reset(new GeneSegmentAlphabet(other.V()));
-            _J.reset(new GeneSegmentAlphabet(other.J()));
+            // _J.reset(new GeneSegmentAlphabet(other.J()));
 
             // std::cout << "Assigned " << std::to_string(_V->size()) << " V alleles." << std::endl;
             // std::cout << "Assigned " << std::to_string(_J->size()) << " J alleles." << std::endl;
@@ -366,21 +366,21 @@ namespace ymir {
         ///@{
         const GeneSegmentAlphabet& V() const { 
 #ifndef DNDEBUG
-            check_and_throw((bool) _V, "V pointer is null");
+            check_and_throw(!(bool) _V, "V pointer is null");
 #endif
             return *_V;
         }
 
         const GeneSegmentAlphabet& J() const { 
 #ifndef DNDEBUG
-            check_and_throw((bool) _J, "J pointer is null");
+            check_and_throw(!(bool) _J, "J pointer is null");
 #endif
             return *_J;
         }
 
         const GeneSegmentAlphabet& D() const { 
 #ifndef DNDEBUG
-            check_and_throw((bool) _D, "D pointer is null");
+            check_and_throw(!(bool) _D, "D pointer is null");
 #endif
             return *_D;
         }

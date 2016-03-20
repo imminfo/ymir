@@ -138,7 +138,7 @@ namespace ymir {
 //                    std::cout << (size_t) maag_i << " / " << (size_t) (std::min(indices.size(), start_i + block_size)) << std::endl;
 //                    std::cout << (size_t) indices[maag_i] << std::endl;
 //                    std::cout << (size_t) indices[maag_i] << std::endl;
-//                    std::cout << rep_nonc[indices[maag_i]].toString() << std::endl;
+                    std::cout << rep_nonc[indices[maag_i]].toString() << std::endl;
 //                    std::cout << rep_nonc[indices[maag_i]].is_good() << std::endl;
 //                    std::cout << good_clonotypes[indices[maag_i]] << std::endl;
 //                    std::cout << prob_vec[indices[maag_i]] << std::endl;

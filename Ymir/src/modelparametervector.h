@@ -261,7 +261,7 @@ namespace ymir {
         event_ind_t event_index(EventClass event_class, event_ind_t event_family, event_ind_t event_index) const {
 #ifndef DNDEBUG
             if (!(_edges[_event_classes[event_class] + event_family] + event_index < _edges[_event_classes[event_class] + event_family + 1])) {
-                throw(std::runtime_error("Index " + std::to_string(event_family) + ":" + std::to_string(event_index) +  " is out of bounds."));
+                throw(std::runtime_error("Index " + std::to_string(event_class) + ":" + std::to_string(event_family) + ":" + std::to_string(event_index) +  " is out of bounds."));
 
             }
 #endif
@@ -294,7 +294,7 @@ namespace ymir {
         prob_t event_prob(EventClass event_class, event_ind_t event_family, event_ind_t event_index) const {
 #ifndef DNDEBUG
             if (this->event_index(event_class, event_family, event_index) >= _vec.size()) {
-                throw(std::runtime_error("Index " + std::to_string(event_family) + ":" + std::to_string(event_index) +  " is out of bounds."));
+                throw(std::runtime_error("Index " + std::to_string(event_class) + ":" + std::to_string(event_family) + ":" + std::to_string(event_index) +  " is out of bounds."));
             }
 #endif
             return _vec[this->event_index(event_class, event_family, event_index)];

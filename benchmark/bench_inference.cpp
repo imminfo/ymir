@@ -120,9 +120,9 @@ int main(int argc, char* argv[]) {
 
 //    RUN_EM_INFERENCE(string("vj"), cloneset_vj, vj_single_model, niter, sample, error_mode)
 //    RUN_EM_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, niter, sample, error_mode)
-   for(auto val_sample: vec_sample) {
-       RUN_EM_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, 40, val_sample, error_mode)
-   }
+   // for(auto val_sample: vec_sample) {
+   //     RUN_EM_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, 40, val_sample, error_mode)
+   // }
 
 //    ModelParameterVector new_param_vec = vj_single_model.event_probabilities();
 //    new_param_vec.fill(1);

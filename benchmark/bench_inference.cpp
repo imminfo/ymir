@@ -99,12 +99,12 @@ int main(int argc, char* argv[]) {
     // Inference
     //
     vector<int> vec_sample = {10000, 25000, 50000, 100000, 150000};
-    // vec_sample = { 100000 };
+     vec_sample = { std::stoi(argv[2]) };
     // int val_sample = cloneset_vdj.noncoding().size();
-    int val_sample = 100000;
+//    int val_sample = 100;
     vector<int> vec_block = {500, 1000, 2000, 5000, 10000}; //, 2000, 5000, 10000};
 //    vec_block = {2000, 5000, 10000};
-    vec_block = { std::stoi(argv[2]) };
+    vec_block = { std::stoi(argv[3]) };
     vector<double> vec_alpha = {.5, .6, .7, .8, .9};
     // vec_alpha = { std::stof(argv[3]) };
     vector<double> vec_beta =  {.1, .5, 1, 3};
@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
 //        }
 //    }
 
-    // for(auto val_sample: vec_sample) {
+     for(auto val_sample: vec_sample) {
         for(auto val_block: vec_block) {
             for (auto val_alpha: vec_alpha) {
                 for (auto val_beta: vec_beta) {
@@ -156,6 +156,6 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
-    // }
+     }
 
 }

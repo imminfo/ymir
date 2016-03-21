@@ -171,8 +171,6 @@ namespace ymir {
                 return false;
             }
 
-//            std::cout << "passed 1" << std::endl;
-
             event_pair_t ep;
             while (!fb.is_empty()) {
                 ep = fb.nextEvent();
@@ -180,17 +178,11 @@ namespace ymir {
                 changed[ep.first] = true;
             }
 
-//            std::cout << "passed 2" << std::endl;
-
             if (error_mode) {
                 new_param_vec.set_error_prob(new_param_vec.error_prob() + fb.err_prob());
             }
 
             if (maag.is_vj()) {
-//                if (std::isnan(fb.VJ_nuc_probs()[0])) { cout << "A" << endl; check_and_throw(std::isnan(fb.VJ_nuc_probs()[0]), "123"); }
-//                if (std::isnan(fb.VJ_nuc_probs()[1])) {cout << "C" << endl; check_and_throw(std::isnan(fb.VJ_nuc_probs()[1]), "123"); }
-//                if (std::isnan(fb.VJ_nuc_probs()[2])) {cout << "G" << endl; check_and_throw(std::isnan(fb.VJ_nuc_probs()[2]), "123"); }
-//                if (std::isnan(fb.VJ_nuc_probs()[3])) {cout << "T" << endl; check_and_throw(std::isnan(fb.VJ_nuc_probs()[3]), "123"); }
                 new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] += fb.VJ_nuc_probs()[0];
                 new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] += fb.VJ_nuc_probs()[1];
                 new_param_vec[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] += fb.VJ_nuc_probs()[2];
@@ -205,32 +197,14 @@ namespace ymir {
                         k_dj = new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0);
 
                 for (auto i = 0; i < 16; ++i) {
+                    std::cout << "i" << (int) i << std::endl;
                     new_param_vec[i + k_vd] += fb.VD_nuc_probs()[k_vd];
                     changed[i + k_vd] = true;
 
                     new_param_vec[i + k_dj] += fb.DJ_nuc_probs()[k_dj];
                     changed[i + k_dj] = true;
                 }
-
-//                int k = 0;
-//                for (auto prev_nuc = 0; prev_nuc < 4; ++prev_nuc) {
-//                    for (auto next_nuc = 0; next_nuc < 4; ++next_nuc, ++k) {
-//                        new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, prev_nuc, next_nuc)] += fb.VD_nuc_probs()[k];
-//                        changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, prev_nuc, next_nuc)] = true;
-//                    }
-//                }
-//
-//                k = 0;
-//                for (auto prev_nuc = 0; prev_nuc < 4; ++prev_nuc) {
-//                    for (auto next_nuc = 0; next_nuc < 4; ++next_nuc, ++k) {
-//                        std::cout << "prev" << (int) prev_nuc << "next" << (int) next_nuc << "k" << (int) k << std::endl;
-//                        new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, prev_nuc, next_nuc)] += fb.DJ_nuc_probs()[k];
-//                        changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, prev_nuc, next_nuc)] = true;
-//                    }
-//                }
             }
-
-//            std::cout << "passed 3" << std::endl;
         }
 
 

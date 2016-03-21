@@ -230,7 +230,7 @@ namespace ymir {
         prob_t operator[] (event_ind_t gl_event_index) const {
 #ifndef DNDEBUG
             if (gl_event_index >= _vec.size()) {
-                throw(std::runtime_error("Index is out of bounds."));
+                throw(std::runtime_error("Index " + std::to_string(gl_event_index) + " is out of bounds."));
             }
 #endif
             return _vec[gl_event_index];

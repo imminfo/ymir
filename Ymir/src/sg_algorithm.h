@@ -197,6 +197,7 @@ namespace ymir {
                         k_dj = new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0);
 
                 for (auto i = 0; i < 16; ++i) {
+                    std::cout << (int) i << std::endl;
                     new_param_vec[i + k_vd] += fb.VD_nuc_probs()[i];
                     changed[i + k_vd] = true;
 

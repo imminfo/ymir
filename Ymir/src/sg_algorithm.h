@@ -160,17 +160,12 @@ namespace ymir {
 
     protected:
 
-        bool updateTempVec(MAAGForwardBackwardAlgorithm &fb,
+        void updateTempVec(MAAGForwardBackwardAlgorithm &fb,
                            MAAG &maag,
                            ModelParameterVector &new_param_vec,
                            vector<bool> &changed,
                            ErrorMode error_mode) const
         {
-            if (!fb.process(maag, error_mode)) {
-                std::cout << "error in temp vec" << std::endl;
-                return false;
-            }
-
             event_pair_t ep;
             while (!fb.is_empty()) {
                 ep = fb.nextEvent();

@@ -135,7 +135,6 @@ namespace ymir {
 //                    cout << "start of the iteration" << endl;
                     // compute marginal probabilities for this block
                     // and update the temporary model parameter vector
-                    std::cout << (size_t) maag_i << std::endl;
                     std::cout << (size_t) maag_i << " / " << (size_t) (std::min(indices.size(), start_i + block_size)) << std::endl;
 //                    std::cout << (size_t) indices[maag_i] << std::endl;
 //                    std::cout << (size_t) indices[maag_i] << std::endl;
@@ -275,6 +274,8 @@ namespace ymir {
 //                changed[k_dj + 14] = true;
 //                changed[k_dj + 15] = true;
             }
+
+            std::cout << "processed" << std::endl;
         }
 
 

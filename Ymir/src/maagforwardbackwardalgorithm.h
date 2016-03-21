@@ -694,7 +694,6 @@ namespace ymir {
             for (event_ind_t d_ind = 0; d_ind < maag.nDiv(); ++d_ind) {
                 recompute_d_gen_fi = true;
                 for (event_ind_t j_ind = 0; j_ind < maag.nJoi(); ++j_ind) {
-                    std::cout << "d:" << (int) d_ind << "\t" << "j:" << (int) j_ind << std::endl;
                     // compute forward and backward probabilities for a specific J gene
                     this->forward_vdj(maag, d_ind, j_ind, recompute_d_gen_fi);
                     this->backward_vdj(maag, d_ind, j_ind);
@@ -707,9 +706,7 @@ namespace ymir {
                     }
                     this->pushEventPairs(maag, VDJ_VAR_DIV_INS_I, 0, 0);
                     this->pushEventPairsWithErrors(maag, VDJ_DIV_DEL_I, d_ind, 0, 1);
-                    std::cout << "VD ins start" <<  std::endl;
                     this->pushEventPairs(maag, VDJ_DIV_JOI_INS_I, 0, 0);
-                    std::cout << "VD ins end" <<  std::endl;
                     this->pushEventPairsWithErrors(maag, VDJ_JOI_DEL_I, j_ind, 0, 2);
                     this->pushEventPair(maag, VDJ_JOI_DIV_GEN_I, 0, j_ind, d_ind, 0, 0, 0);
 
@@ -723,11 +720,13 @@ namespace ymir {
                                                     v_vertices, v_vertices + d3_vertices - 1,
                                                     _nuc_arr1, false);
 
-                    std::cout << "VD nucs start" <<  std::endl;
+
+                    std::cout << "start" << std::endl;
                     this->inferInsertionNucleotides(maag, VDJ_DIV_JOI_INS_I,
                                                     v_vertices + d3_vertices, v_vertices + d3_vertices + d5_vertices - 1,
                                                     v_vertices + d3_vertices + d5_vertices, v_vertices + d3_vertices + d5_vertices + j_vertices - 1,
                                                     _nuc_arr2, true);
+                    std::cout << "end" << std::endl;
                 }
             }
 

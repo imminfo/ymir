@@ -196,14 +196,54 @@ namespace ymir {
                 int k_vd = new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0),
                         k_dj = new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0);
 
-                for (auto i = 0; i < 16; ++i) {
-                    std::cout << (int) i << std::endl;
-                    new_param_vec[i + k_vd] += fb.VD_nuc_probs()[i];
-                    changed[i + k_vd] = true;
+                // it's not working in Linux Fedora g++
+//                for (auto i = 0; i < 16; ++i) {
+//                    std::cout << (int) i << std::endl;
+//                    new_param_vec[i + k_vd] += fb.VD_nuc_probs()[i];
+//                    changed[i + k_vd] = true;
+//
+//                    new_param_vec[i + k_dj] += fb.DJ_nuc_probs()[i];
+//                    changed[i + k_dj] = true;
+//                }
 
-                    new_param_vec[i + k_dj] += fb.DJ_nuc_probs()[i];
-                    changed[i + k_dj] = true;
-                }
+                new_param_vec[k_vd]      += fb.VD_nuc_probs()[0];
+                new_param_vec[k_vd + 1]  += fb.VD_nuc_probs()[1];
+                new_param_vec[k_vd + 2]  += fb.VD_nuc_probs()[2];
+                new_param_vec[k_vd + 3]  += fb.VD_nuc_probs()[3];
+                new_param_vec[k_vd + 4]  += fb.VD_nuc_probs()[4];
+                new_param_vec[k_vd + 5]  += fb.VD_nuc_probs()[5];
+                new_param_vec[k_vd + 6]  += fb.VD_nuc_probs()[6];
+                new_param_vec[k_vd + 7]  += fb.VD_nuc_probs()[7];
+                new_param_vec[k_vd + 8]  += fb.VD_nuc_probs()[8];
+                new_param_vec[k_vd + 9]  += fb.VD_nuc_probs()[9];
+                new_param_vec[k_vd + 10] += fb.VD_nuc_probs()[10];
+                new_param_vec[k_vd + 11] += fb.VD_nuc_probs()[11];
+                new_param_vec[k_vd + 12] += fb.VD_nuc_probs()[12];
+                new_param_vec[k_vd + 13] += fb.VD_nuc_probs()[13];
+                new_param_vec[k_vd + 14] += fb.VD_nuc_probs()[14];
+                new_param_vec[k_vd + 15] += fb.VD_nuc_probs()[15];
+
+                new_param_vec[k_dj]      += fb.VD_nuc_probs()[0];
+                new_param_vec[k_dj + 1]  += fb.DJ_nuc_probs()[1];
+                new_param_vec[k_dj + 2]  += fb.DJ_nuc_probs()[2];
+                new_param_vec[k_dj + 3]  += fb.DJ_nuc_probs()[3];
+                new_param_vec[k_dj + 4]  += fb.DJ_nuc_probs()[4];
+                new_param_vec[k_dj + 5]  += fb.DJ_nuc_probs()[5];
+                new_param_vec[k_dj + 6]  += fb.DJ_nuc_probs()[6];
+                new_param_vec[k_dj + 7]  += fb.DJ_nuc_probs()[7];
+                new_param_vec[k_dj + 8]  += fb.DJ_nuc_probs()[8];
+                new_param_vec[k_dj + 9]  += fb.DJ_nuc_probs()[9];
+                new_param_vec[k_dj + 10] += fb.DJ_nuc_probs()[10];
+                new_param_vec[k_dj + 11] += fb.DJ_nuc_probs()[11];
+                new_param_vec[k_dj + 12] += fb.DJ_nuc_probs()[12];
+                new_param_vec[k_dj + 13] += fb.DJ_nuc_probs()[13];
+                new_param_vec[k_dj + 14] += fb.DJ_nuc_probs()[14];
+                new_param_vec[k_dj + 15] += fb.DJ_nuc_probs()[15];
+
+//                changed[i + k_vd] = true;
+//
+//                new_param_vec[i + k_dj] += fb.DJ_nuc_probs()[i];
+//                changed[i + k_dj] = true;
             }
         }
 

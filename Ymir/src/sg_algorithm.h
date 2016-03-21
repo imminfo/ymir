@@ -206,6 +206,7 @@ namespace ymir {
 //                    changed[i + k_dj] = true;
 //                }
 
+                std::cout << "here" << std::endl;
                 new_param_vec[k_vd]      += fb.VD_nuc_probs()[0];
                 new_param_vec[k_vd + 1]  += fb.VD_nuc_probs()[1];
                 new_param_vec[k_vd + 2]  += fb.VD_nuc_probs()[2];
@@ -221,9 +222,11 @@ namespace ymir {
                 new_param_vec[k_vd + 12] += fb.VD_nuc_probs()[12];
                 new_param_vec[k_vd + 13] += fb.VD_nuc_probs()[13];
                 new_param_vec[k_vd + 14] += fb.VD_nuc_probs()[14];
+                std::cout << "here" << std::endl;
                 new_param_vec[k_vd + 15] += fb.VD_nuc_probs()[15];
+                std::cout << "here" << std::endl;
 
-                new_param_vec[k_dj]      += fb.VD_nuc_probs()[0];
+                new_param_vec[k_dj]      += fb.DJ_nuc_probs()[0];
                 new_param_vec[k_dj + 1]  += fb.DJ_nuc_probs()[1];
                 new_param_vec[k_dj + 2]  += fb.DJ_nuc_probs()[2];
                 new_param_vec[k_dj + 3]  += fb.DJ_nuc_probs()[3];

@@ -434,22 +434,33 @@ namespace ymir {
 
         dim_t cols(node_ind_t node_i) const { return this->nodeColumns(node_i); }
 
+
     protected:
 
-        pEventIndMMC _events;  /** Matrix of indices of events for each edge. */
+//        pEventIndMMC _events;  /** Matrix of indices of events for each edge. */
+//
+//        unique_ptr<seq_len_t[]> _seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
+//        seq_len_t _n_poses;
+//
+//        unique_ptr<sequence_t> _sequence;  /** Nucleotide or amino acid CDR3 sequence. */
+//        SequenceType _seq_type;
+//
+//        pErrMMC _errors;  /** Matrix of number of errors for each scenario event position. */
+//        prob_t _err_prob;  /** Probability of a error. */
+//
+//        Recombination _recomb;
 
-        unique_ptr<seq_len_t[]> _seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
-        seq_len_t _n_poses;
-
-        unique_ptr<sequence_t> _sequence;  /** Nucleotide or amino acid CDR3 sequence. */
-        SequenceType _seq_type;
-
-        pErrMMC _errors;  /** Matrix of number of errors for each scenario event position. */
         prob_t _err_prob;  /** Probability of a error. */
 
+        pEventIndMMC _events;  /** Matrix of indices of events for each edge. */
+        pErrMMC _errors;  /** Matrix of number of errors for each scenario event position. */
+        unique_ptr<seq_len_t[]> _seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
+        unique_ptr<sequence_t> _sequence;  /** Nucleotide or amino acid CDR3 sequence. */
+
+        SequenceType _seq_type;
         Recombination _recomb;
 
-//        MAAGMetadataPtr _metadata;
+        seq_len_t _n_poses;
 
     };
 

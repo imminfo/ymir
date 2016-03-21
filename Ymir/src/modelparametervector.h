@@ -411,15 +411,14 @@ namespace ymir {
 
     private:
 
+        prob_t _err_prob;
         vector<prob_t> _vec;
         vector<event_ind_t> _edges;  /** Vector with starting indices for each event family. */
         vector<event_ind_t> _event_classes;  /** Vector of indices of event classes in _edges. */
         vector<seq_len_t> _event_family_col_numbers;  /** Vector of the number of rows of each event family. */
         vector<prob_t> _laplace;
         vector<seq_len_t> _d_genes_min_len;
-        prob_t _err_prob;
         Recombination _recomb;
-
 
         /**
         * \brief Private default constructor.

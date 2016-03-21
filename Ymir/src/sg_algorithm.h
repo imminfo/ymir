@@ -241,7 +241,9 @@ namespace ymir {
                 new_param_vec[k_dj + 12] += fb.DJ_nuc_probs()[12];
                 new_param_vec[k_dj + 13] += fb.DJ_nuc_probs()[13];
                 new_param_vec[k_dj + 14] += fb.DJ_nuc_probs()[14];
+                std::cout << "here2" << std::endl;
                 new_param_vec[k_dj + 15] += fb.DJ_nuc_probs()[15];
+                std::cout << "here2" << std::endl;
 
 //                changed[i + k_vd] = true;
 //

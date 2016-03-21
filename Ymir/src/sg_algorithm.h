@@ -206,7 +206,6 @@ namespace ymir {
 //                    changed[i + k_dj] = true;
 //                }
 
-                std::cout << "here" << std::endl;
                 new_param_vec[k_vd]      += fb.VD_nuc_probs()[0];
                 new_param_vec[k_vd + 1]  += fb.VD_nuc_probs()[1];
                 new_param_vec[k_vd + 2]  += fb.VD_nuc_probs()[2];
@@ -222,9 +221,24 @@ namespace ymir {
                 new_param_vec[k_vd + 12] += fb.VD_nuc_probs()[12];
                 new_param_vec[k_vd + 13] += fb.VD_nuc_probs()[13];
                 new_param_vec[k_vd + 14] += fb.VD_nuc_probs()[14];
-                std::cout << "here" << std::endl;
                 new_param_vec[k_vd + 15] += fb.VD_nuc_probs()[15];
-                std::cout << "here" << std::endl;
+
+                changed[k_vd]      = true;
+                changed[k_vd + 1]  = true;
+                changed[k_vd + 2]  = true;
+                changed[k_vd + 3]  = true;
+                changed[k_vd + 4]  = true;
+                changed[k_vd + 5]  = true;
+                changed[k_vd + 6]  = true;
+                changed[k_vd + 7]  = true;
+                changed[k_vd + 8]  = true;
+                changed[k_vd + 9]  = true;
+                changed[k_vd + 10] = true;
+                changed[k_vd + 11] = true;
+                changed[k_vd + 12] = true;
+                changed[k_vd + 13] = true;
+                changed[k_vd + 14] = true;
+                changed[k_vd + 15] = true;
 
                 new_param_vec[k_dj]      += fb.DJ_nuc_probs()[0];
                 new_param_vec[k_dj + 1]  += fb.DJ_nuc_probs()[1];
@@ -241,11 +255,24 @@ namespace ymir {
                 new_param_vec[k_dj + 12] += fb.DJ_nuc_probs()[12];
                 new_param_vec[k_dj + 13] += fb.DJ_nuc_probs()[13];
                 new_param_vec[k_dj + 14] += fb.DJ_nuc_probs()[14];
-                std::cout << "here2" << std::endl;
                 new_param_vec[k_dj + 15] += fb.DJ_nuc_probs()[15];
-                std::cout << "here2" << std::endl;
 
-//                changed[i + k_vd] = true;
+                changed[k_dj]      = true;
+                changed[k_dj + 1]  = true;
+                changed[k_dj + 2]  = true;
+                changed[k_dj + 3]  = true;
+                changed[k_dj + 4]  = true;
+                changed[k_dj + 5]  = true;
+                changed[k_dj + 6]  = true;
+                changed[k_dj + 7]  = true;
+                changed[k_dj + 8]  = true;
+                changed[k_dj + 9]  = true;
+                changed[k_dj + 10] = true;
+                changed[k_dj + 11] = true;
+                changed[k_dj + 12] = true;
+                changed[k_dj + 13] = true;
+                changed[k_dj + 14] = true;
+                changed[k_dj + 15] = true;
 //
 //                new_param_vec[i + k_dj] += fb.DJ_nuc_probs()[i];
 //                changed[i + k_dj] = true;

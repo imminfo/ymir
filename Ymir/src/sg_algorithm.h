@@ -201,87 +201,16 @@ namespace ymir {
                 changed[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] = true;
                 changed[new_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] = true;
             } else {
-                // Because optimization and some compilers failing for some reason on the commented loops.
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)] += fb.VD_nuc_probs()[0];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 1)] += fb.VD_nuc_probs()[1];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 2)] += fb.VD_nuc_probs()[2];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 3)] += fb.VD_nuc_probs()[3];
+                int k_vd = new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0),
+                        k_dj = new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0);
 
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 1, 0)] += fb.VD_nuc_probs()[4];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 1, 1)] += fb.VD_nuc_probs()[5];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 1, 2)] += fb.VD_nuc_probs()[6];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 1, 3)] += fb.VD_nuc_probs()[7];
+                for (auto i = 0; i < 16; ++i) {
+                    new_param_vec[i + k_vd] += fb.VD_nuc_probs()[k_vd];
+                    changed[i + k_vd] = true;
 
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 2, 0)] += fb.VD_nuc_probs()[8];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 2, 1)] += fb.VD_nuc_probs()[9];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 2, 2)] += fb.VD_nuc_probs()[10];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 2, 3)] += fb.VD_nuc_probs()[11];
-
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 3, 0)] += fb.VD_nuc_probs()[12];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 3, 1)] += fb.VD_nuc_probs()[13];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 3, 2)] += fb.VD_nuc_probs()[14];
-                new_param_vec[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 3, 3)] += fb.VD_nuc_probs()[15];
-
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 1)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 2)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 3)] = true;
-
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 1, 0)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 1, 1)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 1, 2)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 1, 3)] = true;
-
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 2, 0)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 2, 1)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 2, 2)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 2, 3)] = true;
-
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 3, 0)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 3, 1)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 3, 2)] = true;
-                changed[new_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 3, 3)] = true;
-
-
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)] += fb.DJ_nuc_probs()[0];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 1)] += fb.DJ_nuc_probs()[1];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 2)] += fb.DJ_nuc_probs()[2];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 3)] += fb.DJ_nuc_probs()[3];
-
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 1, 0)] += fb.DJ_nuc_probs()[4];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 1, 1)] += fb.DJ_nuc_probs()[5];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 1, 2)] += fb.DJ_nuc_probs()[6];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 1, 3)] += fb.DJ_nuc_probs()[7];
-
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 2, 0)] += fb.DJ_nuc_probs()[8];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 2, 1)] += fb.DJ_nuc_probs()[9];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 2, 2)] += fb.DJ_nuc_probs()[10];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 2, 3)] += fb.DJ_nuc_probs()[11];
-
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 3, 0)] += fb.DJ_nuc_probs()[12];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 3, 1)] += fb.DJ_nuc_probs()[13];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 3, 2)] += fb.DJ_nuc_probs()[14];
-                new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 3, 3)] += fb.DJ_nuc_probs()[15];
-
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 1)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 2)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 3)] = true;
-
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 1, 0)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 1, 1)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 1, 2)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 1, 3)] = true;
-
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 2, 0)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 2, 1)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 2, 2)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 2, 3)] = true;
-
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 3, 0)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 3, 1)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 3, 2)] = true;
-                changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 3, 3)] = true;
+                    new_param_vec[i + k_dj] += fb.DJ_nuc_probs()[k_dj];
+                    changed[i + k_dj] = true;
+                }
 
 //                int k = 0;
 //                for (auto prev_nuc = 0; prev_nuc < 4; ++prev_nuc) {

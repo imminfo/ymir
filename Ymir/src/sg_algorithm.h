@@ -138,7 +138,7 @@ namespace ymir {
 //                    std::cout << (size_t) maag_i << " / " << (size_t) (std::min(indices.size(), start_i + block_size)) << std::endl;
 //                    std::cout << (size_t) indices[maag_i] << std::endl;
 //                    std::cout << (size_t) indices[maag_i] << std::endl;
-                    std::cout << rep_nonc[indices[maag_i]].toString() << std::endl;
+//                    std::cout << rep_nonc[indices[maag_i]].toString() << std::endl;
 //                    std::cout << rep_nonc[indices[maag_i]].is_good() << std::endl;
 //                    std::cout << good_clonotypes[indices[maag_i]] << std::endl;
 //                    std::cout << prob_vec[indices[maag_i]] << std::endl;
@@ -212,6 +212,7 @@ namespace ymir {
                 k = 0;
                 for (auto prev_nuc = 0; prev_nuc < 4; ++prev_nuc) {
                     for (auto next_nuc = 0; next_nuc < 4; ++next_nuc, ++k) {
+                        std::cout << "prev" << (int) prev_nuc << "next" << (int) next_nuc << "k" << (int) k << std::endl;
                         new_param_vec[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, prev_nuc, next_nuc)] += fb.DJ_nuc_probs()[k];
                         changed[new_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, prev_nuc, next_nuc)] = true;
                     }

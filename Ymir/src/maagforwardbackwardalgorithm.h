@@ -721,12 +721,10 @@ namespace ymir {
                                                     _nuc_arr1, false);
 
 
-                    std::cout << "start" << std::endl;
                     this->inferInsertionNucleotides(maag, VDJ_DIV_JOI_INS_I,
                                                     v_vertices + d3_vertices, v_vertices + d3_vertices + d5_vertices - 1,
                                                     v_vertices + d3_vertices + d5_vertices, v_vertices + d3_vertices + d5_vertices + j_vertices - 1,
                                                     _nuc_arr2, true);
-                    std::cout << "end" << std::endl;
                 }
             }
 

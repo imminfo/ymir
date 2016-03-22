@@ -82,14 +82,19 @@ namespace ymir {
         * \brief Probability of the given nucleotide sequence.
         */
         ///@{
-        virtual prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR, bool with_errors = false) const = 0;
-//            return this->nucProbability<std::string::const_iterator>(sequence.cbegin(), sequence.size(), first_char);
-//            return this->nucProbability(sequence.cbegin(), sequence.size(), first_char);
-//        }
+        virtual prob_t nucProbability(const std::string& sequence,
+                                      char first_char = NULL_CHAR,
+                                      bool with_errors = false) const = 0;
 
-        virtual prob_t nucProbability(std::string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const = 0;
+        virtual prob_t nucProbability(std::string::const_iterator start,
+                                      seq_len_t sequence_len,
+                                      char first_char = NULL_CHAR,
+                                      bool with_errors = false) const = 0;
 
-        virtual prob_t nucProbability(std::string::const_reverse_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const = 0;
+        virtual prob_t nucProbability(std::string::const_reverse_iterator start,
+                                      seq_len_t sequence_len,
+                                      char first_char = NULL_CHAR,
+                                      bool with_errors = false) const = 0;
         ///@}
 
 
@@ -97,13 +102,20 @@ namespace ymir {
          *
          */
         ///@{
-        prob_t aaProbability(const std::string& sequence, char first_char = NULL_CHAR) const {
-            return this->aaProbability(sequence.cbegin(), sequence.size(), first_char);
-        }
+        virtual prob_t aaProbability(const std::string& sequence,
+                                     seq_len_t first_nuc_pos,  // or an index of the codon?
+                                     seq_len_t last_nuc_pos,
+                                     char first_char = NULL_CHAR) const = 0;
 
-        prob_t aaProbability(std::string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR) const {
-            return 0;
-        }
+        virtual prob_t aaProbability(std::string::const_iterator start,
+                                     seq_len_t first_nuc_pos,
+                                     seq_len_t last_nuc_pos,
+                                     char first_char = NULL_CHAR) const = 0;
+
+        virtual prob_t aaProbability(std::string::const_reverse_iterator start,
+                                     seq_len_t first_nuc_pos,
+                                     seq_len_t last_nuc_pos,
+                                     char first_char = NULL_CHAR) const = 0;
         ///@}
 
 
@@ -207,11 +219,18 @@ namespace ymir {
         }
 
 
-        prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR, bool with_errors = false) const {
+        prob_t nucProbability(const std::string& sequence,
+                              char first_char = NULL_CHAR,
+                              bool with_errors = false) const
+        {
             return this->nucProbability(sequence.cbegin(), sequence.size(), first_char, with_errors);
         }
 
-        prob_t nucProbability(std::string::const_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const {
+        prob_t nucProbability(std::string::const_iterator start,
+                              seq_len_t sequence_len,
+                              char first_char = NULL_CHAR,
+                              bool with_errors = false) const
+        {
             prob_t res = 1;
 
             if (sequence_len) {
@@ -230,7 +249,11 @@ namespace ymir {
             return res;
         }
 
-        prob_t nucProbability(std::string::const_reverse_iterator start, seq_len_t sequence_len, char first_char = NULL_CHAR, bool with_errors = false) const {
+        prob_t nucProbability(std::string::const_reverse_iterator start,
+                              seq_len_t sequence_len,
+                              char first_char = NULL_CHAR,
+                              bool with_errors = false) const
+        {
             prob_t res = 1;
 
             if (sequence_len) {
@@ -248,6 +271,32 @@ namespace ymir {
 
             return res;
         }
+
+
+        /**
+         *
+         */
+        ///@{
+        prob_t aaProbability(const std::string& sequence,
+                             char first_char = NULL_CHAR) const
+        {
+            return this->aaProbability(sequence.cbegin(), sequence.size(), first_char);
+        }
+
+        prob_t aaProbability(std::string::const_iterator start,
+                             seq_len_t sequence_len,
+                             char first_char = NULL_CHAR) const
+        {
+            throw(std::runtime_error("not implemented yet"));
+        }
+
+        prob_t aaProbability(std::string::const_reverse_iterator start,
+                             seq_len_t sequence_len,
+                             char first_char = NULL_CHAR) const
+        {
+            throw(std::runtime_error("not implemented yet"));
+        }
+        ///@}
 
 
         sequence_t generate(seq_len_t len, std::default_random_engine &rg, char first_char = NULL_CHAR, bool reverse = false) const {
@@ -316,6 +365,7 @@ namespace ymir {
         }
 
 
+        ///@{
         prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR, bool with_errors = false) const {
             return this->nucProbability(sequence.cbegin(), sequence.size(), first_char, with_errors);
         }
@@ -365,6 +415,30 @@ namespace ymir {
 
             return res;
         }
+        ///@}
+
+
+        ///@{
+        prob_t aaProbability(const std::string& sequence,
+                             char first_char = NULL_CHAR) const
+        {
+            return this->aaProbability(sequence.cbegin(), sequence.size(), first_char);
+        }
+
+        prob_t aaProbability(std::string::const_iterator start,
+                             seq_len_t sequence_len,
+                             char first_char = NULL_CHAR) const
+        {
+            throw(std::runtime_error("not implemented yet"));
+        }
+
+        prob_t aaProbability(std::string::const_reverse_iterator start,
+                             seq_len_t sequence_len,
+                             char first_char = NULL_CHAR) const
+        {
+            throw(std::runtime_error("not implemented yet"));
+        }
+        ///@}
 
 
         sequence_t generate(seq_len_t len, std::default_random_engine &rg, char first_char = NULL_CHAR, bool reverse = false) const {

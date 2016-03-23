@@ -32,19 +32,21 @@ namespace ymir {
                    bool append = false) const {
             std::ofstream ofs;
 
-            ofs.open(filepath);
+            ofs.open(filepath, std::ofstream::out | std::ofstream::app);
 
             if (ofs.is_open()) {
 
-                // write the header
-                ofs << "Nucleotide sequence" << '\t' <<
-                        "Amino acid sequence" << '\t' <<
-                        "Variable" << '\t' <<
-                        "Diversity" << '\t' <<
-                        "Joining" << '\t' <<
-                        "V alignment" << '\t' <<
-                        "D alignment" << '\t' <<
-                        "J alignment" << std::endl;
+                if (!append) {
+                    // write the header
+                    ofs <<  "Nucleotide sequence" << '\t' <<
+                            "Amino acid sequence" << '\t' <<
+                            "Variable" << '\t' <<
+                            "Diversity" << '\t' <<
+                            "Joining" << '\t' <<
+                            "V alignment" << '\t' <<
+                            "D alignment" << '\t' <<
+                            "J alignment" << std::endl;
+                }
 
                 // write clonotypes
                 for (auto i = 0; i < cloneset.size(); ++i) {

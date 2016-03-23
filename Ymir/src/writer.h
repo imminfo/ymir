@@ -28,7 +28,8 @@ namespace ymir {
 
         bool write(const std::string &filepath,
                    const ClonesetView &cloneset,
-                   const VDJRecombinationGenes& gene_segments) const {
+                   const VDJRecombinationGenes& gene_segments,
+                   bool append = false) const {
             std::ofstream ofs;
 
             ofs.open(filepath);

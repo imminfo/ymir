@@ -153,14 +153,14 @@ namespace ymir {
          *
          * \return Artificial repertoire.
          */
-        Cloneset generateSequences(size_t count = 1) const {
+        Cloneset generateSequences(size_t count = 1, bool verbose = true) const {
 #ifndef DNDEBUG
             if (!_status) {
                 throw(std::runtime_error("Can't generate sequences due to a model's failed status!"));
             }
 #endif
             // generate sequences
-            return _generator->generate(count);
+            return _generator->generate(count, verbose);
         }
 
 

@@ -31,11 +31,18 @@ int main(int argc, char* argv[]) {
 
     if (model.status()) {
         std::cout << std::endl;
-        Cloneset gen_rep = model.generateSequences(count);
 
+        size_t to_generate, generated = 0;
+        size_t block_size = 100000;
         RepertoireWriter writer;
-        if (!writer.write(out_file_path, gen_rep, model.gene_segments())) {
-            std::cout << "Problems in writing the output file. Terminating..." << std::endl;
+        while (generated < count) {
+            to_generate = std::min(count - generated, block_size);
+            generated += to_generate;
+            Cloneset gen_rep = model.generateSequences(to_generate, false);
+            if (!writer.write(out_file_path, gen_rep, model.gene_segments(), true)) {
+                std::cout << "Problems in writing the output file. Terminating..." << std::endl;
+            }
+            std::cout << "Generated " << (size_t) generated << "/" << (size_t) count << std::endl;
         }
     } else {
         std::cout << "Problems with the model. Terminating..." << std::endl;

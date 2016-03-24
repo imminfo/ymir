@@ -31,7 +31,6 @@
 #include <iostream>
 #include <sstream>
 #include <tuple>
-#include <unordered_map>
 #include <vector>
 
 #include "jsoncpp.cpp"
@@ -41,6 +40,7 @@
 #endif
 
 #include "matrix.h"
+#include "codon_table.h"
 
 //#include "Eigen/Dense"
 

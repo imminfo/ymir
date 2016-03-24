@@ -79,7 +79,12 @@ namespace ymir {
 
 
         /**
+         * \brief Get the sequence of this Clonotype.
          *
+         * Function sequence() returns just stored sequence;
+         * nuc_sequence() tries to return the nucleotide sequence and fails in debug mode
+         * if the stored sequence is the amino acid one;
+         * aa_sequence() always returns amino acid sequence.
          */
         ///@{
         const sequence_t& sequence() const { return _sequence; }
@@ -113,6 +118,10 @@ namespace ymir {
         SequenceType sequence_type() const { return _seq_type; }
 
 
+        /**
+         * \brief Check if clonotype's sequence is coding, noncoding or out-of-frame.
+         */
+        ///@{
         bool isCoding() const {
             if (_seq_type == NUCLEOTIDE) {
                 return !(is_out_of_frame(_sequence) || has_end_codon(_sequence));
@@ -120,7 +129,6 @@ namespace ymir {
                 return !has_bad_aa_codons(_sequence);
             }
         }
-
 
         bool isNoncoding() const {
             if (_seq_type == NUCLEOTIDE) {
@@ -130,7 +138,6 @@ namespace ymir {
             }
         }
 
-
         bool isOutOfFrame() const {
             if (_seq_type == NUCLEOTIDE) {
                 return is_out_of_frame(_sequence);
@@ -138,7 +145,11 @@ namespace ymir {
                 return has_oof_aa_codon(_sequence);
             }
         }
+        ///@}
 
+        /**
+         * \brief Return the string representation of the clonotype.
+         */
         std::string toString() const {
             std::string res = "";
             res += this->nuc_sequence() + "\t";

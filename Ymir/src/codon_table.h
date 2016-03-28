@@ -25,6 +25,29 @@ namespace ymir {
 
         CodonTable()
         {
+            _aa2codon = {
+                    {'A', "GCT"}, {'A', "GCC"}, {'A', "GCA"}, {'A', "GCG"},
+                    {'L', "TTA"}, {'L', "TTG"}, {'L', "CTT"}, {'L', "CTC"}, {'L', "CTA"}, {'L', "CTG"},
+                    {'R', "CGT"}, {'R', "CGC"}, {'R', "CGA"}, {'R', "CGG"}, {'R', "AGA"}, {'R', "AGG"},
+                    {'K', "AAA"}, {'K', "AAG"},
+                    {'N', "AAT"}, {'N', "AAC"},
+                    {'M', "ATG"},
+                    {'D', "GAT"}, {'D', "GAC"},
+                    {'F', "TTT"}, {'F', "TTC"},
+                    {'C', "TGT"}, {'C', "TGC"},
+                    {'P', "CCT"}, {'P', "CCC"}, {'P', "CCA"}, {'P', "CCG"},
+                    {'Q', "CAA"}, {'Q', "CAG"},
+                    {'S', "TCT"}, {'S', "TCC"}, {'S', "TCA"}, {'S', "TCG"}, {'S', "AGT"}, {'S', "AGC"},
+                    {'E', "GAA"}, {'E', "GAG"},
+                    {'T', "ACT"}, {'T', "ACC"}, {'T', "ACA"}, {'T', "ACG"},
+                    {'G', "GGT"}, {'G', "GGC"}, {'G', "GGA"}, {'G', "GGG"},
+                    {'W', "TGG"},
+                    {'H', "CAT"}, {'H', "CAC"},
+                    {'Y', "TAT"}, {'Y', "TAC"},
+                    {'I', "ATT"}, {'I', "ATC"}, {'I', "ATA"},
+                    {'V', "GTT"}, {'V', "GTC"}, {'V', "GTA"}, {'V', "GTG"},
+                    {'*', "TAA"}, {'*', "TGA"}, {'*', "TAG"}
+            };
         }
 
 

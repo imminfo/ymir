@@ -264,6 +264,80 @@ YMIR_TEST_START(test_writer)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_writer_append)
+
+    RepertoireWriter writer;
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1");
+    alvec1.push_back("Vseg2");
+    alvec1.push_back("Vseg3");
+    seqvec1.push_back("CCCG");
+    seqvec1.push_back("GGG");
+    seqvec1.push_back("AGGCGAG");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1");
+    alvec2.push_back("Jseg2");
+    alvec2.push_back("Jseg3");
+    seqvec2.push_back("CCGTTT");
+    seqvec2.push_back("ATTTGG");
+    seqvec2.push_back("AGGTTT");
+
+    VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
+
+    vector<Clonotype> vec1, vec2, vec12;
+    ClonotypeBuilder cl_builder;
+    // CCCG.AC.GGTTT
+    cl_builder.setSequence("CCCGACGGTTT")
+            .setNucleotideSeq()
+            .setRecombination(VJ_RECOMB)
+            .addVarAlignment(1, 1, 1, 4)
+            .addVarAlignment(3, 4, 3, 4)
+            .addJoiAlignment(1, 2, 6, 5)
+            .addJoiAlignment(2, 2, 9, 3)
+            .addJoiAlignment(3, 2, 7, 5);
+    Clonotype clonotype1 = cl_builder.buildClonotype();
+    vec1.push_back(clonotype1);
+    vec12.push_back(clonotype1);
+
+    cl_builder.setSequence("TACGATCTAGTC")
+            .setNucleotideSeq()
+            .setRecombination(VJ_RECOMB)
+            .addVarAlignment(3, 4, 3, 4)
+            .addVarAlignment(1, 1, 1, 4)
+            .addJoiAlignment(2, 2, 9, 3)
+            .addJoiAlignment(1, 2, 6, 5)
+            .addJoiAlignment(3, 2, 7, 5);
+    Clonotype clonotype2 = cl_builder.buildClonotype();
+    vec2.push_back(clonotype2);
+    vec12.push_back(clonotype2);
+
+    Cloneset cloneset1(vec1), cloneset2(vec2), cloneset12(vec12);
+
+    YMIR_ASSERT(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset1, genes))
+    YMIR_ASSERT(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset2, genes, true))
+
+    Cloneset cloneset_final;
+    NaiveNucParser parser;
+    YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "../out.txt",
+                                    &cloneset_final,
+                                    genes,
+                                    NUCLEOTIDE,
+                                    VJ_RECOMB,
+                                    AlignmentColumnOptions()
+                                            .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                            .setJ(AlignmentColumnOptions::USE_PROVIDED)))
+
+    YMIR_ASSERT2(cloneset_final.size(), cloneset12.size())
+    YMIR_ASSERT(cloneset_final[0] == cloneset12[0])
+    YMIR_ASSERT(cloneset_final[1] == cloneset12[1])
+
+YMIR_TEST_END
+
+
 int main(int argc, char* argv[]) {
 
     TEST_DATA_FOLDER = string(argv[1]) + string("/");
@@ -288,6 +362,7 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_parser_vj_by_block())
     YMIR_TEST(test_parser_vdj_with_d_alignment())
     YMIR_TEST(test_writer())
+    YMIR_TEST(test_writer_append())
 
     //**************  **************//
 

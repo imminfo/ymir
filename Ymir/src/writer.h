@@ -32,7 +32,11 @@ namespace ymir {
                    bool append = false) const {
             std::ofstream ofs;
 
-            ofs.open(filepath, std::ofstream::out | std::ofstream::app);
+            if (append) {
+                ofs.open(filepath, std::ofstream::out | std::ofstream::app);
+            } else {
+                ofs.open(filepath, std::ofstream::out);
+            }
 
             if (ofs.is_open()) {
 

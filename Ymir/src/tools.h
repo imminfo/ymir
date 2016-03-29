@@ -79,7 +79,8 @@ namespace ymir {
 
 
     std::string translate(const std::string &nuc_seq) {
-        return CodonTable::table().translate(nuc_seq);
+//        return CodonTable::table().translate(nuc_seq);
+        return "nothing";
     }
 
 

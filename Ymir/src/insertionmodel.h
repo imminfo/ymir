@@ -102,20 +102,40 @@ namespace ymir {
          *
          */
         ///@{
+//        virtual prob_t aaProbability(const std::string& sequence,
+//                                     seq_len_t first_nuc_pos,  // or an index of the codon?
+//                                     seq_len_t last_nuc_pos,
+//                                     char first_char = NULL_CHAR) const = 0;
+//
+//        virtual prob_t aaProbability(std::string::const_iterator start,
+//                                     seq_len_t first_nuc_pos,
+//                                     seq_len_t last_nuc_pos,
+//                                     char first_char = NULL_CHAR) const = 0;
+//
+//        virtual prob_t aaProbability(std::string::const_reverse_iterator start,
+//                                     seq_len_t first_nuc_pos,
+//                                     seq_len_t last_nuc_pos,
+//                                     char first_char = NULL_CHAR) const = 0;
+
         virtual prob_t aaProbability(const std::string& sequence,
-                                     seq_len_t first_nuc_pos,  // or an index of the codon?
-                                     seq_len_t last_nuc_pos,
-                                     char first_char = NULL_CHAR) const = 0;
+                             char first_char = NULL_CHAR) const
+        {
+            return this->aaProbability(sequence.cbegin(), sequence.size(), first_char);
+        }
 
         virtual prob_t aaProbability(std::string::const_iterator start,
-                                     seq_len_t first_nuc_pos,
-                                     seq_len_t last_nuc_pos,
-                                     char first_char = NULL_CHAR) const = 0;
+                             seq_len_t sequence_len,
+                             char first_char = NULL_CHAR) const
+        {
+            throw(std::runtime_error("not implemented yet"));
+        }
 
         virtual prob_t aaProbability(std::string::const_reverse_iterator start,
-                                     seq_len_t first_nuc_pos,
-                                     seq_len_t last_nuc_pos,
-                                     char first_char = NULL_CHAR) const = 0;
+                             seq_len_t sequence_len,
+                             char first_char = NULL_CHAR) const
+        {
+            throw(std::runtime_error("not implemented yet"));
+        }
         ///@}
 
 

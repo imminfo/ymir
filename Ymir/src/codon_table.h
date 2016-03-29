@@ -10,17 +10,17 @@
 
 
 namespace ymir {
-
+/*
     class CodonTable;
 
 
     class CodonTable {
     public:
 
-        typedef std::unordered_multimap<> aa_to_codon_storage_t;
-
-
-        typedef std::unordered_map<> codon_to_aa_storage_t;
+//        typedef std::unordered_multimap<> aa_to_codon_storage_t;
+//
+//
+//        typedef std::unordered_map<> codon_to_aa_storage_t;
 
 
         CodonTable()
@@ -82,7 +82,7 @@ namespace ymir {
         codon_to_aa_storage_t _codon2aa;
 
     };
-
+*/
 }
 
 #endif //YMIR_CODON_TABLE_H

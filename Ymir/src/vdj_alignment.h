@@ -213,14 +213,14 @@ namespace ymir {
 
     protected:
 
-        segments_storage_t _segments;  /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
-                                              /// vector of indices of segments, aligned on this clone: V1--V2--V3--J1--J2--D1--D2--...
-
         NoGapAlignmentVector _alignments;  /// Vector of alignments for segments.
-        
+
         n_D_alignments_storage_t _n_D_alignments;  /// Accumulated number of alignments for each D gene segment;
                                                    /// vector's length == _segments[2] + 1. Number of alignments for i-th
                                                    /// gene is equal to v[i+1] - v[i].
+
+        segments_storage_t _segments;  /// Two concatenated vectors: vector of length 3 w/ numbers of aligned segments (V-J-D) and
+                                       /// vector of indices of segments, aligned on this clone: V1--V2--V3--J1--J2--D1--D2--...
 
 
         VDJAlignment() {}

@@ -163,11 +163,11 @@ namespace ymir {
 
     protected:
 
+        sequence_t _sequence; //* CDR3 or full nucleotide or amino acid sequence of a clone. */
+
         Recombination _recomb;
 
         SequenceType _seq_type;
-
-        sequence_t _sequence; //* CDR3 or full nucleotide or amino acid sequence of a clone. */
 
         bool _good;
 

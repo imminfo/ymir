@@ -88,7 +88,7 @@ namespace ymir {
         /**
          *
          */
-        virtual ~ProbabilisticAssemblingModel()
+        ~ProbabilisticAssemblingModel()
         {
         }
 

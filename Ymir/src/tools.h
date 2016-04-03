@@ -30,6 +30,7 @@
 #include "math.h"
 
 #include "types.h"
+#include "codon_table.h"
 //#include "repertoire.h"
 
 
@@ -79,8 +80,7 @@ namespace ymir {
 
 
     std::string translate(const std::string &nuc_seq) {
-//        return CodonTable::table().translate(nuc_seq);
-        return "nothing";
+        return CodonTable::table().translate(nuc_seq);
     }
 
 

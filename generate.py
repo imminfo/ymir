@@ -22,9 +22,15 @@ if __name__ == "__main__":
     if out_file == "./ymir_artif/out.ymir_gen.txt":
         out_file = "./ymir_artif/out.ymir_gen." + args.model + ".txt"
 
+    cod_nonc = '0'
+    if args.coding:
+        cod_nonc = '1'
+    elif args.noncoding:
+        cod_nonc = '2'
+
     if model_check:
         print()
-        os.system(" ".join(["./build/scripts/Generate", model, str(args.count), out_file]))
+        os.system(" ".join(["./build/scripts/Generate", model, str(args.count), out_file, cod_nonc]))
         print()
     else:
         print("Can't process further, too many errors for me! T_T")

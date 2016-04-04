@@ -127,8 +127,10 @@ namespace ymir {
 
         std::string translate(const std::string &nuc_seq) const {
             if (nuc_seq.size() % 3 == 0 && !nuc_seq.empty()) {
-                std::string res;
-                // for
+                std::string res = "";
+                for (seq_len_t i = 0; i < nuc_seq.size(); i += 3) {
+                    res += _codon2aa.find(16*nuc_hash(nuc_seq[i]) + 4*nuc_hash(nuc_seq[i+1]) + nuc_hash(nuc_seq[i+2]))->second;
+                }
                 return res;
             }
             return "";

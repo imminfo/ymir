@@ -52,6 +52,19 @@ namespace ymir {
 
             char aminoacid() const { return _current->first; }
 
+
+            std::string print() {
+                std::string res = " ";
+                res[0] = this->aminoacid();
+                res += ":" + this->codon() + "_";
+                while (this->next()) {
+                    res += "_";
+                    res[res.size() - 1] = this->aminoacid();
+                    res += ":" + this->codon() + "_";
+                }
+                return res;
+            }
+
         private:
 
             aa_to_codon_storage_t::const_iterator _begin, _end, _current;
@@ -119,6 +132,15 @@ namespace ymir {
                 return res;
             }
             return "";
+        }
+
+
+        std::string print() {
+            std::string res = "";
+            for (aa_to_codon_storage_t::iterator it = _aa2codon.begin(); it != _aa2codon.end(); ++it) {
+                res += this->codons(it->first).print();
+            }
+            return res;
         }
 
     private:

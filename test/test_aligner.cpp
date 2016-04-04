@@ -33,8 +33,9 @@ using namespace ymir;
 std::string TEST_DATA_FOLDER;
 
 
-YMIR_TEST_START(test_basic)
-YMIR_ASSERT(1 == 1)
+YMIR_TEST_START(test_codon_table)
+    std::cout << CodonTable::table().print() << std::endl;
+    YMIR_ASSERT(false)
 YMIR_TEST_END
 
 
@@ -567,6 +568,8 @@ int main(int argc, char* argv[]) {
 
 
     //**************  TEST CASES  **************//
+    // Test for CodonTable.
+    YMIR_TEST(test_codon_table())
 
     // Tests for sequences aligners.
     YMIR_TEST(test_naive_cdr3_nuc_aligner())

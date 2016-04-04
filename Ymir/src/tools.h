@@ -30,8 +30,6 @@
 #include "math.h"
 
 #include "types.h"
-#include "codon_table.h"
-//#include "repertoire.h"
 
 
 namespace ymir {
@@ -76,11 +74,6 @@ namespace ymir {
             case 'T': return 'A';
             default : return NULL_CHAR;
         }
-    }
-
-
-    std::string translate(const std::string &nuc_seq) {
-        return CodonTable::table().translate(nuc_seq);
     }
 
 

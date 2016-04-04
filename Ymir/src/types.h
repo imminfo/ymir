@@ -40,7 +40,6 @@
 #endif
 
 #include "matrix.h"
-#include "codon_table.h"
 
 //#include "Eigen/Dense"
 
@@ -249,79 +248,6 @@ namespace ymir {
         MONO_NUCLEOTIDE,
         DI_NUCLEOTIDE
     };
-
-
-    /**
-     * \struct CodonTable
-     *
-     * \brief A struct for representing nucleotide codons for amino acids.
-     */
-    struct CodonTable {
-
-        struct Codons {
-
-            Codons(std::pair<std::unordered_multimap<char, std::string>::const_iterator, std::unordered_multimap<char, std::string>::const_iterator> it)
-                    : _begin(it.first), _end(it.second), _current(it.first)
-            {}
-
-
-            std::string next() {
-                std::string res = _current->second;
-                ++_current;
-                return res;
-            }
-
-
-            bool end() const { return _current == _end; }
-
-        protected:
-            std::unordered_multimap<char, std::string>::const_iterator _begin, _end, _current;
-
-            Codons() {}
-
-        };
-
-        CodonTable() {
-            _codons = {
-                    {'A', "GCT"}, {'A', "GCC"}, {'A', "GCA"}, {'A', "GCG"},
-                    {'L', "TTA"}, {'L', "TTG"}, {'L', "CTT"}, {'L', "CTC"}, {'L', "CTA"}, {'L', "CTG"},
-                    {'R', "CGT"}, {'R', "CGC"}, {'R', "CGA"}, {'R', "CGG"}, {'R', "AGA"}, {'R', "AGG"},
-                    {'K', "AAA"}, {'K', "AAG"},
-                    {'N', "AAT"}, {'N', "AAC"},
-                    {'M', "ATG"},
-                    {'D', "GAT"}, {'D', "GAC"},
-                    {'F', "TTT"}, {'F', "TTC"},
-                    {'C', "TGT"}, {'C', "TGC"},
-                    {'P', "CCT"}, {'P', "CCC"}, {'P', "CCA"}, {'P', "CCG"},
-                    {'Q', "CAA"}, {'Q', "CAG"},
-                    {'S', "TCT"}, {'S', "TCC"}, {'S', "TCA"}, {'S', "TCG"}, {'S', "AGT"}, {'S', "AGC"},
-                    {'E', "GAA"}, {'E', "GAG"},
-                    {'T', "ACT"}, {'T', "ACC"}, {'T', "ACA"}, {'T', "ACG"},
-                    {'G', "GGT"}, {'G', "GGC"}, {'G', "GGA"}, {'G', "GGG"},
-                    {'W', "TGG"},
-                    {'H', "CAT"}, {'H', "CAC"},
-                    {'Y', "TAT"}, {'Y', "TAC"},
-                    {'I', "ATT"}, {'I', "ATC"}, {'I', "ATA"},
-                    {'V', "GTT"}, {'V', "GTC"}, {'V', "GTA"}, {'V', "GTG"},
-                    {'*', "TAA"}, {'*', "TGA"}, {'*', "TAG"}
-            };
-        }
-
-        Codons codons(char aminoacid) const { return Codons(_codons.equal_range(aminoacid)); }
-
-
-
-    protected:
-        std::unordered_multimap<char, std::string> _codons;
-    };
-
-
-    typedef std::pair<std::string*, uint> codons_t;
-    codons_t codons(char aminoacid) {
-        switch (aminoacid) {
-            default: return codons_t(nullptr, 0);
-        }
-    }
 
 }
 

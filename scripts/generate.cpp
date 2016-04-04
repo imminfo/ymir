@@ -54,17 +54,41 @@ int main(int argc, char* argv[]) {
     if (model.status()) {
         std::cout << std::endl;
 
-        size_t to_generate, generated = 0;
+        size_t to_generate, generated = 0, generated_coding = 0, generated_noncoding = 0;
         size_t block_size = 100000;
         RepertoireWriter writer;
+        bool first_iter = false;
         while (generated < count) {
             to_generate = std::min(count - generated, block_size);
-            generated += to_generate;
-            Cloneset gen_rep = model.generateSequences(to_generate, coding_type);
-            if (!writer.write(out_file_path, gen_rep, model.gene_segments(), generated != to_generate)) {
-                std::cout << "Problems in writing the output file. Terminating..." << std::endl;
+            ClonesetView gen_rep = model.generateSequences(to_generate);
+
+            if (coding_type == SequenceCodingType::CODING) {
+                gen_rep = gen_rep.coding();
+                if (gen_rep.size() > to_generate) {
+                    gen_rep = gen_rep.head(to_generate);
+                }
+                generated_coding += gen_rep.size();
+            } else if (coding_type == SequenceCodingType::NONCODING) {
+                gen_rep = gen_rep.noncoding();
+                if (gen_rep.size() > to_generate) {
+                    gen_rep = gen_rep.head(to_generate);
+                }
+                generated_noncoding += gen_rep.size();
+            } else {
+                generated_coding += gen_rep.coding().size();
+                generated_noncoding += gen_rep.noncoding().size();
+            }
+
+            generated = generated_coding + generated_noncoding;
+            if (!writer.write(out_file_path, gen_rep, model.gene_segments(), first_iter)) {
+                std::cout << "Problems occurred while writing the output file. Terminating..." << std::endl;
+                break;
             }
             std::cout << "Generated " << (size_t) generated << "/" << (size_t) count << std::endl;
+            std::cout << "\t- " << (size_t) generated_coding << " coding sequences" << std::endl;
+            std::cout << "\t- " << (size_t) generated_noncoding << " noncoding sequences" << std::endl;
+
+            first_iter = true;
         }
     } else {
         std::cout << "Problems with the model. Terminating..." << std::endl;

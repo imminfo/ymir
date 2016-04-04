@@ -32,9 +32,7 @@ namespace ymir {
         virtual ~ClonotypeAssembler() { }
 
 
-        void updateModelParameterVector(const ModelParameterVector &param_vec) {
-            _param_vec = param_vec;
-        }
+        void updateModelParameterVector(const ModelParameterVector &param_vec) { _param_vec = param_vec; }
 
 
         /**
@@ -56,7 +54,13 @@ namespace ymir {
                 for (size_t clonotype_i = 0; clonotype_i < count; ++clonotype_i) {
                     vec.push_back(this->generate_vdj(rg));
                 }
-            } else {
+            }
+//            else if (_param_vec.recombination() == VD2J_RECOMB) {
+//                for (size_t clonotype_i = 0; clonotype_i < count; ++clonotype_i) {
+//                    vec.push_back(this->generate_vd2j(rg));
+//                }
+//            }
+            else {
                 std::cout << "Unrecognised recombination type of the input model." << std::endl;
             }
 

@@ -38,7 +38,7 @@ namespace ymir {
         /**
          *
          */
-        Cloneset generate(size_t count = 1, SequenceCodingType coding_type = SequenceCodingType::ALL) const {
+        Cloneset generate(size_t count = 1) const {
             std::vector<Clonotype> vec;
             vec.reserve(count);
 

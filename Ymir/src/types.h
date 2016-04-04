@@ -249,6 +249,13 @@ namespace ymir {
         DI_NUCLEOTIDE
     };
 
+
+    enum SequenceCodingType {
+        ALL,
+        CODING,
+        NONCODING
+    };
+
 }
 
 #endif

@@ -10,6 +10,7 @@
 
 using namespace ymir;
 
+
 /**
  * \brief Main function of a script for generation of pre-selected receptors. It has
  * a strict order of input arguments in console:

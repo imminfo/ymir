@@ -79,9 +79,9 @@ int main(int argc, char* argv[]) {
                                        NUCLEOTIDE,
                                        VDJ_RECOMB,
                                        AlignmentColumnOptions()
-                                               .setV(AlignmentColumnOptions::USE_PROVIDED)
+                                               .setV(AlignmentColumnOptions::OVERWRITE)
                                                .setD(AlignmentColumnOptions::OVERWRITE)
-                                               .setJ(AlignmentColumnOptions::USE_PROVIDED),
+                                               .setJ(AlignmentColumnOptions::OVERWRITE),
                                        VDJAlignerParameters(3)))
 
     //

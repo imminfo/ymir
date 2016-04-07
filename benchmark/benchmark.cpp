@@ -39,8 +39,8 @@ int main(int argc, char* argv[]) {
 
     CDR3NucParser parser;
 
-    string input_alpha_file = "alpha.250k.txt";
-    string input_beta_file = "beta.250k.txt";
+    string input_alpha_file = "alpha.500k.txt";
+    string input_beta_file = "beta.500k.txt";
 
 
     //

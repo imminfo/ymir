@@ -105,47 +105,47 @@ int main(int argc, char* argv[]) {
     //
     // VJ inference
     //
-    YMIR_BENCHMARK("VJ EM",
-                   logLvec = EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
-                                                                EMAlgorithm::AlgorithmParameters()
-                                                                        .set("niter", 10)
-                                                                        .set("sample", 100000),
-                                                                NO_ERRORS))
-
-    YMIR_BENCHMARK("VJ SG",
-                   logLvec = SGAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
-                                                                SGAlgorithm::AlgorithmParameters()
-                                                                        .set("niter", 10)
-                                                                        .set("block.size", 5000)
-                                                                        .set("alpha", .7)
-                                                                        .set("beta", 1.)
-                                                                        .set("K", 2.)
-                                                                        .set("prebuild", false)
-                                                                        .set("sample", 100000),
-                                                                NO_ERRORS))
+//    YMIR_BENCHMARK("VJ EM",
+//                   logLvec = EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
+//                                                                EMAlgorithm::AlgorithmParameters()
+//                                                                        .set("niter", 10)
+//                                                                        .set("sample", 100000),
+//                                                                NO_ERRORS))
+//
+//    YMIR_BENCHMARK("VJ SG",
+//                   logLvec = SGAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
+//                                                                SGAlgorithm::AlgorithmParameters()
+//                                                                        .set("niter", 10)
+//                                                                        .set("block.size", 5000)
+//                                                                        .set("alpha", .7)
+//                                                                        .set("beta", 1.)
+//                                                                        .set("K", 2.)
+//                                                                        .set("prebuild", false)
+//                                                                        .set("sample", 100000),
+//                                                                NO_ERRORS))
 
 
     //
     // VDJ inference
     //
-    YMIR_BENCHMARK("VDJ EM",
-                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
-                                                      EMAlgorithm::AlgorithmParameters()
-                                                              .set("niter", 10)
-                                                              .set("sample", 100000),
-                                                                NO_ERRORS))
-
-    YMIR_BENCHMARK("VDJ SG",
-                   logLvec = SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
-                                                      SGAlgorithm::AlgorithmParameters()
-                                                              .set("niter", 10)
-                                                              .set("block.size", 5000)
-                                                              .set("alpha", .7)
-                                                              .set("beta", 1.)
-                                                              .set("K", 2.)
-                                                              .set("prebuild", false)
-                                                              .set("sample", 100000),
-                                                                NO_ERRORS))
+//    YMIR_BENCHMARK("VDJ EM",
+//                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
+//                                                      EMAlgorithm::AlgorithmParameters()
+//                                                              .set("niter", 10)
+//                                                              .set("sample", 100000),
+//                                                                NO_ERRORS))
+//
+//    YMIR_BENCHMARK("VDJ SG",
+//                   logLvec = SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
+//                                                      SGAlgorithm::AlgorithmParameters()
+//                                                              .set("niter", 10)
+//                                                              .set("block.size", 5000)
+//                                                              .set("alpha", .7)
+//                                                              .set("beta", 1.)
+//                                                              .set("K", 2.)
+//                                                              .set("prebuild", false)
+//                                                              .set("sample", 100000),
+//                                                                NO_ERRORS))
 
     //
     // Results

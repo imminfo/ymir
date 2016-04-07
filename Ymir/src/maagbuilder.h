@@ -96,11 +96,10 @@ namespace ymir {
                    MetadataMode metadata_mode,
                    ErrorMode error_mode,
                    SequenceType seq_type = NUCLEOTIDE) const {
-            if (clonotype.is_good())
-            {
-                ProbMMC probs;
-                EventIndMMC events;
-                ErrMMC errors;
+            if (clonotype.is_good()) {
+                pProbMMC probs(new ProbMMC);
+                pEventIndMMC events;
+                pErrMMC errors;
                 vector<seq_len_t> seq_poses;
                 seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
 
@@ -122,22 +121,24 @@ namespace ymir {
 #endif
                 }
 
-                probs.resize(resize_size);
+                probs->resize(resize_size);
                 if (metadata_mode) {
-                    events.resize(resize_size);
+                    events.reset(new EventIndMMC);
+                    events->resize(resize_size);
                 }
                 if (error_mode) {
-                    errors.resize(e_resize_size);
+                    errors.reset(new ErrMMC);
+                    errors->resize(e_resize_size);
                 }
 
-                this->buildVariable(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
-                this->buildJoining(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+                this->buildVariable(clonotype, *probs, *events, *errors, seq_poses, metadata_mode, error_mode);
+                this->buildJoining(clonotype, *probs, *events, *errors, seq_poses, metadata_mode, error_mode);
                 if (clonotype.recombination() == VJ_RECOMB) {
-                    this->buildVJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                    this->buildVJinsertions(clonotype, *probs, *events, seq_poses, metadata_mode, error_mode);
                 } else if (clonotype.recombination() == VDJ_RECOMB) {
-                    this->buildDiversity(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
-                    this->buildVDinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
-                    this->buildDJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                    this->buildDiversity(clonotype, *probs, *events, *errors, seq_poses, metadata_mode, error_mode);
+                    this->buildVDinsertions(clonotype, *probs, *events, seq_poses, metadata_mode, error_mode);
+                    this->buildDJinsertions(clonotype, *probs, *events, seq_poses, metadata_mode, error_mode);
                 }
 
 //            if (error_mode && metadata_mode) {
@@ -166,20 +167,21 @@ namespace ymir {
 
 //                std::cout << clonotype.toString() << std::endl;
 
-                probs.finish();
+                probs->finish();
 
                 MAAG maag;
                 maag._recomb = clonotype.recombination();
                 maag._seq_type = clonotype.sequence_type();
-                maag.swap(probs);
+                maag.swap(*probs);
                 if (error_mode) {
-                    errors.finish();
+                    errors->finish();
 
-                    maag._errors.reset(new ErrMMC());
-                    maag._errors->swap(errors);
+                    maag._errors.swap(errors);
+//                    maag._errors.reset(new ErrMMC());
+//                    maag._errors->swap(errors);
                 }
                 if (metadata_mode) {
-                    events.finish();
+                    events->finish();
 
                     unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
                     copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
@@ -187,8 +189,9 @@ namespace ymir {
                     maag._seq_poses.swap(seq_poses_arr);
                     maag._n_poses = seq_poses.size();
 
-                    maag._events.reset(new EventIndMMC());
-                    maag._events->swap(events);
+//                    maag._events.reset(new EventIndMMC());
+//                    maag._events->swap(events);
+                    maag._events.swap(events);
                 }
                 return maag;
             } else {

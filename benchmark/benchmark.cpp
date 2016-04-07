@@ -58,7 +58,8 @@ int main(int argc, char* argv[]) {
                                        vj_single_genes,
                                        NUCLEOTIDE,
                                        VJ_RECOMB,
-                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE, AlignmentColumnOptions::OVERWRITE),
+                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+                                                              AlignmentColumnOptions::OVERWRITE),
                                        VDJAlignerParameters(2)))
 
     //
@@ -78,10 +79,9 @@ int main(int argc, char* argv[]) {
                                        vdj_single_genes,
                                        NUCLEOTIDE,
                                        VDJ_RECOMB,
-                                       AlignmentColumnOptions()
-                                               .setV(AlignmentColumnOptions::OVERWRITE)
-                                               .setD(AlignmentColumnOptions::OVERWRITE)
-                                               .setJ(AlignmentColumnOptions::OVERWRITE),
+                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+                                                              AlignmentColumnOptions::OVERWRITE,
+                                                              AlignmentColumnOptions::OVERWRITE),
                                        VDJAlignerParameters(3)))
 
     //

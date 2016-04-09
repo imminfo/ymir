@@ -110,68 +110,6 @@ namespace ymir {
 
 
         /**
-         * \brief Special swap constructor for MAAGs that will be used only for computation of
-         * the full probability.
-         */
-//        MAAG(ProbMMC &prob_mmc)
-//            : _recomb(prob_mmc.chainSize() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB),  // TODO: fix this
-//              _events(nullptr),
-//              _sequence(nullptr),
-//              _seq_poses(nullptr),
-//              _n_poses(0),
-//              _seq_type(NUCLEOTIDE)
-//        {
-//            this->swap(prob_mmc);
-//        }
-//
-//
-//        MAAG(ProbMMC &prob_mmc, ErrMMC &err_mmc)
-//            : MAAG(prob_mmc)
-//        {
-//            _errors.reset(new ErrMMC());
-//            _errors.get()->swap(err_mmc);
-//        }
-
-
-        /**
-         * \brief Special swap constructor for MAAGs that will be used for statistical inference.
-         */
-//        MAAG(ProbMMC &prob_mmc,
-//             EventIndMMC &eventind_mcc,
-//             const std::string &sequence,
-//             unique_ptr<seq_len_t[]> &seq_poses,
-//             seq_len_t n_poses,
-//             SequenceType seq_type)
-//                : _recomb(prob_mmc.chainSize() == VJ_CHAIN_SIZE ? VJ_RECOMB : VDJ_RECOMB),
-//                  _n_poses(n_poses),
-//                  _seq_type(seq_type)
-//        {
-//            this->swap(prob_mmc);
-//
-//            _events.reset(new EventIndMMC());
-//            _events.get()->swap(eventind_mcc);
-//
-//            _sequence.reset(new std::string(sequence));
-//
-//            _seq_poses.swap(seq_poses);
-//        }
-//
-//
-//        MAAG(ProbMMC &prob_mmc,
-//             EventIndMMC &eventind_mcc,
-//             ErrMMC &err_mmc,
-//             const std::string &sequence,
-//             unique_ptr<seq_len_t[]> &seq_poses,
-//             seq_len_t n_poses,
-//             SequenceType seq_type)
-//            : MAAG(prob_mmc, eventind_mcc, sequence, seq_poses, n_poses, seq_type)
-//        {
-//            _errors.reset(new ErrMMC());
-//            _errors.get()->swap(err_mmc);
-//        }
-
-
-        /**
          *
          */
         virtual ~MAAG() { }

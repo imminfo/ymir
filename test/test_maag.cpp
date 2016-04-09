@@ -149,7 +149,7 @@ YMIR_TEST_START(test_maag_vj)
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
-    MAAGBuilder maag_builder(mvec, genes);
+    MAAGNucBuilder maag_builder(mvec, genes);
 
     ClonotypeBuilder cl_builder;
     // CCCGACGGTTT
@@ -171,7 +171,7 @@ YMIR_TEST_START(test_maag_vj)
     Clonotype clonotype = cl_builder.buildClonotype();
 
 //    cout << "here" << endl;
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
+    MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
     YMIR_ASSERT2(maag.nVar(), 2)
     YMIR_ASSERT2(maag.nJoi(), 3)
@@ -260,7 +260,7 @@ YMIR_TEST_START(test_maag_vj_err)
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
-    MAAGBuilder maag_builder(mvec, genes);
+    MAAGNucBuilder maag_builder(mvec, genes);
 
     NoGapAlignmentVector vec;
     NoGapAlignmentVector::events_storage_t bits;
@@ -301,7 +301,7 @@ YMIR_TEST_START(test_maag_vj_err)
     Clonotype clonotype = cl_builder.buildClonotype();
 
 //    cout << "here" << endl;
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, COMPUTE_ERRORS);
+    MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, COMPUTE_ERRORS);
 
     YMIR_ASSERT2(maag.nVar(), 2)
     YMIR_ASSERT2(maag.nJoi(), 3)
@@ -436,7 +436,7 @@ YMIR_TEST_START(test_maag_vdj)
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
-    MAAGBuilder maag_builder(mvec, genes);
+    MAAGNucBuilder maag_builder(mvec, genes);
 
     ClonotypeBuilder cl_builder;
     /*
@@ -475,7 +475,7 @@ YMIR_TEST_START(test_maag_vdj)
     cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
+    MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
 //    cout << "V 0:" << maag.rows(0) << ":" << maag.cols(0) << endl;
 //    cout << "Vdel 1:" << maag.rows(1) << ":" << maag.cols(1) << endl;
@@ -613,7 +613,7 @@ YMIR_TEST_START(test_maag_vdj_err)
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
-    MAAGBuilder maag_builder(mvec, genes);
+    MAAGNucBuilder maag_builder(mvec, genes);
 
     NoGapAlignmentVector vec, vec2;
     NoGapAlignmentVector::events_storage_t bits;
@@ -686,7 +686,7 @@ YMIR_TEST_START(test_maag_vdj_err)
 
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, COMPUTE_ERRORS);
+    MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, COMPUTE_ERRORS);
 
     YMIR_ASSERT2(maag.nVar(), 2)
     YMIR_ASSERT2(maag.nJoi(), 3)
@@ -840,7 +840,7 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
-    MAAGBuilder maag_builder(mvec, genes);
+    MAAGNucBuilder maag_builder(mvec, genes);
 
     ClonotypeBuilder cl_builder;
     // CCCG.AC.GGTTT
@@ -857,7 +857,7 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
+    MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
     ModelParameterVector mvec2 = make_test_events_vj2();
 
@@ -870,7 +870,7 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
 //    cout << mvec.event_prob(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1) << endl;
 //    YMIR_ASSERT2(maag.event_probability(2, 0, 0, 0), mvec2.event_prob(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
 
-    MAAGBuilder maag_builder2(mvec2, genes);
+    MAAGNucBuilder maag_builder2(mvec2, genes);
 
     maag_builder2.updateEventProbabilities(&maag);
 
@@ -955,7 +955,7 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
-    MAAGBuilder maag_builder(mvec, genes);
+    MAAGNucBuilder maag_builder(mvec, genes);
 
     ClonotypeBuilder cl_builder;
     /*
@@ -991,13 +991,13 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
     cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
+    MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
     ModelParameterVector mvec2 = make_test_events_vdj2();
 
     YMIR_ASSERT(!(mvec == mvec2))
 
-    MAAGBuilder maag_builder2(mvec2, genes);
+    MAAGNucBuilder maag_builder2(mvec2, genes);
     maag_builder2.updateEventProbabilities(&maag);
 
     YMIR_ASSERT2(maag.nVar(), 2)
@@ -1105,7 +1105,7 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] = 0;
     mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] = 0;
     mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] = 0;
-    MAAGBuilder maag_builder(mvec, genes);
+    MAAGNucBuilder maag_builder(mvec, genes);
 
     ClonotypeBuilder cl_builder;
     // CCCAAAAAAATT
@@ -1128,7 +1128,7 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     cl_builder.setRecombination(VJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
+    MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
     MAAGForwardBackwardAlgorithm algo(maag);
 
@@ -1184,7 +1184,7 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
-    MAAGBuilder maag_builder(mvec, genes);
+    MAAGNucBuilder maag_builder(mvec, genes);
 
     ClonotypeBuilder cl_builder;
     /*
@@ -1218,7 +1218,7 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
     cl_builder.setRecombination(VDJ_RECOMB);
     Clonotype clonotype = cl_builder.buildClonotype();
 
-    MAAG maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
+    MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
 //    for (int node_i = 0; node_i < maag.chainSize(); ++node_i) {
 //        for (int mat_i = 0; mat_i < maag.nodeSize(node_i); ++mat_i) {

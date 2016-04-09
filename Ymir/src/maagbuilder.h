@@ -1029,10 +1029,9 @@ namespace ymir {
                     insertion_len = seq_poses[right_vertex_i] - seq_poses[left_vertex_i] - 1;
                     good_insertion = (insertion_len >= 0) && (insertion_len <= max_size);
                     if (good_insertion) {
+                        last_char = NULL_CHAR;
                         if (!reversed) {
-                            if (seq_poses[left_vertex_i] == 0) {
-                                last_char = NULL_CHAR;
-                            } else {
+                            if (seq_poses[left_vertex_i] != 0) {
                                 last_char = sequence[seq_poses[left_vertex_i] - 1];
                             }
 
@@ -1043,9 +1042,7 @@ namespace ymir {
                                                         error_mode)
                                       * (*_param_vec)[null_insertion + insertion_len];
                         } else {
-                            if (seq_poses[right_vertex_i] == sequence.size() + 1) {
-                                last_char = NULL_CHAR;
-                            } else {
+                            if (seq_poses[right_vertex_i] != sequence.size() + 1) {
                                 last_char = sequence[seq_poses[right_vertex_i] - 1];
                             }
 

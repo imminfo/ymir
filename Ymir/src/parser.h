@@ -156,7 +156,6 @@ namespace ymir {
     * To make new parsers inherit from this class and rewrite virtual private method
     * "parseRepertoire".
     */
-    template <typename Aligner >
     class RepertoireParser {
 
     public:
@@ -171,6 +170,12 @@ namespace ymir {
 
         RepertoireParser() {
 //            _config_is_loaded = false;
+        }
+
+
+        RepertoireParser(VDJAlignerBase *aligner)
+            : _aligner(aligner)
+        {
         }
 
 
@@ -280,7 +285,7 @@ namespace ymir {
         AlignmentColumnOptions _opts;
         SequenceType _seq_type;
         RepertoireParserStatistics _stats;
-        Aligner _aligner;
+        unique_ptr<VDJAlignerBase> _aligner;
         bool _status;
         bool _read_header;
 

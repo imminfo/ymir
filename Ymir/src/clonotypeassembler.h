@@ -38,8 +38,8 @@ namespace ymir {
         /**
          *
          */
-        Cloneset generate(size_t count = 1) const {
-            std::vector<Clonotype> vec;
+        ClonesetNuc generate(size_t count = 1) const {
+            std::vector<ClonotypeNuc> vec;
             vec.reserve(count);
 
             unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -64,7 +64,7 @@ namespace ymir {
                 std::cout << "Unrecognised recombination type of the input model." << std::endl;
             }
 
-            return Cloneset(vec);
+            return ClonesetNuc(vec);
         }
 
     protected:
@@ -73,8 +73,8 @@ namespace ymir {
         VDJRecombinationGenes _genes;
 
 
-        Clonotype generate_vj(std::default_random_engine &rg) const {
-            ClonotypeBuilder builder;
+        ClonotypeNuc generate_vj(std::default_random_engine &rg) const {
+            ClonotypeNucBuilder builder;
             MonoNucInsertionModel mc_vj(_param_vec.get_iterator(_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
 
             std::discrete_distribution<event_ind_t> vj_genes(_param_vec.get_iterator(_param_vec.event_index(VJ_VAR_JOI_GEN, 0, 0)),
@@ -105,13 +105,12 @@ namespace ymir {
             builder.setSequence(_genes.V()[vgene].sequence.substr(0, _genes.V()[vgene].sequence.size() - v_del_num)
                                   + mc_vj.generate(ins_len, rg)
                                   + _genes.J()[jgene].sequence.substr(j_del_num));
-            builder.setNucleotideSeq();
             return builder.buildClonotype();
         }
 
 
-        Clonotype generate_vdj(std::default_random_engine &rg) const {
-            ClonotypeBuilder builder;
+        ClonotypeNuc generate_vdj(std::default_random_engine &rg) const {
+            ClonotypeNucBuilder builder;
             const DiNucInsertionModel mc_vd(_param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
             const DiNucInsertionModel mc_dj(_param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
 
@@ -170,7 +169,6 @@ namespace ymir {
                                 + mc_dj.generate(ins_len_dj, rg, first_j_char, true)
                                 + jgene_del);
 
-            builder.setNucleotideSeq();
             return builder.buildClonotype();
         }
 

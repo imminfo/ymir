@@ -89,19 +89,19 @@ namespace ymir {
         ///@{
         alignment_vector_t alignVar(seg_index_t id, const sequence_t &sequence) const {
             alignment_vector_t vec;
-            this->_alignVar(id, _genes.V()[id].sequence, _sequence, &vec);
+            this->_alignVar(id, _genes.V()[id].sequence, this->sequence(), &vec);
             return vec;
         }
 
         alignment_vector_t alignDiv(seg_index_t id, const sequence_t &sequence) const {
             alignment_vector_t vec;
-            this->_alignDiv(id, _genes.D()[id].sequence, _sequence, &vec);
+            this->_alignDiv(id, _genes.D()[id].sequence, this->sequence(), &vec);
             return vec;
         }
 
         alignment_vector_t alignJoi(seg_index_t id, const sequence_t &sequence) const {
             alignment_vector_t vec;
-            this->_alignJoi(id, _genes.J()[id].sequence, _sequence, &vec);
+            this->_alignJoi(id, _genes.J()[id].sequence, this->sequence(), &vec);
             return vec;
         }
         ///@}
@@ -118,7 +118,7 @@ namespace ymir {
         bool alignVar() {
             alignment_vector_t vec;
             for (seg_index_t id = 1; id <= _genes.V().max(); ++id) {
-                this->_alignVar(id, _genes.V()[id].sequence, _sequence, &vec);
+                this->_alignVar(id, _genes.V()[id].sequence, this->sequence(), &vec);
             }
             this->addVarAlignment(vec);
             return vec.size() != 0;
@@ -128,7 +128,7 @@ namespace ymir {
             alignment_vector_t vec;
             for (seg_index_t id = 1; id <= _genes.D().max(); ++id) {
                 vec.clear(); // TODO: some strange behaviour here after I added this line. Be careful. Maybe there is some bug in clear().
-                this->_alignDiv(id, _genes.D()[id].sequence, _sequence, &vec);
+                this->_alignDiv(id, _genes.D()[id].sequence, this->sequence(), &vec);
                 if (vec.size()) {
                     this->addDivAlignment(vec);
                 }
@@ -139,7 +139,7 @@ namespace ymir {
         bool alignJoi() {
             alignment_vector_t vec;
             for (seg_index_t id = 1; id <= _genes.J().max(); ++id) {
-                this->_alignJoi(id, _genes.J()[id].sequence, _sequence, &vec);
+                this->_alignJoi(id, _genes.J()[id].sequence, this->sequence(), &vec);
             }
             this->addJoiAlignment(vec);
             return vec.size() != 0;

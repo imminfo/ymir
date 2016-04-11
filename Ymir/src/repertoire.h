@@ -28,7 +28,6 @@
 #include <memory>
 
 #include "aligner.h"
-#include "clonotype.h"
 #include "maag.h"
 #include "tools.h"
 
@@ -42,23 +41,36 @@ namespace ymir {
 
 
     // typedef std::vector<ClonotypePtr> ClonotypeVector;
-    typedef std::vector<Clonotype> ClonotypeVector;
+    typedef std::vector<ClonotypeNuc> ClonotypeNucVector;
+    template <typename ClonotypeType> using ClonotypeVector = std::vector<ClonotypeType>;
+
+    typedef ClonotypeVector<ClonotypeNuc> ClonotypeNucVector;
+
+    typedef ClonotypeVector<ClonotypeAA> ClonotypeAAVector;
 
 
-    typedef std::shared_ptr<ClonotypeVector> SharedClonotypeVectorPtr;
+    template <typename ClonotypeType> using SharedClonotypeVectorPtr = std::shared_ptr<ClonotypeVector<ClonotypeType> >;
+
+    typedef SharedClonotypeVectorPtr<ClonotypeNuc> SharedClonotypeNucVectorPtr;
+
+    typedef SharedClonotypeVectorPtr<ClonotypeAA> SharedClonotypeAAVectorPtr;
 
 
+    /**
+     * \class ClonesetView
+     */
+    template <typename ClonotypeType>
     class ClonesetView {
 
     public:
 
         ClonesetView()
-            : _source(new ClonotypeVector())
+            : _source(new ClonotypeVector<ClonotypeType>())
         {
         }
 
 
-        ClonesetView(SharedClonotypeVectorPtr pvec, 
+        ClonesetView(SharedClonotypeVectorPtr<ClonotypeType> pvec,
                      const std::vector<size_t>& shifts) 
             : _source(pvec), _shifts(shifts) 
         {
@@ -66,7 +78,7 @@ namespace ymir {
 
 
         ///@{
-        const Clonotype& operator[] (size_t index) const {
+        const ClonotypeType& operator[] (size_t index) const {
             return _source->at(_shifts[index]);
         }
 
@@ -162,29 +174,29 @@ namespace ymir {
 
     protected:
 
-        SharedClonotypeVectorPtr _source;
+        SharedClonotypeVectorPtr<ClonotypeType> _source;
         std::vector<size_t> _shifts;
 
     };
 
 
-    class Cloneset : public ClonesetView {
+    template <typename ClonotypeType>
+    class Cloneset : public ClonesetView<ClonotypeType> {
 
     public:
 
-
-        Cloneset() : ClonesetView()
+        Cloneset() : ClonesetView<ClonotypeType>()
         {
         }
 
 
         // swap constructor
-        Cloneset(ClonotypeVector& vec) {
+        Cloneset(ClonotypeVector<ClonotypeType>& vec) {
             this->swap(vec);
         }
 
 
-        void swap(ClonotypeVector& vec) {
+        void swap(ClonotypeVector<ClonotypeType>& vec) {
             this->_source->swap(vec);
             this->_shifts.resize(this->_source->size());
             for (size_t i = 0; i < this->_source->size(); ++i) {
@@ -193,14 +205,20 @@ namespace ymir {
         }
 
 
-        Clonotype& operator[] (size_t index) {
-            return _source->at(_shifts[index]);
+        ClonotypeType& operator[] (size_t index) {
+            return ClonesetView<ClonotypeType>::_source->at(ClonesetView<ClonotypeType>::_shifts[index]);
         }
 
-
-    protected:
-
     };
+
+
+    typedef ClonesetView<ClonotypeNuc> ClonesetViewNuc;
+
+    typedef ClonesetView<ClonotypeAA> ClonesetViewAA;
+
+    typedef Cloneset<ClonotypeNuc> ClonesetNuc;
+
+    typedef Cloneset<ClonotypeAA> ClonesetAA;
 
 }
 

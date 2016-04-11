@@ -14,7 +14,11 @@ namespace ymir {
 
 
     class ClonotypeNuc : public VDJAlignmentNuc, ClonotypeBase {
+
     public:
+
+        typedef VDJAlignmentNuc vdj_alignment_t;
+
 
         ClonotypeNuc(const sequence_t &sequence,
                      Recombination recomb,
@@ -59,6 +63,7 @@ namespace ymir {
 
 
     typedef unique_ptr<ClonotypeNuc> ClonotypeNucPtr;
+
 }
 
 

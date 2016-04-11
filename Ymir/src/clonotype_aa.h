@@ -15,6 +15,10 @@ namespace ymir {
     class ClonotypeAA : public VDJAlignmentAA, ClonotypeBase {
     public:
 
+
+        typedef VDJAlignmentAA vdj_alignment_t;
+
+
         ClonotypeAA(const sequence_t &sequence,
                     Recombination recomb,
                     const segments_storage_t &segments,

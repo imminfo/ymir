@@ -17,6 +17,9 @@ namespace ymir {
 
     public:
 
+        typedef VDJAlignmentAA base_t;
+
+
         VDJAlignmentAA(const segments_storage_t &segments,
                        const CodonAlignmentVector &alignments,
                        const n_D_alignments_storage_t &n_D_alignments)

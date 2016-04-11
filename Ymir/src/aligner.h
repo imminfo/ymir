@@ -39,10 +39,20 @@ namespace ymir {
     /**
      * \class VDJAlignerBase
      */
-    template <typename AlignmentType>
-    class VDJAlignerBase : public ClonotypeBuilder {
+    template <typename ClonotypeType>
+    class VDJAlignerBase : public ClonotypeBuilder<ClonotypeType> {
 
     public:
+
+
+        typedef ClonotypeType clonotype_t;
+
+
+        typedef typename ClonotypeType::vdj_alignment_t vdj_alignment_t;
+        
+        
+        typedef typename vdj_alignment_t::alignment_vector_t alignment_vector_t;
+
 
         /**
          *
@@ -77,20 +87,20 @@ namespace ymir {
          * \brief General methods for alignment.
          */
         ///@{
-        AlignmentType alignVar(seg_index_t id, const sequence_t &sequence) const {
-            AlignmentType vec;
+        alignment_vector_t alignVar(seg_index_t id, const sequence_t &sequence) const {
+            alignment_vector_t vec;
             this->_alignVar(id, _genes.V()[id].sequence, _sequence, &vec);
             return vec;
         }
 
-        AlignmentType alignDiv(seg_index_t id, const sequence_t &sequence) const {
-            AlignmentType vec;
+        alignment_vector_t alignDiv(seg_index_t id, const sequence_t &sequence) const {
+            alignment_vector_t vec;
             this->_alignDiv(id, _genes.D()[id].sequence, _sequence, &vec);
             return vec;
         }
 
-        AlignmentType alignJoi(seg_index_t id, const sequence_t &sequence) const {
-            AlignmentType vec;
+        alignment_vector_t alignJoi(seg_index_t id, const sequence_t &sequence) const {
+            alignment_vector_t vec;
             this->_alignJoi(id, _genes.J()[id].sequence, _sequence, &vec);
             return vec;
         }
@@ -106,7 +116,7 @@ namespace ymir {
          */
         ///@{
         bool alignVar() {
-            AlignmentType vec;
+            alignment_vector_t vec;
             for (seg_index_t id = 1; id <= _genes.V().max(); ++id) {
                 this->_alignVar(id, _genes.V()[id].sequence, _sequence, &vec);
             }
@@ -115,7 +125,7 @@ namespace ymir {
         }
 
         bool alignDiv() {
-            AlignmentType vec;
+            alignment_vector_t vec;
             for (seg_index_t id = 1; id <= _genes.D().max(); ++id) {
                 vec.clear(); // TODO: some strange behaviour here after I added this line. Be careful. Maybe there is some bug in clear().
                 this->_alignDiv(id, _genes.D()[id].sequence, _sequence, &vec);
@@ -127,7 +137,7 @@ namespace ymir {
         }
 
         bool alignJoi() {
-            AlignmentType vec;
+            alignment_vector_t vec;
             for (seg_index_t id = 1; id <= _genes.J().max(); ++id) {
                 this->_alignJoi(id, _genes.J()[id].sequence, _sequence, &vec);
             }
@@ -153,11 +163,11 @@ namespace ymir {
          * \param vec
          */
         ///@{
-        virtual void _alignVar(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const = 0;
+        virtual void _alignVar(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, alignment_vector_t *avec) const = 0;
 
-        virtual void _alignDiv(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const = 0;
+        virtual void _alignDiv(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, alignment_vector_t *avec) const = 0;
 
-        virtual void _alignJoi(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const = 0;
+        virtual void _alignJoi(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, alignment_vector_t *avec) const = 0;
         ///@}
 
     };
@@ -169,7 +179,7 @@ namespace ymir {
      * \brief CDR3-only alignment without errors - align V starting from the left edge,
      * J starting from the right edge, and align D everywhere.
      */
-    class NaiveCDR3NucleotideAligner : public VDJAlignerBase<NoGapAlignmentVector> {
+    class NaiveCDR3NucleotideAligner : public VDJAlignerBase<ClonotypeNuc> {
     public:
 
         NaiveCDR3NucleotideAligner()
@@ -179,7 +189,7 @@ namespace ymir {
 
         NaiveCDR3NucleotideAligner(const VDJRecombinationGenes &genes,
                                    VDJAlignerParameters params)
-            : VDJAlignerBase<NoGapAlignmentVector>(genes, params)
+            : VDJAlignerBase<ClonotypeNuc>(genes, params)
         {
         }
 
@@ -271,7 +281,7 @@ namespace ymir {
     // CDR3-only alignment with errors - align V starting from the left edge, 
     // J starting from the right edge, and align D everywhere.
     //
-    class CDR3NucleotideAligner : public VDJAlignerBase<NoGapAlignmentVector> {
+    class CDR3NucleotideAligner : public VDJAlignerBase<ClonotypeNuc> {
     public:
 
         CDR3NucleotideAligner()
@@ -281,7 +291,7 @@ namespace ymir {
 
         CDR3NucleotideAligner(const VDJRecombinationGenes &genes,
                               VDJAlignerParameters _params)
-                : VDJAlignerBase<NoGapAlignmentVector>(genes, _params)
+                : VDJAlignerBase<ClonotypeNuc>(genes, _params)
         {
         }
 
@@ -416,7 +426,7 @@ namespace ymir {
     // Smith-Waterman with no gap allowed, but with errors
     // Smith-Waterman aligner without gaps, returns maximal matches with information about mismatch errors.
     //
-    class SmithWatermanNoGapAligner : public VDJAlignerBase<NoGapAlignmentVector> {
+    class SmithWatermanNoGapAligner : public VDJAlignerBase<ClonotypeNuc> {
     public:
 
         SmithWatermanNoGapAligner()
@@ -426,7 +436,7 @@ namespace ymir {
 
         SmithWatermanNoGapAligner(const VDJRecombinationGenes &genes,
                                   VDJAlignerParameters _params)
-                : VDJAlignerBase<NoGapAlignmentVector>(genes, _params)
+                : VDJAlignerBase<ClonotypeNuc>(genes, _params)
         {
         }
 

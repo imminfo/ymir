@@ -34,10 +34,18 @@ namespace ymir {
     /**
     * \class ClonotypeBuilder
     */
-    class ClonotypeBuilder : protected Clonotype, public VDJAlignmentBuilder {
+    template <typename ClonotypeType>
+    class ClonotypeBuilder : protected ClonotypeBase, public VDJAlignmentBuilder<typename ClonotypeType::vdj_alignment_t> {
     public:
 
-        ClonotypeBuilder() : VDJAlignmentBuilder()
+
+        typedef ClonotypeType clonotype_t;
+
+
+        typedef typename ClonotypeType::vdj_alignment_t vdj_alignment_t;
+
+
+        ClonotypeBuilder() : VDJAlignmentBuilder<vdj_alignment_t>()
         {
         }
 
@@ -52,10 +60,10 @@ namespace ymir {
          *
          * \return Pointer to the newly created ClonotypeAlignment object.
         */
-        Clonotype buildClonotype() {
+        clonotype_t buildClonotype() {
 //            ClonotypePtr cla(new Clonotype(_sequence, _seq_type, _recomb, this->buildAlignment()));
 //            return std::move(cla);
-            return Clonotype(_sequence, _seq_type, _recomb, this->buildAlignment());
+            return clonotype_t(_sequence, _seq_type, _recomb, this->buildAlignment());
         }
 
 
@@ -77,6 +85,12 @@ namespace ymir {
     protected:
 
     };
+
+
+    typedef ClonotypeBuilder<ClonotypeNuc> ClonotypeNucBuilder;
+
+
+    typedef ClonotypeBuilder<ClonotypeAA> ClonotypeAABuilder;
 
 }
 

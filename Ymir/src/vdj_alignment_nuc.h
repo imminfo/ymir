@@ -21,14 +21,12 @@ namespace ymir {
         VDJAlignmentNuc(const segments_storage_t &segments,
                         const NoGapAlignmentVector &alignments,
                         const n_D_alignments_storage_t &n_D_alignments)
-                : _segments(segments),
-                  _alignments(alignments),
-                  _n_D_alignments(n_D_alignments)
+            : VDJAlignmentBase<NoGapAlignmentVector>(segments, alignments, n_D_alignments)
         {
         }
 
 
-        virtual ~VDJAlignmentBase()
+        virtual ~VDJAlignmentNuc()
         {
         }
 

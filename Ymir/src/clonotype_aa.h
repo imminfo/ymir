@@ -12,7 +12,7 @@
 
 namespace ymir {
 
-    class ClonotypeAA : public VDJAlignmentAA, ClonotypeBase {
+    class ClonotypeAA : public VDJAlignmentAA, public ClonotypeBase {
     public:
 
 

@@ -173,13 +173,19 @@ namespace ymir {
     };
 
 
+    typedef VDJAlignerBase<ClonotypeNuc> VDJNucAligner;
+
+
+    typedef VDJAlignerBase<ClonotypeAA> VDJAAAligner;
+
+
     /**
      * \class NaiveCDR3NucleotideAligner
      *
      * \brief CDR3-only alignment without errors - align V starting from the left edge,
      * J starting from the right edge, and align D everywhere.
      */
-    class NaiveCDR3NucleotideAligner : public VDJAlignerBase<ClonotypeNuc> {
+    class NaiveCDR3NucleotideAligner : public VDJNucAligner {
     public:
 
         NaiveCDR3NucleotideAligner()
@@ -281,7 +287,7 @@ namespace ymir {
     // CDR3-only alignment with errors - align V starting from the left edge, 
     // J starting from the right edge, and align D everywhere.
     //
-    class CDR3NucleotideAligner : public VDJAlignerBase<ClonotypeNuc> {
+    class CDR3NucleotideAligner : public VDJNucAligner {
     public:
 
         CDR3NucleotideAligner()
@@ -290,8 +296,8 @@ namespace ymir {
 
 
         CDR3NucleotideAligner(const VDJRecombinationGenes &genes,
-                              VDJAlignerParameters _params)
-                : VDJAlignerBase<ClonotypeNuc>(genes, _params)
+                              VDJAlignerParameters params)
+                : VDJNucAligner(genes, params)
         {
         }
 
@@ -381,7 +387,8 @@ namespace ymir {
     // Classic Smith-Waterman
     // Smith-Waterman aligner for finding maximal matches with gaps. Don't takes into account errors.
     //
-    class SmithWatermanAligner : public VDJAlignerBase<GappedAlignmentVector> {
+//    class SmithWatermanAligner : public VDJAlignerBase<GappedAlignmentVector> {
+    class SmithWatermanAligner : public VDJNucAligner {
     public:
 
         SmithWatermanAligner()
@@ -390,8 +397,9 @@ namespace ymir {
 
 
         SmithWatermanAligner(const VDJRecombinationGenes &genes,
-                             VDJAlignerParameters _params)
-                : VDJAlignerBase<GappedAlignmentVector>(genes, _params)
+                             VDJAlignerParameters params)
+//                : VDJAlignerBase<GappedAlignmentVector>(genes, _params)
+        : VDJNucAligner(genes, _params)
         {
         }
 
@@ -426,7 +434,7 @@ namespace ymir {
     // Smith-Waterman with no gap allowed, but with errors
     // Smith-Waterman aligner without gaps, returns maximal matches with information about mismatch errors.
     //
-    class SmithWatermanNoGapAligner : public VDJAlignerBase<ClonotypeNuc> {
+    class SmithWatermanNoGapAligner : public VDJNucAligner {
     public:
 
         SmithWatermanNoGapAligner()
@@ -435,8 +443,8 @@ namespace ymir {
 
 
         SmithWatermanNoGapAligner(const VDJRecombinationGenes &genes,
-                                  VDJAlignerParameters _params)
-                : VDJAlignerBase<ClonotypeNuc>(genes, _params)
+                                  VDJAlignerParameters params)
+                : VDJNucAligner(genes, params)
         {
         }
 

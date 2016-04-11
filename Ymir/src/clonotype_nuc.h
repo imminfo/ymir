@@ -13,7 +13,7 @@
 namespace ymir {
 
 
-    class ClonotypeNuc : public VDJAlignmentNuc, ClonotypeBase {
+    class ClonotypeNuc : public VDJAlignmentNuc, public ClonotypeBase {
 
     public:
 

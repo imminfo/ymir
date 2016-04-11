@@ -35,7 +35,7 @@ namespace ymir {
     * \class ClonotypeBuilder
     */
     template <typename ClonotypeType>
-    class ClonotypeBuilder : protected ClonotypeBase, public VDJAlignmentBuilder<typename ClonotypeType::vdj_alignment_t> {
+    class ClonotypeBuilder : public ClonotypeBase, public VDJAlignmentBuilder<typename ClonotypeType::vdj_alignment_t> {
     public:
 
 

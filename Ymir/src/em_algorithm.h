@@ -26,7 +26,7 @@ namespace ymir {
         /**
          *
          */
-        virtual std::vector<prob_t> statisticalInference(const ClonesetView &repertoire,
+        virtual std::vector<prob_t> statisticalInference(const ClonesetViewNuc &repertoire,
                                                          ProbabilisticAssemblingModel &model,
                                                          const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10).set("sample", 50000),
                                                          ErrorMode error_mode = NO_ERRORS) const {
@@ -43,7 +43,7 @@ namespace ymir {
 
 
             size_t sample = algo_param["sample"].asUInt();
-            ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
+            ClonesetViewNuc rep_nonc = repertoire.noncoding().sample(sample);
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
             std::vector<prob_t> logLvec;
@@ -55,7 +55,7 @@ namespace ymir {
             new_param_vec.normaliseEventFamilies();
             model.updateModelParameterVector(new_param_vec);
 
-            MAAGRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
+            MAAGNucRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, true);
 
             vector<prob_t> prob_vec;
 
@@ -107,7 +107,7 @@ namespace ymir {
     protected:
 
         bool updateTempVec(MAAGForwardBackwardAlgorithm &fb,
-                           MAAG &maag,
+                           MAAGnuc &maag,
                            ModelParameterVector &new_param_vec,
                            ErrorMode error_mode) const
         {
@@ -153,7 +153,7 @@ namespace ymir {
 
         void updateModel(ProbabilisticAssemblingModel &model,
                          ModelParameterVector &new_param_vec,
-                         MAAGRepertoire &maag_rep,
+                         MAAGNucRepertoire &maag_rep,
                          vector<prob_t> &prob_vec,
                          prob_t &prev_ll,
                          size_t removed,

@@ -401,7 +401,7 @@ namespace ymir {
 
 
     MAAGNucRepertoire MAAGBuilder::build(const ClonesetViewNuc &cloneset, MetadataMode metadata_mode,
-                                         ErrorMode error_mode, bool verbose = true) const {
+                                         ErrorMode error_mode, bool verbose) const {
         size_t verbose_step;
 
         if (verbose) {
@@ -409,7 +409,7 @@ namespace ymir {
             verbose_step = cloneset.size() / 10;
         }
 
-        MAAGRepertoire res;
+        MAAGNucRepertoire res;
         res.resize(cloneset.size());
 #ifdef USE_OMP
         #if OMP_THREADS == -1
@@ -419,7 +419,7 @@ namespace ymir {
 #endif
 #endif
         for (size_t i = 0; i < cloneset.size(); ++i) {
-            res[i] = this->build(cloneset[i], metadata_mode, error_mode, seq_type);
+            res[i] = this->build(cloneset[i], metadata_mode, error_mode);
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
@@ -437,14 +437,13 @@ namespace ymir {
 
 
     prob_t MAAGBuilder::buildAndCompute(const ClonotypeNuc &clonotype, ErrorMode error_mode,
-                                        MAAGComputeProbAction action = SUM_PROBABILITY) const {
+                                        MAAGComputeProbAction action) const {
         return this->build(clonotype, NO_METADATA, error_mode).fullProbability(action);
     }
 
 
     vector<prob_t> MAAGBuilder::buildAndCompute(const ClonesetViewNuc &cloneset, ErrorMode error_mode,
-                                                MAAGComputeProbAction action = SUM_PROBABILITY,
-                                                bool verbose = true) const {
+                                                MAAGComputeProbAction action, bool verbose) const {
         vector<prob_t> res;
         res.reserve(cloneset.size());
         size_t verbose_step;
@@ -462,7 +461,7 @@ namespace ymir {
 #endif
 #endif
         for (size_t i = 0; i < cloneset.size(); ++i) {
-            res.push_back(buildAndCompute(cloneset[i], error_mode, seq_type, action));
+            res.push_back(buildAndCompute(cloneset[i], error_mode, action));
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
@@ -608,7 +607,7 @@ namespace ymir {
     }
 
 
-    void MAAGBuilder::updateEventProbabilities(MAAGNucRepertoire *repertoire, bool verbose = true) const {
+    void MAAGBuilder::updateEventProbabilities(MAAGNucRepertoire *repertoire, bool verbose) const {
         size_t verbose_step;
 
         if (verbose) {
@@ -644,7 +643,7 @@ namespace ymir {
     }
 
 
-    MAAGAARepertoire MAAGBuilder::build(const ClonesetViewAA &cloneset, bool verbose = true) const {
+    MAAGAARepertoire MAAGBuilder::build(const ClonesetViewAA &cloneset, bool verbose) const {
 
     }
 
@@ -654,7 +653,7 @@ namespace ymir {
     }
 
 
-    vector<prob_t> MAAGBuilder::buildAndCompute(const ClonesetViewAA &cloneset, bool verbose = true) const {
+    vector<prob_t> MAAGBuilder::buildAndCompute(const ClonesetViewAA &cloneset, bool verbose) const {
 
     }
 

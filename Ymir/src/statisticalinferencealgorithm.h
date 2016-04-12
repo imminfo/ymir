@@ -84,14 +84,14 @@ namespace ymir {
 
         virtual ~StatisticalInferenceAlgorithm() { }
 
-        virtual std::vector<prob_t> statisticalInference(const ClonesetView &repertoire,
+        virtual std::vector<prob_t> statisticalInference(const ClonesetViewNuc &repertoire,
                                                          ProbabilisticAssemblingModel &model,
                                                          const AlgorithmParameters &algo_param = AlgorithmParameters(),
                                                          ErrorMode error_mode = NO_ERRORS) const = 0;
 
 
-        void filterOut(const ClonesetView &rep_nonc,
-                       const MAAGRepertoire &maag_rep,
+        void filterOut(const ClonesetViewNuc &rep_nonc,
+                       const MAAGNucRepertoire &maag_rep,
                        vector<prob_t> &prob_vec,
                        vector<bool> &good_clonotypes,
                        size_t &removed,

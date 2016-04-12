@@ -26,8 +26,9 @@ namespace ymir {
         virtual ~RepertoireWriter() { }
 
 
+        template <typename ClonotypeType>
         bool write(const std::string &filepath,
-                   const ClonesetView &cloneset,
+                   const ClonesetView<ClonotypeType> &cloneset,
                    const VDJRecombinationGenes& gene_segments,
                    bool append = false) const {
             std::ofstream ofs;
@@ -54,7 +55,7 @@ namespace ymir {
 
                 // write clonotypes
                 for (auto i = 0; i < cloneset.size(); ++i) {
-                    if (cloneset[i].sequence_type() == NUCLEOTIDE) {
+                    if (ClonotypeType::sequence_type == NUCLEOTIDE) {
                         ofs << cloneset[i].sequence() << '\t';
                         ofs << translate(cloneset[i].sequence()) << '\t';
                     } else {

@@ -106,12 +106,18 @@ namespace ymir {
          *
          * \return Vector of full assembling probabilities.
          */
-        vector<prob_t> computeFullProbabilities(const ClonesetView& repertoire,
+        ///@{
+        vector<prob_t> computeFullProbabilities(const ClonesetViewNuc& repertoire,
                                                 ErrorMode error_mode,
-                                                SequenceType sequence_type = NUCLEOTIDE,
                                                 MAAGComputeProbAction action = SUM_PROBABILITY) const {
-            return _builder->buildAndCompute(repertoire, error_mode, sequence_type, action);
+            return _builder->buildAndCompute(repertoire, error_mode, action);
         }
+
+        vector<prob_t> computeFullProbabilities(const ClonesetViewAA& repertoire,
+                                                MAAGComputeProbAction action = SUM_PROBABILITY) const {
+            return _builder->buildAndCompute(repertoire, action);
+        }
+        ///@}
 
 
         /**
@@ -123,24 +129,32 @@ namespace ymir {
          *
          * \return Set of MAAGs.
          */
-        MAAGRepertoire buildGraphs(const ClonesetView &repertoire,
-                                   MetadataMode save_metadata,
-                                   ErrorMode error_mode,
-                                   SequenceType sequence_type = NUCLEOTIDE,
-                                   bool verbose = true) const {
+        ///@{
+        MAAGNucRepertoire buildGraphs(const ClonesetViewNuc &repertoire, MetadataMode save_metadata,
+                                      ErrorMode error_mode, bool verbose = true) const {
 #ifndef DNDEBUG
             if (!_status) {
                 throw(std::runtime_error("Can't build graphs due to a model's failed status!"));
             }
 #endif
-            return _builder->build(repertoire, save_metadata, error_mode, sequence_type, verbose);
+            return _builder->build(repertoire, save_metadata, error_mode, verbose);
         }
+
+        MAAGAARepertoire buildGraphs(const ClonesetViewAA &repertoire, bool verbose = true) const {
+#ifndef DNDEBUG
+            if (!_status) {
+                throw(std::runtime_error("Can't build graphs due to a model's failed status!"));
+            }
+#endif
+            return _builder->build(repertoire, verbose);
+        }
+        ///@}
 
 
         /**
          * \brief Update event probabilities in the given MAAG repertoire with new ones.
          */
-        void updateEventProbabilities(MAAGRepertoire *repertoire, bool verbose = true) {
+        void updateEventProbabilities(MAAGNucRepertoire *repertoire, bool verbose = true) {
             _builder->updateEventProbabilities(repertoire, verbose);
         }
 
@@ -153,7 +167,7 @@ namespace ymir {
          *
          * \return Artificial repertoire.
          */
-        Cloneset generateSequences(size_t count = 1) const {
+        ClonesetNuc generateSequences(size_t count = 1) const {
 #ifndef DNDEBUG
             if (!_status) {
                 throw(std::runtime_error("Can't generate sequences due to a model's failed status!"));
@@ -217,9 +231,9 @@ namespace ymir {
          * \brief Given the cloneset, compute its gene usage on out-of-frames and
          * update the event probability vector with new gene probabilities.
          */
-        void updateGeneUsage(const ClonesetView &cloneset) {
+        void updateGeneUsage(const ClonesetViewNuc &cloneset) {
             prob_t laplace = 0;
-            ClonesetView nonc = cloneset.noncoding();
+            ClonesetViewNuc nonc = cloneset.noncoding();
             if (_recomb == VJ_RECOMB) {
                 // Update V-J
                 _param_vec->familyFill(VJ_VAR_JOI_GEN, 0);

@@ -156,9 +156,18 @@ namespace ymir {
     * To make new parsers inherit from this class and rewrite virtual private method
     * "parseRepertoire".
     */
+    template <typename ClonotypeType>
     class RepertoireParser {
 
     public:
+
+        typedef ClonotypeType clonotype_t;
+
+        typedef VDJAlignerBase<clonotype_t> vdj_aligner_t;
+
+        typedef ClonotypeVector<clonotype_t> clonotype_vector_t;
+
+        typedef Cloneset<clonotype_t> cloneset_t;
 
         /**
         * \typedef ParserConfig
@@ -173,7 +182,7 @@ namespace ymir {
         }
 
 
-        RepertoireParser(VDJAlignerBase *aligner)
+        RepertoireParser(vdj_aligner_t *aligner)
             : _aligner(aligner)
         {
         }
@@ -236,7 +245,7 @@ namespace ymir {
         /**
          * \param cloneset Pointer to clonal repertoire object to which data will be uploaded.
          */
-        bool parse(Cloneset *cloneset, size_t max_clonotype_count = (size_t)-1) {
+        bool parse(cloneset_t *cloneset, size_t max_clonotype_count = (size_t)-1) {
             if (_stream.eof()) {
                 _stats.print();
                 _stats.reset();
@@ -250,7 +259,7 @@ namespace ymir {
                 return false;
             }
 
-            ClonotypeVector clonevec;
+            clonotype_vector_t clonevec;
             clonevec.reserve(DEFAULT_REPERTOIRE_RESERVE_SIZE);
 
             this->parseRepertoire(clonevec, max_clonotype_count);
@@ -261,7 +270,7 @@ namespace ymir {
 
 
         bool openAndParse(const std::string &filepath,
-                          Cloneset *cloneset,
+                          cloneset_t *cloneset,
                           const VDJRecombinationGenes &gene_segments,
                           SequenceType seq_type,
                           Recombination recomb,
@@ -285,12 +294,12 @@ namespace ymir {
         AlignmentColumnOptions _opts;
         SequenceType _seq_type;
         RepertoireParserStatistics _stats;
-        unique_ptr<VDJAlignerBase> _aligner;
+        unique_ptr<vdj_aligner_t> _aligner;
         bool _status;
         bool _read_header;
 
 
-        void parseRepertoire(ClonotypeVector& vec, size_t max_clonotype_count)
+        void parseRepertoire(clonotype_vector_t& vec, size_t max_clonotype_count)
         {
             char column_sep ='\t',
                  segment_sep = ',',

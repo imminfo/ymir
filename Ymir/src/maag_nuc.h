@@ -15,6 +15,10 @@ namespace ymir {
      * \class MAAGnuc
      */
     class MAAGnuc : public MAAGBase {
+
+        friend class MAAGBuilder;
+        friend class MAAGForwardBackwardAlgorithm;
+
     public:
 
         /**
@@ -200,6 +204,12 @@ namespace ymir {
             }
         }
         ///@}
+
+
+        bool has_events() const { return (bool) _events; }
+
+
+        bool has_errors() const { return (bool) _errors; }
 
 
     protected:

@@ -18,6 +18,10 @@ namespace ymir {
      * \class MAAGaa
      */
     class MAAGaa : public MAAGBase {
+
+        friend class MAAGBuilder;
+        friend class MAAGForwardBackwardAlgorithm;
+
     public:
 
         /**

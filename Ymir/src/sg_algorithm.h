@@ -22,7 +22,7 @@ namespace ymir {
     class SGAlgorithm : public EMAlgorithm {
     public:
 
-        virtual std::vector<prob_t> statisticalInference(const ClonesetView& repertoire,
+        virtual std::vector<prob_t> statisticalInference(const ClonesetViewNuc& repertoire,
                                                          ProbabilisticAssemblingModel & model,
                                                          const AlgorithmParameters& algo_param = AlgorithmParameters()
                                                                  .set("niter", 10)
@@ -71,7 +71,7 @@ namespace ymir {
 
 
             size_t sample = algo_param["sample"].asUInt();
-            ClonesetView rep_nonc = repertoire.noncoding().sample(sample);
+            ClonesetViewNuc rep_nonc = repertoire.noncoding().sample(sample);
 
 //            rep_nonc = rep_nonc.sample(algo_param.get("sample", (Json::Value::UInt64) rep_nonc.size()).asUInt64()); // TODO: CHECK IS IT OK TO ASSIGN TO ITSELF?
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
@@ -90,7 +90,7 @@ namespace ymir {
 
             std::vector<bool> changed(new_param_vec.size(), false);
 
-            auto maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, NUCLEOTIDE, true);
+            auto maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, true);
             std::cout << "MAAG rep size" << (size_t) maag_rep.size() << std::endl;
 
             std::vector<prob_t> prob_vec(maag_rep.size(), 0);
@@ -161,7 +161,7 @@ namespace ymir {
     protected:
 
         void updateTempVec(MAAGForwardBackwardAlgorithm &fb,
-                           MAAG &maag,
+                           MAAGnuc &maag,
                            ModelParameterVector &new_param_vec,
                            vector<bool> &changed,
                            ErrorMode error_mode) const
@@ -274,7 +274,7 @@ namespace ymir {
 
         void updateModel(ProbabilisticAssemblingModel &model,
                          ModelParameterVector &new_param_vec,
-                         MAAGRepertoire &maag_rep,
+                         MAAGNucRepertoire &maag_rep,
                          vector<prob_t> &prob_vec,
                          prob_t &prev_ll,
                          vector<bool> &changed,

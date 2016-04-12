@@ -261,7 +261,12 @@ YMIR_TEST_START(test_gapped_alignment_vector)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_simple_vj)
+YMIR_TEST_START(test_codon_alignment_vector)
+    YMIR_ASSERT(false)
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_vdj_alignment_nuc_simple_vj)
 
     VDJAlignmentBuilder builder;
 
@@ -344,7 +349,7 @@ YMIR_TEST_START(test_vdj_alignment_simple_vj)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_simple_vdj)
+YMIR_TEST_START(test_vdj_alignment_nuc_simple_vdj)
 
     VDJAlignmentBuilder builder;
 
@@ -416,7 +421,7 @@ YMIR_TEST_START(test_vdj_alignment_simple_vdj)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_vector_vj)
+YMIR_TEST_START(test_vdj_alignment_nuc_vector_vj)
 
     VDJAlignmentBuilder builder;
 
@@ -505,7 +510,7 @@ YMIR_TEST_START(test_vdj_alignment_vector_vj)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_vector_vdj)
+YMIR_TEST_START(test_vdj_alignment_nuc_vector_vdj)
 
     VDJAlignmentBuilder builder;
 
@@ -644,6 +649,34 @@ YMIR_TEST_START(test_vdj_alignment_vector_vdj)
      YMIR_ASSERT(!algn.isDivMismatch(1, 0, 5))
      YMIR_ASSERT(algn.isDivMismatch(1, 0, 6))
      YMIR_ASSERT(algn.isDivMismatch(1, 0, 7))
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_vdj_alignment_aa_simple_vj())
+
+    YMIR_ASSERT(false)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_vdj_alignment_aa_simple_vdj())
+
+    YMIR_ASSERT(false)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_vdj_alignment_aa_vector_vj())
+
+    YMIR_ASSERT(false)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_vdj_alignment_aa_vector_vdj())
+
+    YMIR_ASSERT(false)
 
 YMIR_TEST_END
 
@@ -862,12 +895,18 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_nogap_alignment_vector_no_err())
     YMIR_TEST(test_nogap_alignment_vector_errors())
     YMIR_TEST(test_gapped_alignment_vector())
+    YMIR_TEST(test_codon_alignment_vector())
 
     // Tests for VDJAlignment and VDJAlignmentBuilder
-    YMIR_TEST(test_vdj_alignment_simple_vj())
-    YMIR_TEST(test_vdj_alignment_simple_vdj())
-    YMIR_TEST(test_vdj_alignment_vector_vj())
-    YMIR_TEST(test_vdj_alignment_vector_vdj())
+    YMIR_TEST(test_vdj_alignment_nuc_simple_vj())
+    YMIR_TEST(test_vdj_alignment_nuc_simple_vdj())
+    YMIR_TEST(test_vdj_alignment_nuc_vector_vj())
+    YMIR_TEST(test_vdj_alignment_nuc_vector_vdj())
+
+    YMIR_TEST(test_vdj_alignment_aa_simple_vj())
+    YMIR_TEST(test_vdj_alignment_aa_simple_vdj())
+    YMIR_TEST(test_vdj_alignment_aa_vector_vj())
+    YMIR_TEST(test_vdj_alignment_aa_vector_vdj())
 
     // Tests for clone, clone alignment and clone builder classes.
     YMIR_TEST(test_clone())

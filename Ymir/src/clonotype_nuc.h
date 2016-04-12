@@ -17,6 +17,9 @@ namespace ymir {
 
     public:
 
+        static const SequenceType sequence_type = NUCLEOTIDE;
+
+
         typedef VDJAlignmentNuc vdj_alignment_t;
 
 
@@ -26,7 +29,6 @@ namespace ymir {
                      const NoGapAlignmentVector &alignments,
                      const n_D_alignments_storage_t &n_D_alignments)
             : ClonotypeBase(sequence,
-                            NUCLEOTIDE,
                             recomb,
                             segments[0] && segments[1] && ((segments[2] && recomb == VDJ_RECOMB) || recomb == VJ_RECOMB)),
               VDJAlignmentNuc(segments,
@@ -40,7 +42,6 @@ namespace ymir {
                      Recombination recomb,
                      const VDJAlignmentNuc &alignment)
             : ClonotypeBase(sequence,
-                            NUCLEOTIDE,
                             recomb,
                             alignment.nVar() && alignment.nJoi() && ((alignment.nDiv() && recomb == VDJ_RECOMB) || recomb == VJ_RECOMB)),
               VDJAlignmentNuc(alignment)
@@ -51,6 +52,21 @@ namespace ymir {
         virtual ~ClonotypeNuc()
         {
         }
+
+
+        sequence_t aa_sequence() const { return translate(_sequence); }
+
+
+        /**
+         * \brief Check if clonotype's sequence is coding, noncoding or out-of-frame.
+         */
+        ///@{
+        bool isCoding() const { return !(is_out_of_frame(_sequence) || has_end_codon(_sequence)); }
+
+        bool isNoncoding() const { return is_out_of_frame(_sequence) || has_end_codon(_sequence); }
+
+        bool isOutOfFrame() const { return is_out_of_frame(_sequence); }
+        ///@}
 
 
     protected:

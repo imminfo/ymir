@@ -15,6 +15,8 @@ namespace ymir {
     class ClonotypeAA : public VDJAlignmentAA, public ClonotypeBase {
     public:
 
+        static const SequenceType sequence_type = AMINOACID;
+
 
         typedef VDJAlignmentAA vdj_alignment_t;
 
@@ -25,7 +27,6 @@ namespace ymir {
                     const CodonAlignmentVector &alignments,
                     const n_D_alignments_storage_t &n_D_alignments)
                 : ClonotypeBase(sequence,
-                                AMINOACID,
                                 recomb,
                                 segments[0] && segments[1] && ((segments[2] && recomb == VDJ_RECOMB) || recomb == VJ_RECOMB)),
                   VDJAlignmentAA(segments,
@@ -39,7 +40,6 @@ namespace ymir {
                     Recombination recomb,
                     const VDJAlignmentAA &alignment)
                 : ClonotypeBase(sequence,
-                                AMINOACID,
                                 recomb,
                                 alignment.nVar() && alignment.nJoi() && ((alignment.nDiv() && recomb == VDJ_RECOMB) || recomb == VJ_RECOMB)),
                   VDJAlignmentAA(alignment)
@@ -50,6 +50,18 @@ namespace ymir {
         virtual ~ClonotypeAA()
         {
         }
+
+
+        /**
+         * \brief Check if clonotype's sequence is coding, noncoding or out-of-frame.
+         */
+        ///@{
+        bool isCoding() const { return !has_bad_aa_codons(_sequence); }
+
+        bool isNoncoding() const { return has_bad_aa_codons(_sequence); }
+
+        bool isOutOfFrame() const { return has_oof_aa_codon(_sequence); }
+        ///@}
 
 
     protected:

@@ -42,6 +42,9 @@ namespace ymir {
         typedef ClonotypeType clonotype_t;
 
 
+        static const SequenceType sequence_type = ClonotypeType::sequence_type;
+
+
         typedef typename ClonotypeType::vdj_alignment_t vdj_alignment_t;
 
 
@@ -63,7 +66,7 @@ namespace ymir {
         clonotype_t buildClonotype() {
 //            ClonotypePtr cla(new Clonotype(_sequence, _seq_type, _recomb, this->buildAlignment()));
 //            return std::move(cla);
-            return clonotype_t(_sequence, _seq_type, _recomb, this->buildAlignment());
+            return clonotype_t(_sequence, _recomb, this->buildAlignment());
         }
 
 
@@ -72,12 +75,6 @@ namespace ymir {
          */
         ///@{
         ClonotypeBuilder& setSequence(const std::string& seq) { this->_sequence = seq; return *this; }
-
-        ClonotypeBuilder& setSequenceType(SequenceType seq_type) { _seq_type = seq_type; return *this; }
-
-        ClonotypeBuilder& setNucleotideSeq() { _seq_type = NUCLEOTIDE; return *this; }
-
-        ClonotypeBuilder& setAminoAcidSeq() { _seq_type = AMINOACID; return *this; }
 
         ClonotypeBuilder& setRecombination(Recombination recomb) { _recomb = recomb; return *this; }
         ///@}

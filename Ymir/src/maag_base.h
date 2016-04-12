@@ -15,9 +15,6 @@ namespace ymir {
 #define VDJ_CHAIN_SIZE 7
 
 
-    class MAAGBase;
-
-
     /**
      * \class MAAGBase
      */
@@ -33,22 +30,22 @@ namespace ymir {
          * \brief Default constructor.
          */
         MAAGBase()
-                : _recomb(UNDEF_RECOMB),
-                  _sequence(nullptr),
-                  _seq_poses(nullptr),
-                  _n_poses(0),
-                  _seq_type(UNDEF_SEQ_TYPE)
+            : _recomb(UNDEF_RECOMB),
+              _sequence(nullptr),
+              _seq_poses(nullptr),
+              _n_poses(0),
+              _seq_type(UNDEF_SEQ_TYPE)
         {
             _values.reserve(1);
         }
 
 
         MAAGBase(SequenceType seq_type)
-                : _recomb(UNDEF_RECOMB),
-                  _sequence(nullptr),
-                  _seq_poses(nullptr),
-                  _n_poses(0),
-                  _seq_type(seq_type)
+            : _recomb(UNDEF_RECOMB),
+              _sequence(nullptr),
+              _seq_poses(nullptr),
+              _n_poses(0),
+              _seq_type(seq_type)
         {
             _values.reserve(1);
         }
@@ -58,10 +55,10 @@ namespace ymir {
          *
          */
         MAAGBase(const MAAGBase &other)
-                : ProbMMC(other),
-                  _recomb(other._recomb),
-                  _n_poses(other._n_poses),
-                  _seq_type(other._seq_type),
+            : ProbMMC(other),
+              _recomb(other._recomb),
+              _n_poses(other._n_poses),
+              _seq_type(other._seq_type)
         {
             if (other._seq_poses) {
                 _seq_poses.reset(new seq_len_t[_n_poses]);

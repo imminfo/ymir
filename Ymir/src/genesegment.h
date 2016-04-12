@@ -27,6 +27,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
 
 #include "types.h"
 #include "tools.h"
@@ -242,7 +243,7 @@ namespace ymir {
     protected:
 
         std::string _name;
-        std::unordered_map<std::string, seg_index_t> _map;
+        std::unordered_map<sequence_t, seg_index_t> _map;
         std::vector<GeneSegment> _vec;
         GeneSegments _gene_segment;
 

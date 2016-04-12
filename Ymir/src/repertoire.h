@@ -37,7 +37,10 @@ namespace ymir {
     #define DEFAULT_REPERTOIRE_RESERVE_SIZE 300000
 
 
-    typedef std::vector<MAAG> MAAGRepertoire;
+    typedef std::vector<MAAGnuc> MAAGNucRepertoire;
+
+
+    typedef std::vector<MAAGaa> MAAGAARepertoire;
 
 
     // typedef std::vector<ClonotypePtr> ClonotypeVector;

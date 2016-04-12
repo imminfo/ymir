@@ -27,7 +27,7 @@
 
 #include <unordered_set>
 
-#include "maagbuilder.h"
+#include "maag_builder.h"
 #include "repertoire.h"
 #include "clonotypeassembler.h"
 #include "model_parser.h"

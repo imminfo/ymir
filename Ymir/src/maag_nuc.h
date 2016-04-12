@@ -11,9 +11,6 @@
 
 namespace ymir {
 
-    class MAAGnuc;
-
-
     /**
      * \class MAAGnuc
      */

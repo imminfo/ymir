@@ -6,6 +6,7 @@
 #define YMIR_ALIGNER_PARAMETERS_H
 
 
+#include "alignment.h"
 #include "types.h"
 
 

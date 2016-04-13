@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
         bool first_iter = false;
         while (generated < count) {
             to_generate = std::min(count - generated, block_size);
-            ClonesetView gen_rep = model.generateSequences(to_generate);
+            ClonesetViewNuc gen_rep = model.generateSequences(to_generate);
 
             if (coding_type == SequenceCodingType::CODING) {
                 gen_rep = gen_rep.coding();

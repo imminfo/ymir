@@ -109,7 +109,7 @@ YMIR_TEST_START(test_model_vj_maag)
     ProbabilisticAssemblingModel model(TEST_DATA_FOLDER + "test_vj_model/");
     YMIR_ASSERT(model.status())
 
-     NaiveNucParser parser;
+     ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
      bool V_err, J_err;
      VDJRecombinationGenes vj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt",
@@ -118,17 +118,16 @@ YMIR_TEST_START(test_model_vj_maag)
      YMIR_ASSERT(V_err)
      YMIR_ASSERT(J_err)
 
-     Cloneset cloneset;
+     ClonesetNuc cloneset;
     YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "ymir.alpha2.txt",
                                     &cloneset,
                                     vj_genes,
-                                    NUCLEOTIDE,
                                     VJ_RECOMB,
                                     AlignmentColumnOptions()
                                             .setV(AlignmentColumnOptions::USE_PROVIDED)
                                             .setJ(AlignmentColumnOptions::USE_PROVIDED)))
 
-     MAAG maag = model.buildGraphs(cloneset, SAVE_METADATA, NO_ERRORS, NUCLEOTIDE)[1];
+     MAAGnuc maag = model.buildGraphs(cloneset, SAVE_METADATA, NO_ERRORS)[1];
 
      YMIR_ASSERT2(maag.event_index(0, 0, 0, 0), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 0))
      YMIR_ASSERT2(maag.event_index(0, 0, 0, 1), mvec.event_index(VJ_VAR_JOI_GEN, 0, 0, 1))

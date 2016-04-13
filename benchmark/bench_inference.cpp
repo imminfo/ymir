@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     string input_alpha_file = "alpha.250k.txt";
     string input_beta_file = "beta.250k.txt";
 
-    CDR3NucParser parser;
+    ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
     // Cloneset cloneset_vj;
     // YMIR_BENCHMARK("Parsing VJ",
@@ -71,12 +71,11 @@ int main(int argc, char* argv[]) {
                                    "Dgene",
                                    BENCH_DATA_FOLDER + "trbd.txt");
 
-   Cloneset cloneset_vdj;
+   ClonesetNuc cloneset_vdj;
    YMIR_BENCHMARK("Parsing VDJ",
                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
                                       &cloneset_vdj,
                                       vdj_single_genes,
-                                      NUCLEOTIDE,
                                       VDJ_RECOMB,
                                       AlignmentColumnOptions()
                                               .setV(AlignmentColumnOptions::OVERWRITE)

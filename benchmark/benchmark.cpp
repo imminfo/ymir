@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
     std::string BENCH_DATA_FOLDER = argv[1];
 
 
-    CDR3NucParser parser;
+    ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
     string input_alpha_file = "alpha.250k.txt";
     string input_beta_file = "beta.250k.txt";
@@ -51,12 +51,11 @@ int main(int argc, char* argv[]) {
                                    "Jgene",
                                    BENCH_DATA_FOLDER + "traj.txt");
 
-    Cloneset cloneset_vj;
+    ClonesetNuc cloneset_vj;
     YMIR_BENCHMARK("Parsing VJ",
                    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file,
                                        &cloneset_vj,
                                        vj_single_genes,
-                                       NUCLEOTIDE,
                                        VJ_RECOMB,
                                        AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
                                                               AlignmentColumnOptions::OVERWRITE),
@@ -72,12 +71,11 @@ int main(int argc, char* argv[]) {
                                     "Dgene",
                                     BENCH_DATA_FOLDER + "trbd.txt");
 
-    Cloneset cloneset_vdj;
+    ClonesetNuc cloneset_vdj;
     YMIR_BENCHMARK("Parsing VDJ",
                    parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
                                        &cloneset_vdj,
                                        vdj_single_genes,
-                                       NUCLEOTIDE,
                                        VDJ_RECOMB,
                                        AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
                                                               AlignmentColumnOptions::OVERWRITE,
@@ -90,7 +88,7 @@ int main(int argc, char* argv[]) {
     ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA", EMPTY);
 
     YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS))
-    YMIR_BENCHMARK("VJ prob", vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS, NUCLEOTIDE))
+    YMIR_BENCHMARK("VJ prob", vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS))
 
 
     //
@@ -99,7 +97,7 @@ int main(int argc, char* argv[]) {
     ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
 
     YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS))
-    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS, NUCLEOTIDE))
+    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS))
 
 
     //

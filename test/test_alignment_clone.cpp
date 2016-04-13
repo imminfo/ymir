@@ -268,7 +268,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_vdj_alignment_nuc_simple_vj)
 
-    VDJAlignmentBuilder builder;
+    VDJAlignmentNucBuilder builder;
 
     builder.addVarAlignment(11, 1, 2, 3)
            .addVarAlignment(12, 4, 5, 6)
@@ -276,7 +276,7 @@ YMIR_TEST_START(test_vdj_alignment_nuc_simple_vj)
            .addJoiAlignment(33, 10, 11, 12)
            .addJoiAlignment(35, 13, 14, 15);
 
-    VDJAlignment algn = builder.buildAlignment();
+    VDJAlignmentNuc algn = builder.buildAlignment();
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)
@@ -351,7 +351,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_vdj_alignment_nuc_simple_vdj)
 
-    VDJAlignmentBuilder builder;
+    VDJAlignmentNucBuilder builder;
 
     // VDJ
 
@@ -366,7 +366,7 @@ YMIR_TEST_START(test_vdj_alignment_nuc_simple_vdj)
            .addDivAlignment(45, 33, 34, 35)
            .addDivAlignment(45, 36, 37, 38);
 
-    VDJAlignment algn = builder.buildAlignment();
+    VDJAlignmentNuc algn = builder.buildAlignment();
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)
@@ -423,7 +423,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_vdj_alignment_nuc_vector_vj)
 
-    VDJAlignmentBuilder builder;
+    VDJAlignmentNucBuilder builder;
 
     // V
 
@@ -461,7 +461,7 @@ YMIR_TEST_START(test_vdj_alignment_nuc_vector_vj)
            .addJoiAlignment(vec2)
            .addJoiAlignment(vec3);
 
-    VDJAlignment algn = builder.buildAlignment();
+    VDJAlignmentNuc algn = builder.buildAlignment();
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)
@@ -512,7 +512,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_vdj_alignment_nuc_vector_vdj)
 
-    VDJAlignmentBuilder builder;
+    VDJAlignmentNucBuilder builder;
 
     // V
 
@@ -567,7 +567,7 @@ YMIR_TEST_START(test_vdj_alignment_nuc_vector_vdj)
            .addDivAlignment(vec4)
            .addDivAlignment(vec5);
 
-    VDJAlignment algn = builder.buildAlignment();
+    VDJAlignmentNuc algn = builder.buildAlignment();
 
     YMIR_ASSERT2(algn.nVar(), 2)
     YMIR_ASSERT2(algn.nJoi(), 3)
@@ -653,28 +653,28 @@ YMIR_TEST_START(test_vdj_alignment_nuc_vector_vdj)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_aa_simple_vj())
+YMIR_TEST_START(test_vdj_alignment_aa_simple_vj)
 
     YMIR_ASSERT(false)
 
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_aa_simple_vdj())
+YMIR_TEST_START(test_vdj_alignment_aa_simple_vdj)
 
     YMIR_ASSERT(false)
 
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_aa_vector_vj())
+YMIR_TEST_START(test_vdj_alignment_aa_vector_vj)
 
     YMIR_ASSERT(false)
 
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_aa_vector_vdj())
+YMIR_TEST_START(test_vdj_alignment_aa_vector_vdj)
 
     YMIR_ASSERT(false)
 
@@ -683,7 +683,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_clone)
 
-    VDJAlignmentBuilder builder;
+    VDJAlignmentNucBuilder builder;
 
     builder.addVarAlignment(1, 8, 9, 5);
     builder.addVarAlignment(2, 11, 12, 3);
@@ -698,7 +698,7 @@ YMIR_TEST_START(test_clone)
     builder.addDivAlignment(7, 51, 52, 6);
     builder.addDivAlignment(7, 60, 61, 4);
 
-    Clonotype c("cloneseq", NUCLEOTIDE, VDJ_RECOMB, builder.buildAlignment());
+    ClonotypeNuc c("cloneseq", VDJ_RECOMB, builder.buildAlignment());
     YMIR_ASSERT2(c.recombination(), VDJ_RECOMB)
     YMIR_ASSERT(c.getVar(0) == 1)
     YMIR_ASSERT(c.getVar(1) == 2)
@@ -753,9 +753,8 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_clonebuilder_clonealign)
 
-    ClonotypeBuilder cb;
+    ClonotypeNucBuilder cb;
 
-    cb.setNucleotideSeq();
     cb.setSequence("nuclseq");
     cb.addVarAlignment(10, 1, 3, 15)
             .addVarAlignment(11, 4, 1, 25)
@@ -768,10 +767,10 @@ YMIR_TEST_START(test_clonebuilder_clonealign)
             .addDivAlignment(32, 1, 5, 2);
 
     cb.setRecombination(VDJ_RECOMB);
-    Clonotype c = cb.buildClonotype();
+    ClonotypeNuc c = cb.buildClonotype();
 
     YMIR_ASSERT2(c.sequence(), "nuclseq")
-    YMIR_ASSERT2(c.sequence_type(), NUCLEOTIDE)
+    YMIR_ASSERT2(ClonotypeNuc::sequence_type, NUCLEOTIDE)
     YMIR_ASSERT2(c.recombination(), VDJ_RECOMB)
 
     YMIR_ASSERT2(c.getVar(0), 10)
@@ -826,7 +825,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_clorep)
 
-     NaiveNucParser parser;
+     ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
      bool V_err, J_err;
      VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
@@ -834,11 +833,10 @@ YMIR_TEST_START(test_clorep)
      YMIR_ASSERT(V_err)
      YMIR_ASSERT(J_err)
 
-     Cloneset cr;
+     ClonesetNuc cr;
      YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "ymir.alpha.txt",
                                      &cr,
                                      vdj_genes,
-                                     NUCLEOTIDE,
                                      VJ_RECOMB,
                                      AlignmentColumnOptions()
                                       .setV(AlignmentColumnOptions::USE_PROVIDED)
@@ -853,21 +851,21 @@ YMIR_TEST_START(test_clorep)
     YMIR_ASSERT(is_out_of_frame(cr[24].sequence()))
     YMIR_ASSERT(cr[24].isOutOfFrame())
 
-     ClonesetView crv = cr.head(10);
-     YMIR_ASSERT2(crv.size(), 10)
-     YMIR_ASSERT(cr[0].sequence() == crv[0].sequence())
+    ClonesetViewNuc crv = cr.head(10);
+    YMIR_ASSERT2(crv.size(), 10)
+    YMIR_ASSERT(cr[0].sequence() == crv[0].sequence())
 
-     vector<size_t> inds = {1, 5, 10};
-     crv = cr.subvec(inds);
-     YMIR_ASSERT(crv[0].sequence() == cr[1].sequence())
-     YMIR_ASSERT(crv[1].sequence() == cr[5].sequence())
-     YMIR_ASSERT(crv[2].sequence() == cr[10].sequence())
+    vector<size_t> inds = {1, 5, 10};
+    crv = cr.subvec(inds);
+    YMIR_ASSERT(crv[0].sequence() == cr[1].sequence())
+    YMIR_ASSERT(crv[1].sequence() == cr[5].sequence())
+    YMIR_ASSERT(crv[2].sequence() == cr[10].sequence())
 
-     inds.clear(); inds.push_back(1); inds.push_back(2);
-     ClonesetView crv2 = crv.subvec(inds);
+    inds.clear(); inds.push_back(1); inds.push_back(2);
+    ClonesetViewNuc crv2 = crv.subvec(inds);
 
-     YMIR_ASSERT(crv2[0].sequence() == cr[5].sequence())
-     YMIR_ASSERT(crv2[1].sequence() == cr[10].sequence())
+    YMIR_ASSERT(crv2[0].sequence() == cr[5].sequence())
+    YMIR_ASSERT(crv2[1].sequence() == cr[10].sequence())
 
 YMIR_TEST_END
 
@@ -897,7 +895,7 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_gapped_alignment_vector())
     YMIR_TEST(test_codon_alignment_vector())
 
-    // Tests for VDJAlignment and VDJAlignmentBuilder
+    // Tests for VDJAlignmentNuc and VDJAlignmentNucBuilder
     YMIR_TEST(test_vdj_alignment_nuc_simple_vj())
     YMIR_TEST(test_vdj_alignment_nuc_simple_vdj())
     YMIR_TEST(test_vdj_alignment_nuc_vector_vj())

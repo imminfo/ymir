@@ -204,7 +204,6 @@ namespace ymir {
         */
         bool open(const std::string &filepath,
                   const VDJRecombinationGenes &gene_segments,
-                  SequenceType seq_type,
                   Recombination recomb,
                   AlignmentColumnOptions opts = AlignmentColumnOptions().setV(AlignmentColumnOptions::USE_PROVIDED).setJ(AlignmentColumnOptions::USE_PROVIDED).setD(AlignmentColumnOptions::OVERWRITE),
                   VDJAlignerParameters params = VDJAlignerParameters()) {
@@ -219,20 +218,24 @@ namespace ymir {
                 return false;
             }
 
+            if (!_aligner) {
+                std::cout << "Repertoire parser error:" << "\tsupply the aligner to the parser." << endl;
+                return false;
+            }
+
             _stream.open(filepath);
             if (_stream.good()) {
                 std::cout << "Open [" << filepath << "] for reading" << endl;
                 _genes = gene_segments;
                 std::cout << "-- gene segments assigned to the parser" << endl;
-                _seq_type = seq_type;
                 _recomb = recomb;
                 _opts = opts;
                 std::cout << "-- options assigned" << endl;
-                _status = true;
-                _aligner.set_genes(_genes);
+                _aligner->set_genes(_genes);
                 std::cout << "-- gene segments assigned to the aligner" << endl;
-                _aligner.set_parameters(params);
+                _aligner->set_parameters(params);
                 std::cout << "-- parameters assigned to the aligner" << endl;
+                _status = true;
                 return true;
             } else {
                 std::cout << "Repertoire parser error:" << "\tinput file [" << filepath << "] not found" << endl;
@@ -272,11 +275,10 @@ namespace ymir {
         bool openAndParse(const std::string &filepath,
                           cloneset_t *cloneset,
                           const VDJRecombinationGenes &gene_segments,
-                          SequenceType seq_type,
                           Recombination recomb,
                           AlignmentColumnOptions opts = AlignmentColumnOptions().setV(AlignmentColumnOptions::USE_PROVIDED).setJ(AlignmentColumnOptions::USE_PROVIDED).setD(AlignmentColumnOptions::OVERWRITE),
                           VDJAlignerParameters params = VDJAlignerParameters()) {
-            if (this->open(filepath, gene_segments, seq_type, recomb, opts, params)) {
+            if (this->open(filepath, gene_segments, recomb, opts, params)) {
                 this->parse(cloneset);
                 _stats.print();
                 if (_stream.is_open()) { _stream.close(); }
@@ -292,7 +294,6 @@ namespace ymir {
         VDJRecombinationGenes _genes;
         Recombination _recomb;
         AlignmentColumnOptions _opts;
-        SequenceType _seq_type;
         RepertoireParserStatistics _stats;
         unique_ptr<vdj_aligner_t> _aligner;
         bool _status;
@@ -322,14 +323,14 @@ namespace ymir {
             vector<seg_index_t> vseg, jseg, dseg;
             string temp_str;
 
-            _aligner.setSequenceType(_seq_type);
-            _aligner.setRecombination(_recomb);
+            _aligner->setRecombination(_recomb);
 
             // Skip header
             if (_read_header) {
                 getline(_stream, line);
                 _read_header = false;
             }
+
             while (!_stream.eof() && clonotype_num < max_clonotype_count) {
                 // Start processing clonotypes
                 getline(_stream, line);
@@ -346,14 +347,14 @@ namespace ymir {
                     //
                     // Get nucleotide or amino acid sequence
                     //
-                    if (_seq_type == NUCLEOTIDE) {
+                    if (clonotype_t::sequence_type == NUCLEOTIDE) {
                         getline(column_stream, sequence, column_sep);
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                         getline(column_stream, sequence, column_sep);
                     }
-                    _aligner.setSequence(sequence);
+                    _aligner->setSequence(sequence);
 
                     //
                     // Parse Variable genes
@@ -394,7 +395,7 @@ namespace ymir {
                     //
                     if (do_align_V) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
-                        if (!_aligner.alignVar()) {
+                        if (!_aligner->alignVar()) {
                             _stats.update_no_algn<VARIABLE>();
                         }
                     } else {
@@ -410,7 +411,7 @@ namespace ymir {
                     } else {
                         if (do_align_D) {
                             column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
-                            if (!_aligner.alignDiv()) {
+                            if (!_aligner->alignDiv()) {
                                 _stats.update_no_algn<DIVERSITY>();
                             }
                         } else {
@@ -424,7 +425,7 @@ namespace ymir {
                     //
                     if (do_align_J) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
-                        if (!_aligner.alignJoi()) {
+                        if (!_aligner->alignJoi()) {
                             _stats.update_no_algn<JOINING>();
                         }
                     } else {
@@ -441,7 +442,7 @@ namespace ymir {
                     //
                     // TODO: remove bad clonotypes here ???
                     //
-                    vec.push_back(_aligner.buildClonotype());
+                    vec.push_back(_aligner->buildClonotype());
                 }
             }
         }
@@ -518,7 +519,7 @@ namespace ymir {
                     gene_start = gsa[segvec[seg_order]].sequence.size() - alignment_len + 1;
                 }
 
-                _aligner.addAlignment(gene, segvec[seg_order], gene_start, seq_start, alignment_len);
+                _aligner->addAlignment(gene, segvec[seg_order], gene_start, seq_start, alignment_len);
 
                 ++seg_order;
             }
@@ -566,21 +567,10 @@ namespace ymir {
 
 
 
-    typedef RepertoireParser<NaiveCDR3NucleotideAligner> NaiveNucParser;
+    typedef RepertoireParser<ClonotypeNuc> ParserNuc;
 
 
-    typedef RepertoireParser<CDR3NucleotideAligner> CDR3NucParser;
-
-
-    typedef RepertoireParser<SmithWatermanNoGapAligner> SWNGParser;
-
-
-    typedef RepertoireParser<SmithWatermanAligner> SWParser;
-
-
-//    typedef RepertoireFileParser<NoGapAlignmentVector> RepertoireParser;
-//
-//    typedef RepertoireFileParser<GappedAlignmentVector> ErrorCorrectingParser;
+    typedef RepertoireParser<ClonotypeNuc> ParserAA;
 
 }
 

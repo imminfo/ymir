@@ -35,7 +35,7 @@ std::string TEST_DATA_FOLDER;
 
 YMIR_TEST_START(test_parser_vj)
 
-     NaiveNucParser parser;
+     ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
      bool V_err, J_err;
      VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
@@ -43,11 +43,10 @@ YMIR_TEST_START(test_parser_vj)
      YMIR_ASSERT(V_err)
      YMIR_ASSERT(J_err)
 
-     Cloneset cr;
+     ClonesetNuc cr;
      YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "ymir.alpha.txt",
                                      &cr,
                                      vdj_genes,
-                                     NUCLEOTIDE,
                                      VJ_RECOMB,
                                      AlignmentColumnOptions()
                                       .setV(AlignmentColumnOptions::USE_PROVIDED)
@@ -75,7 +74,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_parser_vj_by_block)
 
-    NaiveNucParser parser;
+    ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
     bool V_err, J_err;
     VDJRecombinationGenes vdj_genes("Vgene", TEST_DATA_FOLDER + "vgene.real.txt"
@@ -83,10 +82,9 @@ YMIR_TEST_START(test_parser_vj_by_block)
     YMIR_ASSERT(V_err)
     YMIR_ASSERT(J_err)
 
-    Cloneset cr;
+    ClonesetNuc cr;
     YMIR_ASSERT(parser.open(TEST_DATA_FOLDER + "ymir.alpha.txt",
                                     vdj_genes,
-                                    NUCLEOTIDE,
                                     VJ_RECOMB,
                                     AlignmentColumnOptions()
                                             .setV(AlignmentColumnOptions::USE_PROVIDED)
@@ -146,13 +144,12 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
-    NaiveNucParser parser;
+    ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
-    Cloneset cr;
+    ClonesetNuc cr;
     YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "ymir.beta.txt",
                                      &cr,
                                      genes,
-                                     NUCLEOTIDE,
                                      VDJ_RECOMB,
                                      AlignmentColumnOptions()
                                       .setV(AlignmentColumnOptions::USE_PROVIDED)
@@ -192,7 +189,6 @@ YMIR_TEST_START(test_parser_vdj_with_d_alignment)
     YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "ymir.beta.txt",
                                     &cr,
                                     genes,
-                                    NUCLEOTIDE,
                                     VDJ_RECOMB,
                                     AlignmentColumnOptions()
                                             .setV(AlignmentColumnOptions::USE_PROVIDED)
@@ -231,29 +227,27 @@ YMIR_TEST_START(test_writer)
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
-    ClonotypeBuilder cl_builder;
+    ClonotypeNucBuilder cl_builder;
     // CCCG.AC.GGTTT
     cl_builder.setSequence("CCCGACGGTTT")
-            .setNucleotideSeq()
             .setRecombination(VJ_RECOMB)
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 4, 3, 4)
             .addJoiAlignment(1, 2, 6, 5)
             .addJoiAlignment(2, 2, 9, 3)
             .addJoiAlignment(3, 2, 7, 5);
-    Clonotype clonotype = cl_builder.buildClonotype();
-    vector<Clonotype> vec;
+    ClonotypeNuc clonotype = cl_builder.buildClonotype();
+    vector<ClonotypeNuc> vec;
     vec.push_back(clonotype);
-    Cloneset cloneset(vec);
+    ClonesetNuc cloneset(vec);
 
     YMIR_ASSERT(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset, genes))
 
-    Cloneset cloneset2;
-    NaiveNucParser parser;
+    ClonesetNuc cloneset2;
+    ParserNuc parser(new NaiveCDR3NucleotideAligner());
     YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "../out.txt",
                                     &cloneset2,
                                     genes,
-                                    NUCLEOTIDE,
                                     VJ_RECOMB,
                                     AlignmentColumnOptions()
                                             .setV(AlignmentColumnOptions::USE_PROVIDED)
@@ -288,44 +282,41 @@ YMIR_TEST_START(test_writer_append)
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
-    vector<Clonotype> vec1, vec2, vec12;
-    ClonotypeBuilder cl_builder;
+    vector<ClonotypeNuc> vec1, vec2, vec12;
+    ClonotypeNucBuilder cl_builder;
     // CCCG.AC.GGTTT
     cl_builder.setSequence("CCCGACGGTTT")
-            .setNucleotideSeq()
             .setRecombination(VJ_RECOMB)
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 4, 3, 4)
             .addJoiAlignment(1, 2, 6, 5)
             .addJoiAlignment(2, 2, 9, 3)
             .addJoiAlignment(3, 2, 7, 5);
-    Clonotype clonotype1 = cl_builder.buildClonotype();
+    ClonotypeNuc clonotype1 = cl_builder.buildClonotype();
     vec1.push_back(clonotype1);
     vec12.push_back(clonotype1);
 
     cl_builder.setSequence("TACGATCTAGTC")
-            .setNucleotideSeq()
             .setRecombination(VJ_RECOMB)
             .addVarAlignment(3, 4, 3, 4)
             .addVarAlignment(1, 1, 1, 4)
             .addJoiAlignment(2, 2, 9, 3)
             .addJoiAlignment(1, 2, 6, 5)
             .addJoiAlignment(3, 2, 7, 5);
-    Clonotype clonotype2 = cl_builder.buildClonotype();
+    ClonotypeNuc clonotype2 = cl_builder.buildClonotype();
     vec2.push_back(clonotype2);
     vec12.push_back(clonotype2);
 
-    Cloneset cloneset1(vec1), cloneset2(vec2), cloneset12(vec12);
+    ClonesetNuc cloneset1(vec1), cloneset2(vec2), cloneset12(vec12);
 
     YMIR_ASSERT(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset1, genes))
     YMIR_ASSERT(writer.write(TEST_DATA_FOLDER + "../out.txt", cloneset2, genes, true))
 
-    Cloneset cloneset_final;
-    NaiveNucParser parser;
+    ClonesetNuc cloneset_final;
+    ParserNuc parser(new NaiveCDR3NucleotideAligner());
     YMIR_ASSERT(parser.openAndParse(TEST_DATA_FOLDER + "../out.txt",
                                     &cloneset_final,
                                     genes,
-                                    NUCLEOTIDE,
                                     VJ_RECOMB,
                                     AlignmentColumnOptions()
                                             .setV(AlignmentColumnOptions::USE_PROVIDED)

@@ -18,6 +18,7 @@ namespace ymir {
 
     public:
 
+
         VDJAlignmentNuc(const segments_storage_t &segments,
                         const NoGapAlignmentVector &alignments,
                         const n_D_alignments_storage_t &n_D_alignments)

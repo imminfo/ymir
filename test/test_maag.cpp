@@ -149,9 +149,9 @@ YMIR_TEST_START(test_maag_vj)
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
-    MAAGNucBuilder maag_builder(mvec, genes);
+    MAAGBuilder maag_builder(mvec, genes);
 
-    ClonotypeBuilder cl_builder;
+    ClonotypeNucBuilder cl_builder;
     // CCCGACGGTTT
     // .....CCGTTT
     // .......ATTT
@@ -161,14 +161,13 @@ YMIR_TEST_START(test_maag_vj)
     // vs: 0-1-2-3-4-5
     // js: 7-8-9-10-11-12
     cl_builder.setSequence("CCCGACGGTTT")
-            .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 5)
             .addJoiAlignment(1, 3, 8, 4)
             .addJoiAlignment(2, 2, 9, 3)
             .addJoiAlignment(3, 2, 7, 5);
     cl_builder.setRecombination(VJ_RECOMB);
-    Clonotype clonotype = cl_builder.buildClonotype();
+    ClonotypeNuc clonotype = cl_builder.buildClonotype();
 
 //    cout << "here" << endl;
     MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
@@ -260,11 +259,11 @@ YMIR_TEST_START(test_maag_vj_err)
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
-    MAAGNucBuilder maag_builder(mvec, genes);
+    MAAGBuilder maag_builder(mvec, genes);
 
     NoGapAlignmentVector vec;
     NoGapAlignmentVector::events_storage_t bits;
-    ClonotypeBuilder cl_builder;
+    ClonotypeNucBuilder cl_builder;
     // CCCGACGGTTT
     // CCCG
     // CCCGAG
@@ -275,7 +274,7 @@ YMIR_TEST_START(test_maag_vj_err)
     // poses:
     // vs: 0-1-2-3-4-5
     // js: 7-8-9-10-11-12
-    cl_builder.setSequence("CCCGACGGTTT").setNucleotideSeq().setRecombination(VJ_RECOMB);
+    cl_builder.setSequence("CCCGACGGTTT").setRecombination(VJ_RECOMB);
 
     bits = {0, 0, 0, 0};
     vec.addAlignment(1, 1, 1, bits);
@@ -298,7 +297,7 @@ YMIR_TEST_START(test_maag_vj_err)
     cl_builder.addJoiAlignment(vec);
     vec.clear();
 
-    Clonotype clonotype = cl_builder.buildClonotype();
+    ClonotypeNuc clonotype = cl_builder.buildClonotype();
 
 //    cout << "here" << endl;
     MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, COMPUTE_ERRORS);
@@ -436,9 +435,9 @@ YMIR_TEST_START(test_maag_vdj)
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
-    MAAGNucBuilder maag_builder(mvec, genes);
+    MAAGBuilder maag_builder(mvec, genes);
 
-    ClonotypeBuilder cl_builder;
+    ClonotypeNucBuilder cl_builder;
     /*
      D1:
             CCGTTT
@@ -460,7 +459,6 @@ YMIR_TEST_START(test_maag_vdj)
          CC.CGG.AC
     */
     cl_builder.setSequence("CCCGACGGTTT")
-            .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 5)
             .addJoiAlignment(1, 3, 8, 4)
@@ -473,7 +471,7 @@ YMIR_TEST_START(test_maag_vdj)
             .addDivAlignment(3, 3, 6, 3)
             .addDivAlignment(1, 1, 8, 4);
     cl_builder.setRecombination(VDJ_RECOMB);
-    Clonotype clonotype = cl_builder.buildClonotype();
+    ClonotypeNuc clonotype = cl_builder.buildClonotype();
 
     MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
@@ -613,13 +611,13 @@ YMIR_TEST_START(test_maag_vdj_err)
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
-    MAAGNucBuilder maag_builder(mvec, genes);
+    MAAGBuilder maag_builder(mvec, genes);
 
     NoGapAlignmentVector vec, vec2;
     NoGapAlignmentVector::events_storage_t bits;
-    ClonotypeBuilder cl_builder;
+    ClonotypeNucBuilder cl_builder;
 
-    cl_builder.setSequence("CCCGACGGTTT").setNucleotideSeq().setRecombination(VDJ_RECOMB);
+    cl_builder.setSequence("CCCGACGGTTT").setRecombination(VDJ_RECOMB);
 
     bits = {0, 0, 0, 0};
     vec.addAlignment(1, 1, 1, bits);
@@ -684,7 +682,7 @@ YMIR_TEST_START(test_maag_vdj_err)
     vec.addAlignment(1, 1, 8, bits);
     cl_builder.addDivAlignment(vec);
 
-    Clonotype clonotype = cl_builder.buildClonotype();
+    ClonotypeNuc clonotype = cl_builder.buildClonotype();
 
     MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, COMPUTE_ERRORS);
 
@@ -840,22 +838,21 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
-    MAAGNucBuilder maag_builder(mvec, genes);
+    MAAGBuilder maag_builder(mvec, genes);
 
-    ClonotypeBuilder cl_builder;
+    ClonotypeNucBuilder cl_builder;
     // CCCG.AC.GGTTT
     // poses:
     // vs: 0-1-2-3-4-5
     // js: 7-8-9-10-11
     cl_builder.setSequence("CCCGACGGTTT")
-            .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 5)
             .addJoiAlignment(1, 3, 8, 4)
             .addJoiAlignment(2, 2, 9, 3)
             .addJoiAlignment(3, 2, 7, 5);
     cl_builder.setRecombination(VJ_RECOMB);
-    Clonotype clonotype = cl_builder.buildClonotype();
+    ClonotypeNuc clonotype = cl_builder.buildClonotype();
 
     MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
@@ -870,7 +867,7 @@ YMIR_TEST_START(test_maag_builder_replace_vj)
 //    cout << mvec.event_prob(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1) << endl;
 //    YMIR_ASSERT2(maag.event_probability(2, 0, 0, 0), mvec2.event_prob(VJ_VAR_JOI_INS_LEN, 0, maag.position(6) - maag.position(0) - 1))
 
-    MAAGNucBuilder maag_builder2(mvec2, genes);
+    MAAGBuilder maag_builder2(mvec2, genes);
 
     maag_builder2.updateEventProbabilities(&maag);
 
@@ -955,9 +952,9 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
-    MAAGNucBuilder maag_builder(mvec, genes);
+    MAAGBuilder maag_builder(mvec, genes);
 
-    ClonotypeBuilder cl_builder;
+    ClonotypeNucBuilder cl_builder;
     /*
      D1:
        CCCGACGGTTT
@@ -976,7 +973,6 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
          CC.CGG.AC
     */
     cl_builder.setSequence("CCCGACGGTTT")
-            .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 5)
             .addJoiAlignment(1, 3, 8, 4)
@@ -989,7 +985,7 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
             .addDivAlignment(3, 3, 6, 3)
             .addDivAlignment(1, 1, 8, 4);
     cl_builder.setRecombination(VDJ_RECOMB);
-    Clonotype clonotype = cl_builder.buildClonotype();
+    ClonotypeNuc clonotype = cl_builder.buildClonotype();
 
     MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
@@ -997,7 +993,7 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
 
     YMIR_ASSERT(!(mvec == mvec2))
 
-    MAAGNucBuilder maag_builder2(mvec2, genes);
+    MAAGBuilder maag_builder2(mvec2, genes);
     maag_builder2.updateEventProbabilities(&maag);
 
     YMIR_ASSERT2(maag.nVar(), 2)
@@ -1105,9 +1101,9 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] = 0;
     mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] = 0;
     mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] = 0;
-    MAAGNucBuilder maag_builder(mvec, genes);
+    MAAGBuilder maag_builder(mvec, genes);
 
-    ClonotypeBuilder cl_builder;
+    ClonotypeNucBuilder cl_builder;
     // CCCAAAAAAATT
     //       CCGTTT
     //         CATT
@@ -1117,7 +1113,6 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
     // vs: 0-1-2-3-4-5
     // js: 7-8-9-10-11
     cl_builder.setSequence("CCCAAAAAAATT")
-            .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 4)
 //            .addVarAlignment(4, 3, 1, 4)
@@ -1126,7 +1121,7 @@ YMIR_TEST_START(test_maag_forward_backward_vj)
             .addJoiAlignment(3, 2, 11, 2);
 //            .addJoiAlignment(4, 2, 11, 3);
     cl_builder.setRecombination(VJ_RECOMB);
-    Clonotype clonotype = cl_builder.buildClonotype();
+    ClonotypeNuc clonotype = cl_builder.buildClonotype();
 
     MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
@@ -1184,9 +1179,9 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
-    MAAGNucBuilder maag_builder(mvec, genes);
+    MAAGBuilder maag_builder(mvec, genes);
 
-    ClonotypeBuilder cl_builder;
+    ClonotypeNucBuilder cl_builder;
     /*
      D1:
        CCCGACGGTTT
@@ -1203,7 +1198,6 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
          CC.CGG.AC
     */
     cl_builder.setSequence("CCCGACGGTTT")
-            .setNucleotideSeq()
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 5)
             .addJoiAlignment(1, 2, 8, 4)
@@ -1216,7 +1210,7 @@ YMIR_TEST_START(test_maag_forward_backward_vdj)
             .addDivAlignment(3, 3, 6, 3)
             .addDivAlignment(1, 1, 8, 4);
     cl_builder.setRecombination(VDJ_RECOMB);
-    Clonotype clonotype = cl_builder.buildClonotype();
+    ClonotypeNuc clonotype = cl_builder.buildClonotype();
 
     MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 

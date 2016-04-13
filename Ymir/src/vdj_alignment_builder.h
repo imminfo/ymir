@@ -70,7 +70,7 @@ namespace ymir {
             }
             // std::copy(_n_Dalign.begin(), _n_Dalign.end(), nDs.begin());
 
-            AlignmentVectorBase avec;
+            alignment_vector_t avec;
             avec.extend(_Valign);
             avec.extend(_Jalign);
             avec.extend(_Dalign);

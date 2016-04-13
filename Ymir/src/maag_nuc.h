@@ -45,7 +45,9 @@ namespace ymir {
         }
 
 
-        MAAGnuc(MAAGnuc &&other) {
+        MAAGnuc(MAAGnuc &&other)
+                : MAAGBase(other)
+        {
             _events.swap(other._events);
 
             _errors.swap(other._errors);

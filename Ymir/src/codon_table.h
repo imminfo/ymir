@@ -56,11 +56,12 @@ namespace ymir {
             std::string print() {
                 std::string res = " ";
                 res[0] = this->aminoacid();
-                res += ":" + this->codon() + "_";
+                res += ": " + this->codon() + "";
                 while (this->next()) {
-                    res += "_";
-                    res[res.size() - 1] = this->aminoacid();
-                    res += ":" + this->codon() + "_";
+                    res += " ";
+//                    res[res.size() - 1] = this->aminoacid();
+//                    res += ":" + this->codon() + "_";
+                    res += this->codon();
                 }
                 return res;
             }
@@ -141,6 +142,7 @@ namespace ymir {
             std::string res = "";
             for (aa_to_codon_storage_t::iterator it = _aa2codon.begin(); it != _aa2codon.end(); ++it) {
                 res += this->codons(it->first).print();
+                res += '\n';
             }
             return res;
         }

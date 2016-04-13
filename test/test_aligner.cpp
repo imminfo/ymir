@@ -98,6 +98,7 @@ YMIR_TEST_START(test_codon_table)
     YMIR_ASSERT2("G", CodonTable::table().translate("GGT"))
     YMIR_ASSERT2("C", CodonTable::table().translate("TGT"))
     YMIR_ASSERT2("S", CodonTable::table().translate("AGT"))
+
 YMIR_TEST_END
 
 

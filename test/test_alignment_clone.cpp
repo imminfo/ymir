@@ -262,7 +262,33 @@ YMIR_TEST_END
 
 
 YMIR_TEST_START(test_codon_alignment_vector)
-    YMIR_ASSERT(false)
+
+    CodonAlignmentVector vec;
+
+    YMIR_ASSERT2(vec.size(), 0)
+
+    AlignmentVectorBase::events_storage_t events1 = {true, false, false, true, false, false};
+    codon_hash hash1 = compute_codon_hash(events1, 0);
+    YMIR_ASSERT2(hash1, 36);
+
+    AlignmentVectorBase::events_storage_t events2 = {true, true, false, true, false, true};
+    codon_hash hash2 = compute_codon_hash(events2, 0);
+    YMIR_ASSERT2(hash2, 53);
+
+    AlignmentVectorBase::events_storage_t events3 = {false, false, false, false, false, false};
+    codon_hash hash3 = compute_codon_hash(events3, 0);
+    YMIR_ASSERT2(hash3, 0);
+
+    AlignmentVectorBase::events_storage_t events4 = {true, true, true, true, true, true};
+    codon_hash hash4 = compute_codon_hash(events4, 0);
+    YMIR_ASSERT2(hash4, 63);
+
+    AlignmentVectorBase::events_storage_t events_add = {true, true, false, false, true, true,
+                                                        true, false, false, true, false, false};
+    YMIR_ASSERT2(compute_codon_hash(events_add, 0), 51);
+    YMIR_ASSERT2(compute_codon_hash(events_add, 6), 36);
+
+
 YMIR_TEST_END
 
 

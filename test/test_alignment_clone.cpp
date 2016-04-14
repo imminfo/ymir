@@ -288,6 +288,30 @@ YMIR_TEST_START(test_codon_alignment_vector)
     YMIR_ASSERT2(compute_codon_hash(events_add, 0), 51);
     YMIR_ASSERT2(compute_codon_hash(events_add, 6), 36);
 
+    events1.insert(events1.end(), events2.begin(), events2.end());
+    events1.insert(events1.end(), events3.begin(), events3.end());
+
+    YMIR_ASSERT2(events1.size(), 18)
+
+    vec.addAlignment(1, 2, 3, events1);
+    vec.addAlignment(4, 5, 6, events4);
+
+    YMIR_ASSERT2(vec.id(0), 1)
+    YMIR_ASSERT2(vec.id(1), 4)
+
+    YMIR_ASSERT2(vec.pattern_start(0), 2)
+    YMIR_ASSERT2(vec.pattern_start(1), 5)
+
+    YMIR_ASSERT2(vec.text_start(0), 3)
+    YMIR_ASSERT2(vec.text_start(1), 6)
+
+    YMIR_ASSERT2(vec.len(0), 3)
+    YMIR_ASSERT2(vec.len(1), 1)
+
+    YMIR_ASSERT2(vec.getCodon(0, 1), hash1)
+    YMIR_ASSERT2(vec.getCodon(0, 2), hash2)
+    YMIR_ASSERT2(vec.getCodon(0, 3), hash3)
+    YMIR_ASSERT2(vec.getCodon(1, 1), hash4)
 
 YMIR_TEST_END
 

@@ -965,8 +965,8 @@ namespace ymir {
 
 
     void MAAGBuilder::buildNucVJinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
-                                        const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
-                                        ErrorMode error_mode) const {
+                                           const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
+                                           ErrorMode error_mode) const {
         MonoNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
 
         seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
@@ -997,8 +997,8 @@ namespace ymir {
 
 
     void MAAGBuilder::buildNucVDinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
-                                        const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
-                                        ErrorMode error_mode) const {
+                                           const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
+                                           ErrorMode error_mode) const {
         DiNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
 
         seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
@@ -1029,8 +1029,8 @@ namespace ymir {
 
 
     void MAAGBuilder::buildNucDJinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
-                                        const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
-                                        ErrorMode error_mode) const {
+                                           const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
+                                           ErrorMode error_mode) const {
         DiNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
 
         seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
@@ -1063,11 +1063,11 @@ namespace ymir {
 
 
     void MAAGBuilder::buildNucInsertions(const string &sequence, ProbMMC &probs, EventIndMMC &events,
-                                      const vector<seq_len_t> &seq_poses, ProbMMC::node_ind_t ins_node_index,
-                                      event_ind_t null_insertion, seq_len_t max_size, MetadataMode metadata_mode,
-                                      bool error_mode, seq_len_t left_vertices_start, seq_len_t left_vertices_end,
-                                      seq_len_t right_vertices_start, seq_len_t right_vertices_end,
-                                      const AbstractInsertionModel &mc, bool reversed) const {
+                                         const vector<seq_len_t> &seq_poses, ProbMMC::node_ind_t ins_node_index,
+                                         event_ind_t null_insertion, seq_len_t max_size, MetadataMode metadata_mode,
+                                         bool error_mode, seq_len_t left_vertices_start, seq_len_t left_vertices_end,
+                                         seq_len_t right_vertices_start, seq_len_t right_vertices_end,
+                                         const AbstractInsertionModel &mc, bool reversed) const {
         int insertion_len;
         bool good_insertion;
         char last_char = NULL_CHAR;

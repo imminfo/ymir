@@ -138,13 +138,13 @@ namespace ymir {
          * \param seq_poses Vector of positions.
          * \param metadata_mode Boolean if build should be full.
          */
-        void buildVariable(const ClonotypeNuc &clonotype,
-                           ProbMMC &probs,
-                           EventIndMMC &events,
-                           ErrMMC &errors,
-                           vector<seq_len_t> &seq_poses,
-                           MetadataMode metadata_mode,
-                           ErrorMode error_mode) const;
+        void buildNucVariable(const ClonotypeNuc &clonotype,
+                              ProbMMC &probs,
+                              EventIndMMC &events,
+                              ErrMMC &errors,
+                              vector<seq_len_t> &seq_poses,
+                              MetadataMode metadata_mode,
+                              ErrorMode error_mode) const;
 
 
         /**
@@ -156,13 +156,13 @@ namespace ymir {
          * \param seq_poses Vector of positions.
          * \param metadata_mode Boolean if build should be full.
          */
-        void buildJoining(const ClonotypeNuc &clonotype,
-                          ProbMMC &probs,
-                          EventIndMMC &events,
-                          ErrMMC &errors,
-                          vector<seq_len_t> &seq_poses,
-                          MetadataMode metadata_mode,
-                          ErrorMode error_mode) const;
+        void buildNucJoining(const ClonotypeNuc &clonotype,
+                             ProbMMC &probs,
+                             EventIndMMC &events,
+                             ErrMMC &errors,
+                             vector<seq_len_t> &seq_poses,
+                             MetadataMode metadata_mode,
+                             ErrorMode error_mode) const;
 
 
         /**
@@ -174,13 +174,13 @@ namespace ymir {
          * \param seq_poses Vector of positions.
          * \param metadata_mode Boolean if build should be full.
          */
-        void buildDiversity(const ClonotypeNuc &clonotype,
-                            ProbMMC &probs,
-                            EventIndMMC &events,
-                            ErrMMC &errors,
-                            vector<seq_len_t> &seq_poses,
-                            MetadataMode metadata_mode,
-                            ErrorMode error_mode) const;
+        void buildNucDiversity(const ClonotypeNuc &clonotype,
+                               ProbMMC &probs,
+                               EventIndMMC &events,
+                               ErrMMC &errors,
+                               vector<seq_len_t> &seq_poses,
+                               MetadataMode metadata_mode,
+                               ErrorMode error_mode) const;
 
 
         /**
@@ -192,12 +192,12 @@ namespace ymir {
          * \param seq_poses Vector of positions.
          * \param metadata_mode Boolean if build should be full.
          */
-        void buildVJinsertions(const ClonotypeNuc &clonotype,
-                               ProbMMC &probs,
-                               EventIndMMC &events,
-                               const vector<seq_len_t> &seq_poses,
-                               MetadataMode metadata_mode,
-                               ErrorMode error_mode) const;
+        void buildNucVJinsertions(const ClonotypeNuc &clonotype,
+                                  ProbMMC &probs,
+                                  EventIndMMC &events,
+                                  const vector<seq_len_t> &seq_poses,
+                                  MetadataMode metadata_mode,
+                                  ErrorMode error_mode) const;
 
 
         /**
@@ -209,12 +209,12 @@ namespace ymir {
          * \param seq_poses Vector of positions.
          * \param metadata_mode Boolean if build should be full.
          */
-        void buildVDinsertions(const ClonotypeNuc &clonotype,
-                               ProbMMC &probs,
-                               EventIndMMC &events,
-                               const vector<seq_len_t> &seq_poses,
-                               MetadataMode metadata_mode,
-                               ErrorMode error_mode) const;
+        void buildNucVDinsertions(const ClonotypeNuc &clonotype,
+                                  ProbMMC &probs,
+                                  EventIndMMC &events,
+                                  const vector<seq_len_t> &seq_poses,
+                                  MetadataMode metadata_mode,
+                                  ErrorMode error_mode) const;
 
 
         /**
@@ -226,12 +226,12 @@ namespace ymir {
          * \param seq_poses Vector of positions.
          * \param metadata_mode Boolean if build should be full.
          */
-        void buildDJinsertions(const ClonotypeNuc &clonotype,
-                               ProbMMC &probs,
-                               EventIndMMC &events,
-                               const vector<seq_len_t> &seq_poses,
-                               MetadataMode metadata_mode,
-                               ErrorMode error_mode) const;
+        void buildNucDJinsertions(const ClonotypeNuc &clonotype,
+                                  ProbMMC &probs,
+                                  EventIndMMC &events,
+                                  const vector<seq_len_t> &seq_poses,
+                                  MetadataMode metadata_mode,
+                                  ErrorMode error_mode) const;
 
 
         /**
@@ -251,21 +251,21 @@ namespace ymir {
          * \param right_vertices_end Ending index in seq_poses for the vertices in the right matrix.
          * \param mc Insertion model that uses for generation of N nucleotides.
          */
-        void buildInsertions(const string &sequence,
-                             ProbMMC &probs,
-                             EventIndMMC &events,
-                             const vector<seq_len_t> &seq_poses,
-                             ProbMMC::node_ind_t ins_node_index,
-                             event_ind_t null_insertion,
-                             seq_len_t max_size,
-                             MetadataMode metadata_mode,
-                             bool error_mode,
-                             seq_len_t left_vertices_start,
-                             seq_len_t left_vertices_end,
-                             seq_len_t right_vertices_start,
-                             seq_len_t right_vertices_end,
-                             const AbstractInsertionModel& mc,
-                             bool reversed = false) const;
+        void buildNucInsertions(const string &sequence,
+                                ProbMMC &probs,
+                                EventIndMMC &events,
+                                const vector<seq_len_t> &seq_poses,
+                                ProbMMC::node_ind_t ins_node_index,
+                                event_ind_t null_insertion,
+                                seq_len_t max_size,
+                                MetadataMode metadata_mode,
+                                bool error_mode,
+                                seq_len_t left_vertices_start,
+                                seq_len_t left_vertices_end,
+                                seq_len_t right_vertices_start,
+                                seq_len_t right_vertices_end,
+                                const AbstractInsertionModel& mc,
+                                bool reversed = false) const;
 
     };
 
@@ -304,14 +304,14 @@ namespace ymir {
                 errors.resize(e_resize_size);
             }
 
-            this->buildVariable(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
-            this->buildJoining(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+            this->buildNucVariable(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+            this->buildNucJoining(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
             if (clonotype.recombination() == VJ_RECOMB) {
-                this->buildVJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                this->buildNucVJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
             } else if (clonotype.recombination() == VDJ_RECOMB) {
-                this->buildDiversity(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
-                this->buildVDinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
-                this->buildDJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                this->buildNucDiversity(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+                this->buildNucVDinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                this->buildNucDJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
             }
 
 //              VERY OLD VERSION
@@ -489,7 +489,7 @@ namespace ymir {
                     seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                             j_vertices = maag->nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
 
-                    this->buildInsertions(maag->sequence(),
+                    this->buildNucInsertions(maag->sequence(),
                                           *maag,
                                           *maag->_events,
                                           seq_poses_vec,
@@ -511,7 +511,7 @@ namespace ymir {
                     seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                             d3_vertices = maag->nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
 
-                    this->buildInsertions(maag->sequence(),
+                    this->buildNucInsertions(maag->sequence(),
                                           *maag,
                                           *maag->_events,
                                           seq_poses_vec,
@@ -535,7 +535,7 @@ namespace ymir {
                             d5_vertices = maag->nodeColumns(DIVERSITY_GENES_MATRIX_INDEX),
                             j_vertices = maag->nodeRows(JOINING_DELETIONS_VDJ_MATRIX_INDEX);
 
-                    this->buildInsertions(maag->sequence(),
+                    this->buildNucInsertions(maag->sequence(),
                                           *maag,
                                           *maag->_events,
                                           seq_poses_vec,
@@ -649,7 +649,7 @@ namespace ymir {
 
 
     prob_t MAAGBuilder::buildAndCompute(const ClonotypeAA &clonotype) const {
-
+        return this->build(clonotype).fullProbability();
     }
 
 
@@ -658,9 +658,9 @@ namespace ymir {
     }
 
 
-    void MAAGBuilder::buildVariable(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events, ErrMMC &errors,
-                                    vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
-                                    ErrorMode error_mode) const {
+    void MAAGBuilder::buildNucVariable(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events, ErrMMC &errors,
+                                       vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
+                                       ErrorMode error_mode) const {
         // find max V alignment
         seq_len_t len = 0;
         seg_index_t v_num = clonotype.nVar(), j_num = clonotype.nJoi();
@@ -746,9 +746,9 @@ namespace ymir {
     }
 
 
-    void MAAGBuilder::buildJoining(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events, ErrMMC &errors,
-                                   vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
-                                   ErrorMode error_mode) const {
+    void MAAGBuilder::buildNucJoining(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events, ErrMMC &errors,
+                                      vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
+                                      ErrorMode error_mode) const {
         int J_index_dels = JOINING_DELETIONS_VJ_MATRIX_INDEX,
                 J_index_genes = JOINING_GENES_VDJ_MATRIX_INDEX;
         if (clonotype.recombination() == VDJ_RECOMB) {
@@ -837,9 +837,9 @@ namespace ymir {
     }
 
 
-    void MAAGBuilder::buildDiversity(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events, ErrMMC &errors,
-                                     vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
-                                     ErrorMode error_mode) const {
+    void MAAGBuilder::buildNucDiversity(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events, ErrMMC &errors,
+                                        vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
+                                        ErrorMode error_mode) const {
         seq_len_t min_D_len;
 
         // vector seq_start -> 0 means no such index in the matrix, 1 otherwise.
@@ -964,7 +964,7 @@ namespace ymir {
     }
 
 
-    void MAAGBuilder::buildVJinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
+    void MAAGBuilder::buildNucVJinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
                                         const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
                                         ErrorMode error_mode) const {
         MonoNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
@@ -978,7 +978,7 @@ namespace ymir {
             events.initNode(VarJoi_INSERTIONS_MATRIX_INDEX, 1, v_vertices, j_vertices);
         }
 
-        this->buildInsertions(clonotype.sequence(),
+        this->buildNucInsertions(clonotype.sequence(),
                               probs,
                               events,
                               seq_poses,
@@ -996,7 +996,7 @@ namespace ymir {
     }
 
 
-    void MAAGBuilder::buildVDinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
+    void MAAGBuilder::buildNucVDinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
                                         const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
                                         ErrorMode error_mode) const {
         DiNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
@@ -1010,7 +1010,7 @@ namespace ymir {
             events.initNode(VarDiv_INSERTIONS_MATRIX_INDEX, 1, v_vertices, d3_vertices);
         }
 
-        this->buildInsertions(clonotype.sequence(),
+        this->buildNucInsertions(clonotype.sequence(),
                               probs,
                               events,
                               seq_poses,
@@ -1028,7 +1028,7 @@ namespace ymir {
     }
 
 
-    void MAAGBuilder::buildDJinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
+    void MAAGBuilder::buildNucDJinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
                                         const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
                                         ErrorMode error_mode) const {
         DiNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
@@ -1044,7 +1044,7 @@ namespace ymir {
             events.initNode(DivJoi_INSERTIONS_MATRIX_INDEX, 1, d5_vertices, j_vertices);
         }
 
-        this->buildInsertions(clonotype.sequence(),
+        this->buildNucInsertions(clonotype.sequence(),
                               probs,
                               events,
                               seq_poses,
@@ -1062,7 +1062,7 @@ namespace ymir {
     }
 
 
-    void MAAGBuilder::buildInsertions(const string &sequence, ProbMMC &probs, EventIndMMC &events,
+    void MAAGBuilder::buildNucInsertions(const string &sequence, ProbMMC &probs, EventIndMMC &events,
                                       const vector<seq_len_t> &seq_poses, ProbMMC::node_ind_t ins_node_index,
                                       event_ind_t null_insertion, seq_len_t max_size, MetadataMode metadata_mode,
                                       bool error_mode, seq_len_t left_vertices_start, seq_len_t left_vertices_end,

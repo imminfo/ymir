@@ -31,6 +31,9 @@ namespace ymir {
         }
 
 
+        /**
+         *
+         */
         ///@{
         codon_hash getVarCodon(seg_index_t vgene, seq_len_t pos) const {
             return _alignments.getCodon(vgene, pos);

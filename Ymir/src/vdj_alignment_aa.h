@@ -31,9 +31,19 @@ namespace ymir {
         }
 
 
-        //
-        // Working with codons is here
-        //
+        ///@{
+        codon_hash getVarCodon(seg_index_t vgene, seq_len_t pos) const {
+            return _alignments.getCodon(vgene, pos);
+        }
+
+        codon_hash getDivCodon(seg_index_t dgene, seg_index_t align_i, seq_len_t pos) const {
+            return _alignments.getCodon(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i, pos);
+        }
+
+        codon_hash getJoiCodon(seg_index_t jgene, seq_len_t pos) const {
+            return _alignments.getCodon(_segments[0] + jgene, pos);
+        }
+        ///@}
 
 
     protected:

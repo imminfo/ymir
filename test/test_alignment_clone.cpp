@@ -703,23 +703,92 @@ YMIR_TEST_START(test_vdj_alignment_nuc_vector_vdj)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_vdj_alignment_aa_simple_vj)
-
-    YMIR_ASSERT(false)
-
-YMIR_TEST_END
-
-
-YMIR_TEST_START(test_vdj_alignment_aa_simple_vdj)
-
-    YMIR_ASSERT(false)
-
-YMIR_TEST_END
-
-
 YMIR_TEST_START(test_vdj_alignment_aa_vector_vj)
 
-    YMIR_ASSERT(false)
+    VDJAlignmentAABuilder builder;
+
+    // V
+
+    CodonAlignmentVector vec1;
+    AlignmentVectorBase::events_storage_t events11 {false, false, true, true, true, false,
+                                                    true, true, false, false, false, true};
+    vec1.addAlignment(11, 1, 2, events11);
+    AlignmentVectorBase::events_storage_t events12 {false, false, true, true, true, false,
+                                                    true, true, false, false, false, true,
+                                                    false, true, true, false, false, false};
+    vec1.addAlignment(12, 4, 5, events12);
+
+
+    // J
+
+    CodonAlignmentVector vec2;
+    AlignmentVectorBase::events_storage_t events21 {false, false, true, true, true, false,
+                                                    false, true, true, false, false, false,
+                                                    true, true, false, false, false, true};
+    vec2.addAlignment(31, 7, 8, events21);
+    AlignmentVectorBase::events_storage_t events22 {false, false, true, true, true, false,
+                                                    false, true, true, false, false, false,
+                                                    true, true, false, false, false, true,
+                                                    false, true, true, true, true, true};
+    vec2.addAlignment(33, 10, 11, events22);
+
+    CodonAlignmentVector vec3;
+    AlignmentVectorBase::events_storage_t events31 {false, true, true, false, true, true,
+                                                    false, true, true, false, true, true,
+                                                    false, true, true, true, true, true};
+    vec3.addAlignment(35, 13, 14, events31);
+
+
+    builder.addVarAlignment(vec1)
+            .addJoiAlignment(vec2)
+            .addJoiAlignment(vec3);
+
+    VDJAlignmentAA algn = builder.buildAlignment();
+
+    YMIR_ASSERT2(algn.nVar(), 2)
+    YMIR_ASSERT2(algn.nJoi(), 3)
+    YMIR_ASSERT2(algn.nDiv(), 0)
+
+    YMIR_ASSERT2(algn.getVar(0), 11)
+    YMIR_ASSERT2(algn.getVar(1), 12)
+    YMIR_ASSERT2(algn.getJoi(0), 31)
+    YMIR_ASSERT2(algn.getJoi(1), 33)
+    YMIR_ASSERT2(algn.getJoi(2), 35)
+
+    YMIR_ASSERT2(algn.getVarGeneStart(0), 1)
+    YMIR_ASSERT2(algn.getVarSeqStart(0), 2)
+    YMIR_ASSERT2(algn.getVarLen(0), 2)
+    YMIR_ASSERT2(algn.getVarCodon(0, 1), 14)
+    YMIR_ASSERT2(algn.getVarCodon(0, 2), 49)
+
+    YMIR_ASSERT2(algn.getVarGeneStart(1), 4)
+    YMIR_ASSERT2(algn.getVarSeqStart(1), 5)
+    YMIR_ASSERT2(algn.getVarLen(1), 3)
+    YMIR_ASSERT2(algn.getVarCodon(1, 1), 14)
+    YMIR_ASSERT2(algn.getVarCodon(1, 2), 49)
+    YMIR_ASSERT2(algn.getVarCodon(1, 3), 24)
+
+    YMIR_ASSERT2(algn.getJoiGeneStart(0), 7)
+    YMIR_ASSERT2(algn.getJoiSeqStart(0), 8)
+    YMIR_ASSERT2(algn.getJoiLen(0), 3)
+    YMIR_ASSERT2(algn.getJoiCodon(0, 1), 14)
+    YMIR_ASSERT2(algn.getJoiCodon(0, 2), 24)
+    YMIR_ASSERT2(algn.getJoiCodon(0, 3), 49)
+
+    YMIR_ASSERT2(algn.getJoiGeneStart(1), 10)
+    YMIR_ASSERT2(algn.getJoiSeqStart(1), 11)
+    YMIR_ASSERT2(algn.getJoiLen(1), 4)
+    YMIR_ASSERT2(algn.getJoiCodon(1, 1), 14)
+    YMIR_ASSERT2(algn.getJoiCodon(1, 2), 24)
+    YMIR_ASSERT2(algn.getJoiCodon(1, 3), 49)
+    YMIR_ASSERT2(algn.getJoiCodon(1, 4), 31)
+
+    YMIR_ASSERT2(algn.getJoiGeneStart(2), 13)
+    YMIR_ASSERT2(algn.getJoiSeqStart(2), 14)
+    YMIR_ASSERT2(algn.getJoiLen(2), 3)
+    YMIR_ASSERT2(algn.getJoiCodon(2, 1), 27)
+    YMIR_ASSERT2(algn.getJoiCodon(2, 2), 27)
+    YMIR_ASSERT2(algn.getJoiCodon(2, 3), 31)
 
 YMIR_TEST_END
 
@@ -951,8 +1020,6 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_vdj_alignment_nuc_vector_vj())
     YMIR_TEST(test_vdj_alignment_nuc_vector_vdj())
 
-    YMIR_TEST(test_vdj_alignment_aa_simple_vj())
-    YMIR_TEST(test_vdj_alignment_aa_simple_vdj())
     YMIR_TEST(test_vdj_alignment_aa_vector_vj())
     YMIR_TEST(test_vdj_alignment_aa_vector_vdj())
 

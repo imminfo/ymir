@@ -36,6 +36,20 @@ using namespace std;
 
 namespace ymir {
 
+    template <typename ClonotypeType>
+    class VDJAlignerBase;
+
+    class NaiveCDR3NucleotideAligner;
+
+    class CDR3NucleotideAligner;
+
+    class SmithWatermanAligner;
+
+    class SmithWatermanNoGapAligner;
+
+    class CDR3AminoAcidAligner;
+
+
     /**
      * \class VDJAlignerBase
      */
@@ -508,6 +522,106 @@ namespace ymir {
             }
 
             mat.getBestAlignment(avec, pattern, text);
+        }
+        ///@}
+
+    };
+
+
+    //
+    // CDR3-only alignment for amino acid sequences - align V starting from the left edge,
+    // J starting from the right edge, and align D everywhere.
+    //
+    class CDR3AminoAcidAligner : public VDJAAAligner {
+    public:
+
+        CDR3AminoAcidAligner()
+        {
+        }
+
+
+        CDR3AminoAcidAligner(const VDJRecombinationGenes &genes,
+                              VDJAlignerParameters params)
+                : VDJAAAligner(genes, params)
+        {
+        }
+
+
+    protected:
+
+        /**
+         *
+         */
+        ///@{
+        void _alignVar(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
+            seq_len_t p_size = pattern.size(), t_size = text.size();
+            NoGapAlignment::events_storage_t vec;
+            vec.reserve(min(p_size, t_size) + 1);
+            alignment_score_t score = 0, val; //, max_score = 0;
+
+            vec.push_back(pattern[0] != text[0]);
+            score += pattern[0] == text[0] ? _params.score.v_score.match : _params.score.v_score.mism;
+            for (seq_len_t i = 1; i < min(p_size, t_size); ++i) {
+                vec.push_back(pattern[i] != text[i]);
+//                val = pattern[i] == text[i] ? _params.score.v_score.match : (_params.score.v_score.mism - _params.score.v_score.acc_mism*(pattern[i] != text[i]));
+                score += pattern[i] == text[i] ? (_params.score.v_score.match + _params.score.v_score.acc_match * (pattern[i - 1] == text[i - 1])) : _params.score.v_score.mism;
+                // max_score = std::max(max_score, score);
+            }
+
+            // if (max_score >= _params.threshold.v_threshold) {
+            if (score >= _params.threshold.v_threshold) {
+                avec->addAlignment(gene, 1, 1, vec);
+            }
+        }
+
+        void _alignDiv(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
+            seq_len_t match_min_len = _params.min_D_len;
+            seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
+            seq_len_t p_start, t_start;
+            AlignmentVectorBase::events_storage_t bitvec;
+            bitvec.reserve(p_size + 1);
+
+            for (seq_len_t pattern_i = 0; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
+                min_subsize = min(p_size - pattern_i, (int) t_size);
+                if (min_subsize >= match_min_len) {
+                    bitvec.resize(min_subsize);
+                    for (seq_len_t i = 0; i < min_subsize; ++i) {
+                        bitvec[i] = pattern[pattern_i + i] != text[i];
+                    }
+                    avec->addAlignment(gene, pattern_i + 1, 1, bitvec);
+                }
+            }
+
+            for (seq_len_t text_i = 1; text_i < t_size - match_min_len + 1; ++text_i) {
+                min_subsize = min((int) p_size, t_size - text_i);
+                if (min_subsize >= match_min_len) {
+                    bitvec.resize(min_subsize);
+                    for (seq_len_t i = 0; i < min_subsize; ++i) {
+                        bitvec[i] = pattern[i] != text[text_i + i];
+                    }
+                    avec->addAlignment(gene, 1, text_i + 1, bitvec);
+                }
+            }
+        }
+
+        void _alignJoi(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
+            seq_len_t p_size = pattern.size(), t_size = text.size();
+            NoGapAlignment::events_storage_t vec;
+            vec.reserve(min(p_size, t_size) + 1);
+            alignment_score_t score = 0, val; //, max_score = 0;
+
+            vec.insert(vec.begin(), pattern[p_size - 1] != text[t_size - 1]);
+            for (seq_len_t i = 1; i < min(p_size, t_size); ++i) {
+                vec.insert(vec.begin(), pattern[p_size - i - 1] != text[t_size - i - 1]);
+//                val = pattern[p_size - i - 1] == text[t_size - i - 1] ? _params.score.j_score.match : (_params.score.j_score.mism - _params.score.j_score.acc_mism*(pattern[p_size - i - 1] != text[t_size - i - 1]));
+                score += pattern[p_size - i - 1] == text[t_size - i - 1] ? (_params.score.j_score.match + _params.score.j_score.acc_match * (pattern[p_size - i] == text[t_size - i])) : _params.score.j_score.mism;
+                // max_score = std::max(max_score, score);
+            }
+
+            // if (max_score >= _params.threshold.j_threshold) {
+            if (score >= _params.threshold.j_threshold) {
+                avec->addAlignment(gene, p_size - min(t_size, p_size) + 1, t_size - min(t_size, p_size) + 1, vec);
+            }
         }
         ///@}
 

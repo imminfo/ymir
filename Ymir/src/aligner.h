@@ -103,19 +103,19 @@ namespace ymir {
         ///@{
         alignment_vector_t alignVar(seg_index_t id, const sequence_t &sequence) const {
             alignment_vector_t vec;
-            this->_alignVar(id, _genes.V()[id].sequence, this->sequence(), &vec);
+            this->_alignVar(id, _genes.V()[id].sequence, sequence, &vec);
             return vec;
         }
 
         alignment_vector_t alignDiv(seg_index_t id, const sequence_t &sequence) const {
             alignment_vector_t vec;
-            this->_alignDiv(id, _genes.D()[id].sequence, this->sequence(), &vec);
+            this->_alignDiv(id, _genes.D()[id].sequence, sequence, &vec);
             return vec;
         }
 
         alignment_vector_t alignJoi(seg_index_t id, const sequence_t &sequence) const {
             alignment_vector_t vec;
-            this->_alignJoi(id, _genes.J()[id].sequence, this->sequence(), &vec);
+            this->_alignJoi(id, _genes.J()[id].sequence, sequence, &vec);
             return vec;
         }
         ///@}
@@ -554,74 +554,113 @@ namespace ymir {
          */
         ///@{
         void _alignVar(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
-            seq_len_t p_size = pattern.size(), t_size = text.size();
-            NoGapAlignment::events_storage_t vec;
-            vec.reserve(min(p_size, t_size) + 1);
-            alignment_score_t score = 0, val; //, max_score = 0;
+            seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0, max_matches = 0, all_matches = 0;
+            CodonAlignmentVector::events_storage_t bits;
+            bool is_ok;
+            size_t bits_size;
+            int num_codons;
 
-            vec.push_back(pattern[0] != text[0]);
-            score += pattern[0] == text[0] ? _params.score.v_score.match : _params.score.v_score.mism;
-            for (seq_len_t i = 1; i < min(p_size, t_size); ++i) {
-                vec.push_back(pattern[i] != text[i]);
-//                val = pattern[i] == text[i] ? _params.score.v_score.match : (_params.score.v_score.mism - _params.score.v_score.acc_mism*(pattern[i] != text[i]));
-                score += pattern[i] == text[i] ? (_params.score.v_score.match + _params.score.v_score.acc_match * (pattern[i - 1] == text[i - 1])) : _params.score.v_score.mism;
-                // max_score = std::max(max_score, score);
+            for (seq_len_t i = 0; i < std::min((seq_len_t) (1 + p_size / 3), t_size); ++i) {
+                num_codons = 0;
+
+                // go through all codons and find the maximal match
+                if (i*3 < p_size) {
+                    is_ok = CodonTable::table().check_nucl(text[i], pattern[i*3], 0, &bits);
+                    ++num_codons;
+                }
+
+                if (is_ok && (i*3 + 1) < p_size) {
+                    is_ok = CodonTable::table().check_nucl(text[i], pattern[i*3 + 1], 1, &bits);
+                    ++num_codons;
+                }
+
+                if (is_ok) {
+                    // find intersected codons
+                    for (int bit_i = 1; bit_i <= 6; ++bit_i) {
+                        bits[bits.size() - bit_i] = bits[bits.size() - bit_i] & bits[bits.size() - 6 - bit_i];
+                    }
+
+                    if ((i*3 + 2) < p_size) {
+                        is_ok = CodonTable::table().check_nucl(text[i], pattern[i*3 + 2], 2, &bits);
+                        ++num_codons;
+
+                        // find intersected codons
+                        for (int bit_i = 1; bit_i <= 6; ++bit_i) {
+                            bits[bits.size() - bit_i] = bits[bits.size() - bit_i] & bits[bits.size() - 6 - bit_i];
+                        }
+                    }
+
+                    if (is_ok) {
+                        // find intersected codons
+                        for (int bit_i = 1; bit_i <= 6; ++bit_i) {
+                            bits[bits.size() - bit_i] = bits[bits.size() - bit_i] & bits[bits.size() - 6 - bit_i];
+                        }
+                    }
+                }
+
+                // remove trailing zeros
+                for (int codon_i = 0; i < num_codons; ++i) {
+                    int bitsum = 0;
+                    for (int bit_i = 1; bit_i <= 6; ++bit_i) {
+                        bitsum += bits[bits.size() - codon_i*6 - bit_i];
+                    }
+                    if (!bitsum) {
+                        bits.resize(bits.size() - 6);
+                    }
+                }
             }
 
-            // if (max_score >= _params.threshold.v_threshold) {
-            if (score >= _params.threshold.v_threshold) {
-                avec->addAlignment(gene, 1, 1, vec);
-            }
+            avec->addAlignment(gene, 1, 1, bits);
         }
 
         void _alignDiv(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
-            seq_len_t match_min_len = _params.min_D_len;
-            seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
-            seq_len_t p_start, t_start;
-            AlignmentVectorBase::events_storage_t bitvec;
-            bitvec.reserve(p_size + 1);
-
-            for (seq_len_t pattern_i = 0; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
-                min_subsize = min(p_size - pattern_i, (int) t_size);
-                if (min_subsize >= match_min_len) {
-                    bitvec.resize(min_subsize);
-                    for (seq_len_t i = 0; i < min_subsize; ++i) {
-                        bitvec[i] = pattern[pattern_i + i] != text[i];
-                    }
-                    avec->addAlignment(gene, pattern_i + 1, 1, bitvec);
-                }
-            }
-
-            for (seq_len_t text_i = 1; text_i < t_size - match_min_len + 1; ++text_i) {
-                min_subsize = min((int) p_size, t_size - text_i);
-                if (min_subsize >= match_min_len) {
-                    bitvec.resize(min_subsize);
-                    for (seq_len_t i = 0; i < min_subsize; ++i) {
-                        bitvec[i] = pattern[i] != text[text_i + i];
-                    }
-                    avec->addAlignment(gene, 1, text_i + 1, bitvec);
-                }
-            }
+//            seq_len_t match_min_len = _params.min_D_len;
+//            seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
+//            seq_len_t p_start, t_start;
+//            AlignmentVectorBase::events_storage_t bitvec;
+//            bitvec.reserve(p_size + 1);
+//
+//            for (seq_len_t pattern_i = 0; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
+//                min_subsize = min(p_size - pattern_i, (int) t_size);
+//                if (min_subsize >= match_min_len) {
+//                    bitvec.resize(min_subsize);
+//                    for (seq_len_t i = 0; i < min_subsize; ++i) {
+//                        bitvec[i] = pattern[pattern_i + i] != text[i];
+//                    }
+//                    avec->addAlignment(gene, pattern_i + 1, 1, bitvec);
+//                }
+//            }
+//
+//            for (seq_len_t text_i = 1; text_i < t_size - match_min_len + 1; ++text_i) {
+//                min_subsize = min((int) p_size, t_size - text_i);
+//                if (min_subsize >= match_min_len) {
+//                    bitvec.resize(min_subsize);
+//                    for (seq_len_t i = 0; i < min_subsize; ++i) {
+//                        bitvec[i] = pattern[i] != text[text_i + i];
+//                    }
+//                    avec->addAlignment(gene, 1, text_i + 1, bitvec);
+//                }
+//            }
         }
 
         void _alignJoi(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
-            seq_len_t p_size = pattern.size(), t_size = text.size();
-            NoGapAlignment::events_storage_t vec;
-            vec.reserve(min(p_size, t_size) + 1);
-            alignment_score_t score = 0, val; //, max_score = 0;
-
-            vec.insert(vec.begin(), pattern[p_size - 1] != text[t_size - 1]);
-            for (seq_len_t i = 1; i < min(p_size, t_size); ++i) {
-                vec.insert(vec.begin(), pattern[p_size - i - 1] != text[t_size - i - 1]);
-//                val = pattern[p_size - i - 1] == text[t_size - i - 1] ? _params.score.j_score.match : (_params.score.j_score.mism - _params.score.j_score.acc_mism*(pattern[p_size - i - 1] != text[t_size - i - 1]));
-                score += pattern[p_size - i - 1] == text[t_size - i - 1] ? (_params.score.j_score.match + _params.score.j_score.acc_match * (pattern[p_size - i] == text[t_size - i])) : _params.score.j_score.mism;
-                // max_score = std::max(max_score, score);
-            }
-
-            // if (max_score >= _params.threshold.j_threshold) {
-            if (score >= _params.threshold.j_threshold) {
-                avec->addAlignment(gene, p_size - min(t_size, p_size) + 1, t_size - min(t_size, p_size) + 1, vec);
-            }
+//            seq_len_t p_size = pattern.size(), t_size = text.size();
+//            NoGapAlignment::events_storage_t vec;
+//            vec.reserve(min(p_size, t_size) + 1);
+//            alignment_score_t score = 0, val; //, max_score = 0;
+//
+//            vec.insert(vec.begin(), pattern[p_size - 1] != text[t_size - 1]);
+//            for (seq_len_t i = 1; i < min(p_size, t_size); ++i) {
+//                vec.insert(vec.begin(), pattern[p_size - i - 1] != text[t_size - i - 1]);
+////                val = pattern[p_size - i - 1] == text[t_size - i - 1] ? _params.score.j_score.match : (_params.score.j_score.mism - _params.score.j_score.acc_mism*(pattern[p_size - i - 1] != text[t_size - i - 1]));
+//                score += pattern[p_size - i - 1] == text[t_size - i - 1] ? (_params.score.j_score.match + _params.score.j_score.acc_match * (pattern[p_size - i] == text[t_size - i])) : _params.score.j_score.mism;
+//                // max_score = std::max(max_score, score);
+//            }
+//
+//            // if (max_score >= _params.threshold.j_threshold) {
+//            if (score >= _params.threshold.j_threshold) {
+//                avec->addAlignment(gene, p_size - min(t_size, p_size) + 1, t_size - min(t_size, p_size) + 1, vec);
+//            }
         }
         ///@}
 
@@ -636,37 +675,37 @@ namespace ymir {
 
 
     //     virtual seq_len_t align5end(const string& pattern, const string& text) const {
-    //         seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0, max_matches = 0, all_matches = 0;
-    //         string codon_s = "";
-    //         for (seq_len_t i = 0; i < std::min((seq_len_t) (1 + p_size / 3), t_size); ++i) {
-    //             max_matches = 0;
-    //             // go through all codons and find the maximal match
-    //             CodonTable::Codons codon = _codons.codons(text[i]);
-    //             while(!codon.end()) {
-    //                 matches = 0;
-    //                 codon_s = codon.next();
-    //                 if (pattern[i*3] == codon_s[0] && i*3 < p_size) {
-    //                     ++matches;
-    //                     if (pattern[i*3 + 1] == codon_s[1] && (i*3 + 1) < p_size) {
-    //                         ++matches;
-    //                         if (pattern[i*3 + 2] == codon_s[2] && (i*3 + 2) < p_size) {
-    //                             ++matches;
-    //                         }
-    //                     }
-    //                 }
-
-    //                 if (matches > max_matches) {
-    //                     max_matches = matches;
-    //                     if (max_matches == 3) { break; }
-    //                 }
-    //             }
-
-    //             // if match == 3 then go to the next amino acid
-    //             all_matches += max_matches;
-    //             if (max_matches != 3) { break; }
-    //         }
-
-    //         return all_matches;
+//             seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0, max_matches = 0, all_matches = 0;
+//             string codon_s = "";
+//             for (seq_len_t i = 0; i < std::min((seq_len_t) (1 + p_size / 3), t_size); ++i) {
+//                 max_matches = 0;
+//                 // go through all codons and find the maximal match
+//                 CodonTable::Codons codon = _codons.codons(text[i]);
+//                 while(!codon.end()) {
+//                     matches = 0;
+//                     codon_s = codon.next();
+//                     if (pattern[i*3] == codon_s[0] && i*3 < p_size) {
+//                         ++matches;
+//                         if (pattern[i*3 + 1] == codon_s[1] && (i*3 + 1) < p_size) {
+//                             ++matches;
+//                             if (pattern[i*3 + 2] == codon_s[2] && (i*3 + 2) < p_size) {
+//                                 ++matches;
+//                             }
+//                         }
+//                     }
+//
+//                     if (matches > max_matches) {
+//                         max_matches = matches;
+//                         if (max_matches == 3) { break; }
+//                     }
+//                 }
+//
+//                 // if match == 3 then go to the next amino acid
+//                 all_matches += max_matches;
+//                 if (max_matches != 3) { break; }
+//             }
+//
+//             return all_matches;
     //     }
 
 

@@ -138,19 +138,21 @@ namespace ymir {
         }
 
 
-        int check_nucl(char aminoacid, char nucl, int pos, AlignmentVectorBase::events_storage_t *vec) const {
+        bool check_nucl(char aminoacid, char nucl, int pos, AlignmentVectorBase::events_storage_t *vec) const {
 #ifndef DNDEBUG
             assert(pos >= 0 && pos <= 2);
 #endif
             auto range = _aa2codon.equal_range(aminoacid);
-            bool check_res;
-            int matches = 0;
+            vec->resize(vec->size() + 6);
+            int i = 6;
+            bool was_found = false, check;
             for (auto it = range.first; it != range.second; ++it) {
-                check_res = nucl == it->second[pos];
-                vec->push_back(check_res);
-                matches += check_res;
+                check = nucl == it->second[pos];
+                was_found = was_found || check;
+                (*vec)[vec->size() - i] = check;
+                --i;
             }
-            return matches;
+            return was_found;
         }
 
 

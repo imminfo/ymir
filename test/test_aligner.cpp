@@ -196,7 +196,6 @@ YMIR_TEST_START(test_cdr3_nuc_aligner)
 
     vector<string> avec3 {"D1", "D2", "D3"};
     vector<string> svec3 {"AA", "AACCTT", "ACT"};
-
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
     CDR3NucleotideAligner nna(genes, VDJAlignerParameters(3));
@@ -310,12 +309,57 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_cdr3_aa_aligner)
 
-    YMIR_ASSERT(false)
+    CodonAlignmentVector vec;
 
-    // NaiveAminoAcidAligner naa;
+    vector<string> avec1 {"V1", "V2", "V3", "V4"};
+    vector<string> svec1 {"TCGTT", "TCGT", "TCGTTC"};
 
-    // // {'S', "TCT"}, {'S', "TCC"}, {'S', "TCA"}, {'S', "TCG"}, {'S', "AGT"}, {'S', "AGC"},
-    // // {'R', "CGT"}, {'R', "CGC"}, {'R', "CGA"}, {'R', "CGG"}, {'R', "AGA"}, {'R', "AGG"},
+    vector<string> avec2 {"J1", "J2", "J3", "J4"};
+    vector<string> svec2 {"CGT", "TACGT", "TTCGT", "TTTTT"};
+
+    vector<string> avec3 {"D1", "D2", "D3"};
+    vector<string> svec3 {"AA", "AACCTT", "ACT"};
+    VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
+
+    CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3));
+
+    // {'S', "TCT"}, {'S', "TCC"}, {'S', "TCA"}, {'S', "TCG"}, {'S', "AGT"}, {'S', "AGC"},
+    // {'L', "TTA"}, {'L', "TTG"}, {'L', "CTT"}, {'L', "CTC"}, {'L', "CTA"}, {'L', "CTG"},
+    // V1: TCGTT
+    auto alignment = aligner.alignVar(1, "SL");
+    YMIR_ASSERT2(alignment.id(0), 1)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 5)
+//    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({true, true, false, false, false, false}, 0))
+
+    alignment = aligner.alignVar(2, "SL");
+    YMIR_ASSERT2(alignment.id(0), 2)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 4)
+//    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
+
+    alignment = aligner.alignVar(3, "SL");
+    YMIR_ASSERT2(alignment.id(0), 3)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 5)
+//    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
+//    YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({true, true, false, false, false, false}, 0))
+
+
+
     // YMIR_ASSERT2(naa.align5end("GGG", "SR"), 0)
     // YMIR_ASSERT2(naa.align5end("TC", "SR"), 2)
     // YMIR_ASSERT2(naa.align5end("TCA", "SR"), 3)
@@ -638,12 +682,12 @@ int main(int argc, char* argv[]) {
 
     // Tests for sequences aligners.
 //    YMIR_TEST(test_naive_cdr3_nuc_aligner())
-    YMIR_TEST(test_cdr3_nuc_aligner())
+//    YMIR_TEST(test_cdr3_nuc_aligner())
     YMIR_TEST(test_cdr3_aa_aligner())
-    YMIR_TEST(test_sw_alignment_matrix())
-    YMIR_TEST(test_sw_aligner())
-    YMIR_TEST(test_swng_alignment_matrix())
-    YMIR_TEST(test_swng_aligner())
+//    YMIR_TEST(test_sw_alignment_matrix())
+//    YMIR_TEST(test_sw_aligner())
+//    YMIR_TEST(test_swng_alignment_matrix())
+//    YMIR_TEST(test_swng_aligner())
 
     // Error corrector test
     YMIR_TEST(test_errcorr_aligner())

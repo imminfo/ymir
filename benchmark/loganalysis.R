@@ -31,7 +31,7 @@ maxB2 = filter(maxB2, logL == max(logL))
 remove.iters <- c(1:1)
 
 sg <- as.data.frame(t(as.data.frame(sg)))
-sg.data <- as.data.frame(sg.data)[-remove.iters, ]
+# sg.data <- as.data.frame(sg.data)[-remove.iters, ]
 colnames(sg) <- c("niter", "block", "alpha", "beta", "K")
 colnames(sg.data) <- paste0("block_", sg$block, "_alpha_", sg$alpha, "_beta_", sg$beta, "_K_", sg$K)
 sg.data$Iteration <- 1:nrow(sg.data)
@@ -71,22 +71,30 @@ p2 <- ggplot() +
 
 grid.arrange(p1, p2, ncol = 1)
 
-# em.pars <- c()
-# sg.pars <- list()
-# for (file in list.files("./log", full.names = T)) {
-#   spl <- strsplit(file, "_", T)[[1]]
-#   # vec <- list(as.numeric(readLines(file))[1:9])
-#   vec <- as.numeric(readLines(file))
-#   if (tail(spl, 1) == "1.pars.txt") {
-#     if (spl[2] == "em") {
-#       em.pars <- vec
-#     } else {
-#       sg.pars <- c(sg.pars, list(vec))
-#     }
-#   }
-# }
-# 
-# cor.names <- paste0("m=", sg$block, ";a=", sg$alpha, ";b=", sg$beta, ";k=", sg$K)
+# 0:1
+# 1:2351
+# 2351:3038
+# 3038:4590
+# 4590:4651
+# 4651:4655
+
+em.pars <- c()
+sg.pars <- list()
+for (file in list.files("./log", full.names = T)) {
+  spl <- strsplit(file, "_", T)[[1]]
+  # vec <- list(as.numeric(readLines(file))[1:9])
+  vec <- as.numeric(readLines(file))
+  if (tail(spl, 1) == "1.pars.txt") {
+    if (spl[2] == "em") {
+      em.pars <- vec
+    } else {
+      print(file)
+      sg.pars <- c(sg.pars, list(vec))
+    }
+  }
+}
+
+cor.names <- paste0("m=", sg$block, ";a=", sg$alpha, ";b=", sg$beta, ";k=", sg$K)
 # cor.plots <- lapply(1:length(sg.pars), function (j) { 
 #   df <- data.frame(EM = em.pars, 
 #                    SG = sg.pars[[j]])
@@ -100,3 +108,17 @@ grid.arrange(p1, p2, ncol = 1)
 #     ggtitle(cor.names[j]) + xlab("") + ylab("")
 #   })
 # do.call(grid.arrange, c(cor.plots, list(ncol = 5)))
+
+vj = 1:2350
+vdel = 2351:3037
+jdel = 3038:4589
+ins = 4590:4651
+nuc = 4652:4655
+sg = sg.pars[[4]]
+
+inds = vj; tmp1 = arrangeGrob(qplot(em.pars[inds], sg[inds]), qplot(em.pars[inds], sg[inds], log = 'xy'), ncol = 2, top = "VJ")
+inds = vdel; tmp2 = arrangeGrob(qplot(em.pars[inds], sg[inds]), qplot(em.pars[inds], sg[inds], log = 'xy'), ncol = 2, top = "Vdel")
+inds = jdel; tmp3 = arrangeGrob(qplot(em.pars[inds], sg[inds]), qplot(em.pars[inds], sg[inds], log = 'xy'), ncol = 2, top = "Jdel")
+# inds = ins; tmp4 = arrangeGrob(qplot(em.pars[inds], sg[inds]), qplot(em.pars[inds][em.pars[inds] != 0 & sg[inds] != 0], sg[inds][em.pars[inds] != 0 & sg[inds] != 0], log = 'xy'), ncol = 2, top = "ins")
+inds = nuc; tmp5 = arrangeGrob(qplot(em.pars[inds], sg[inds]), top = "nuc")
+grid.arrange(tmp1, tmp2, tmp3, tmp5, top = "block 10000")

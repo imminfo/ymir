@@ -311,11 +311,11 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
 
     CodonAlignmentVector vec;
 
-    vector<string> avec1 {"V1", "V2", "V3", "V4"};
+    vector<string> avec1 {"V1", "V2", "V3"};
     vector<string> svec1 {"TCGTT", "TCGT", "TCGTTC"};
 
     vector<string> avec2 {"J1", "J2", "J3", "J4"};
-    vector<string> svec2 {"CGT", "TACGT", "TTCGT", "TTTTT"};
+    vector<string> svec2 {"CTTTA", "CCTT", "AGCCTG", "AGGCTG"};
 
     vector<string> avec3 {"D1", "D2", "D3"};
     vector<string> svec3 {"AA", "AACCTT", "ACT"};
@@ -358,27 +358,40 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
     YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({true, true, false, false, false, false}, 0))
 
+    // J1: CT.TTA
+    //    TCT.TTA
+    alignment = aligner.alignJoi(1, "SL");
+    YMIR_ASSERT2(alignment.id(0), 1)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 2)
+    YMIR_ASSERT2(alignment.len(0), 5)
 
+    // J2: C.CTT
+    //   TCC.CTT
+    //   AGC.TTA
+    alignment = aligner.alignJoi(2, "SL");
+    YMIR_ASSERT2(alignment.id(0), 2)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 3)
+    YMIR_ASSERT2(alignment.len(0), 4)
 
-    // YMIR_ASSERT2(naa.align5end("GGG", "SR"), 0)
-    // YMIR_ASSERT2(naa.align5end("TC", "SR"), 2)
-    // YMIR_ASSERT2(naa.align5end("TCA", "SR"), 3)
-    // YMIR_ASSERT2(naa.align5end("TCGCG", "SR"), 5)
+    // J3: AGC.CTG
+    //     AGC.CTG
+    alignment = aligner.alignJoi(3, "SL");
+    YMIR_ASSERT2(alignment.id(0), 3)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 6)
 
-    // YMIR_ASSERT2(naa.align5end("AG", "SR"), 2)
-    // YMIR_ASSERT2(naa.align5end("AGTAGA", "SR"), 6)
-    // YMIR_ASSERT2(naa.align5end("AGTAGG", "SR"), 6)
+    // J4: AGG.CTG
+    //     TCG.CTG
+    alignment = aligner.alignJoi(4, "SL");
+    YMIR_ASSERT2(alignment.id(0), 4)
+    YMIR_ASSERT2(alignment.pattern_start(0), 3)
+    YMIR_ASSERT2(alignment.text_start(0), 3)
+    YMIR_ASSERT2(alignment.len(0), 4)
 
-    // YMIR_ASSERT2(naa.align3end("T", "SR"), 1)
-    // YMIR_ASSERT2(naa.align3end("CT", "SR"), 1)
-    // YMIR_ASSERT2(naa.align3end("GT", "SR"), 2)
-
-    // YMIR_ASSERT2(naa.align3end("AAA", "SR"), 1)
-    // YMIR_ASSERT2(naa.align3end("TGA", "SR"), 2)
-    // YMIR_ASSERT2(naa.align3end("TTTAGG", "SR"), 4)
-    // YMIR_ASSERT2(naa.align3end("AGTAGG", "SR"), 6)
-
-    // YMIR_ASSERT(naa.alignLocal("TGATGAA", "SR").size() != 0)
+    YMIR_ASSERT(false)
 
 YMIR_TEST_END
 

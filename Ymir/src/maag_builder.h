@@ -7,7 +7,7 @@
 
 
 #include "genesegment.h"
-#include "insertionmodel.h"
+#include "insertion_model.h"
 #include "maag.h"
 #include "modelparametervector.h"
 #include "repertoire.h"

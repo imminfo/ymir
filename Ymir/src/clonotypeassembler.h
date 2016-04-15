@@ -8,7 +8,7 @@
 
 #include <chrono>
 
-#include "insertionmodel.h"
+#include "insertion_model.h"
 #include "clonotype_builder.h"
 
 

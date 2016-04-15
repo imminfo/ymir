@@ -123,6 +123,9 @@ namespace ymir {
     using std::unique_ptr;
 
 
+    using std::shared_ptr;
+
+
     typedef std::pair<event_ind_t, prob_t> event_pair_t;
 
 

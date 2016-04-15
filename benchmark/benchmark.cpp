@@ -39,8 +39,8 @@ int main(int argc, char* argv[]) {
 
     ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
-    string input_alpha_file = "alpha.250k.txt";
-    string input_beta_file = "beta.250k.txt";
+    string input_alpha_file = "alpha.100k.txt";
+    string input_beta_file = "beta.100k.txt";
 
 
     //
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
     // VJ MAAG
     //
     ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA", EMPTY);
-
+    return 0;
     YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS))
     YMIR_BENCHMARK("VJ prob", vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS))
 

@@ -16,33 +16,35 @@ namespace ymir {
 
 
         DiNucInsertionModel()
-                : AbstractInsertionModel(16, 0)
+            : AbstractInsertionModel(16, 0)
         {
+            this->make_aminoacid_probs();
         }
 
 
         DiNucInsertionModel(prob_t err_prob)
-                : AbstractInsertionModel(16, err_prob)
+            : AbstractInsertionModel(16, err_prob)
         {
+            this->make_aminoacid_probs();
         }
 
 
         DiNucInsertionModel(std::vector<prob_t>::const_iterator start, prob_t err_prob = 0)
-                : AbstractInsertionModel(16, err_prob)
+            : AbstractInsertionModel(16, err_prob)
         {
             this->updateProbabilities(start);
         }
 
 
         DiNucInsertionModel(const event_matrix_t& mat, prob_t err_prob = 0)
-                : AbstractInsertionModel(16, err_prob)
+            : AbstractInsertionModel(16, err_prob)
         {
             this->updateProbabilitiesMatrix(mat);
         }
 
 
         DiNucInsertionModel(const DiNucInsertionModel &other)
-                : AbstractInsertionModel(other)
+            : AbstractInsertionModel(other)
         {
         }
 
@@ -191,6 +193,11 @@ namespace ymir {
         void updateProbabilitiesMatrix(const event_matrix_t& mat, prob_t err_prob) {
             this->updateProbabilitiesMatrix(mat);
             _err_prob = err_prob;
+        }
+
+
+        void make_aminoacid_probs() {
+
         }
 
     };

@@ -13,55 +13,31 @@ namespace ymir {
 
     class MonoNucInsertionModel : public AbstractInsertionModel {
 
-
-        struct AminoAcidInsertions {
-
-            typedef std::unordered_map<char, prob_t> map_t;
-
-            AminoAcidInsertions() {
-
-            }
-
-            AminoAcidInsertions(const AminoAcidInsertions&) = delete;
-
-            void operator=(const AminoAcidInsertions&) = delete;
-
-            static AminoAcidInsertions &aaN() {
-                static AminoAcidInsertions aa;
-                return aa;
-            }
-
-            prob_t prob(char aminoacid) const { return _map.find(aminoacid)->second; }
-
-        private:
-
-            map_t _map;
-
-        };
-
     public:
 
         MonoNucInsertionModel()
-                : AbstractInsertionModel(4, 0)
+            : AbstractInsertionModel(4, 0)
         {
+            this->make_aminoacid_probs();
         }
 
 
         MonoNucInsertionModel(prob_t err_prob)
-                : AbstractInsertionModel(4, err_prob)
+            : AbstractInsertionModel(4, err_prob)
         {
+            this->make_aminoacid_probs();
         }
 
 
         MonoNucInsertionModel(std::vector<prob_t>::const_iterator start, prob_t err_prob = 0)
-                : AbstractInsertionModel(4, err_prob)
+            : AbstractInsertionModel(4, err_prob)
         {
             this->updateProbabilities(start);
         }
 
 
         MonoNucInsertionModel(const MonoNucInsertionModel &other)
-                : AbstractInsertionModel(other)
+            : AbstractInsertionModel(other)
         {
         }
 
@@ -181,6 +157,11 @@ namespace ymir {
             }
 
             return res;
+        }
+
+
+        void make_aminoacid_probs() {
+
         }
 
     };

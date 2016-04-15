@@ -36,24 +36,25 @@ namespace ymir {
 
 
         AbstractInsertionModel(uint8_t size, prob_t err_prob = 0)
-                : _size(size),
-                  _err_prob(err_prob),
-                  _arr(new prob_t[size])
+            : _size(size),
+              _err_prob(err_prob),
+              _arr(new prob_t[size])
         {
         }
 
 
         AbstractInsertionModel(uint8_t size, std::vector<prob_t>::const_iterator start, prob_t err_prob = 0)
-                : AbstractInsertionModel(size, err_prob)
+            : AbstractInsertionModel(size, err_prob)
         {
             this->updateProbabilities(start);
         }
 
 
         AbstractInsertionModel(const AbstractInsertionModel &other)
-                : _size(other._size),
-                  _arr(new prob_t[other._size]),
-                  _err_prob(other._err_prob)
+            : _size(other._size),
+              _arr(new prob_t[other._size]),
+              _err_prob(other._err_prob),
+              _aa_probs(other._aa_probs)
         {
             this->updateProbabilities(other._arr.get());
         }
@@ -67,6 +68,7 @@ namespace ymir {
                 _arr.reset(new prob_t[_size]);
                 this->updateProbabilities(other._arr.get());
             }
+            _aa_probs = other._aa_probs;
             return *this;
         }
 
@@ -149,6 +151,11 @@ namespace ymir {
         uint8_t _size;
 
 
+        typedef shared_ptr<std::unordered_map<char, prob_t>> shared_aa_ins_t;
+
+        shared_aa_ins_t _aa_probs;
+
+
         /**
         * \name Update chain probabilities.
         *
@@ -182,6 +189,9 @@ namespace ymir {
             _err_prob = err_prob;
         }
         ///@}
+
+
+        virtual void make_aminoacid_probs() = 0;
 
     };
 

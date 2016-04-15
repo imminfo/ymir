@@ -53,8 +53,7 @@ namespace ymir {
         AbstractInsertionModel(const AbstractInsertionModel &other)
             : _size(other._size),
               _arr(new prob_t[other._size]),
-              _err_prob(other._err_prob),
-              _aa_probs(other._aa_probs)
+              _err_prob(other._err_prob)
         {
             this->updateProbabilities(other._arr.get());
         }
@@ -68,7 +67,6 @@ namespace ymir {
                 _arr.reset(new prob_t[_size]);
                 this->updateProbabilities(other._arr.get());
             }
-            _aa_probs = other._aa_probs;
             return *this;
         }
 
@@ -149,11 +147,6 @@ namespace ymir {
         prob_array_t _arr;  /** Representation for a std::vector (#elements = 4) or a matrix (#elements = 16) with transition probabilities; rows and cols are for A-C-G-T (sequentially). */
         prob_t _err_prob;
         uint8_t _size;
-
-
-        typedef shared_ptr<std::unordered_map<char, prob_t>> shared_aa_ins_t;
-
-        shared_aa_ins_t _aa_probs;
 
 
         /**

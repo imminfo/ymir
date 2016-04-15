@@ -33,6 +33,7 @@ namespace ymir {
             : AbstractInsertionModel(16, err_prob)
         {
             this->updateProbabilities(start);
+            this->make_aminoacid_probs();
         }
 
 
@@ -40,11 +41,13 @@ namespace ymir {
             : AbstractInsertionModel(16, err_prob)
         {
             this->updateProbabilitiesMatrix(mat);
+            this->make_aminoacid_probs();
         }
 
 
         DiNucInsertionModel(const DiNucInsertionModel &other)
-            : AbstractInsertionModel(other)
+            : AbstractInsertionModel(other),
+              _aa_probs(other._aa_probs)
         {
         }
 
@@ -56,6 +59,7 @@ namespace ymir {
 //                _arr.reset(new prob_t[16]);
 //                this->updateProbabilities(other._arr.get());
 //            }
+            _aa_probs = other._aa_probs;
             return *this;
         }
 
@@ -181,6 +185,12 @@ namespace ymir {
         prob_t operator()(uint8_t row, uint8_t col) const { return _arr[4*row + col]; }
 
     protected:
+
+
+        typedef shared_ptr<std::unordered_map<char, prob_t>> shared_aa_ins_t;
+
+        shared_aa_ins_t _aa_probs;
+
 
         void updateProbabilitiesMatrix(const event_matrix_t& mat) {
             for (uint8_t i = 0; i < 4; ++i) {

@@ -37,7 +37,8 @@ namespace ymir {
 
 
         MonoNucInsertionModel(const MonoNucInsertionModel &other)
-            : AbstractInsertionModel(other)
+            : AbstractInsertionModel(other),
+              _aa_probs(other._aa_probs)
         {
         }
 
@@ -49,6 +50,7 @@ namespace ymir {
 //                _arr.reset(new prob_t[4]);
 //                this->updateProbabilities(other._arr.get());
 //            }
+            _aa_probs = other._aa_probs;
             return *this;
         }
 
@@ -158,6 +160,13 @@ namespace ymir {
 
             return res;
         }
+
+
+    private:
+
+        typedef shared_ptr<std::unordered_map<char, prob_t>> shared_aa_ins_t;
+
+        shared_aa_ins_t _aa_probs;
 
 
         void make_aminoacid_probs() {

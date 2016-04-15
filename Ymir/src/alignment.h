@@ -25,7 +25,6 @@
 #define _ALIGNMENT_H_
 
 
-#include "gapped_alignment_vector.h"
 #include "vdj_alignment.h"
 
 

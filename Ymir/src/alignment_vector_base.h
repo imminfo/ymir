@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "alignment.h"
 #include "tools.h"
 #include "types.h"
 

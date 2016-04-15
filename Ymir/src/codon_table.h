@@ -138,7 +138,7 @@ namespace ymir {
         }
 
 
-        bool check_nucl(char aminoacid, char nucl, int pos, AlignmentVectorBase::events_storage_t *vec) const {
+        bool check_nucl(char aminoacid, char nucl, int pos, std::vector<bool> *vec) const {
 #ifndef DNDEBUG
             assert(pos >= 0 && pos <= 2);
 #endif

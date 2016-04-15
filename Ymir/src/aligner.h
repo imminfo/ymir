@@ -708,7 +708,7 @@ namespace ymir {
             CodonAlignmentVector::events_storage_t bits2;
             bits2.resize(bits.size());
             for (size_t bit_i = 0; bit_i < bits.size(); bit_i += 6) {
-                bits2[bit_i]     = bits[bits.size() - bit_i - 6];
+                bits2[bit_i] = bits[bits.size() - bit_i - 6];
                 bits2[bit_i + 1] = bits[bits.size() - bit_i - 5];
                 bits2[bit_i + 2] = bits[bits.size() - bit_i - 4];
                 bits2[bit_i + 3] = bits[bits.size() - bit_i - 3];

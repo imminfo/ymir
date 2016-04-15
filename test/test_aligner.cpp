@@ -391,7 +391,7 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.text_start(0), 3)
     YMIR_ASSERT2(alignment.len(0), 4)
 
-    YMIR_ASSERT(false)
+    YMIR_ASSERT2("cdr aa div aligner is implemented", "cdr aa div aligner is not implemented")
 
 YMIR_TEST_END
 

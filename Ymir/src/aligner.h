@@ -560,8 +560,10 @@ namespace ymir {
             size_t bits_size;
             int num_codons;
 
-            for (seq_len_t i = 0; i < std::min((seq_len_t) (1 + p_size / 3), t_size); ++i) {
+            int max_iter = std::min((seq_len_t) (p_size / 3 + static_cast<seq_len_t>((p_size % 3) != 0)), t_size);
+            for (seq_len_t i = 0; i < max_iter; ++i) {
                 num_codons = 0;
+                is_ok = false;
 
                 // go through all codons and find the maximal match
                 if (i*3 < p_size) {
@@ -572,6 +574,8 @@ namespace ymir {
                 if (is_ok && (i*3 + 1) < p_size) {
                     is_ok = CodonTable::table().check_nucl(text[i], pattern[i*3 + 1], 1, &bits);
                     ++num_codons;
+                } else {
+                    is_ok = false;
                 }
 
                 if (is_ok) {
@@ -584,22 +588,17 @@ namespace ymir {
                         is_ok = CodonTable::table().check_nucl(text[i], pattern[i*3 + 2], 2, &bits);
                         ++num_codons;
 
-                        // find intersected codons
-                        for (int bit_i = 1; bit_i <= 6; ++bit_i) {
-                            bits[bits.size() - bit_i] = bits[bits.size() - bit_i] & bits[bits.size() - 6 - bit_i];
-                        }
-                    }
-
-                    if (is_ok) {
-                        // find intersected codons
-                        for (int bit_i = 1; bit_i <= 6; ++bit_i) {
-                            bits[bits.size() - bit_i] = bits[bits.size() - bit_i] & bits[bits.size() - 6 - bit_i];
+                        if (is_ok) {
+                            // find intersected codons
+                            for (int bit_i = 1; bit_i <= 6; ++bit_i) {
+                                bits[bits.size() - bit_i] = bits[bits.size() - bit_i] & bits[bits.size() - 6 - bit_i];
+                            }
                         }
                     }
                 }
 
                 // remove trailing zeros
-                for (int codon_i = 0; i < num_codons; ++i) {
+                for (int codon_i = 0; codon_i < num_codons; ++codon_i) {
                     int bitsum = 0;
                     for (int bit_i = 1; bit_i <= 6; ++bit_i) {
                         bitsum += bits[bits.size() - codon_i*6 - bit_i];

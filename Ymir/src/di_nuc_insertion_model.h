@@ -128,8 +128,7 @@ namespace ymir {
                                      codon_hash last_aa_codons,
                                      char first_char = NULL_CHAR) const
         {
-            check_and_throw(true, "not implemented yet");
-            return 0;
+            return this->aaProbability(sequence.begin(), sequence.size(), first_nuc_pos, last_nuc_pos, first_aa_codons, last_aa_codons, first_char);
         }
 
         virtual prob_t aaProbability(std::string::const_iterator start,

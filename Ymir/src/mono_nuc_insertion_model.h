@@ -120,7 +120,7 @@ namespace ymir {
                                      codon_hash last_aa_codons,
                                      char first_char = NULL_CHAR) const
         {
-
+            return this->aaProbability(sequence.begin(), sequence.size(), first_nuc_pos, last_nuc_pos, first_aa_codons, last_aa_codons);
         }
 
         virtual prob_t aaProbability(std::string::const_iterator start,
@@ -164,13 +164,32 @@ namespace ymir {
 
     private:
 
-        typedef shared_ptr<std::unordered_map<char, prob_t>> shared_aa_ins_t;
+        // aminoacid + codon hash -> prob
+        // (aminoacid << 8) + codon_hash_value + start position
+        // reverse or not???
+        typedef shared_ptr<std::unordered_map<int16_t, prob_t>> shared_aa_ins_t;
 
         shared_aa_ins_t _aa_probs;
 
 
         void make_aminoacid_probs() {
+            _aa_probs = std::make_shared<std::unordered_map<int16_t, prob_t>>();
 
+            for (auto it: CodonTable::table().aminoacids()) {
+                int16_t val = it.first << 8;
+                prob_t prob_val = 0;
+                prob_t nuc_prob;
+                for (codon_hash hash_value = 0; hash_value <= 64; ++hash_value) {
+                    for (int start_pos = 0; start_pos <= 2; ++start_pos) {
+                        // start position
+                        nuc_prob =  _arr[0] * std::bitset<6>(CodonTable::table().mask_nucl(it.first, 'A', start_pos) & hash_value).count();
+                        nuc_prob += _arr[1] * std::bitset<6>(CodonTable::table().mask_nucl(it.first, 'C', start_pos) & hash_value).count();
+                        nuc_prob += _arr[2] * std::bitset<6>(CodonTable::table().mask_nucl(it.first, 'G', start_pos) & hash_value).count();
+                        nuc_prob += _arr[3] * std::bitset<6>(CodonTable::table().mask_nucl(it.first, 'T', start_pos) & hash_value).count();
+                        (*_aa_probs)[val + (hash_value << 2) + start_pos] = prob_val;
+                    }
+                }
+            }
         }
 
     };

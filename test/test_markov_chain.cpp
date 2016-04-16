@@ -139,8 +139,61 @@ YMIR_TEST_START(test_markovchain_nuc_di)
 YMIR_TEST_END
 
 
-YMIR_TEST_START(test_markovchain_aa)
+YMIR_TEST_START(test_markovchain_aa_mono)
+
+    vector<prob_t> probs = {.1, .2, .3, .4};
+    MonoNucInsertionModel m(probs.begin(), .5);
+
+    // neighbour aminoacids
+    YMIR_ASSERT2(0, m.aaProbability("M", 1, 3, 63, 63))
+
+    // exact same aminoacid
+
+    // distant aminoacids
+
+
     YMIR_ASSERT(false)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_markovchain_aa_di)
+
+    event_matrix_t mat;
+    mat.resize(4, 4);
+    // A
+    mat(0, 0) = .1;
+    mat(1, 0) = .4;
+    mat(2, 0) = .25;
+    mat(3, 0) = .25;
+    // C
+    mat(0, 1) = .7;
+    mat(1, 1) = .1;
+    mat(2, 1) = .1;
+    mat(3, 1) = .1;
+    // G
+    mat(0, 2) = .3;
+    mat(1, 2) = .3;
+    mat(2, 2) = .15;
+    mat(3, 2) = .25;
+    // T
+    mat(0, 3) = .1;
+    mat(1, 3) = .4;
+    mat(2, 3) = .2;
+    mat(3, 3) = .3;
+
+    DiNucInsertionModel mc(mat, .5);
+
+
+    // neighbour aminoacids
+
+    // exact same aminoacid
+
+    // distant aminoacids
+
+
+    YMIR_ASSERT(false)
+
 YMIR_TEST_END
 
 
@@ -253,7 +306,8 @@ int main(int argc, char* argv[]) {
     // Tests for markov chain.
     YMIR_TEST(test_markovchain_nuc_mono())
     YMIR_TEST(test_markovchain_nuc_di())
-    YMIR_TEST(test_markovchain_aa())
+    YMIR_TEST(test_markovchain_aa_mono())
+    YMIR_TEST(test_markovchain_aa_di())
     YMIR_TEST(test_markovchain_nuc_mono_err())
     YMIR_TEST(test_markovchain_nuc_di_err())
 

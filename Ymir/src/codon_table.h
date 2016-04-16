@@ -156,6 +156,20 @@ namespace ymir {
         }
 
 
+        codon_hash mask_nucl(char aminoacid, char nucl, int pos) const {
+#ifndef DNDEBUG
+            assert(pos >= 0 && pos <= 2);
+#endif
+            auto range = _aa2codon.equal_range(aminoacid);
+            codon_hash res = 0;
+            for (auto it = range.first; it != range.second; ++it) {
+                res += nucl == it->second[pos];
+                res <<= 1;
+            }
+            return res;
+        }
+
+
         std::string print() {
             std::string res = "";
             for (aa_to_codon_storage_t::iterator it = _aa2codon.begin(); it != _aa2codon.end(); ++it) {
@@ -164,6 +178,8 @@ namespace ymir {
             }
             return res;
         }
+
+        const aa_to_codon_storage_t aminoacids() const { return _aa2codon; }
 
     private:
 

@@ -131,7 +131,7 @@ namespace ymir {
                                      codon_hash last_aa_codons,
                                      char first_char = NULL_CHAR) const
         {
-
+            ((*it) << 8) + (first_aa_codons << 2) + ((i+1) % 3)
         }
 
         virtual prob_t aaProbability(std::string::const_reverse_iterator start,

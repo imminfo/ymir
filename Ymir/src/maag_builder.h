@@ -279,18 +279,6 @@ namespace ymir {
                             CodonMMC &codons,
                             vector<seq_len_t> &seq_poses) const;
 
-
-        void buildAAVJInsertions(const ClonotypeAA &clonotype,
-                                 ProbMMC &probs,
-                                 CodonMMC &codons,
-                                 vector<seq_len_t> &seq_poses) const;
-
-
-        void buildAAInsertions(const ClonotypeAA &clonotype,
-                               ProbMMC &probs,
-                               CodonMMC &codons,
-                               vector<seq_len_t> &seq_poses) const;
-
     };
 
 
@@ -665,7 +653,7 @@ namespace ymir {
     MAAGaa MAAGBuilder::build(const ClonotypeAA &clonotype) const {
         if (clonotype.is_good()) {
             ProbMMC probs;
-            CodonMMC events;
+            CodonMMC codons;
             vector<seq_len_t> seq_poses;
             seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
 
@@ -690,10 +678,16 @@ namespace ymir {
             probs.resize(resize_size);
             codons.resize(e_resize_size);
 
+            MAAGaa maag;
+
             this->buildAAVariable(clonotype, probs, codons, seq_poses);
             this->buildAAJoining(clonotype, probs, codons, seq_poses);
             if (clonotype.recombination() == VJ_RECOMB) {
-                this->buildAAVJinsertions(clonotype, probs, codons, seq_poses);
+                probs.initNode(VarJoi_INSERTIONS_MATRIX_INDEX,
+                               1,
+                               probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                               probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX));
+                maag._insertions.reset(new MonoNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), 0));
             } else if (clonotype.recombination() == VDJ_RECOMB) {
                 check_and_throw(true, "MAAGBuilder: VDJ is not implemented yet.");
 //                this->buildNucDiversity(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
@@ -703,7 +697,6 @@ namespace ymir {
 
             probs.finish();
 
-            MAAGaa maag;
             maag._recomb = clonotype.recombination();
             maag.swap(probs);
             maag._codons.swap(codons);
@@ -1232,7 +1225,10 @@ namespace ymir {
 
             for (seq_len_t i = 0; i < v_end - v_start + 2; ++i) {
                 probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, (1 + v_len) - (v_start + i)); // probability of deletions
-                codons(0, v_index, 0, i) = clonotype.getVarCodon(v_index, i) // ???
+            }
+
+            for (seq_len_t i = 1; i < v_end - v_start + 2; ++i) {
+                codons(0, v_index, 0, i) = clonotype.getVarCodon(v_index, i);
             }
         }
 
@@ -1243,21 +1239,62 @@ namespace ymir {
     void MAAGBuilder::buildAAJoining(const ClonotypeAA &clonotype, ProbMMC &probs, CodonMMC &codons,
                                      vector<seq_len_t> &seq_poses) const
     {
+        int J_index_dels = JOINING_DELETIONS_VJ_MATRIX_INDEX,
+                J_index_genes = JOINING_GENES_VDJ_MATRIX_INDEX;
+        if (clonotype.recombination() == VDJ_RECOMB) {
+            J_index_dels = JOINING_DELETIONS_VDJ_MATRIX_INDEX;
+        }
 
-    }
+        // find max J alignment
+        seg_index_t j_num = clonotype.nJoi();
+        seq_len_t len = 0, seq_global_start_pos = (seq_len_t) -1;
+        for (int j_index = 0; j_index < j_num; ++j_index) {
+            len = std::max(len, clonotype.getJoiLen(j_index));
+            seq_global_start_pos = std::min(seq_global_start_pos, clonotype.getJoiSeqStart(j_index));
+        }
 
+        // add J deletions nodes
+        probs.initNode(J_index_dels, j_num, len + 1, 1);
+        codons.initNode(codons.chainSize() - 1, j_num, len + 1, 1);
 
-    void MAAGBuilder::buildAAVJInsertions(const ClonotypeAA &clonotype, ProbMMC &probs, CodonMMC &codons,
-                                          vector<seq_len_t> &seq_poses) const
-    {
+        // add J or J-D gene nodes
+        if (clonotype.recombination() == VDJ_RECOMB) {
+            probs.initNode(J_index_genes, 1, j_num, clonotype.nDiv());
+        }
 
-    }
+        // compute J deletions
+        seq_len_t j_len, j_gene, j_start, j_end, shift;
 
+        EventClass J_DEL = clonotype.recombination() == VJ_RECOMB ? VJ_JOI_DEL : VDJ_JOI_DEL;
+        for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
+            // probability of choosing the J segment
+            j_gene = clonotype.getJoi(j_index);
+            j_len = _genes->J()[j_gene].sequence.size();
 
-    void MAAGBuilder::buildAAInsertions(const ClonotypeAA &clonotype, ProbMMC &probs, CodonMMC &codons,
-                                        vector<seq_len_t> &seq_poses) const
-    {
+            if (clonotype.recombination() == VDJ_RECOMB) {
+                for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                    probs(J_index_genes, 0, j_index, d_index)
+                            = _param_vec->event_prob(VDJ_JOI_DIV_GEN, 0, j_gene - 1, clonotype.getDiv(d_index) - 1); // probability of choosing this J gene segment with other D genes
+                }
+            }
 
+            // J deletions
+            j_start = clonotype.getJoiGeneStart(j_index);
+            j_end = clonotype.getJoiGeneEnd(j_index);
+            shift = clonotype.getJoiSeqStart(j_index) - seq_global_start_pos;
+
+            for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index) + 1; ++i) {
+                probs(J_index_dels, j_index, i + shift, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_start + i - 1); // probability of deletions
+            }
+
+            for (seq_len_t i = 1; i < clonotype.getJoiLen(j_index) + 1; ++i) {
+                codons(codons.chainSize() - 1, j_index, i, 0) = clonotype.getJoiCodon(j_index, i);
+            }
+        }
+
+        for (seq_len_t i = clonotype.sequence().size() - len + 1; i <= clonotype.sequence().size() + 1; ++i) {
+            seq_poses.push_back(i);
+        }
     }
 
 }

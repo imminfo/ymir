@@ -145,7 +145,7 @@ YMIR_TEST_START(test_markovchain_aa_mono)
     MonoNucInsertionModel m(probs.begin(), .5);
 
     // exact same aminoacid
-    // {'M', "ATG"},
+    // {'M', "ATG"}
     YMIR_ASSERT3(m.aaProbability("M", 1, 1, 0, 0), 0)
     YMIR_ASSERT3(m.aaProbability("M", 1, 2, 0, 0), 0)
     YMIR_ASSERT3(m.aaProbability("M", 1, 3, 0, 0), 0)
@@ -155,7 +155,32 @@ YMIR_TEST_START(test_markovchain_aa_mono)
     YMIR_ASSERT3(m.aaProbability("M", 2, 3, 63, 63), .4 * .3)
     YMIR_ASSERT3(m.aaProbability("M", 3, 3, 63, 63), .3)
 
-    // {'I', "ATT"}, {'I', "ATC"}, {'I', "ATA"},
+    // {'I', "ATT"}, {'I', "ATC"}, {'I', "ATA"}
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 0, 0), 0)
+
+    // 111000
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 56, 56), 3 * .1)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 56, 56), 3 * .1 * 3 * .4)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 56, 56), (3 * .1) * (3 * .4) * (.1 + .2 + .4))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 56, 56), (3 * .4))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 56, 56), (3 * .4) * (.1 + .2 + .4))
+    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 56, 56), (.1 + .2 + .4))
+
+    // 101000
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 40, 40), .1)
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 40, 40), .1 * .4)
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 40, 40), .1 * .4 * .3)
+//    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 40, 40), .4 * .3)
+//    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 40, 40), .3)
+//
+//    // 110000 and 011000
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 48, 24), .1)
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 48, 24), .1 * .4)
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 48, 24), .1 * .4 * .3)
+//    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 48, 24), .4 * .3)
+//    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 48, 24), .3)
 
 
     // neighbour aminoacids

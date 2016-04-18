@@ -161,12 +161,13 @@ namespace ymir {
             assert(pos >= 0 && pos <= 2);
 #endif
             auto range = _aa2codon.equal_range(aminoacid);
-            codon_hash res = 0;
+            std::bitset<6> res = 0;
+            int i = 0;
             for (auto it = range.first; it != range.second; ++it) {
-                res += nucl == it->second[pos];
-                res <<= 1;
+                res.set(5 - i, nucl == it->second[pos]);
+                ++i;
             }
-            return res;
+            return res.to_ulong();
         }
 
 

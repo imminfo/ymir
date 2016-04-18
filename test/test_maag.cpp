@@ -1069,6 +1069,88 @@ YMIR_TEST_START(test_maag_builder_replace_vdj)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_maag_vj_aa)
+
+    ModelParameterVector mvec = make_test_events_vj3();
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1");
+    alvec1.push_back("Vseg2");
+    alvec1.push_back("Vseg3");
+    seqvec1.push_back("TGTGC");
+    seqvec1.push_back("TGCG");
+    seqvec1.push_back("TGA");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1");
+    alvec2.push_back("Jseg2");
+    alvec2.push_back("Jseg3");
+    seqvec2.push_back("TTT");
+    seqvec2.push_back("ATTC");
+    seqvec2.push_back("AATT");
+
+    VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
+
+    mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)] = .1;
+    mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 1)] = .2;
+    mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 2)] = .3;
+    mvec[mvec.event_index(VJ_VAR_JOI_INS_NUC, 0, 3)] = .4;
+
+    MAAGBuilder maag_builder(mvec, genes);
+
+    ClonotypeNucBuilder cl_builder;
+    // C: TGT TGC
+    // A: GCT GCC GCA GCG
+    // S: TCT TCC TCA TCG
+    // F: TTT TTC
+    CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3));
+    aligner.setSequence("CASF").setRecombination(VJ_RECOMB);
+    YMIR_ASSERT(aligner.alignVar())
+    YMIR_ASSERT(aligner.alignJoi())
+
+    ClonotypeAA clonotype = aligner.buildClonotype();
+
+    YMIR_ASSERT2(clonotype.getVarLen(0), 5)
+    YMIR_ASSERT2(clonotype.getVarLen(1), 4)
+    YMIR_ASSERT2(clonotype.getVarLen(2), 2)
+
+    YMIR_ASSERT2(clonotype.getJoiLen(0), 3)
+    YMIR_ASSERT2(clonotype.getJoiLen(1), 4)
+    YMIR_ASSERT2(clonotype.getJoiLen(2), 2)
+
+    MAAGaa maag = maag_builder.build(clonotype);
+
+    YMIR_ASSERT2(maag.nVar(), 3)
+    YMIR_ASSERT2(maag.nDiv(), 0)
+    YMIR_ASSERT2(maag.nJoi(), 3)
+
+    YMIR_ASSERT2(maag.n_poses(), 11)
+
+    YMIR_ASSERT2(maag.position(0), 0)
+    YMIR_ASSERT2(maag.position(1), 1)
+    YMIR_ASSERT2(maag.position(2), 2)
+    YMIR_ASSERT2(maag.position(3), 3)
+    YMIR_ASSERT2(maag.position(4), 4)
+    YMIR_ASSERT2(maag.position(5), 5)
+
+    YMIR_ASSERT2(maag.position(6), 9)
+    YMIR_ASSERT2(maag.position(7), 10)
+    YMIR_ASSERT2(maag.position(8), 11)
+    YMIR_ASSERT2(maag.position(9), 12)
+    YMIR_ASSERT2(maag.position(10), 13)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_maag_vdj_aa)
+
+    YMIR_ASSERT(false)
+
+YMIR_TEST_END
+
+
 YMIR_TEST_START(test_maag_forward_backward_vj)
 
     ModelParameterVector mvec = make_test_events_vj();
@@ -1268,6 +1350,9 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_maag_vdj_err())
     YMIR_TEST(test_maag_builder_replace_vj())
     YMIR_TEST(test_maag_builder_replace_vdj())
+
+    YMIR_TEST(test_maag_vj_aa())
+    YMIR_TEST(test_maag_vdj_aa())
 
     // Tests for forward-backward algorithms
     YMIR_TEST(test_maag_forward_backward_vj())

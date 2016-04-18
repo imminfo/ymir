@@ -64,6 +64,14 @@ namespace ymir {
         }
 
 
+        ~DiNucInsertionModel()
+        {
+        }
+
+
+        virtual DiNucInsertionModel* clone() const { return new DiNucInsertionModel(*this); }
+
+
         ///@{
         prob_t nucProbability(const std::string& sequence, char first_char = NULL_CHAR, bool with_errors = false) const {
             return this->nucProbability(sequence.cbegin(), sequence.size(), first_char, with_errors);

@@ -37,14 +37,19 @@ namespace ymir {
          *
          */
         MAAGaa(const MAAGaa &other)
-                : MAAGBase(other) //, codons, insertions
+                : MAAGBase(other),
+                  _codons(other._codons),
+                  _insertions(other._insertions->clone())
         {
+
         }
 
 
-        MAAGaa(MAAGaa &&other) {
-            // codons
-            // insertions
+        MAAGaa(MAAGaa &&other)
+                : MAAGBase(other)
+        {
+            _codons.swap(other._codons);
+            _insertions.swap(other._insertions);
         }
 
 
@@ -83,6 +88,7 @@ namespace ymir {
 #ifndef DNDEBUG
             assert(_insertions);
 #endif
+
         }
 
 

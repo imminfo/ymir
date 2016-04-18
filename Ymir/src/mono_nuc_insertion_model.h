@@ -54,6 +54,13 @@ namespace ymir {
             return *this;
         }
 
+        ~MonoNucInsertionModel()
+        {
+        }
+
+
+        MonoNucInsertionModel* clone() const { return new MonoNucInsertionModel(*this); }
+
 
         prob_t nucProbability(const std::string& sequence,
                               char first_char = NULL_CHAR,

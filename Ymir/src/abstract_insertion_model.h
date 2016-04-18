@@ -76,6 +76,9 @@ namespace ymir {
         }
 
 
+        virtual AbstractInsertionModel* clone() const = 0;
+
+
         /**
         * \brief Probability of the given nucleotide sequence.
         */

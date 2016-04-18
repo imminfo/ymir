@@ -144,7 +144,9 @@ YMIR_TEST_START(test_markovchain_aa_mono)
     vector<prob_t> probs = {.1, .2, .3, .4};
     MonoNucInsertionModel m(probs.begin(), .5);
 
+    //
     // exact same aminoacid
+    //
     // {'M', "ATG"}
     YMIR_ASSERT3(m.aaProbability("M", 1, 1, 0, 0), 0)
     YMIR_ASSERT3(m.aaProbability("M", 1, 2, 0, 0), 0)
@@ -169,23 +171,30 @@ YMIR_TEST_START(test_markovchain_aa_mono)
     YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 56, 56), (.1 + .2 + .4))
 
     // 101000
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 40, 40), .1)
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 40, 40), .1 * .4)
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 40, 40), .1 * .4 * .3)
-//    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 40, 40), .4 * .3)
-//    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 40, 40), .3)
-//
-//    // 110000 and 011000
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 48, 24), .1)
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 48, 24), .1 * .4)
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 48, 24), .1 * .4 * .3)
-//    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 48, 24), .4 * .3)
-//    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 48, 24), .3)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 40, 40), 2 * .1)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 40, 40), (2 * .1) * (2 * .4))
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 40, 40), (2 * .1) * (2 * .4) * (.1 + .4))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 40, 40), (2 * .4))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 40, 40), (2 * .4) * (.1 + .4))
+    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 40, 40), (.1 + .4))
+
+    // 110000 and 011000 -> 010000
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 48, 24), .1)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 48, 24), .1 * .4)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 48, 24), .1 * .4 * .2)
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 48, 24), .4)
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 48, 24), .4 * .2)
+    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 48, 24), .2)
 
 
+    //
     // neighbour aminoacids
+    //
 
+
+    //
     // distant aminoacids
+    //
 
 
     YMIR_ASSERT(false)

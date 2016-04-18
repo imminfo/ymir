@@ -15,6 +15,8 @@
 
 namespace ymir {
 
+#define YMIR_TEST_PRECISION 1e-14
+
 #define YMIR_TEST(res) { all_tests += 1; if (res.size() == 0) {tests_passed += 1;} \
                         else { \
                         failed_test_info.push_back(TestInfo(#res, res)); \
@@ -24,9 +26,8 @@ namespace ymir {
 #define YMIR_TEST_START(funname) vector<string> funname() { std::cout << " --- " << (#funname) << std::endl; vector<string> _failed_cases;
 #define YMIR_ASSERT(expr) { if (!(expr)) { _failed_cases.push_back(#expr); } };
 #define YMIR_ASSERT2(expr1, expr2) { if ((expr1) != (expr2)) { std::stringstream ss; ss << #expr1 << " == " << #expr2 << "  (result: " << (expr1) << ", need: " << (expr2) << ")";_failed_cases.push_back(ss.str()); } };
+#define YMIR_ASSERT3(expr1, expr2) { if (abs((expr1) - (expr2)) > YMIR_TEST_PRECISION) { std::stringstream ss; ss << #expr1 << " == " << #expr2 << "  (result: " << (expr1) << ", need: " << (expr2) << ")";_failed_cases.push_back(ss.str()); } };
 #define YMIR_TEST_END std::cout << std::endl; return _failed_cases; }
-
-#define YMIR_TEST_PRECISION 1e-14
 
     struct TestInfo {
         string test_name;

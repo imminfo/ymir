@@ -39,7 +39,7 @@ namespace ymir {
         MAAGaa(const MAAGaa &other)
                 : MAAGBase(other),
                   _codons(other._codons),
-                  _insertions(other._insertions->clone()),
+                  _insertions(other._insertions->clone())
         {
 
         }

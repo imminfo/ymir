@@ -92,12 +92,14 @@ namespace ymir {
                 this->fill(2, 0, 0);
                 for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
                     for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
-                        if (_seq_poses[this->nodeColumns(1) + col_i] >= _seq_poses[row_i]) {
-                            this->at(2, 0, row_i, col_i) = _insertions->aaProbability(*_sequence,
-                                                                                      _seq_poses[row_i],
-                                                                                      _seq_poses[this->nodeColumns(1) + col_i],
-                                                                                      _codons(0, v_index, 0, row_i),
-                                                                                      _codons(1, j_index, col_i, 0));
+                        if (_seq_poses[this->nodeColumns(1) + col_i] >= _seq_poses[row_i]
+                            && (_seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i]) <= _max_ins_len) {
+                            this->at(2, 0, row_i, col_i) = *(_ins_start + (_seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i]))
+                                                           * _insertions->aaProbability(*_sequence,
+                                                                                        _seq_poses[row_i],
+                                                                                        _seq_poses[this->nodeColumns(1) + col_i],
+                                                                                        _codons(0, v_index, 0, row_i),
+                                                                                        _codons(1, j_index, col_i, 0));
                         }
                     }
                 }
@@ -181,11 +183,17 @@ namespace ymir {
         ///@}
 
 
+        codon_hash codon(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
+            return _codons(node_i, mat_i, row, col);
+        }
+
 
     protected:
 
         CodonMMC _codons;
         unique_ptr<AbstractInsertionModel> _insertions;
+        std::vector<prob_t>::const_iterator _ins_start;
+        seq_len_t _max_ins_len;
 
     };
 

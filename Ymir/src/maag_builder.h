@@ -705,6 +705,10 @@ namespace ymir {
             maag._sequence.reset(new sequence_t(clonotype.sequence()));
             maag._seq_poses.swap(seq_poses_arr);
             maag._n_poses = seq_poses.size();
+
+            maag._ins_start = _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0));
+            maag._max_ins_len = _param_vec->max_VJ_ins_len();
+
             return maag;
         } else {
             return MAAGaa();

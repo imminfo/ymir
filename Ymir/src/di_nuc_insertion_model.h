@@ -121,37 +121,19 @@ namespace ymir {
          *
          */
         ///@{
-        virtual prob_t aaProbability(const std::string& sequence,
+        virtual prob_t aaProbability(const sequence_t& sequence,
                                      seq_len_t first_nuc_pos,
                                      seq_len_t last_nuc_pos,
                                      codon_hash first_aa_codons,
                                      codon_hash last_aa_codons,
-                                     char first_char = NULL_CHAR) const
-        {
-            return this->aaProbability(sequence.begin(), sequence.size(), first_nuc_pos, last_nuc_pos, first_aa_codons, last_aa_codons, first_char);
-        }
+                                     char first_char = NULL_CHAR) const {}
 
-        virtual prob_t aaProbability(std::string::const_iterator start,
-                                     seq_len_t sequence_len,
-                                     seq_len_t first_nuc_pos,
-                                     seq_len_t last_nuc_pos,
-                                     codon_hash first_aa_codons,
-                                     codon_hash last_aa_codons,
-                                     char first_char = NULL_CHAR) const
-        {
-            check_and_throw(true, "not implemented yet");
-        }
-
-        virtual prob_t aaProbability(std::string::const_reverse_iterator start,
-                                     seq_len_t sequence_len,
-                                     seq_len_t first_nuc_pos,
-                                     seq_len_t last_nuc_pos,
-                                     codon_hash first_aa_codons,
-                                     codon_hash last_aa_codons,
-                                     char first_char = NULL_CHAR) const
-        {
-            check_and_throw(true, "not implemented yet");
-        }
+        virtual prob_t aaProbabilityRev(const sequence_t &sequence,
+                                        seq_len_t first_nuc_pos,
+                                        seq_len_t last_nuc_pos,
+                                        codon_hash first_aa_codons,
+                                        codon_hash last_aa_codons,
+                                        char first_char = NULL_CHAR) const {}
         ///@}
 
 

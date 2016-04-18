@@ -113,34 +113,67 @@ namespace ymir {
          *
          */
         ///@{
-        virtual prob_t aaProbability(const std::string& sequence,
+        virtual prob_t aaProbability(const sequence_t& sequence,
                                      seq_len_t first_nuc_pos,
                                      seq_len_t last_nuc_pos,
                                      codon_hash first_aa_codons,
                                      codon_hash last_aa_codons,
                                      char first_char = NULL_CHAR) const
         {
-            return this->aaProbability(sequence.begin(), sequence.size(), first_nuc_pos, last_nuc_pos, first_aa_codons, last_aa_codons);
+            assert(first_nuc_pos <= last_nuc_pos);
+            prob_t res = 1, nuc_prob;
+            if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
+                codon_hash hash_value = first_aa_codons & last_aa_codons;
+
+                for (seq_len_t pos = first_nuc_pos; pos <= last_nuc_pos; ++pos) {
+                    int aa_pos = (pos - 1) / 3;
+                    int codon_pos = (pos - 1) % 3;
+                    nuc_prob =  _arr[0] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'A', codon_pos) & hash_value).count();
+                    nuc_prob += _arr[1] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'C', codon_pos) & hash_value).count();
+                    nuc_prob += _arr[2] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'G', codon_pos) & hash_value).count();
+                    nuc_prob += _arr[3] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'T', codon_pos) & hash_value).count();
+                    res *= nuc_prob;
+                }
+            } else {
+                codon_hash hash_value = first_aa_codons;
+                for (seq_len_t pos = first_nuc_pos; pos < 3 * (first_nuc_pos / 3); ++pos) {
+                    int aa_pos = (pos - 1) / 3;
+                    int codon_pos = (pos - 1) % 3;
+                    res += _arr[0] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'A', codon_pos) & hash_value).count();
+                    res += _arr[1] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'C', codon_pos) & hash_value).count();
+                    res += _arr[2] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'G', codon_pos) & hash_value).count();
+                    res += _arr[3] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'T', codon_pos) & hash_value).count();
+                }
+
+                for (seq_len_t pos = 3 * (first_nuc_pos / 3) + 1; pos < last_nuc_pos; ++pos) {
+                    int aa_pos = (pos - 1) / 3;
+                    int codon_pos = (pos - 1) % 3;
+                    res += _arr[0] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'A', codon_pos)).count();
+                    res += _arr[1] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'C', codon_pos)).count();
+                    res += _arr[2] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'G', codon_pos)).count();
+                    res += _arr[3] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'T', codon_pos)).count();
+                }
+
+                hash_value = last_aa_codons;
+                for (seq_len_t pos = last_nuc_pos; pos < 3 * (last_nuc_pos / 3); ++pos) {
+                    int aa_pos = (pos - 1) / 3;
+                    int codon_pos = (pos - 1) % 3;
+                    res += _arr[0] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'A', codon_pos) & hash_value).count();
+                    res += _arr[1] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'C', codon_pos) & hash_value).count();
+                    res += _arr[2] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'G', codon_pos) & hash_value).count();
+                    res += _arr[3] * std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'T', codon_pos) & hash_value).count();
+                }
+            }
+//            ((*it) << 8) + (first_aa_codons << 2) + ((i+1) % 3);
+            return res;
         }
 
-        virtual prob_t aaProbability(std::string::const_iterator start,
-                                     seq_len_t sequence_len,
-                                     seq_len_t first_nuc_pos,
-                                     seq_len_t last_nuc_pos,
-                                     codon_hash first_aa_codons,
-                                     codon_hash last_aa_codons,
-                                     char first_char = NULL_CHAR) const
-        {
-            ((*it) << 8) + (first_aa_codons << 2) + ((i+1) % 3)
-        }
-
-        virtual prob_t aaProbability(std::string::const_reverse_iterator start,
-                                     seq_len_t sequence_len,
-                                     seq_len_t first_nuc_pos,
-                                     seq_len_t last_nuc_pos,
-                                     codon_hash first_aa_codons,
-                                     codon_hash last_aa_codons,
-                                     char first_char = NULL_CHAR) const
+        virtual prob_t aaProbabilityRev(const sequence_t &sequence,
+                                        seq_len_t first_nuc_pos,
+                                        seq_len_t last_nuc_pos,
+                                        codon_hash first_aa_codons,
+                                        codon_hash last_aa_codons,
+                                        char first_char = NULL_CHAR) const
         {
 
         }
@@ -169,7 +202,8 @@ namespace ymir {
         // reverse or not???
         typedef shared_ptr<std::unordered_map<int16_t, prob_t>> shared_aa_ins_t;
 
-        shared_aa_ins_t _aa_probs;
+        shared_aa_ins_t _aa_probs; // _aa_probs_frow, _aa_probs_back;
+        // forward and reverse aminoacid probs
 
 
         void make_aminoacid_probs() {

@@ -266,7 +266,6 @@ YMIR_TEST_START(test_markovchain_aa_mono)
     YMIR_ASSERT3(m.aaProbability("NGY", 3, 8, 48, 32), (.2 + .4) * 1.44 * .4 * .1)
     YMIR_ASSERT3(m.aaProbability("NGY", 3, 9, 48, 32), (.2 + .4) * 1.44 * .4 * .1 * .4)
 
-
 YMIR_TEST_END
 
 

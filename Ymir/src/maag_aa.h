@@ -28,7 +28,7 @@ namespace ymir {
          * \brief Default constructor.
          */
         MAAGaa()
-                : MAAGBase(AMINOACID) //, codons
+                : MAAGBase(AMINOACID) //, codons, insertions
         {
             _values.reserve(1);
         }
@@ -37,13 +37,14 @@ namespace ymir {
          *
          */
         MAAGaa(const MAAGaa &other)
-                : MAAGBase(other) //, codons
+                : MAAGBase(other) //, codons, insertions
         {
         }
 
 
         MAAGaa(MAAGaa &&other) {
             // codons
+            // insertions
         }
 
 
@@ -58,6 +59,8 @@ namespace ymir {
 
             // codons
 
+            // insertions
+
             return *this;
         }
 
@@ -67,6 +70,8 @@ namespace ymir {
 
             // codons
 
+            // insertions
+
             return *this;
         }
 
@@ -75,13 +80,17 @@ namespace ymir {
          * \brief Compute the full generation probability of the amino acid sequence.
          */
         prob_t fullProbability(MAAGComputeProbAction action = SUM_PROBABILITY) const {
-
+#ifndef DNDEBUG
+            assert(_insertions);
+#endif
         }
 
 
 
     protected:
 
+        CodonMMC _codons;
+        unique_ptr<AbstractInsertionModel> _insertions;
 
     };
 

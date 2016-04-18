@@ -120,7 +120,9 @@ namespace ymir {
                                      codon_hash last_aa_codons,
                                      char first_char = NULL_CHAR) const
         {
+#ifndef DNDEBUG
             assert(first_nuc_pos <= last_nuc_pos);
+#endif
             prob_t res = 1, nuc_prob;
             if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
                 codon_hash hash_value = first_aa_codons & last_aa_codons;

@@ -70,6 +70,9 @@ namespace ymir {
     typedef unique_ptr<ErrMMC> pErrMMC;
 
 
+    typedef MultiMatrixChain<codon_hash> CodonMMC;
+
+
     /**
     * \class MultiMatrixChain
     *

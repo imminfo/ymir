@@ -61,22 +61,16 @@ namespace ymir {
 
         MAAGaa& operator= (const MAAGaa &other) {
             MAAGBase::operator=(other);
-
-            // codons
-
-            // insertions
-
+            _codons = other._codons;
+            _insertions.reset(other._insertions->clone());
             return *this;
         }
 
 
         MAAGaa& operator=(MAAGaa &&other) {
             MAAGBase::operator=(other);
-
-            // codons
-
-            // insertions
-
+            _codons.swap(other._codons);
+            _insertions.swap(other._insertions);
             return *this;
         }
 
@@ -88,7 +82,9 @@ namespace ymir {
 #ifndef DNDEBUG
             assert(_insertions);
 #endif
-
+            // for each pair of V and J
+            // generate insertion matrix
+            // compute full prob
         }
 
 

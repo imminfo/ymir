@@ -219,9 +219,53 @@ YMIR_TEST_START(test_markovchain_aa_mono)
     //
     // distant aminoacids
     //
+    // {'N', "AAT"}, {'N', "AAC"}
+    // {'G', "GGT"}, {'G', "GGC"}, {'G', "GGA"}, {'G', "GGG"}
+    // {'Y', "TAT"}, {'Y', "TAC"}
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 7, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 8, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 9, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 7, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 8, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 9, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 7, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 8, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 9, 0, 0), 0)
+    
+    // 110000, 111100, 110000 - full
+    // G - (4*.3) * (4*.3) * 1 = 1.44
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 7, 48, 48), (2*.1) * (2*.1) * (.2 + .4) * 1.44 * (2*.4))
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 8, 48, 48), (2*.1) * (2*.1) * (.2 + .4) * 1.44 * (2*.4) * (2*.1))
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 9, 48, 48), (2*.1) * (2*.1) * (.2 + .4) * 1.44 * (2*.4) * (2*.1) * (.2 + .4))
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 7, 48, 48), (2*.1) * (.2 + .4) * 1.44 * (2*.4))
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 8, 48, 48), (2*.1) * (.2 + .4) * 1.44 * (2*.4) * (2*.1))
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 9, 48, 48), (2*.1) * (.2 + .4) * 1.44 * (2*.4) * (2*.1) * (.2 + .4))
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 7, 48, 48), (.2 + .4) * 1.44 * (2*.4))
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 8, 48, 48), (.2 + .4) * 1.44 * (2*.4) * (2*.1))
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 9, 48, 48), (.2 + .4) * 1.44 * (2*.4) * (2*.1) * (.2 + .4))
 
+    // 010000, 111100, 110000 - full
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 7, 16, 48), .1 * .1 * .2 * 1.44 * (2*.4))
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 8, 16, 48), .1 * .1 * .2 * 1.44 * (2*.4) * (2*.1))
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 9, 16, 48), .1 * .1 * .2 * 1.44 * (2*.4) * (2*.1) * (.2 + .4))
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 7, 16, 48), .1 * .2 * 1.44 * (2*.4))
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 8, 16, 48), .1 * .2 * 1.44 * (2*.4) * (2*.1))
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 9, 16, 48), .1 * .2 * 1.44 * (2*.4) * (2*.1) * (.2 + .4))
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 7, 16, 48), .2 * 1.44 * (2*.4))
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 8, 16, 48), .2 * 1.44 * (2*.4) * (2*.1))
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 9, 16, 48), .2 * 1.44 * (2*.4) * (2*.1) * (.2 + .4))
 
-    YMIR_ASSERT(false)
+    // 110000, 111100, 100000 - full
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 7, 48, 32), (2*.1) * (2*.1) * (.2 + .4) * 1.44 * .4)
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 8, 48, 32), (2*.1) * (2*.1) * (.2 + .4) * 1.44 * .4 * .1)
+    YMIR_ASSERT3(m.aaProbability("NGY", 1, 9, 48, 32), (2*.1) * (2*.1) * (.2 + .4) * 1.44 * .4 * .1 * .4)
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 7, 48, 32), (2*.1) * (.2 + .4) * 1.44 * .4)
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 8, 48, 32), (2*.1) * (.2 + .4) * 1.44 * .4 * .1)
+    YMIR_ASSERT3(m.aaProbability("NGY", 2, 9, 48, 32), (2*.1) * (.2 + .4) * 1.44 * .4 * .1 * .4)
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 7, 48, 32), (.2 + .4) * 1.44 * .4)
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 8, 48, 32), (.2 + .4) * 1.44 * .4 * .1)
+    YMIR_ASSERT3(m.aaProbability("NGY", 3, 9, 48, 32), (.2 + .4) * 1.44 * .4 * .1 * .4)
+
 
 YMIR_TEST_END
 

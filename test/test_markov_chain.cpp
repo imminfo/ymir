@@ -144,10 +144,21 @@ YMIR_TEST_START(test_markovchain_aa_mono)
     vector<prob_t> probs = {.1, .2, .3, .4};
     MonoNucInsertionModel m(probs.begin(), .5);
 
-    // neighbour aminoacids
-    YMIR_ASSERT2(0, m.aaProbability("M", 1, 3, 63, 63))
-
     // exact same aminoacid
+    // {'M', "ATG"},
+    YMIR_ASSERT3(m.aaProbability("M", 1, 1, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("M", 1, 2, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("M", 1, 3, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("M", 1, 1, 63, 63), .1)
+    YMIR_ASSERT3(m.aaProbability("M", 1, 2, 63, 63), .1 * .4)
+    YMIR_ASSERT3(m.aaProbability("M", 1, 3, 63, 63), .1 * .4 * .3)
+    YMIR_ASSERT3(m.aaProbability("M", 2, 3, 63, 63), .4 * .3)
+    YMIR_ASSERT3(m.aaProbability("M", 3, 3, 63, 63), .3)
+
+    // {'I', "ATT"}, {'I', "ATC"}, {'I', "ATA"},
+
+
+    // neighbour aminoacids
 
     // distant aminoacids
 

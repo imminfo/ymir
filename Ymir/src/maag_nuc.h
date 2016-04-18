@@ -58,7 +58,7 @@ namespace ymir {
         /**
          *
          */
-        virtual ~MAAGnuc() { }
+        ~MAAGnuc() { }
 
 
         MAAGnuc& operator= (const MAAGnuc &other) {
@@ -129,7 +129,7 @@ namespace ymir {
          * \return Full assembling probability. Returns 0 if wrong recombination function is used.
          */
         ///@{
-        virtual prob_t fullProbability(event_ind_t v_index, event_ind_t j_index) const {
+        prob_t fullProbability(event_ind_t v_index, event_ind_t j_index) const {
             if (_recomb == VJ_RECOMB) {
                 // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
                 return (matrix(0, 0)(v_index, j_index) *   // P(Vi & Ji)
@@ -142,7 +142,7 @@ namespace ymir {
             }
         }
 
-        virtual prob_t fullProbability(event_ind_t v_index, event_ind_t d_index, event_ind_t j_index) const {
+        prob_t fullProbability(event_ind_t v_index, event_ind_t d_index, event_ind_t j_index) const {
             if (_recomb == VDJ_RECOMB) {
                 // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
                 return (matrix(0, v_index) *      // P(Vi)
@@ -157,7 +157,7 @@ namespace ymir {
             }
         }
 
-        virtual prob_t fullProbability(MAAGComputeProbAction action = SUM_PROBABILITY) const {
+        prob_t fullProbability(MAAGComputeProbAction action = SUM_PROBABILITY) const {
             // choose the max full probability from all possible recombinations of V(D)J gene segment indices
             if (_recomb == UNDEF_RECOMB) {
                 return 0;

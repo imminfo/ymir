@@ -267,6 +267,30 @@ namespace ymir {
                                 const AbstractInsertionModel& mc,
                                 bool reversed = false) const;
 
+
+        void buildAAVariable(const ClonotypeAA &clonotype,
+                             ProbMMC &probs,
+                             CodonMMC &codons,
+                             vector<seq_len_t> &seq_poses) const;
+
+
+        void buildAAJoining(const ClonotypeAA &clonotype,
+                            ProbMMC &probs,
+                            CodonMMC &codons,
+                            vector<seq_len_t> &seq_poses) const;
+
+
+        void buildAAVJInsertions(const ClonotypeAA &clonotype,
+                                 ProbMMC &probs,
+                                 CodonMMC &codons,
+                                 vector<seq_len_t> &seq_poses) const;
+
+
+        void buildAAInsertions(const ClonotypeAA &clonotype,
+                               ProbMMC &probs,
+                               CodonMMC &codons,
+                               vector<seq_len_t> &seq_poses) const;
+
     };
 
 
@@ -639,7 +663,59 @@ namespace ymir {
 
 
     MAAGaa MAAGBuilder::build(const ClonotypeAA &clonotype) const {
+        if (clonotype.is_good()) {
+            ProbMMC probs;
+            CodonMMC events;
+            vector<seq_len_t> seq_poses;
+            seq_poses.reserve(DEFAULT_SEQ_POSES_RESERVE);
 
+            auto resize_size = 0, e_resize_size = 0;
+            switch (clonotype.recombination()) {
+                case VJ_RECOMB:
+                    resize_size = VJ_CHAIN_SIZE;
+                    e_resize_size = 2;
+                    break;
+
+                case VDJ_RECOMB:
+                    resize_size = VDJ_CHAIN_SIZE;
+                    e_resize_size = 3;
+                    break;
+
+                default:
+#ifndef DNDEBUG
+                    check_and_throw(true, "MAAGBuilder: unknown recombination type.");
+#endif
+            }
+
+            probs.resize(resize_size);
+            codons.resize(e_resize_size);
+
+            this->buildAAVariable(clonotype, probs, codons, seq_poses);
+            this->buildAAJoining(clonotype, probs, codons, seq_poses);
+            if (clonotype.recombination() == VJ_RECOMB) {
+                this->buildAAVJinsertions(clonotype, probs, codons, seq_poses);
+            } else if (clonotype.recombination() == VDJ_RECOMB) {
+                check_and_throw(true, "MAAGBuilder: VDJ is not implemented yet.");
+//                this->buildNucDiversity(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
+//                this->buildNucVDinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+//                this->buildNucDJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+            }
+
+            probs.finish();
+
+            MAAGaa maag;
+            maag._recomb = clonotype.recombination();
+            maag.swap(probs);
+            maag._codons.swap(codons);
+            unique_ptr<seq_len_t[]> seq_poses_arr(new seq_len_t[seq_poses.size()]);
+            std::copy(seq_poses.begin(), seq_poses.end(), seq_poses_arr.get());
+            maag._sequence.reset(new sequence_t(clonotype.sequence()));
+            maag._seq_poses.swap(seq_poses_arr);
+            maag._n_poses = seq_poses.size();
+            return maag;
+        } else {
+            return MAAGaa();
+        }
     }
 
 
@@ -1109,6 +1185,79 @@ namespace ymir {
                 }
             }
         }
+    }
+
+
+    void MAAGBuilder::buildAAVariable(const ClonotypeAA &clonotype, ProbMMC &probs, CodonMMC &codons,
+                                      vector<seq_len_t> &seq_poses) const
+    {
+        // find max V alignment
+        seq_len_t len = 0;
+        seg_index_t v_num = clonotype.nVar(), j_num = clonotype.nJoi();
+        for (int v_index = 0; v_index < v_num; ++v_index) {
+            len = std::max(len, clonotype.getVarLen(v_index));
+        }
+
+        // compute V deletions
+        seq_len_t v_len, v_gene, v_start, v_end;
+
+        probs.initNode(VARIABLE_DELETIONS_MATRIX_INDEX, v_num, 1, len + 1);
+        codons.initNode(0, v_num, 1, len + 1);
+
+        if (clonotype.recombination() == VJ_RECOMB) {
+            probs.initNode(VARIABLE_GENES_MATRIX_INDEX, 1, v_num, j_num);
+        } else if (clonotype.recombination() == VDJ_RECOMB) {
+            probs.initNode(VARIABLE_GENES_MATRIX_INDEX, v_num, 1, 1);
+        }
+
+        EventClass V_DEL = clonotype.recombination() == VJ_RECOMB ? VJ_VAR_DEL : VDJ_VAR_DEL;
+        for (seg_index_t v_index = 0; v_index < v_num; ++v_index) {
+
+            // probability of choosing this V gene segment
+            v_gene = clonotype.getVar(v_index);
+
+            if (clonotype.recombination() == VJ_RECOMB) {
+                for (seg_index_t j_index = 0; j_index < j_num; ++j_index) {
+                    probs(VARIABLE_GENES_MATRIX_INDEX, 0, v_index, j_index)
+                            = _param_vec->event_prob(VJ_VAR_JOI_GEN, 0, v_gene - 1, clonotype.getJoi(j_index) - 1);
+                }
+            } else if (clonotype.recombination() == VDJ_RECOMB) {
+                probs(VARIABLE_GENES_MATRIX_INDEX, v_index, 0, 0) = _param_vec->event_prob(VDJ_VAR_GEN, 0, v_gene - 1); // probability of choosing this V gene segment
+            }
+
+            // V deletions
+            v_len = _genes->V()[v_gene].sequence.size();
+            v_start = clonotype.getVarGeneStart(v_index);
+            v_end = clonotype.getVarGeneEnd(v_index);
+
+            for (seq_len_t i = 0; i < v_end - v_start + 2; ++i) {
+                probs(VARIABLE_DELETIONS_MATRIX_INDEX, v_index, 0, i) = _param_vec->event_prob(V_DEL, v_gene - 1, (1 + v_len) - (v_start + i)); // probability of deletions
+                codons(0, v_index, 0, i) = clonotype.getVarCodon(v_index, i) // ???
+            }
+        }
+
+        for (seq_len_t i = 0; i <= len; ++i) { seq_poses.push_back(i); }
+    }
+
+
+    void MAAGBuilder::buildAAJoining(const ClonotypeAA &clonotype, ProbMMC &probs, CodonMMC &codons,
+                                     vector<seq_len_t> &seq_poses) const
+    {
+
+    }
+
+
+    void MAAGBuilder::buildAAVJInsertions(const ClonotypeAA &clonotype, ProbMMC &probs, CodonMMC &codons,
+                                          vector<seq_len_t> &seq_poses) const
+    {
+
+    }
+
+
+    void MAAGBuilder::buildAAInsertions(const ClonotypeAA &clonotype, ProbMMC &probs, CodonMMC &codons,
+                                        vector<seq_len_t> &seq_poses) const
+    {
+
     }
 
 }

@@ -151,12 +151,14 @@ YMIR_TEST_START(test_markovchain_aa_mono)
     YMIR_ASSERT3(m.aaProbability("M", 1, 1, 0, 0), 0)
     YMIR_ASSERT3(m.aaProbability("M", 1, 2, 0, 0), 0)
     YMIR_ASSERT3(m.aaProbability("M", 1, 3, 0, 0), 0)
+
     YMIR_ASSERT3(m.aaProbability("M", 1, 1, 63, 63), .1)
     YMIR_ASSERT3(m.aaProbability("M", 1, 2, 63, 63), .1 * .4)
     YMIR_ASSERT3(m.aaProbability("M", 1, 3, 63, 63), .1 * .4 * .3)
     YMIR_ASSERT3(m.aaProbability("M", 2, 3, 63, 63), .4 * .3)
     YMIR_ASSERT3(m.aaProbability("M", 3, 3, 63, 63), .3)
 
+    //
     // {'I', "ATT"}, {'I', "ATC"}, {'I', "ATA"}
     YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 0, 0), 0)
     YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 0, 0), 0)
@@ -190,6 +192,28 @@ YMIR_TEST_START(test_markovchain_aa_mono)
     //
     // neighbour aminoacids
     //
+    // {'A', "GCT"}, {'A', "GCC"}, {'A', "GCA"}, {'A', "GCG"}
+    // {'F', "TTT"}, {'F', "TTC"}
+    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("AF", 1, 5, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("AF", 1, 6, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("AF", 2, 4, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("AF", 2, 5, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("AF", 2, 6, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("AF", 3, 4, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("AF", 3, 5, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("AF", 3, 6, 0, 0), 0)
+
+    // 111100 and 110000 (full)
+    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 60, 48), (.3*4) * (.2*4) * 1 * (.4*2))
+    YMIR_ASSERT3(m.aaProbability("AF", 1, 5, 60, 48), (.3*4) * (.2*4) * 1 * (.4*2) * (2*.4))
+    YMIR_ASSERT3(m.aaProbability("AF", 1, 6, 60, 48), (.3*4) * (.2*4) * 1 * (.4*2) * (2*.4) * (.4 + .2))
+    YMIR_ASSERT3(m.aaProbability("AF", 2, 4, 60, 48), (.2*4) * 1 * (.4*2))
+    YMIR_ASSERT3(m.aaProbability("AF", 2, 5, 60, 48), (.2*4) * 1 * (.4*2) * (2*.4))
+    YMIR_ASSERT3(m.aaProbability("AF", 2, 6, 60, 48), (.2*4) * 1 * (.4*2) * (2*.4) * (.4 + .2))
+    YMIR_ASSERT3(m.aaProbability("AF", 3, 4, 60, 48), 1 * (.4*2))
+    YMIR_ASSERT3(m.aaProbability("AF", 3, 5, 60, 48), 1 * (.4*2) * (2*.4))
+    YMIR_ASSERT3(m.aaProbability("AF", 3, 6, 60, 48), 1 * (.4*2) * (2*.4) * (.4 + .2))
 
 
     //

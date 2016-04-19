@@ -358,6 +358,8 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
     YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({true, true, false, false, false, false}, 0))
 
+    // {'S', "TCT"}, {'S', "TCC"}, {'S', "TCA"}, {'S', "TCG"}, {'S', "AGT"}, {'S', "AGC"},
+    // {'L', "TTA"}, {'L', "TTG"}, {'L', "CTT"}, {'L', "CTC"}, {'L', "CTA"}, {'L', "CTG"},
     // J1: CT.TTA
     //    TCT.TTA
     alignment = aligner.alignJoi(1, "SL");
@@ -365,6 +367,11 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.pattern_start(0), 1)
     YMIR_ASSERT2(alignment.text_start(0), 2)
     YMIR_ASSERT2(alignment.len(0), 5)
+    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({true, false, false, false, false, false}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({true, false, false, false, true, false}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, false, false, false, true, false}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({true, false, false, false, true, false}, 0))
 
     // J2: C.CTT
     //   TCC.CTT
@@ -374,6 +381,10 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.pattern_start(0), 1)
     YMIR_ASSERT2(alignment.text_start(0), 3)
     YMIR_ASSERT2(alignment.len(0), 4)
+    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({false, true, false, false, false, true}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({false, false, true, false, false, false}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, false, true, false, false, false}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({false, false, true, false, false, false}, 0))
 
     // J3: AGC.CTG
     //     AGC.CTG
@@ -382,6 +393,12 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.pattern_start(0), 1)
     YMIR_ASSERT2(alignment.text_start(0), 1)
     YMIR_ASSERT2(alignment.len(0), 6)
+    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({false, false, false, false, false, true}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({false, false, false, false, false, true}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, true, false, false, false, true}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({false, false, false, false, false, true}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 6), compute_codon_hash({false, true, false, false, false, true}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({false, true, false, false, false, true}, 0))
 
     // J4: AGG.CTG
     //     TCG.CTG
@@ -390,6 +407,10 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.pattern_start(0), 3)
     YMIR_ASSERT2(alignment.text_start(0), 3)
     YMIR_ASSERT2(alignment.len(0), 4)
+    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({false, false, false, true, false, false}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({false, false, false, false, false, true}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, true, false, false, false, true}, 0))
+    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({false, true, false, false, false, true}, 0))
 
     YMIR_ASSERT2("cdr aa div aligner is implemented", "cdr aa div aligner is not implemented")
 

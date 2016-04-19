@@ -39,7 +39,9 @@ namespace ymir {
         MAAGaa(const MAAGaa &other)
                 : MAAGBase(other),
                   _codons(other._codons),
-                  _insertions(other._insertions->clone())
+                  _insertions(other._insertions->clone()),
+                  _max_ins_len(other._max_ins_len),
+                  _ins_start(other._ins_start)
         {
 
         }
@@ -50,6 +52,8 @@ namespace ymir {
         {
             _codons.swap(other._codons);
             _insertions.swap(other._insertions);
+            std::swap(_max_ins_len, other._max_ins_len);
+            std::swap(_ins_start, other._ins_start);
         }
 
 
@@ -63,6 +67,8 @@ namespace ymir {
             MAAGBase::operator=(other);
             _codons = other._codons;
             _insertions.reset(other._insertions->clone());
+            _max_ins_len = other._max_ins_len;
+            _ins_start = other._ins_start;
             return *this;
         }
 
@@ -71,6 +77,8 @@ namespace ymir {
             MAAGBase::operator=(other);
             _codons.swap(other._codons);
             _insertions.swap(other._insertions);
+            std::swap(_max_ins_len, other._max_ins_len);
+            std::swap(_ins_start, other._ins_start);
             return *this;
         }
 
@@ -92,15 +100,19 @@ namespace ymir {
                 this->fill(2, 0, 0);
                 for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
                     for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
-                        if (_seq_poses[this->nodeColumns(1) + col_i] >= _seq_poses[row_i]
-                            && (_seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i]) <= _max_ins_len) {
-                            this->at(2, 0, row_i, col_i) = *(_ins_start + (_seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i]))
+                        int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i];
+                        if (insertion_len >= 0 && insertion_len <= _max_ins_len) {
+                            this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
                                                            * _insertions->aaProbability(*_sequence,
                                                                                         _seq_poses[row_i],
                                                                                         _seq_poses[this->nodeColumns(1) + col_i],
                                                                                         _codons(0, v_index, 0, row_i),
                                                                                         _codons(1, j_index, col_i, 0));
                         }
+//                        std::cout << row_i << ":" << col_i << ":" << insertion_len << "=" << this->at(2, 0, row_i, col_i) << std::endl;
+//                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << ":" << (_codons(0, v_index, 0, row_i) & _codons(1, j_index, col_i, 0)) << std::endl;
+//                        std::cout << (int) _codons(0, v_index, 0, row_i) << ":" << (int) _codons(1, j_index, col_i, 0) << std::endl;
+//                        std::cout << std::endl;
                     }
                 }
 
@@ -185,6 +197,20 @@ namespace ymir {
 
         codon_hash codon(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
             return _codons(node_i, mat_i, row, col);
+        }
+
+
+        void print() const {
+            std::cout << matrix(0, 0).print() << std::endl;
+            std::cout << matrix(1, 0).print() << std::endl;
+            std::cout << matrix(2, 0).print() << std::endl;
+            std::cout << matrix(3, 0).print() << std::endl;
+        }
+
+
+        void printCodons() const {
+            std::cout << _codons.matrix(0, 0).print() << std::endl;
+            std::cout << _codons.matrix(1, 0).print() << std::endl;
         }
 
 

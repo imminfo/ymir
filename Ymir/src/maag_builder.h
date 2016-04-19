@@ -706,7 +706,7 @@ namespace ymir {
             maag._seq_poses.swap(seq_poses_arr);
             maag._n_poses = seq_poses.size();
 
-            maag._ins_start = _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0));
+            maag._ins_start = _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0));
             maag._max_ins_len = _param_vec->max_VJ_ins_len();
 
             return maag;
@@ -1291,12 +1291,12 @@ namespace ymir {
                 probs(J_index_dels, j_index, i + shift, 0) = _param_vec->event_prob(J_DEL, j_gene - 1, j_start + i - 1); // probability of deletions
             }
 
-            for (seq_len_t i = 1; i < clonotype.getJoiLen(j_index) + 1; ++i) {
-                codons(codons.chainSize() - 1, j_index, i, 0) = clonotype.getJoiCodon(j_index, i);
+            for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index); ++i) {
+                codons(codons.chainSize() - 1, j_index, i, 0) = clonotype.getJoiCodon(j_index, i + 1);
             }
         }
 
-        for (seq_len_t i = clonotype.sequence().size() - len + 1; i <= clonotype.sequence().size() + 1; ++i) {
+        for (seq_len_t i = 3 * clonotype.sequence().size() - len + 1; i <= 3 * clonotype.sequence().size() + 1; ++i) {
             seq_poses.push_back(i);
         }
     }

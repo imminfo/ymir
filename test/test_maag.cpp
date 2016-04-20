@@ -1101,8 +1101,8 @@ YMIR_TEST_START(test_maag_vj_aa)
     // F: TTT TTC
     CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3));
 //    aligner.setSequence("C").setRecombination(VJ_RECOMB);
-    aligner.setSequence("CF").setRecombination(VJ_RECOMB);
-//    aligner.setSequence("CAF").setRecombination(VJ_RECOMB);
+//    aligner.setSequence("CF").setRecombination(VJ_RECOMB);
+    aligner.setSequence("CAF").setRecombination(VJ_RECOMB);
 //    aligner.setSequence("CASF").setRecombination(VJ_RECOMB);
     YMIR_ASSERT(aligner.alignVar())
     YMIR_ASSERT(aligner.alignJoi())
@@ -1167,9 +1167,9 @@ YMIR_TEST_START(test_maag_vj_aa)
                                     "TGCGCGTCGTTT", "TGTGCGTCGTTT", "TGCGCTTCGTTT", "TGTGCTTCGTTT", "TGCGCATCTTTT", "TGTGCATCTTTT",
                                     "TGCGCCTCTTTT", "TGTGCCTCTTTT", "TGCGCGTCTTTT", "TGTGCGTCTTTT", "TGCGCTTCTTTT", "TGTGCTTCTTTT"};
 
-//    rev_nuc = {"TGCGCATTC", "TGTGCATTC", "TGCGCCTTC", "TGTGCCTTC", "TGCGCGTTC", "TGTGCGTTC", "TGCGCTTTC", "TGTGCTTTC", "TGCGCATTT", "TGTGCATTT", "TGCGCCTTT", "TGTGCCTTT", "TGCGCGTTT", "TGTGCGTTT", "TGCGCTTTT", "TGTGCTTTT"};
+    rev_nuc = {"TGCGCATTC", "TGTGCATTC", "TGCGCCTTC", "TGTGCCTTC", "TGCGCGTTC", "TGTGCGTTC", "TGCGCTTTC", "TGTGCTTTC", "TGCGCATTT", "TGTGCATTT", "TGCGCCTTT", "TGTGCCTTT", "TGCGCGTTT", "TGTGCGTTT", "TGCGCTTTT", "TGTGCTTTT"};
 //
-    rev_nuc = { "TGCTTC", "TGTTTC", "TGCTTT", "TGTTTT" };
+//    rev_nuc = { "TGCTTC", "TGTTTC", "TGCTTT", "TGTTTT" };
 //
 //    rev_nuc = { "TGC", "TGT" };
 

@@ -1097,12 +1097,12 @@ YMIR_TEST_START(test_maag_vj_aa)
     ClonotypeNucBuilder cl_builder;
     // C: TGT TGC
     // A: GCT GCC GCA GCG
-    // S: TCT TCC TCA TCG
+    // S: TCT TCC TCA TCG AGT AGC
     // F: TTT TTC
     CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3));
-//    aligner.setSequence("C").setRecombination(VJ_RECOMB);
+    aligner.setSequence("C").setRecombination(VJ_RECOMB);
 //    aligner.setSequence("CF").setRecombination(VJ_RECOMB);
-    aligner.setSequence("CAF").setRecombination(VJ_RECOMB);
+//    aligner.setSequence("CAF").setRecombination(VJ_RECOMB);
 //    aligner.setSequence("CASF").setRecombination(VJ_RECOMB);
     YMIR_ASSERT(aligner.alignVar())
     YMIR_ASSERT(aligner.alignJoi())
@@ -1168,10 +1168,10 @@ YMIR_TEST_START(test_maag_vj_aa)
                                     "TGCGCCTCTTTT", "TGTGCCTCTTTT", "TGCGCGTCTTTT", "TGTGCGTCTTTT", "TGCGCTTCTTTT", "TGTGCTTCTTTT"};
 
     rev_nuc = {"TGCGCATTC", "TGTGCATTC", "TGCGCCTTC", "TGTGCCTTC", "TGCGCGTTC", "TGTGCGTTC", "TGCGCTTTC", "TGTGCTTTC", "TGCGCATTT", "TGTGCATTT", "TGCGCCTTT", "TGTGCCTTT", "TGCGCGTTT", "TGTGCGTTT", "TGCGCTTTT", "TGTGCTTTT"};
-//
-//    rev_nuc = { "TGCTTC", "TGTTTC", "TGCTTT", "TGTTTT" };
-//
-//    rev_nuc = { "TGC", "TGT" };
+
+    rev_nuc = { "TGCTTC", "TGTTTC", "TGCTTT", "TGTTTT" };
+
+    rev_nuc = { "TGC", "TGT" };
 
     std::vector<ClonotypeNuc> clonotype_vec;
     NaiveCDR3NucleotideAligner naligner(genes, VDJAlignerParameters(3));
@@ -1185,8 +1185,8 @@ YMIR_TEST_START(test_maag_vj_aa)
     prob_t sum_prob = 0;
     for (int i = 0; i < clonotype_vec.size(); ++i) {
         sum_prob += maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS);
-        std::cout << rev_nuc[i] << " = " << maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS) << std::endl;
-        maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS).print();
+//        std::cout << rev_nuc[i] << " = " << maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS) << std::endl;
+//        maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS).print();
 //        if (!maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS)) {
 //            maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS).print();
 //        }

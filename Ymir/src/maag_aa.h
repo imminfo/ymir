@@ -133,19 +133,21 @@ namespace ymir {
                                                                                         left_codon,
                                                                                         right_codon);
 
-//                            auto prob = _insertions->aaProbability(*_sequence,
-//                                                                   _seq_poses[row_i] + 1,
-//                                                                   _seq_poses[this->nodeColumns(1) + col_i] - 1,
-//                                                                   left_codon,
-//                                                                   right_codon);
+                            auto prob = _insertions->aaProbability(*_sequence,
+                                                                   _seq_poses[row_i] + 1,
+                                                                   _seq_poses[this->nodeColumns(1) + col_i] - 1,
+                                                                   left_codon,
+                                                                   right_codon);
 //                            if (prob == 0) {
-//                            std::cout << "--------" << std::endl;
-//                                std::cout << row_i << ":" << col_i << std::endl;
-//                                std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << "=" << prob << std::endl;
-//                                std::cout << insertion_len << "(" << (*(_ins_start + insertion_len)) << ")" << std::endl;
-//                                std::cout << std::bitset<6>(left_codon).to_string() << ":" << std::bitset<6>(right_codon).to_string()  << std::endl;
-//                                std::cout << "final:\t" << this->at(2, 0, row_i, col_i) << std::endl;
-//                            std::cout << "--------" << std::endl;
+                            if (col_i == 0) {
+                                std::cout << "--------" << std::endl;
+                                std::cout << row_i << ":" << col_i << std::endl;
+                                std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << "=" << prob << std::endl;
+                                std::cout << insertion_len << "(" << (*(_ins_start + insertion_len)) << ")" << std::endl;
+                                std::cout << std::bitset<6>(left_codon).to_string() << ":" << std::bitset<6>(right_codon).to_string()  << std::endl;
+                                std::cout << "final:\t" << this->at(2, 0, row_i, col_i) << std::endl;
+                                std::cout << "--------" << std::endl;
+                            }
 //                            }
                         }
 

@@ -6,6 +6,7 @@
 #define YMIR_CODON_TABLE_H
 
 
+#include <array>
 #include <unordered_map>
 
 #include "types.h"
@@ -168,6 +169,21 @@ namespace ymir {
                 ++i;
             }
             return res.to_ulong();
+        }
+
+
+        std::array<int, 6> which_nucl(char aminoacid, int pos) const {
+#ifndef DNDEBUG
+            assert(pos >= 0 && pos <= 2);
+#endif
+            auto range = _aa2codon.equal_range(aminoacid);
+            std::array<int, 6> res = {0, 0, 0, 0, 0, 0};
+            int i = 0;
+            for (auto it = range.first; it != range.second; ++it) {
+                res[i] = nuc_hash(it->second[pos]);
+                ++i;
+            }
+            return res;
         }
 
 

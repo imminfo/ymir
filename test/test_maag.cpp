@@ -1071,7 +1071,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_maag_vj_aa)
 
-    ModelParameterVector mvec = make_test_events_vj3();
+    ModelParameterVector mvec = make_test_events_vj4();
 
     vector<string> alvec1;
     vector<string> seqvec1;
@@ -1100,7 +1100,9 @@ YMIR_TEST_START(test_maag_vj_aa)
     // S: TCT TCC TCA TCG
     // F: TTT TTC
     CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3));
-    aligner.setSequence("CAF").setRecombination(VJ_RECOMB);
+    aligner.setSequence("C").setRecombination(VJ_RECOMB);
+//    aligner.setSequence("CF").setRecombination(VJ_RECOMB);
+//    aligner.setSequence("CAF").setRecombination(VJ_RECOMB);
 //    aligner.setSequence("CASF").setRecombination(VJ_RECOMB);
     YMIR_ASSERT(aligner.alignVar())
     YMIR_ASSERT(aligner.alignJoi())
@@ -1110,11 +1112,11 @@ YMIR_TEST_START(test_maag_vj_aa)
     YMIR_ASSERT2(clonotype.getVarLen(0), 5)
 //    YMIR_ASSERT2(clonotype.getVarLen(1), 4)
 //    YMIR_ASSERT2(clonotype.getVarLen(2), 2)
-    YMIR_ASSERT2(clonotype.getVarCodon(0, 1), compute_codon_hash({true, true, false, false, false, false}, 0))
-    YMIR_ASSERT2(clonotype.getVarCodon(0, 2), compute_codon_hash({true, true, false, false, false, false}, 0))
-    YMIR_ASSERT2(clonotype.getVarCodon(0, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
-    YMIR_ASSERT2(clonotype.getVarCodon(0, 4), compute_codon_hash({true, true, true, true, false, false}, 0))
-    YMIR_ASSERT2(clonotype.getVarCodon(0, 5), compute_codon_hash({true, true, true, true, false, false}, 0))
+//    YMIR_ASSERT2(clonotype.getVarCodon(0, 1), compute_codon_hash({true, true, false, false, false, false}, 0))
+//    YMIR_ASSERT2(clonotype.getVarCodon(0, 2), compute_codon_hash({true, true, false, false, false, false}, 0))
+//    YMIR_ASSERT2(clonotype.getVarCodon(0, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
+//    YMIR_ASSERT2(clonotype.getVarCodon(0, 4), compute_codon_hash({true, true, true, true, false, false}, 0))
+//    YMIR_ASSERT2(clonotype.getVarCodon(0, 5), compute_codon_hash({true, true, true, true, false, false}, 0))
 
     YMIR_ASSERT2(clonotype.getJoiLen(0), 3)
 //    YMIR_ASSERT2(clonotype.getJoiLen(1), 4)
@@ -1123,9 +1125,9 @@ YMIR_TEST_START(test_maag_vj_aa)
 //    YMIR_ASSERT2(clonotype.getJoiSeqEnd(2), 12)
 //    YMIR_ASSERT2(clonotype.getJoiGeneStart(2), 3)
 //    YMIR_ASSERT2(clonotype.getJoiGeneEnd(2), 4)
-    YMIR_ASSERT2(clonotype.getJoiCodon(0, 1), compute_codon_hash({true, false, false, false, false, false}, 0))
-    YMIR_ASSERT2(clonotype.getJoiCodon(0, 2), compute_codon_hash({true, false, false, false, false, false}, 0))
-    YMIR_ASSERT2(clonotype.getJoiCodon(0, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
+//    YMIR_ASSERT2(clonotype.getJoiCodon(0, 1), compute_codon_hash({true, false, false, false, false, false}, 0))
+//    YMIR_ASSERT2(clonotype.getJoiCodon(0, 2), compute_codon_hash({true, false, false, false, false, false}, 0))
+//    YMIR_ASSERT2(clonotype.getJoiCodon(0, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
 
     MAAGaa maag = maag_builder.build(clonotype);
 
@@ -1135,18 +1137,18 @@ YMIR_TEST_START(test_maag_vj_aa)
 
     YMIR_ASSERT2(maag.n_poses(), 11)
 
-    YMIR_ASSERT2(maag.position(0), 0)
-    YMIR_ASSERT2(maag.position(1), 1)
-    YMIR_ASSERT2(maag.position(2), 2)
-    YMIR_ASSERT2(maag.position(3), 3)
-    YMIR_ASSERT2(maag.position(4), 4)
-    YMIR_ASSERT2(maag.position(5), 5)
-
-    YMIR_ASSERT2(maag.position(6), 9)
-    YMIR_ASSERT2(maag.position(7), 10)
-    YMIR_ASSERT2(maag.position(8), 11)
-    YMIR_ASSERT2(maag.position(9), 12)
-    YMIR_ASSERT2(maag.position(10), 13)
+//    YMIR_ASSERT2(maag.position(0), 0)
+//    YMIR_ASSERT2(maag.position(1), 1)
+//    YMIR_ASSERT2(maag.position(2), 2)
+//    YMIR_ASSERT2(maag.position(3), 3)
+//    YMIR_ASSERT2(maag.position(4), 4)
+//    YMIR_ASSERT2(maag.position(5), 5)
+//
+//    YMIR_ASSERT2(maag.position(6), 9)
+//    YMIR_ASSERT2(maag.position(7), 10)
+//    YMIR_ASSERT2(maag.position(8), 11)
+//    YMIR_ASSERT2(maag.position(9), 12)
+//    YMIR_ASSERT2(maag.position(10), 13)
 
     std::vector<string> rev_nuc =  {"TGCGCAAGCTTC", "TGTGCAAGCTTC", "TGCGCCAGCTTC", "TGTGCCAGCTTC", "TGCGCGAGCTTC", "TGTGCGAGCTTC",
                                     "TGCGCTAGCTTC", "TGTGCTAGCTTC", "TGCGCAAGTTTC", "TGTGCAAGTTTC", "TGCGCCAGTTTC", "TGTGCCAGTTTC",
@@ -1167,6 +1169,10 @@ YMIR_TEST_START(test_maag_vj_aa)
 
     rev_nuc = {"TGCGCATTC", "TGTGCATTC", "TGCGCCTTC", "TGTGCCTTC", "TGCGCGTTC", "TGTGCGTTC", "TGCGCTTTC", "TGTGCTTTC", "TGCGCATTT", "TGTGCATTT", "TGCGCCTTT", "TGTGCCTTT", "TGCGCGTTT", "TGTGCGTTT", "TGCGCTTTT", "TGTGCTTTT"};
 
+    rev_nuc = { "TGCTTC", "TGTTTC", "TGCTTT", "TGTTTT" };
+
+    rev_nuc = { "TGC", "TGT" };
+
     std::vector<ClonotypeNuc> clonotype_vec;
     NaiveCDR3NucleotideAligner naligner(genes, VDJAlignerParameters(3));
     for (auto &seq: rev_nuc) {
@@ -1179,6 +1185,11 @@ YMIR_TEST_START(test_maag_vj_aa)
     prob_t sum_prob = 0;
     for (int i = 0; i < clonotype_vec.size(); ++i) {
         sum_prob += maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS);
+        std::cout << rev_nuc[i] << " = " << maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS) << std::endl;
+        maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS).print();
+//        if (!maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS)) {
+//            maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS).print();
+//        }
     }
 
 //    YMIR_ASSERT3(maag.fullProbability(0, 0), 0)

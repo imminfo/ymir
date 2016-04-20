@@ -214,6 +214,14 @@ namespace ymir {
         bool has_errors() const { return (bool) _errors; }
 
 
+        void print() const {
+            std::cout << matrix(0, 0).print() << std::endl;
+            std::cout << matrix(1, 0).print() << std::endl;
+            std::cout << matrix(2, 0).print() << std::endl;
+            std::cout << matrix(3, 0).print() << std::endl;
+        }
+
+
     protected:
 
         prob_t _err_prob;  /** Probability of a error. */

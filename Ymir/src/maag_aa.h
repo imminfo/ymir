@@ -108,9 +108,20 @@ namespace ymir {
                                                                                         _seq_poses[this->nodeColumns(1) + col_i],
                                                                                         _codons(0, v_index, 0, row_i),
                                                                                         _codons(1, j_index, col_i, 0));
+
+                            if (insertion_len == 0) {
+                                auto prob = _insertions->aaProbability(*_sequence,
+                                                                       _seq_poses[row_i],
+                                                                       _seq_poses[this->nodeColumns(1) + col_i],
+                                                                       _codons(0, v_index, 0, row_i),
+                                                                       _codons(1, j_index, col_i, 0));
+                                std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << "=" << prob << std::endl;
+                                std::cout << (*(_ins_start + insertion_len)) << std::endl;
+                                std::cout << (int) _codons(0, v_index, 0, row_i) << ":" << (int) _codons(1, j_index, col_i, 0) << std::endl;
+                            }
                         }
 //                        std::cout << row_i << ":" << col_i << ":" << insertion_len << "=" << this->at(2, 0, row_i, col_i) << std::endl;
-//                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << ":" << (_codons(0, v_index, 0, row_i) & _codons(1, j_index, col_i, 0)) << std::endl;
+//                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << std::endl;
 //                        std::cout << (int) _codons(0, v_index, 0, row_i) << ":" << (int) _codons(1, j_index, col_i, 0) << std::endl;
 //                        std::cout << std::endl;
                     }

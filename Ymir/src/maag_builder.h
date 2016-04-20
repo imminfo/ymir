@@ -1299,6 +1299,11 @@ namespace ymir {
         for (seq_len_t i = 3 * clonotype.sequence().size() - len + 1; i <= 3 * clonotype.sequence().size() + 1; ++i) {
             seq_poses.push_back(i);
         }
+
+//        for (auto &i: seq_poses) {
+//            std::cout << (int) i << "\t";
+//        }
+//        std::cout << std::endl;
     }
 
 }

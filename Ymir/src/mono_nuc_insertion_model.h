@@ -132,6 +132,16 @@ namespace ymir {
 #endif
             prob_t res = 1, nuc_prob;
             if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
+                if (first_nuc_pos == 0) {
+                    ++first_nuc_pos;
+                    first_aa_codons = 63;
+                }
+
+                if (last_aa_codons == sequence.size() * 3 + 1) {
+                    --last_nuc_pos;
+                    last_aa_codons = 63;
+                }
+
                 codon_hash hash_value = first_aa_codons & last_aa_codons;
 
                 for (seq_len_t pos = first_nuc_pos; pos <= last_nuc_pos; ++pos) {

@@ -100,26 +100,60 @@ namespace ymir {
                 this->fill(2, 0, 0);
                 for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
                     for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
-                        int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i];
+                        int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i] - 1;
                         if (insertion_len >= 0 && insertion_len <= _max_ins_len) {
+                            codon_hash left_codon, right_codon;
+                            ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i)) : 63;
+
+                            if (_seq_poses[row_i] == 0) {
+                                left_codon = 63;
+                            } else {
+                                if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
+                                    left_codon = _codons(0, v_index, 0, row_i);
+                                } else {
+                                    left_codon = 63;
+                                }
+                            }
+
+                            if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size()*3 + 1) {
+                                right_codon = 63;
+                            } else {
+                                if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) == ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
+                                    right_codon = _codons(1, j_index, col_i, 0);
+                                } else {
+                                    right_codon = 63;
+                                }
+                            }
+
+//                            std::cout << "before:" << this->at(2, 0, row_i, col_i) << std::endl;
                             this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
                                                            * _insertions->aaProbability(*_sequence,
-                                                                                        _seq_poses[row_i],
-                                                                                        _seq_poses[this->nodeColumns(1) + col_i],
-                                                                                        _codons(0, v_index, 0, row_i),
-                                                                                        _codons(1, j_index, col_i, 0));
+                                                                                        _seq_poses[row_i] + 1,
+                                                                                        _seq_poses[this->nodeColumns(1) + col_i] - 1,
+                                                                                        left_codon,
+                                                                                        right_codon);
 
-                            if (insertion_len == 0) {
-                                auto prob = _insertions->aaProbability(*_sequence,
-                                                                       _seq_poses[row_i],
-                                                                       _seq_poses[this->nodeColumns(1) + col_i],
-                                                                       _codons(0, v_index, 0, row_i),
-                                                                       _codons(1, j_index, col_i, 0));
-                                std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << "=" << prob << std::endl;
-                                std::cout << (*(_ins_start + insertion_len)) << std::endl;
-                                std::cout << (int) _codons(0, v_index, 0, row_i) << ":" << (int) _codons(1, j_index, col_i, 0) << std::endl;
-                            }
+//                            auto prob = _insertions->aaProbability(*_sequence,
+//                                                                   _seq_poses[row_i] + 1,
+//                                                                   _seq_poses[this->nodeColumns(1) + col_i] - 1,
+//                                                                   left_codon,
+//                                                                   right_codon);
+//                            if (prob == 0) {
+//                            std::cout << "--------" << std::endl;
+//                                std::cout << row_i << ":" << col_i << std::endl;
+//                                std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << "=" << prob << std::endl;
+//                                std::cout << insertion_len << "(" << (*(_ins_start + insertion_len)) << ")" << std::endl;
+//                                std::cout << std::bitset<6>(left_codon).to_string() << ":" << std::bitset<6>(right_codon).to_string()  << std::endl;
+//                                std::cout << "final:\t" << this->at(2, 0, row_i, col_i) << std::endl;
+//                            std::cout << "--------" << std::endl;
+//                            }
                         }
+
+//                        std::cout << (int) insertion_len << std::endl;
+//                        std::cout << row_i << ":" << col_i << std::endl;
+//                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << std::endl;
+//                        std::cout << "=" << this->at(2, 0, row_i, col_i) << std::endl << std::endl;
+
 //                        std::cout << row_i << ":" << col_i << ":" << insertion_len << "=" << this->at(2, 0, row_i, col_i) << std::endl;
 //                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << std::endl;
 //                        std::cout << (int) _codons(0, v_index, 0, row_i) << ":" << (int) _codons(1, j_index, col_i, 0) << std::endl;

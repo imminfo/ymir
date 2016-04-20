@@ -179,12 +179,9 @@ namespace ymir {
         vector<seq_len_t> v4;  // event family col numbers
 
         // V-J
-//        v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
-//        v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
-//        v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
-        v1.push_back(.11) ; v1.push_back(.11); v1.push_back(.11); // J1
-        v1.push_back(.11); v1.push_back(.11); v1.push_back(.11); // J2
-        v1.push_back(.11); v1.push_back(.11); v1.push_back(.11); // J3
+        v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
+        v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
+        v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
         v2.push_back(9);
 
         v3.push_back(0);
@@ -195,18 +192,12 @@ namespace ymir {
         v1.push_back(.03); v1.push_back(.04); v1.push_back(.15);
         v2.push_back(6);
 
-//        v1.push_back(.4);  v1.push_back(.5);  v1.push_back(.05);
-//        v1.push_back(.02); v1.push_back(.03);
-//        v2.push_back(5);
-        v1.push_back(.75); v1.push_back(.01); v1.push_back(.02);
-        v1.push_back(.03); v1.push_back(.04); v1.push_back(.15);
-        v2.push_back(6);
+        v1.push_back(.4);  v1.push_back(.5);  v1.push_back(.05);
+        v1.push_back(.02); v1.push_back(.03);
+        v2.push_back(5);
 
-//        v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
-//        v2.push_back(4);
-        v1.push_back(.75); v1.push_back(.01); v1.push_back(.02);
-        v1.push_back(.03); v1.push_back(.04); v1.push_back(.15);
-        v2.push_back(6);
+        v1.push_back(.3); v1.push_back(.1); v1.push_back(.2); v1.push_back(.4);
+        v2.push_back(4);
 
         v3.push_back(1);
         v4.push_back(0);
@@ -219,22 +210,14 @@ namespace ymir {
         v2.push_back(4);
         v4.push_back(0);
 
-//        v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
-//        v1.push_back(.03); v1.push_back(.64);
-//        v2.push_back(5);
-//        v4.push_back(0);
-        v1.push_back(.1); v1.push_back(.2); v1.push_back(.3);
-        v1.push_back(.4);
-        v2.push_back(4);
+        v1.push_back(.1); v1.push_back(.2); v1.push_back(.01); v1.push_back(.02);
+        v1.push_back(.03); v1.push_back(.64);
+        v2.push_back(5);
         v4.push_back(0);
 
-//        v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
-//        v1.push_back(.19); v1.push_back(.21);
-//        v2.push_back(5);
-//        v4.push_back(0);
-        v1.push_back(.1); v1.push_back(.2); v1.push_back(.3);
-        v1.push_back(.4);
-        v2.push_back(4);
+        v1.push_back(.125); v1.push_back(.175); v1.push_back(.3);
+        v1.push_back(.19); v1.push_back(.21);
+        v2.push_back(5);
         v4.push_back(0);
 
         v3.push_back(4);

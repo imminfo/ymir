@@ -139,9 +139,15 @@ namespace ymir {
             prob_t res = 0, nuc_prob;
             std::array<prob_t, 6> res_vec = {1, 1, 1, 1, 1, 1};
 
+            prob_t arr_prob[5];
+            arr_prob[0] = _arr[0];
+            arr_prob[1] = _arr[1];
+            arr_prob[2] = _arr[2];
+            arr_prob[3] = _arr[3];
+            arr_prob[4] = 0;
+
             if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
-                codon_hash hash_value = first_aa_codons & last_aa_codons;
-                std::bitset<6> bithash = hash_value;
+                std::bitset<6> bithash = first_aa_codons & last_aa_codons;
 
                 for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
 
@@ -150,51 +156,75 @@ namespace ymir {
                     int codon_pos = (pos - 1) % 3;
                     auto nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], codon_pos);
                     for (int i = 0; i < 6; ++i) {
-                        res_vec[i] *= _arr[nuc_ids[i]];
+                        res_vec[i] *= arr_prob[nuc_ids[i]];
                     }
                 }
 
                 for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
             } else {
-                codon_hash hash_value = first_aa_codons;
+                std::bitset<6> bithash = first_aa_codons;
+                prob_t tmp;
 
+                for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
+
+                // cycle through all amino acids
                 for (seq_len_t pos = first_nuc_pos; pos <= 3 * (1 + (first_nuc_pos - 1) / 3); ++pos) {
                     int aa_pos = (pos - 1) / 3;
+                    std::cout << sequence[aa_pos] << std::endl;
                     int codon_pos = (pos - 1) % 3;
-                    nuc_prob =  _arr[0] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'A', codon_pos) & hash_value).count() > 0);
-                    nuc_prob += _arr[1] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'C', codon_pos) & hash_value).count() > 0);
-                    nuc_prob += _arr[2] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'G', codon_pos) & hash_value).count() > 0);
-                    nuc_prob += _arr[3] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'T', codon_pos) & hash_value).count() > 0);
-                    res *= nuc_prob;
+                    auto nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], codon_pos);
+                    for (int i = 0; i < 6; ++i) {
+                        res_vec[i] *= arr_prob[nuc_ids[i]];
+                    }
                 }
-                std::cout << "first" << std::endl;
-                std::cout << res << std::endl;
+                for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
+                std::cout << "first = " << res << std::endl;
 
-                for (seq_len_t pos = 3 * (1 + (first_nuc_pos - 1) / 3) + 1; pos < 1 + 3 * ((last_nuc_pos - 1) / 3); ++pos) {
-                    int aa_pos = (pos - 1) / 3;
-                    int codon_pos = (pos - 1) % 3;
-                    nuc_prob =  _arr[0] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'A', codon_pos)).count() > 0);
-                    nuc_prob += _arr[1] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'C', codon_pos)).count() > 0);
-                    nuc_prob += _arr[2] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'G', codon_pos)).count() > 0);
-                    nuc_prob += _arr[3] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'T', codon_pos)).count() > 0);
-                    res *= nuc_prob;
+                for (seq_len_t aa_pos = (1 + (first_nuc_pos - 1) / 3) + 1; aa_pos < 1 + ((last_nuc_pos - 1) / 3); ++aa_pos) {
+                    res_vec = {1, 1, 1, 1, 1, 1};
+                    std::cout << sequence[aa_pos] << std::endl;
+                    for (seq_len_t nuc_pos = aa_pos * 3; nuc_pos <= (aa_pos + 1) * 3; ++nuc_pos) {
+                        int codon_pos = (nuc_pos - 1) % 3;
+                        auto nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], codon_pos);
+                        for (int i = 0; i < 6; ++i) {
+                            res_vec[i] *= arr_prob[nuc_ids[i]];
+                        }
+                    }
+                    tmp = 0;
+                    for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
+                    res *= tmp;
                 }
-                std::cout << "medium" << std::endl;
-                std::cout << res << std::endl;
 
-                hash_value = last_aa_codons;
-//                    std::cout << (int) hash_value << std::endl;
+//                for (seq_len_t pos = 3 * (1 + (first_nuc_pos - 1) / 3) + 1; pos < 1 + 3 * ((last_nuc_pos - 1) / 3); ++pos) {
+//                    int aa_pos = (pos - 1) / 3;
+//                    int codon_pos = (pos - 1) % 3;
+//                    nuc_prob =  _arr[0] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'A', codon_pos)).count() > 0);
+//                    nuc_prob += _arr[1] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'C', codon_pos)).count() > 0);
+//                    nuc_prob += _arr[2] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'G', codon_pos)).count() > 0);
+//                    nuc_prob += _arr[3] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'T', codon_pos)).count() > 0);
+//                    res *= nuc_prob;
+//                }
+//                prob_t tmp = 0;
+//                for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
+//                res *= tmp;
+                std::cout << "medium = " << res << std::endl;
+
+                bithash = last_aa_codons;
+                for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
                 for (seq_len_t pos = 1 + 3 * ((last_nuc_pos - 1) / 3); pos <= last_nuc_pos; ++pos) {
                     int aa_pos = (pos - 1) / 3;
+                    std::cout << sequence[aa_pos] << std::endl;
                     int codon_pos = (pos - 1) % 3;
-                    nuc_prob =  _arr[0] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'A', codon_pos) & hash_value).count() > 0);
-                    nuc_prob += _arr[1] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'C', codon_pos) & hash_value).count() > 0);
-                    nuc_prob += _arr[2] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'G', codon_pos) & hash_value).count() > 0);
-                    nuc_prob += _arr[3] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'T', codon_pos) & hash_value).count() > 0);
-                    res *= nuc_prob;
+                    auto nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], codon_pos);
+                    for (int i = 0; i < 6; ++i) {
+                        res_vec[i] *= arr_prob[nuc_ids[i]];
+                    }
                 }
-                std::cout << "last" << std::endl;
-                std::cout << res << std::endl;
+                tmp = 0;
+                for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
+                res *= tmp;
+
+                std::cout << "last = " << res << std::endl;
             }
             return res;
         }

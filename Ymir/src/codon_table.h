@@ -177,7 +177,7 @@ namespace ymir {
             assert(pos >= 0 && pos <= 2);
 #endif
             auto range = _aa2codon.equal_range(aminoacid);
-            std::array<int, 6> res = {0, 0, 0, 0, 0, 0};
+            std::array<int, 6> res = {4, 4, 4, 4, 4, 4};
             int i = 0;
             for (auto it = range.first; it != range.second; ++it) {
                 res[i] = nuc_hash(it->second[pos]);

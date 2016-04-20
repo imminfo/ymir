@@ -139,7 +139,7 @@ namespace ymir {
                                                                    left_codon,
                                                                    right_codon);
 //                            if (prob == 0) {
-                            if (col_i == 0) {
+                            if (row_i == 0) {
                                 std::cout << "--------" << std::endl;
                                 std::cout << row_i << ":" << col_i << std::endl;
                                 std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << "=" << prob << std::endl;

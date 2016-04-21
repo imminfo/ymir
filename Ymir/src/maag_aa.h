@@ -129,41 +129,12 @@ namespace ymir {
                                 }
                             }
 
-//                            std::cout << "before:" << this->at(2, 0, row_i, col_i) << std::endl;
                             this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
                                                            * _insertions->aaProbability(*_sequence,
                                                                                         _seq_poses[row_i] + 1,
                                                                                         _seq_poses[this->nodeColumns(1) + col_i] - 1,
                                                                                         left_codon,
                                                                                         right_codon);
-
-                            auto prob = _insertions->aaProbability(*_sequence,
-                                                                   _seq_poses[row_i] + 1,
-                                                                   _seq_poses[this->nodeColumns(1) + col_i] - 1,
-                                                                   left_codon,
-                                                                   right_codon);
-//                            if (prob == 0) {
-//                            if (row_i == 5 && col_i == 1) {
-//                                std::cout << "--------" << std::endl;
-//                                std::cout << row_i << ":" << col_i << std::endl;
-//                                std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << "=" << prob << std::endl;
-//                                std::cout << insertion_len << "(" << (*(_ins_start + insertion_len)) << ")" << std::endl;
-//                                std::cout << std::bitset<6>(left_codon).to_string() << ":" << std::bitset<6>(right_codon).to_string()  << std::endl;
-//                                std::cout << "final:\t" << this->at(2, 0, row_i, col_i) << std::endl;
-//                                std::cout << "--------" << std::endl;
-//                            }
-//                            }
-                        }
-
-//                        std::cout << (int) insertion_len << std::endl;
-//                        std::cout << row_i << ":" << col_i << std::endl;
-//                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << std::endl;
-//                        std::cout << "=" << this->at(2, 0, row_i, col_i) << std::endl << std::endl;
-
-//                        std::cout << row_i << ":" << col_i << ":" << insertion_len << "=" << this->at(2, 0, row_i, col_i) << std::endl;
-//                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << std::endl;
-//                        std::cout << (int) _codons(0, v_index, 0, row_i) << ":" << (int) _codons(1, j_index, col_i, 0) << std::endl;
-//                        std::cout << std::endl;
                     }
                 }
 
@@ -180,18 +151,55 @@ namespace ymir {
         }
 
         prob_t fullProbability(event_ind_t v_index, event_ind_t d_index, event_ind_t j_index) {
-//            if (_recomb == VDJ_RECOMB) {
-//                // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
-//                return (matrix(0, v_index) *      // P(Vi)
-//                        matrix(1, v_index) *      // P(#dels | Vi)
-//                        matrix(2, 0) *            // P(V-D3' insertion seq)
-//                        matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
-//                        matrix(4, 0) *            // P(D5'-J insertion seq)
-//                        matrix(5, j_index) *      // P(#dels | Ji)
-//                        matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
-//            } else {
-//                return 0;
-//            }
+            if (_recomb == VDJ_RECOMB) {
+
+                //                            std::cout << "before:" << this->at(2, 0, row_i, col_i) << std::endl;
+//                this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
+//                                               * _insertions->aaProbability(*_sequence,
+//                                                                            _seq_poses[row_i] + 1,
+//                                                                            _seq_poses[this->nodeColumns(1) + col_i] - 1,
+//                                                                            left_codon,
+//                                                                            right_codon);
+//
+//                auto prob = _insertions->aaProbability(*_sequence,
+//                                                       _seq_poses[row_i] + 1,
+//                                                       _seq_poses[this->nodeColumns(1) + col_i] - 1,
+//                                                       left_codon,
+//                                                       right_codon);
+//                            if (prob == 0) {
+//                            if (row_i == 5 && col_i == 1) {
+//                                std::cout << "--------" << std::endl;
+//                                std::cout << row_i << ":" << col_i << std::endl;
+//                                std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << "=" << prob << std::endl;
+//                                std::cout << insertion_len << "(" << (*(_ins_start + insertion_len)) << ")" << std::endl;
+//                                std::cout << std::bitset<6>(left_codon).to_string() << ":" << std::bitset<6>(right_codon).to_string()  << std::endl;
+//                                std::cout << "final:\t" << this->at(2, 0, row_i, col_i) << std::endl;
+//                                std::cout << "--------" << std::endl;
+//                            }
+//                            }
+            }
+
+//                        std::cout << (int) insertion_len << std::endl;
+//                        std::cout << row_i << ":" << col_i << std::endl;
+//                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << std::endl;
+//                        std::cout << "=" << this->at(2, 0, row_i, col_i) << std::endl << std::endl;
+
+//                        std::cout << row_i << ":" << col_i << ":" << insertion_len << "=" << this->at(2, 0, row_i, col_i) << std::endl;
+//                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << std::endl;
+//                        std::cout << (int) _codons(0, v_index, 0, row_i) << ":" << (int) _codons(1, j_index, col_i, 0) << std::endl;
+//                        std::cout << std::endl;
+
+                // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
+                return (matrix(0, v_index) *      // P(Vi)
+                        matrix(1, v_index) *      // P(#dels | Vi)
+                        matrix(2, 0) *            // P(V-D3' insertion seq)
+                        matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
+                        matrix(4, 0) *            // P(D5'-J insertion seq)
+                        matrix(5, j_index) *      // P(#dels | Ji)
+                        matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
+            } else {
+                return 0;
+            }
             return 0;
         }
 

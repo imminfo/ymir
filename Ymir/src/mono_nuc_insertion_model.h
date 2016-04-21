@@ -128,7 +128,6 @@ namespace ymir {
                                      char first_char = NULL_CHAR) const
         {
 #ifndef DNDEBUG
-//            assert(first_nuc_pos <= last_nuc_pos);
             assert(first_nuc_pos <= 3*sequence.size() + 1);
             assert(last_nuc_pos <= 3*sequence.size() + 1);
 #endif
@@ -152,7 +151,6 @@ namespace ymir {
                 for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
 
                 for (seq_len_t pos = first_nuc_pos; pos <= last_nuc_pos; ++pos) {
-//                    std::cout << (int) pos << std::endl;
                     int aa_pos = (pos - 1) / 3;
                     int codon_pos = (pos - 1) % 3;
                     auto nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], codon_pos);
@@ -177,7 +175,6 @@ namespace ymir {
                     }
                 }
                 for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
-//                std::cout << "first = " << res << std::endl;
 
                 for (seq_len_t aa_pos = (1 + (first_nuc_pos - 1) / 3); aa_pos < ((last_nuc_pos - 1) / 3); ++aa_pos) {
                     res_vec = {1, 1, 1, 1, 1, 1};
@@ -196,20 +193,6 @@ namespace ymir {
                     res *= tmp;
                 }
 
-//                for (seq_len_t pos = 3 * (1 + (first_nuc_pos - 1) / 3) + 1; pos < 1 + 3 * ((last_nuc_pos - 1) / 3); ++pos) {
-//                    int aa_pos = (pos - 1) / 3;
-//                    int codon_pos = (pos - 1) % 3;
-//                    nuc_prob =  _arr[0] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'A', codon_pos)).count() > 0);
-//                    nuc_prob += _arr[1] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'C', codon_pos)).count() > 0);
-//                    nuc_prob += _arr[2] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'G', codon_pos)).count() > 0);
-//                    nuc_prob += _arr[3] * (std::bitset<6>(CodonTable::table().mask_nucl(sequence[aa_pos], 'T', codon_pos)).count() > 0);
-//                    res *= nuc_prob;
-//                }
-//                prob_t tmp = 0;
-//                for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
-//                res *= tmp;
-//                std::cout << "medium = " << res << std::endl;
-
                 bithash = last_aa_codons;
                 for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
                 for (seq_len_t pos = 1 + 3 * ((last_nuc_pos - 1) / 3); pos <= last_nuc_pos; ++pos) {
@@ -223,8 +206,6 @@ namespace ymir {
                 tmp = 0;
                 for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
                 res *= tmp;
-
-//                std::cout << "last = " << res << std::endl;
             }
             return res;
         }

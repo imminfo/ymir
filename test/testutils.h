@@ -264,8 +264,8 @@ namespace ymir {
 
         // J del 3 4 4
         v1.push_back(.1); v1.push_back(.2); v1.push_back(.3);
-        v1.push_back(.4);
-        v2.push_back(4);
+        v1.push_back(.35); v1.push_back(.05);
+        v2.push_back(5);
         v4.push_back(0);
 
         v3.push_back(2);

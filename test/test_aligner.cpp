@@ -314,8 +314,8 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     vector<string> avec1 {"V1", "V2", "V3"};
     vector<string> svec1 {"TCGTT", "TCGT", "TCGTTC"};
 
-    vector<string> avec2 {"J1", "J2", "J3", "J4"};
-    vector<string> svec2 {"CTTTA", "CCTT", "AGCCTG", "AGGCTG"};
+    vector<string> avec2 {"J1", "J2", "J3", "J4", "J5", "J6"};
+    vector<string> svec2 {"CTTTA", "CCTT", "AGCCTG", "AGGCTG", "AATT", "TTT"};
 
     vector<string> avec3 {"D1", "D2", "D3"};
     vector<string> svec3 {"AA", "AACCTT", "ACT"};
@@ -411,6 +411,21 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({false, false, false, false, false, true}, 0))
     YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, true, false, false, false, true}, 0))
     YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({false, true, false, false, false, true}, 0))
+
+    // J5: AATT
+    // S: TCT TCC TCA TCG AGT AGC
+    // F: TTT TTC
+    alignment = aligner.alignJoi(5, "SF");
+    YMIR_ASSERT2(alignment.id(0), 5)
+    YMIR_ASSERT2(alignment.pattern_start(0), 3)
+    YMIR_ASSERT2(alignment.text_start(0), 5)
+    YMIR_ASSERT2(alignment.len(0), 2)
+
+    alignment = aligner.alignJoi(6, "ASF");
+    YMIR_ASSERT2(alignment.id(0), 6)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 7)
+    YMIR_ASSERT2(alignment.len(0), 3)
 
     YMIR_ASSERT2("cdr aa div aligner is implemented", "cdr aa div aligner is not implemented")
 

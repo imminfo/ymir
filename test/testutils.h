@@ -179,7 +179,10 @@ namespace ymir {
         vector<seq_len_t> v4;  // event family col numbers
 
         // V-J
-        v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
+//        v1.push_back(.05); v1.push_back(.025); v1.push_back(.035); // J1
+//        v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
+//        v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
+        v1.push_back(.33); v1.push_back(.025); v1.push_back(.035); // J1
         v1.push_back(.045); v1.push_back(.055); v1.push_back(.065); // J2
         v1.push_back(.075); v1.push_back(.085); v1.push_back(.565); // J3
         v2.push_back(9);

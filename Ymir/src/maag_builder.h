@@ -1292,7 +1292,7 @@ namespace ymir {
             }
 
             for (seq_len_t i = 0; i < clonotype.getJoiLen(j_index); ++i) {
-                codons(codons.chainSize() - 1, j_index, i, 0) = clonotype.getJoiCodon(j_index, i + 1);
+                codons(codons.chainSize() - 1, j_index, i + shift, 0) = clonotype.getJoiCodon(j_index, i + 1);
             }
         }
 

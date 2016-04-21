@@ -1076,14 +1076,14 @@ YMIR_TEST_START(test_maag_vj_aa)
     vector<string> alvec1;
     vector<string> seqvec1;
     alvec1.push_back("Vseg1"); seqvec1.push_back("TGTGC");
-//    alvec1.push_back("Vseg2"); seqvec1.push_back("TGCG");
-//    alvec1.push_back("Vseg3"); seqvec1.push_back("TGA");
+    alvec1.push_back("Vseg2"); seqvec1.push_back("TGCG");
+    alvec1.push_back("Vseg3"); seqvec1.push_back("TGA");
 
     vector<string> alvec2;
     vector<string> seqvec2;
     alvec2.push_back("Jseg1"); seqvec2.push_back("TTT");
     alvec2.push_back("Jseg2"); seqvec2.push_back("ATTC");
-//    alvec2.push_back("Jseg3"); seqvec2.push_back("AATT");
+    alvec2.push_back("Jseg3"); seqvec2.push_back("AATT");
 
     VDJRecombinationGenes genes("VA", alvec1, seqvec1, "JA", alvec2, seqvec2);
 
@@ -1183,8 +1183,14 @@ YMIR_TEST_START(test_maag_vj_aa)
     }
 
     prob_t sum_prob = 0;
+    std::array<prob_t, 9> prob_vec = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     for (int i = 0; i < clonotype_vec.size(); ++i) {
         sum_prob += maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS);
+        for (int k = 0; k < 3; ++k) {
+            for (int j = 0; j < 3; ++j) {
+                prob_vec[3*k + j] += maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS).fullProbability(k, j);
+            }
+        }
 //        std::cout << rev_nuc[i] << " = " << maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS) << std::endl;
 //        maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS).print();
 //        if (!maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS)) {
@@ -1192,19 +1198,21 @@ YMIR_TEST_START(test_maag_vj_aa)
 //        }
     }
 
-//    YMIR_ASSERT3(maag.fullProbability(0, 0), 0)
-//    YMIR_ASSERT3(maag.fullProbability(0, 1), 0)
-//    YMIR_ASSERT3(maag.fullProbability(0, 2), 0)
-//    YMIR_ASSERT3(maag.fullProbability(1, 0), 0)
-//    YMIR_ASSERT3(maag.fullProbability(1, 1), 0)
-//    YMIR_ASSERT3(maag.fullProbability(1, 2), 0)
-//    YMIR_ASSERT3(maag.fullProbability(2, 0), 0)
-//    YMIR_ASSERT3(maag.fullProbability(2, 1), 0)
-//    YMIR_ASSERT3(maag.fullProbability(2, 2), 0)
+    YMIR_ASSERT3(maag.fullProbability(0, 0), prob_vec[0])
+    YMIR_ASSERT3(maag.fullProbability(0, 1), prob_vec[1])
+    YMIR_ASSERT3(maag.fullProbability(0, 2), prob_vec[2])
+    YMIR_ASSERT3(maag.fullProbability(1, 0), prob_vec[3])
+    YMIR_ASSERT3(maag.fullProbability(1, 1), prob_vec[4])
+    YMIR_ASSERT3(maag.fullProbability(1, 2), prob_vec[5])
+    YMIR_ASSERT3(maag.fullProbability(2, 0), prob_vec[6])
+    YMIR_ASSERT3(maag.fullProbability(2, 1), prob_vec[7])
+    YMIR_ASSERT3(maag.fullProbability(2, 2), prob_vec[8])
 
-    maag.print();
-    maag.printCodons();
+//    maag.print();
+//    maag.printCodons();
 
+    YMIR_ASSERT3(sum_prob, prob_vec[0] + prob_vec[1] + prob_vec[2] + prob_vec[3] + prob_vec[4] + prob_vec[5] + prob_vec[6] + prob_vec[7] + prob_vec[8])
+    YMIR_ASSERT3(maag.fullProbability(), prob_vec[0] + prob_vec[1] + prob_vec[2] + prob_vec[3] + prob_vec[4] + prob_vec[5] + prob_vec[6] + prob_vec[7] + prob_vec[8])
     YMIR_ASSERT3(maag.fullProbability(), sum_prob)
     YMIR_ASSERT3(maag.fullProbability(), maag_builder.buildAndCompute(clonotype))
 

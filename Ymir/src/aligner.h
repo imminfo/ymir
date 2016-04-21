@@ -556,7 +556,7 @@ namespace ymir {
         void _alignVar(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
             seq_len_t p_size = pattern.size(), t_size = text.size(), matches = 0, max_matches = 0, all_matches = 0;
             CodonAlignmentVector::events_storage_t bits;
-            bool is_ok;
+            bool is_ok, stop = false;
             size_t bits_size;
             int num_codons;
 
@@ -605,10 +605,13 @@ namespace ymir {
                     }
                     if (!bitsum) {
                         bits.resize(bits.size() - 6);
+                        stop = true;
                     } else {
                         break;
                     }
                 }
+
+                if (stop) { break; }
             }
 
             avec->addAlignment(gene, 1, 1, bits);
@@ -647,7 +650,7 @@ namespace ymir {
         void _alignJoi(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
             seq_len_t p_size = pattern.size(), t_size = text.size();
             CodonAlignmentVector::events_storage_t bits;
-            bool is_ok;
+            bool is_ok, stop = false;
             size_t bits_size;
             int num_codons, all_codons = 0;
 
@@ -698,10 +701,13 @@ namespace ymir {
                     if (!bitsum) {
                         bits.resize(bits.size() - 6);
                         --all_codons;
+                        stop = true;
                     } else {
                         break;
                     }
                 }
+
+                if (stop) { break; }
             }
 
             // reverse bits

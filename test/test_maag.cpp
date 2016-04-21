@@ -1162,7 +1162,7 @@ YMIR_TEST_START(test_maag_vj_aa)
                                     "TGCGCATCCTTT", "TGTGCATCCTTT", "TGCGCCTCCTTT", "TGTGCCTCCTTT", "TGCGCGTCCTTT", "TGTGCGTCCTTT",
                                     "TGCGCTTCCTTT", "TGTGCTTCCTTT", "TGCGCATCGTTT", "TGTGCATCGTTT", "TGCGCCTCGTTT", "TGTGCCTCGTTT",
                                     "TGCGCGTCGTTT", "TGTGCGTCGTTT", "TGCGCTTCGTTT", "TGTGCTTCGTTT", "TGCGCATCTTTT", "TGTGCATCTTTT",
-                                    "TGCGCCTCTTTT", "TGTGCCTCTTTT", "TGCGCGTCTTTT", "TGTGCGTCTTTT", "TGCGCTTCTTTT", "TGTGCTTCTTTT"}
+                                    "TGCGCCTCTTTT", "TGTGCCTCTTTT", "TGCGCGTCTTTT", "TGTGCGTCTTTT", "TGCGCTTCTTTT", "TGTGCTTCTTTT"};
 
     std::vector<ClonotypeNuc> clonotype_vec;
     NaiveCDR3NucleotideAligner naligner(genes, VDJAlignerParameters(3));

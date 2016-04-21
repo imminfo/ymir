@@ -1071,7 +1071,7 @@ YMIR_TEST_END
 
 YMIR_TEST_START(test_maag_vj_aa)
 
-    ModelParameterVector mvec = make_test_events_vj4();
+    ModelParameterVector mvec = make_test_events_vj3();
 
     vector<string> alvec1;
     vector<string> seqvec1;
@@ -1100,10 +1100,10 @@ YMIR_TEST_START(test_maag_vj_aa)
     // S: TCT TCC TCA TCG AGT AGC
     // F: TTT TTC
     CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3));
-    aligner.setSequence("C").setRecombination(VJ_RECOMB);
+//    aligner.setSequence("C").setRecombination(VJ_RECOMB);
 //    aligner.setSequence("CF").setRecombination(VJ_RECOMB);
 //    aligner.setSequence("CAF").setRecombination(VJ_RECOMB);
-//    aligner.setSequence("CASF").setRecombination(VJ_RECOMB);
+    aligner.setSequence("CASF").setRecombination(VJ_RECOMB);
     YMIR_ASSERT(aligner.alignVar())
     YMIR_ASSERT(aligner.alignJoi())
 
@@ -1167,11 +1167,11 @@ YMIR_TEST_START(test_maag_vj_aa)
                                     "TGCGCGTCGTTT", "TGTGCGTCGTTT", "TGCGCTTCGTTT", "TGTGCTTCGTTT", "TGCGCATCTTTT", "TGTGCATCTTTT",
                                     "TGCGCCTCTTTT", "TGTGCCTCTTTT", "TGCGCGTCTTTT", "TGTGCGTCTTTT", "TGCGCTTCTTTT", "TGTGCTTCTTTT"};
 
-    rev_nuc = {"TGCGCATTC", "TGTGCATTC", "TGCGCCTTC", "TGTGCCTTC", "TGCGCGTTC", "TGTGCGTTC", "TGCGCTTTC", "TGTGCTTTC", "TGCGCATTT", "TGTGCATTT", "TGCGCCTTT", "TGTGCCTTT", "TGCGCGTTT", "TGTGCGTTT", "TGCGCTTTT", "TGTGCTTTT"};
+//    rev_nuc = {"TGCGCATTC", "TGTGCATTC", "TGCGCCTTC", "TGTGCCTTC", "TGCGCGTTC", "TGTGCGTTC", "TGCGCTTTC", "TGTGCTTTC", "TGCGCATTT", "TGTGCATTT", "TGCGCCTTT", "TGTGCCTTT", "TGCGCGTTT", "TGTGCGTTT", "TGCGCTTTT", "TGTGCTTTT"};
 
-    rev_nuc = { "TGCTTC", "TGTTTC", "TGCTTT", "TGTTTT" };
+//    rev_nuc = { "TGCTTC", "TGTTTC", "TGCTTT", "TGTTTT" };
 
-    rev_nuc = { "TGC", "TGT" };
+//    rev_nuc = { "TGC", "TGT" };
 
     std::vector<ClonotypeNuc> clonotype_vec;
     NaiveCDR3NucleotideAligner naligner(genes, VDJAlignerParameters(3));

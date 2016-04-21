@@ -152,6 +152,7 @@ namespace ymir {
                 for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
 
                 for (seq_len_t pos = first_nuc_pos; pos <= last_nuc_pos; ++pos) {
+//                    std::cout << (int) pos << std::endl;
                     int aa_pos = (pos - 1) / 3;
                     int codon_pos = (pos - 1) % 3;
                     auto nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], codon_pos);
@@ -162,15 +163,13 @@ namespace ymir {
 
                 for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
             } else {
-                std::bitset<6> bithash = first_aa_codons;
                 prob_t tmp;
 
-                for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
-
                 // cycle through all amino acids
+                std::bitset<6> bithash = first_aa_codons;
+                for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
                 for (seq_len_t pos = first_nuc_pos; pos <= 3 * (1 + (first_nuc_pos - 1) / 3); ++pos) {
                     int aa_pos = (pos - 1) / 3;
-                    std::cout << sequence[aa_pos] << std::endl;
                     int codon_pos = (pos - 1) % 3;
                     auto nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], codon_pos);
                     for (int i = 0; i < 6; ++i) {
@@ -178,18 +177,20 @@ namespace ymir {
                     }
                 }
                 for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
-                std::cout << "first = " << res << std::endl;
+//                std::cout << "first = " << res << std::endl;
 
-                for (seq_len_t aa_pos = (1 + (first_nuc_pos - 1) / 3) + 1; aa_pos < 1 + ((last_nuc_pos - 1) / 3); ++aa_pos) {
+                for (seq_len_t aa_pos = (1 + (first_nuc_pos - 1) / 3); aa_pos < ((last_nuc_pos - 1) / 3); ++aa_pos) {
                     res_vec = {1, 1, 1, 1, 1, 1};
-                    std::cout << sequence[aa_pos] << std::endl;
-                    for (seq_len_t nuc_pos = aa_pos * 3; nuc_pos <= (aa_pos + 1) * 3; ++nuc_pos) {
-                        int codon_pos = (nuc_pos - 1) % 3;
-                        auto nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], codon_pos);
-                        for (int i = 0; i < 6; ++i) {
-                            res_vec[i] *= arr_prob[nuc_ids[i]];
-                        }
-                    }
+
+                    auto nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], 0);
+                    for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
+
+                    nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], 1);
+                    for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
+//
+                    nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], 2);
+                    for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
+
                     tmp = 0;
                     for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
                     res *= tmp;
@@ -207,13 +208,12 @@ namespace ymir {
 //                prob_t tmp = 0;
 //                for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
 //                res *= tmp;
-                std::cout << "medium = " << res << std::endl;
+//                std::cout << "medium = " << res << std::endl;
 
                 bithash = last_aa_codons;
                 for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
                 for (seq_len_t pos = 1 + 3 * ((last_nuc_pos - 1) / 3); pos <= last_nuc_pos; ++pos) {
                     int aa_pos = (pos - 1) / 3;
-                    std::cout << sequence[aa_pos] << std::endl;
                     int codon_pos = (pos - 1) % 3;
                     auto nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], codon_pos);
                     for (int i = 0; i < 6; ++i) {
@@ -224,7 +224,7 @@ namespace ymir {
                 for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
                 res *= tmp;
 
-                std::cout << "last = " << res << std::endl;
+//                std::cout << "last = " << res << std::endl;
             }
             return res;
         }

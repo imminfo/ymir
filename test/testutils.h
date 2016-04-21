@@ -223,8 +223,9 @@ namespace ymir {
         v3.push_back(4);
 
         // VJ ins len
-        v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
-        v2.push_back(7);
+        v1.push_back(.01); v1.push_back(.04); v1.push_back(.1); v1.push_back(.10); v1.push_back(.05);
+        v1.push_back(.2); v1.push_back(.25); v1.push_back(.22); v1.push_back(.01); v1.push_back(.02);
+        v2.push_back(10);
         v4.push_back(0);
 
         v3.push_back(7);

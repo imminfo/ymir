@@ -118,10 +118,14 @@ namespace ymir {
                             if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size()*3 + 1) {
                                 right_codon = 63;
                             } else {
-                                if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) == ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
-                                    right_codon = _codons(1, j_index, col_i, 0);
-                                } else {
+                                if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
                                     right_codon = 63;
+                                } else {
+                                    if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) == ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
+                                        right_codon = _codons(1, j_index, col_i, 0);
+                                    } else {
+                                        right_codon = 63;
+                                    }
                                 }
                             }
 
@@ -139,7 +143,7 @@ namespace ymir {
                                                                    left_codon,
                                                                    right_codon);
 //                            if (prob == 0) {
-                            if (row_i == 0) {
+                            if (row_i == 5 && col_i == 1) {
                                 std::cout << "--------" << std::endl;
                                 std::cout << row_i << ":" << col_i << std::endl;
                                 std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << "=" << prob << std::endl;

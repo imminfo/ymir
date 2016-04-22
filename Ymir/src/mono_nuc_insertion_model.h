@@ -217,7 +217,7 @@ namespace ymir {
                                         codon_hash last_aa_codons,
                                         char first_char = NULL_CHAR) const
         {
-
+            throw(std::runtime_error("aaProbabilityRev() is not implemented for MonoNucInsertionModel."));
         }
         ///@}
 

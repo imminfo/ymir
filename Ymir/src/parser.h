@@ -570,7 +570,7 @@ namespace ymir {
     typedef RepertoireParser<ClonotypeNuc> ParserNuc;
 
 
-    typedef RepertoireParser<ClonotypeNuc> ParserAA;
+//    typedef RepertoireParser<ClonotypeAA> ParserAA;
 
 }
 

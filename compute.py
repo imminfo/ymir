@@ -8,6 +8,8 @@ if __name__ == "__main__":
     ap.add_argument("-p", "--predefined", help = "recompute or use predefined model's gene usage (default is to recompute, to change it add '-p' to your script call)", action = "store_true")
     ap.add_argument("-l", "--leave", help = "add this to leave converted files (default is to remove converted files)", action = "store_true")
     ap.add_argument("-e", "--error", help = "error rate in the input data (default 0)", type = float, default = 0)
+    ap.add_argument("-n", "--nuc", help = "compute nucleotide sequence probabilities (by default)", default = True, action = "store_true")
+    ap.add_argument("-a", "--aa", help = "compute amino acid sequence probabilities", action = "store_true")
     ap = add_prealign(ap)
     args = ap.parse_args()
 
@@ -23,7 +25,7 @@ if __name__ == "__main__":
             conv_file, convert_flag = convert(files[i], converter)
             if convert_flag:
                 print()
-                os.system(" ".join(["./build/scripts/Compute", conv_file, model, out_files[i], "0" if args.predefined else "1"]))
+                os.system(" ".join(["./build/scripts/Compute", conv_file, model, out_files[i], "0" if args.predefined else "1", "n" if not args.aa else "a"]))
 
                 if not args.leave and args.format != 'ymir':
                     os.remove(conv_file)

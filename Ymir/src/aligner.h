@@ -29,6 +29,7 @@
 #include "alignment_matrix.h"
 #include "clonotype_builder.h"
 #include "genesegment.h"
+#include "repertoire.h"
 
 
 using namespace std;
@@ -544,6 +545,29 @@ namespace ymir {
                               VDJAlignerParameters params)
                 : VDJAAAligner(genes, params)
         {
+        }
+
+
+        ClonotypeAA toAminoAcid(const ClonotypeNuc &clonotype) {
+            this->setSequence(clonotype.sequence());
+            this->setRecombination(clonotype.recombination());
+            this->alignVar();
+            if (_recomb == VDJ_RECOMB) { this->alignDiv(); }
+            this->alignJoi();
+            return this->buildClonotype();
+        }
+
+
+        void toAminoAcid(const ClonesetViewNuc &cloneset, ClonesetAA *cloneset_aa) {
+            ClonotypeAAVector vec;
+            vec.reserve(cloneset.size());
+            for (size_t i = 0; i < cloneset.size(); ++i) {
+                vec.push_back(this->toAminoAcid(cloneset[i]));
+                if ((i+1) % 50000 == 0) {
+                    std::cout << "converted " << (int) i << " clonotypes" << std::endl;
+                }
+            }
+            cloneset_aa->swap(vec);
         }
 
 

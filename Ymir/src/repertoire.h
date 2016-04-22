@@ -27,7 +27,7 @@
 
 #include <memory>
 
-#include "aligner.h"
+#include "clonotype.h"
 #include "maag.h"
 #include "tools.h"
 

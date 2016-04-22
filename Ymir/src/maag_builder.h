@@ -461,7 +461,7 @@ namespace ymir {
         size_t verbose_step;
 
         if (verbose) {
-            std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes." << std::endl;
+            std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes (nuc)." << std::endl;
             verbose_step = cloneset.size() / 10;
         }
 
@@ -727,7 +727,37 @@ namespace ymir {
 
 
     vector<prob_t> MAAGBuilder::buildAndCompute(const ClonesetViewAA &cloneset, bool verbose) const {
+        vector<prob_t> res;
+        res.reserve(cloneset.size());
+        size_t verbose_step;
 
+        if (verbose) {
+            std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes (aa)." << std::endl;
+            verbose_step = cloneset.size() / 10;
+        }
+
+#ifdef USE_OMP
+        #if OMP_THREADS == -1
+            #pragma omp parallel for
+#else
+            #pragma omp parallel for  num_threads(OMP_THREADS)
+#endif
+#endif
+        for (size_t i = 0; i < cloneset.size(); ++i) {
+            res.push_back(buildAndCompute(cloneset[i]));
+
+#ifndef USE_OMP
+            if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
+                std::cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] " << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
+            }
+#endif
+        }
+
+        if (verbose) {
+            std::cout << "[100%] Computed " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
+        }
+
+        return res;
     }
 
 

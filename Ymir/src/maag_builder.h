@@ -717,7 +717,37 @@ namespace ymir {
 
 
     MAAGAARepertoire MAAGBuilder::build(const ClonesetViewAA &cloneset, bool verbose) const {
+        size_t verbose_step;
 
+        if (verbose) {
+            std::cout << "Building " << (size_t) cloneset.size() << " MAAGs..." << std::endl;
+            verbose_step = cloneset.size() / 10;
+        }
+
+        MAAGNucRepertoire res;
+        res.resize(cloneset.size());
+#ifdef USE_OMP
+        #if OMP_THREADS == -1
+            #pragma omp parallel for
+#else
+            #pragma omp parallel for  num_threads(OMP_THREADS)
+#endif
+#endif
+        for (size_t i = 0; i < cloneset.size(); ++i) {
+            res[i] = this->build(cloneset[i]);
+
+#ifndef USE_OMP
+            if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
+                cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "<< "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;
+            }
+#endif
+        }
+
+        if (verbose) {
+            cout << "[100%] Built " << (int) (cloneset.size()) << " MAAGs." << endl;
+        }
+
+        return res;
     }
 
 

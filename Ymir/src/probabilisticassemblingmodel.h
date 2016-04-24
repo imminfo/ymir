@@ -205,6 +205,16 @@ namespace ymir {
             return *_param_vec;
         }
 
+
+        const Json::Value& algorithm_parameters() const {
+            return _algo_params;
+        }
+
+
+        void set_algorithm_parameters(const std::string &name, const Json::Value &value) {
+            _algo_params[name] = value;
+        }
+
         /**
          * \brief Set a new event probabilities vector to this model.
          *
@@ -331,6 +341,7 @@ namespace ymir {
         ModelBehaviour _behaviour;
 
         Json::Value _config;
+        Json::Value _algo_params;
         Recombination _recomb;
         string _model_path;
         unique_ptr<ModelParser> _parser;

@@ -724,7 +724,7 @@ namespace ymir {
             verbose_step = cloneset.size() / 10;
         }
 
-        MAAGNucRepertoire res;
+        MAAGAARepertoire res;
         res.resize(cloneset.size());
 #ifdef USE_OMP
         #if OMP_THREADS == -1

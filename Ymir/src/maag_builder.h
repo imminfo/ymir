@@ -724,6 +724,8 @@ namespace ymir {
             verbose_step = cloneset.size() / 10;
         }
 
+        std::chrono::system_clock::time_point tp1, tp2;
+
         MAAGAARepertoire res;
         res.resize(cloneset.size());
 #ifdef USE_OMP
@@ -733,12 +735,15 @@ namespace ymir {
             #pragma omp parallel for  num_threads(OMP_THREADS)
 #endif
 #endif
+        tp1 = std::chrono::system_clock::now();
         for (size_t i = 0; i < cloneset.size(); ++i) {
             res[i] = this->build(cloneset[i]);
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
-                cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "<< "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;
+                tp2 = std::chrono::system_clock::now();
+                cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "<< "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs. " << (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1)) << endl;
+                tp1 = std::chrono::system_clock::now();
             }
 #endif
         }
@@ -773,12 +778,16 @@ namespace ymir {
             #pragma omp parallel for  num_threads(OMP_THREADS)
 #endif
 #endif
+        std::chrono::system_clock::time_point tp1, tp2;
+        tp1 = std::chrono::system_clock::now();
         for (size_t i = 0; i < cloneset.size(); ++i) {
             res.push_back(buildAndCompute(cloneset[i]));
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
-                std::cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] " << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
+                tp2 = std::chrono::system_clock::now();
+                std::cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] " << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities. " << (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1)) << endl;
+                tp1 = std::chrono::system_clock::now();
             }
 #endif
         }

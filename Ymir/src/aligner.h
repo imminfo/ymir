@@ -549,7 +549,7 @@ namespace ymir {
 
 
         ClonotypeAA toAminoAcid(const ClonotypeNuc &clonotype) {
-            this->setSequence(clonotype.sequence());
+            this->setSequence(clonotype.aa_sequence());
             this->setRecombination(clonotype.recombination());
             this->alignVar();
             if (_recomb == VDJ_RECOMB) { this->alignDiv(); }
@@ -562,7 +562,9 @@ namespace ymir {
             ClonotypeAAVector vec;
             vec.reserve(cloneset.size());
             for (size_t i = 0; i < cloneset.size(); ++i) {
-                vec.push_back(this->toAminoAcid(cloneset[i]));
+                if (cloneset[i].isCoding()) {
+                    vec.push_back(this->toAminoAcid(cloneset[i]));
+                }
                 if ((i+1) % 50000 == 0) {
                     std::cout << "converted " << (int) i << " clonotypes" << std::endl;
                 }
@@ -638,7 +640,7 @@ namespace ymir {
                 if (stop) { break; }
             }
 
-            avec->addAlignment(gene, 1, 1, bits);
+            if (bits.size() / 6 >= 4) { avec->addAlignment(gene, 1, 1, bits); }
         }
 
         void _alignDiv(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
@@ -746,7 +748,7 @@ namespace ymir {
                 bits2[bit_i + 5] = bits[bits.size() - bit_i - 1];
             }
 
-            avec->addAlignment(gene, p_size + 1 - bits2.size() / 6, t_size*3 + 1 - all_codons, bits2);
+            if (bits2.size() / 6 >= 4) { avec->addAlignment(gene, p_size + 1 - bits2.size() / 6, t_size*3 + 1 - all_codons, bits2); }
         }
         ///@}
 

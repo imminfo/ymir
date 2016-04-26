@@ -166,35 +166,15 @@ namespace ymir {
 
                 for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
             } else {
-                prob_t tmp;
+                res = 1;
 
-                // cycle through all amino acids
-                std::bitset<6> bithash = first_aa_codons;
-                for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
-                for (seq_len_t pos = first_nuc_pos; pos <= 3 * (1 + (first_nuc_pos - 1) / 3); ++pos) {
-                    nuc_ids = CodonTable::table().which_nucl(sequence[(pos - 1) / 3], (pos - 1) % 3);
-                    for (int i = 0; i < 6; ++i) {
-                        res_vec[i] *= arr_prob[nuc_ids[i]];
-                    }
-                }
-                for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
-//                res *= (*_aa_probs_from)[(sequence[(first_nuc_pos - 1) / 3] << 8) + (first_aa_codons << 2) + ((first_nuc_pos - 1) % 3)];
+                res *= (*_aa_probs_from)[(sequence[(first_nuc_pos - 1) / 3] << 8) + (first_aa_codons << 2) + ((first_nuc_pos - 1) % 3)];
 
                 for (seq_len_t aa_pos = (1 + (first_nuc_pos - 1) / 3); aa_pos < ((last_nuc_pos - 1) / 3); ++aa_pos) {
-                    res *= (*_aa_probs_from)[(sequence[aa_pos] << 8) + (63 << 2) + 0];
+                    res *= (*_aa_probs_from)[(sequence[aa_pos] << 8) + (63 << 2)];
                 }
 
-                bithash = last_aa_codons;
-                for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
-                for (seq_len_t pos = 1 + 3 * ((last_nuc_pos - 1) / 3); pos <= last_nuc_pos; ++pos) {
-                    nuc_ids = CodonTable::table().which_nucl(sequence[(pos - 1) / 3], (pos - 1) % 3);
-                    for (int i = 0; i < 6; ++i) {
-                        res_vec[i] *= arr_prob[nuc_ids[i]];
-                    }
-                }
-                tmp = 0;
-                for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
-                res *= tmp;
+                res *= (*_aa_probs_to)[(sequence[(last_nuc_pos - 1) / 3] << 8) + (last_aa_codons << 2) + ((last_nuc_pos - 1) % 3)];
             }
             return res;
         }
@@ -266,6 +246,8 @@ namespace ymir {
 
                             prob_t tmp = 0;
                             for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
+//                            std::cout << (int) start_pos << std::endl;
+//                            std::cout << tmp << std::endl;
 
                             (*_aa_probs_from)[val + (hash_value << 2) + start_pos] = tmp;
                         }

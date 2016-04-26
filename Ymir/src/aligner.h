@@ -648,6 +648,7 @@ namespace ymir {
             }
 
             if (bits.size() / 6 >= 4) { avec->addAlignment(gene, 1, 1, bits); }
+//            avec->addAlignment(gene, 1, 1, bits);
         }
 
         void _alignDiv(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
@@ -756,6 +757,7 @@ namespace ymir {
             }
 
             if (bits2.size() / 6 >= 4) { avec->addAlignment(gene, p_size + 1 - bits2.size() / 6, t_size*3 + 1 - all_codons, bits2); }
+//            avec->addAlignment(gene, p_size + 1 - bits2.size() / 6, t_size*3 + 1 - all_codons, bits2);
         }
         ///@}
 

@@ -39,7 +39,8 @@ namespace ymir {
 
         MonoNucInsertionModel(const MonoNucInsertionModel &other)
             : AbstractInsertionModel(other),
-              _aa_probs(other._aa_probs)
+              _aa_probs_from(other._aa_probs_from),
+              _aa_probs_to(other._aa_probs_to)
         {
         }
 
@@ -51,7 +52,8 @@ namespace ymir {
 //                _arr.reset(new prob_t[4]);
 //                this->updateProbabilities(other._arr.get());
 //            }
-            _aa_probs = other._aa_probs;
+            _aa_probs_from = other._aa_probs_from;
+            _aa_probs_to = other._aa_probs_to;
             return *this;
         }
 
@@ -156,8 +158,6 @@ namespace ymir {
                 for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
 
                 for (seq_len_t pos = first_nuc_pos; pos <= last_nuc_pos; ++pos) {
-//                    aa_pos = (pos - 1) / 3;
-//                    codon_pos = (pos - 1) % 3;
                     nuc_ids = CodonTable::table().which_nucl(sequence[(pos - 1) / 3], (pos - 1) % 3);
                     for (int i = 0; i < 6; ++i) {
                         res_vec[i] *= arr_prob[nuc_ids[i]];
@@ -178,24 +178,10 @@ namespace ymir {
                     }
                 }
                 for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
+//                res *= (*_aa_probs_from)[(sequence[(first_nuc_pos - 1) / 3] << 8) + (first_aa_codons << 2) + ((first_nuc_pos - 1) % 3)];
 
                 for (seq_len_t aa_pos = (1 + (first_nuc_pos - 1) / 3); aa_pos < ((last_nuc_pos - 1) / 3); ++aa_pos) {
-                    res *= (*_aa_probs)[(sequence[aa_pos] << 8) + 63];
-
-//                    res_vec = {1, 1, 1, 1, 1, 1};
-//
-//                    nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], 0);
-//                    for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
-//
-//                    nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], 1);
-//                    for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
-//
-//                    nuc_ids = CodonTable::table().which_nucl(sequence[aa_pos], 2);
-//                    for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
-//
-//                    tmp = 0;
-//                    for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
-//                    res *= tmp;
+                    res *= (*_aa_probs_from)[(sequence[aa_pos] << 8) + (63 << 2) + 0];
                 }
 
                 bithash = last_aa_codons;
@@ -247,12 +233,12 @@ namespace ymir {
         // reverse or not???
         typedef shared_ptr<std::unordered_map<int16_t, prob_t>> shared_aa_ins_t;
 
-        shared_aa_ins_t _aa_probs; // _aa_probs_frow, _aa_probs_back;
-        // forward and reverse aminoacid probs
+        shared_aa_ins_t _aa_probs_from, _aa_probs_to;
 
 
         void make_aminoacid_probs() {
-            _aa_probs = std::make_shared<std::unordered_map<int16_t, prob_t>>();
+            _aa_probs_from = std::make_shared<std::unordered_map<int16_t, prob_t>>();
+            _aa_probs_to = std::make_shared<std::unordered_map<int16_t, prob_t>>();
 
             prob_t arr_prob[5];
             arr_prob[0] = _arr[0];
@@ -269,27 +255,37 @@ namespace ymir {
                     prob_t nuc_prob;
 
                     for (codon_hash hash_value = 0; hash_value <= 63; ++hash_value) {
-//                    for (int start_pos = 0; start_pos <= 2; ++start_pos) {
-                        // start position
-
                         std::bitset<6> bithash = hash_value;
-                        for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
+                        for (int start_pos = 0; start_pos <= 2; ++start_pos) {
+                            for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
 
-                        auto nuc_ids = CodonTable::table().which_nucl(it.first, 0);
-                        for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
+                            for (int pos = start_pos; pos <= 2; ++pos) {
+                                auto nuc_ids = CodonTable::table().which_nucl(it.first, pos);
+                                for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
+                            }
 
-                        nuc_ids = CodonTable::table().which_nucl(it.first, 1);
-                        for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
-//
-                        nuc_ids = CodonTable::table().which_nucl(it.first, 2);
-                        for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
+                            prob_t tmp = 0;
+                            for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
 
-                        prob_t tmp = 0;
-                        for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
+                            (*_aa_probs_from)[val + (hash_value << 2) + start_pos] = tmp;
+                        }
+                    }
 
-                        (*_aa_probs)[val + hash_value] = tmp;
-//                        res *= tmp;
-//                    }
+                    for (codon_hash hash_value = 0; hash_value <= 63; ++hash_value) {
+                        std::bitset<6> bithash = hash_value;
+                        for (int end_pos = 0; end_pos <= 2; ++end_pos) {
+                            for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
+
+                            for (int pos = 0; pos <= end_pos; ++pos) {
+                                auto nuc_ids = CodonTable::table().which_nucl(it.first, pos);
+                                for (int i = 0; i < 6; ++i) { res_vec[i] *= arr_prob[nuc_ids[i]]; }
+                            }
+
+                            prob_t tmp = 0;
+                            for (int i = 0; i < 6; ++i) { tmp += res_vec[i]; }
+
+                            (*_aa_probs_to)[val + (hash_value << 2) + end_pos] = tmp;
+                        }
                     }
                 }
             }

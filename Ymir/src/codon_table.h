@@ -108,6 +108,24 @@ namespace ymir {
                 sequence_t codon = it->second;
                 _codon2aa[16*nuc_hash(codon[0]) + 4*nuc_hash(codon[1]) + nuc_hash(codon[2])] = it->first;
             }
+
+            for (aa_to_codon_storage_t::iterator it = _aa2codon.begin(); it != _aa2codon.end(); ++it) {
+                sequence_t codon = it->second;
+                _codon2aa[16*nuc_hash(codon[0]) + 4*nuc_hash(codon[1]) + nuc_hash(codon[2])] = it->first;
+            }
+            auto aas = {'A', 'L', 'R', 'K', 'N', 'M', 'D', 'F', 'C', 'P', 'Q', 'S', 'E', 'T', 'G', 'W', 'H', 'Y', 'I', 'V'};
+            for (auto aa: aas) {
+                auto range = _aa2codon.equal_range(aa);
+                for (int pos = 0; pos <= 2; ++pos) {
+                    std::array<int, 6> res = {4, 4, 4, 4, 4, 4};
+                    int i = 0;
+                    for (auto it = range.first; it != range.second; ++it) {
+                        res[i] = nuc_hash(it->second[pos]);
+                        ++i;
+                    }
+                    _arr_map[(aa << 2) + pos] = res;
+                }
+            }
         }
 
 
@@ -176,14 +194,7 @@ namespace ymir {
 #ifndef DNDEBUG
             assert(pos >= 0 && pos <= 2);
 #endif
-            auto range = _aa2codon.equal_range(aminoacid);
-            std::array<int, 6> res = {4, 4, 4, 4, 4, 4};
-            int i = 0;
-            for (auto it = range.first; it != range.second; ++it) {
-                res[i] = nuc_hash(it->second[pos]);
-                ++i;
-            }
-            return res;
+            return _arr_map.find((aminoacid << 2) + pos)->second;
         }
 
 
@@ -202,6 +213,7 @@ namespace ymir {
 
         aa_to_codon_storage_t _aa2codon;
         codon_to_aa_storage_t _codon2aa;
+        std::unordered_map<int, std::array<int, 6>> _arr_map;
 
     };
 

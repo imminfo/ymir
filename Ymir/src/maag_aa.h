@@ -210,9 +210,7 @@ namespace ymir {
 
         prob_t fullProbability(MAAGComputeProbAction action = SUM_PROBABILITY) {
             // choose the max full probability from all possible recombinations of V(D)J gene segment indices
-            if (_recomb == UNDEF_RECOMB) {
-                return 0;
-            }
+//            assert(_recomb != UNDEF_RECOMB);
 
             if (action == MAX_PROBABILITY) {
                 prob_t max_prob = 0, cur_prob = 0;

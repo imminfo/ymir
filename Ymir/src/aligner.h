@@ -561,14 +561,21 @@ namespace ymir {
         void toAminoAcid(const ClonesetViewNuc &cloneset, ClonesetAA *cloneset_aa) {
             ClonotypeAAVector vec;
             vec.reserve(cloneset.size());
+            int stats = 0;
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 if (cloneset[i].isCoding()) {
-                    vec.push_back(this->toAminoAcid(cloneset[i]));
+                    auto res = this->toAminoAcid(cloneset[i]);
+                    if (res.nVar() && res.nJoi()) {
+                        vec.push_back(res);
+                    } else {
+                        ++stats;
+                    }
                 }
                 if ((i+1) % 50000 == 0) {
                     std::cout << "converted " << (int) i << " clonotypes" << std::endl;
                 }
             }
+            std::cout << "bad clonotypes " << (int) stats << " clonotypes" << std::endl;
             cloneset_aa->swap(vec);
         }
 

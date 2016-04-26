@@ -728,14 +728,14 @@ namespace ymir {
 
         MAAGAARepertoire res;
         res.resize(cloneset.size());
+        tp1 = std::chrono::system_clock::now();
 #ifdef USE_OMP
         #if OMP_THREADS == -1
             #pragma omp parallel for
-#else
+        #else
             #pragma omp parallel for  num_threads(OMP_THREADS)
+        #endif
 #endif
-#endif
-        tp1 = std::chrono::system_clock::now();
         for (size_t i = 0; i < cloneset.size(); ++i) {
             res[i] = this->build(cloneset[i]);
 
@@ -757,6 +757,10 @@ namespace ymir {
 
 
     prob_t MAAGBuilder::buildAndCompute(const ClonotypeAA &clonotype) const {
+//        std::cout << (int) clonotype.nVar() << std::endl;
+//        std::cout << (int) clonotype.nJoi() << std::endl;
+//        auto res = this->build(clonotype);
+//        return res.fullProbability();
         return this->build(clonotype).fullProbability();
     }
 
@@ -771,6 +775,9 @@ namespace ymir {
             verbose_step = cloneset.size() / 10;
         }
 
+        std::chrono::system_clock::time_point tp1, tp2;
+        tp1 = std::chrono::system_clock::now();
+
 #ifdef USE_OMP
         #if OMP_THREADS == -1
             #pragma omp parallel for
@@ -778,9 +785,10 @@ namespace ymir {
             #pragma omp parallel for  num_threads(OMP_THREADS)
 #endif
 #endif
-        std::chrono::system_clock::time_point tp1, tp2;
-        tp1 = std::chrono::system_clock::now();
         for (size_t i = 0; i < cloneset.size(); ++i) {
+//            std::cout << "i:" << i << std::endl;
+//            std::cout << cloneset[i].sequence() << std::endl;
+//            std::cout << cloneset[i].recombination() << std::endl;
             res.push_back(buildAndCompute(cloneset[i]));
 
 #ifndef USE_OMP

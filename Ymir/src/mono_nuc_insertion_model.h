@@ -128,7 +128,7 @@ namespace ymir {
                                      seq_len_t last_nuc_pos,
                                      codon_hash first_aa_codons,
                                      codon_hash last_aa_codons,
-                                     char first_char = NULL_CHAR) const
+                                     codon_hash prev_aa_codons = 1) const
         {
 #ifndef DNDEBUG
             assert(first_nuc_pos <= 3*sequence.size() + 1);
@@ -184,7 +184,7 @@ namespace ymir {
                                         seq_len_t last_nuc_pos,
                                         codon_hash first_aa_codons,
                                         codon_hash last_aa_codons,
-                                        char first_char = NULL_CHAR) const
+                                        codon_hash prev_aa_codons = 1) const
         {
             throw(std::runtime_error("aaProbabilityRev() is not implemented for MonoNucInsertionModel."));
         }

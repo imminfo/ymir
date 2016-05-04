@@ -275,35 +275,44 @@ YMIR_TEST_START(test_markovchain_aa_di)
     mat.resize(4, 4);
     // A
     mat(0, 0) = .1;
-    mat(1, 0) = .4;
-    mat(2, 0) = .25;
-    mat(3, 0) = .25;
+    mat(1, 0) = .2;
+    mat(2, 0) = .3;
+    mat(3, 0) = .4;
     // C
-    mat(0, 1) = .7;
+    mat(0, 1) = .5;
     mat(1, 1) = .1;
-    mat(2, 1) = .1;
+    mat(2, 1) = .3;
     mat(3, 1) = .1;
     // G
-    mat(0, 2) = .3;
-    mat(1, 2) = .3;
-    mat(2, 2) = .15;
-    mat(3, 2) = .25;
+    mat(0, 2) = .1;
+    mat(1, 2) = .5;
+    mat(2, 2) = .1;
+    mat(3, 2) = .3;
     // T
-    mat(0, 3) = .1;
-    mat(1, 3) = .4;
+    mat(0, 3) = .4;
+    mat(1, 3) = .3;
     mat(2, 3) = .2;
-    mat(3, 3) = .3;
+    mat(3, 3) = .1;
 
-    DiNucInsertionModel mc(mat, .5);
+    DiNucInsertionModel m(mat, .5);
 
 
     // neighbour aminoacids
+    // {'M', "ATG"}
+    YMIR_ASSERT3(m.aaProbability("M", 1, 1, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("M", 1, 2, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("M", 1, 3, 0, 0), 0)
+
+    YMIR_ASSERT3(m.aaProbability("M", 1, 1, 63, 63), .25)
+    YMIR_ASSERT3(m.aaProbability("M", 1, 2, 63, 63), .25 * .4)
+    YMIR_ASSERT3(m.aaProbability("M", 1, 3, 63, 63), .25 * .4 * .3)
+    YMIR_ASSERT3(m.aaProbability("M", 2, 3, 63, 63), .4 * .3)
+    YMIR_ASSERT3(m.aaProbability("M", 3, 3, 63, 63), .3)
 
     // exact same aminoacid
+    YMIR_ASSERT(false)
 
     // distant aminoacids
-
-
     YMIR_ASSERT(false)
 
 YMIR_TEST_END

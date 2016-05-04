@@ -126,7 +126,7 @@ namespace ymir {
 
 
         /**
-         *
+         * \param prev_aa_codons
          */
         ///@{
         virtual prob_t aaProbability(const sequence_t& sequence,
@@ -134,9 +134,9 @@ namespace ymir {
                                      seq_len_t last_nuc_pos,
                                      codon_hash first_aa_codons,
                                      codon_hash last_aa_codons,
-                                     char first_char = NULL_CHAR) const
+                                     codon_hash prev_aa_codons = 1) const
         {
-
+            return 0;
         }
 
         virtual prob_t aaProbabilityRev(const sequence_t &sequence,
@@ -144,9 +144,9 @@ namespace ymir {
                                         seq_len_t last_nuc_pos,
                                         codon_hash first_aa_codons,
                                         codon_hash last_aa_codons,
-                                        char first_char = NULL_CHAR) const
+                                        codon_hash prev_aa_codons = 1) const
         {
-
+            return 0;
         }
         ///@}
 
@@ -182,7 +182,11 @@ namespace ymir {
     protected:
 
 
-        typedef shared_ptr<std::unordered_map<char, prob_t>> shared_aa_ins_t;
+        typedef std::bitset<6> bitset6;
+
+
+        typedef shared_ptr<std::unordered_map<char, bitset6>> shared_aa_ins_t;
+
 
         shared_aa_ins_t _aa_probs;
 
@@ -202,7 +206,24 @@ namespace ymir {
 
 
         void make_aminoacid_probs() {
+            _aa_probs = std::make_shared<std::unordered_map<char, bitset6>>();
 
+            for (auto it: CodonTable::table().aminoacids()) {
+                if (it.first != '*') {
+
+                    auto codon = CodonTable::table().codons(it.first);
+
+                    int i = 4;
+                    (*_aa_probs)[it.first] = bitset6(0);
+                    (*_aa_probs)[it.first][5] = (*this)(nuc_hash(codon.codon()[0]), nuc_hash(codon.codon()[1]))
+                                                * (*this)(nuc_hash(codon.codon()[1]), nuc_hash(codon.codon()[2]));
+                    while(codon.next()) {
+                        (*_aa_probs)[it.first][i] = (*this)(nuc_hash(codon.codon()[0]), nuc_hash(codon.codon()[1]))
+                                                    * (*this)(nuc_hash(codon.codon()[1]), nuc_hash(codon.codon()[2]));
+                        --i;
+                    }
+                }
+            }
         }
 
     };

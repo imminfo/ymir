@@ -12,6 +12,9 @@
 namespace ymir {
 
     class DiNucInsertionModel : public AbstractInsertionModel {
+
+        typedef std::bitset<6> bitset6;
+
     public:
 
 
@@ -136,7 +139,64 @@ namespace ymir {
                                      codon_hash last_aa_codons,
                                      codon_hash prev_aa_codons = 1) const
         {
-            return 0;
+
+            // TODO: make _arr like that
+            prob_t arr_prob[16];
+            arr_prob[0] = _arr[0];
+            arr_prob[1] = _arr[1];
+            arr_prob[2] = _arr[2];
+            arr_prob[3] = _arr[3];
+            arr_prob[4] = 0;
+
+            arr_prob[5] = _arr[4];
+            arr_prob[6] = _arr[5];
+            arr_prob[7] = _arr[6];
+            arr_prob[8] = _arr[7];
+            arr_prob[9] = 0;
+
+            arr_prob[10] = _arr[8];
+            arr_prob[11] = _arr[9];
+            arr_prob[12] = _arr[10];
+            arr_prob[13] = _arr[11];
+            arr_prob[14] = 0;
+
+            arr_prob[15] = _arr[12];
+            arr_prob[16] = _arr[13];
+            arr_prob[17] = _arr[14];
+            arr_prob[18] = _arr[15];
+            arr_prob[19] = 0;
+
+            arr_prob[20] = 0;
+            arr_prob[21] = 0;
+            arr_prob[22] = 0;
+            arr_prob[23] = 0;
+            arr_prob[24] = 0;
+
+
+            std::array<prob_t, 6> res_vec;
+
+            if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
+                if (first_nuc_pos == 1) {
+                    res_vec = {.25, 0, 0, 0, 0, 0};
+                } else {
+                    (first_nuc_pos - 2) % 3
+                }
+
+                bitset6 bithash = first_aa_codons & last_aa_codons;
+
+                for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
+
+                for (seq_len_t pos = first_nuc_pos + 1; pos <= last_nuc_pos; ++pos) {
+                    nuc_ids = CodonTable::table().which_nucl(sequence[(pos - 1) / 3], (pos - 1) % 3);
+                    for (int i = 0; i < 6; ++i) {
+                        res_vec[i] *= arr_prob[nuc_ids[i]];
+                    }
+                }
+
+                for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
+            } else {
+
+            }
         }
 
         virtual prob_t aaProbabilityRev(const sequence_t &sequence,
@@ -181,16 +241,13 @@ namespace ymir {
 
     protected:
 
-
-        typedef std::bitset<6> bitset6;
-
-
         typedef shared_ptr<std::unordered_map<char, bitset6>> shared_aa_ins_t;
 
 
         shared_aa_ins_t _aa_probs;
 
 
+        ///@{
         void updateProbabilitiesMatrix(const event_matrix_t& mat) {
             for (uint8_t i = 0; i < 4; ++i) {
                 for (uint8_t j = 0; j < 4; ++j) {
@@ -203,6 +260,7 @@ namespace ymir {
             this->updateProbabilitiesMatrix(mat);
             _err_prob = err_prob;
         }
+        ///@}
 
 
         void make_aminoacid_probs() {
@@ -210,14 +268,13 @@ namespace ymir {
 
             for (auto it: CodonTable::table().aminoacids()) {
                 if (it.first != '*') {
-
                     auto codon = CodonTable::table().codons(it.first);
 
                     int i = 4;
                     (*_aa_probs)[it.first] = bitset6(0);
                     (*_aa_probs)[it.first][5] = (*this)(nuc_hash(codon.codon()[0]), nuc_hash(codon.codon()[1]))
                                                 * (*this)(nuc_hash(codon.codon()[1]), nuc_hash(codon.codon()[2]));
-                    while(codon.next()) {
+                    while (codon.next()) {
                         (*_aa_probs)[it.first][i] = (*this)(nuc_hash(codon.codon()[0]), nuc_hash(codon.codon()[1]))
                                                     * (*this)(nuc_hash(codon.codon()[1]), nuc_hash(codon.codon()[2]));
                         --i;

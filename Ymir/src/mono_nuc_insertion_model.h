@@ -141,6 +141,7 @@ namespace ymir {
             prob_t res = 0, nuc_prob;
             std::array<prob_t, 6> res_vec = {1, 1, 1, 1, 1, 1};
 
+            // TODO: make _arr like that
             prob_t arr_prob[5];
             arr_prob[0] = _arr[0];
             arr_prob[1] = _arr[1];

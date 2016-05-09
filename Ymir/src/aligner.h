@@ -139,6 +139,13 @@ namespace ymir {
             return vec.size() != 0;
         }
 
+        bool alignVar(seg_index_t id) {
+            alignment_vector_t vec;
+            this->_alignVar(id, _genes.V()[id].sequence, this->sequence(), &vec);
+            this->addVarAlignment(vec);
+            return vec.size() != 0;
+        }
+
         bool alignDiv() {
             alignment_vector_t vec;
             for (seg_index_t id = 1; id <= _genes.D().max(); ++id) {
@@ -156,6 +163,13 @@ namespace ymir {
             for (seg_index_t id = 1; id <= _genes.J().max(); ++id) {
                 this->_alignJoi(id, _genes.J()[id].sequence, this->sequence(), &vec);
             }
+            this->addJoiAlignment(vec);
+            return vec.size() != 0;
+        }
+
+        bool alignJoi(seg_index_t id) {
+            alignment_vector_t vec;
+            this->_alignJoi(id, _genes.J()[id].sequence, this->sequence(), &vec);
             this->addJoiAlignment(vec);
             return vec.size() != 0;
         }

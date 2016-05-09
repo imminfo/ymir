@@ -443,6 +443,10 @@ namespace ymir {
                     // TODO: remove bad clonotypes here ???
                     //
                     vec.push_back(_aligner->buildClonotype());
+//                    std::cout << "clonotype" << std::endl;
+//                    std::cout << (int) vec[vec.size() - 1].nVar() << std::endl;
+//                    std::cout << (int) vec[vec.size() - 1].nDiv() << std::endl;
+//                    std::cout << (int) vec[vec.size() - 1].nJoi() << std::endl;
                 }
             }
         }

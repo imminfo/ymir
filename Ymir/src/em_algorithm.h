@@ -43,7 +43,7 @@ namespace ymir {
 
 
             size_t sample = algo_param["sample"].asUInt();
-            ClonesetViewNuc rep_nonc = repertoire.noncoding().sample(sample);
+            ClonesetViewNuc rep_nonc = repertoire.noncoding();//.sample(sample);
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
             std::vector<prob_t> logLvec;

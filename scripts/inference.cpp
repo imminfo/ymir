@@ -44,18 +44,16 @@ int main(int argc, char* argv[]) {
     std::cout << std::endl;
 
     if (model.status()) {
-        RepertoireParser parser;
-        Cloneset cloneset;
+        ParserNuc parser;
+        ClonesetNuc cloneset;
 
-        if (parser.parse(in_file_path,
-                         &cloneset,
-                         model.gene_segments(),
-                         NUCLEOTIDE,
-                         model.recombination(),
-                         RepertoireParser::AlignmentColumnOptions()
-                                 .setV(RepertoireParser::USE_PROVIDED)
-                                 .setJ(RepertoireParser::USE_PROVIDED)
-                                 .setD(RepertoireParser::OVERWRITE))) {
+        if (parser.openAndParse( in_file_path,
+                                 &cloneset,
+                                 model.gene_segments(),
+                                 model.recombination(),
+                                 AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+                                                        AlignmentColumnOptions::OVERWRITE,
+                                                        AlignmentColumnOptions::OVERWRITE))) {
 
             std::cout << std::endl;
             infer_algo->statisticalInference(cloneset, model, params);

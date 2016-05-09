@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
     std::cout << std::endl;
 
     if (model.status()) {
-        ParserNuc parser();
+        ParserNuc parser(new CDR3NucleotideAligner());
         ClonesetNuc cloneset;
 
         if (parser.openAndParse( in_file_path,

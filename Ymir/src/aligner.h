@@ -562,23 +562,33 @@ namespace ymir {
         }
 
 
-        ClonotypeAA toAminoAcid(const ClonotypeNuc &clonotype) {
+        ClonotypeAA toAminoAcid(const ClonotypeNuc &clonotype, bool use_aligned_segments = false) {
             this->setSequence(clonotype.aa_sequence());
             this->setRecombination(clonotype.recombination());
-            this->alignVar();
+            if (use_aligned_segments) {
+                for (seg_index_t id = 0; id < clonotype.nVar(); ++id) {
+                    this->alignVar(clonotype.getVar(id));
+                }
+                for (seg_index_t id = 0; id < clonotype.nJoi(); ++id) {
+                    this->alignVar(clonotype.getJoi(id));
+                }
+            } else {
+                this->alignVar();
+                this->alignJoi();
+            }
             if (_recomb == VDJ_RECOMB) { this->alignDiv(); }
-            this->alignJoi();
+
             return this->buildClonotype();
         }
 
 
-        void toAminoAcid(const ClonesetViewNuc &cloneset, ClonesetAA *cloneset_aa) {
+        void toAminoAcid(const ClonesetViewNuc &cloneset, ClonesetAA *cloneset_aa, bool use_aligned_segments = false) {
             ClonotypeAAVector vec;
             vec.reserve(cloneset.size());
             int stats = 0;
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 if (cloneset[i].isCoding()) {
-                    auto res = this->toAminoAcid(cloneset[i]);
+                    auto res = this->toAminoAcid(cloneset[i], use_aligned_segments);
                     if (res.nVar() && res.nJoi()) {
                         vec.push_back(res);
                     } else {

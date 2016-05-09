@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
                 prob_vec = model.computeFullProbabilities(cloneset, NO_ERRORS);
             } else {
                 std::cout << "Converting nucleotide clonotypes to amino acid clonotypes..." << std::endl;
-                CDR3AminoAcidAligner(model.gene_segments(), VDJAlignerParameters(3)).toAminoAcid(cloneset, &cloneset_aa);
+                CDR3AminoAcidAligner(model.gene_segments(), VDJAlignerParameters(3)).toAminoAcid(cloneset, &cloneset_aa, true);
                 std::cout << "Done." << std::endl << std::endl;
 
                 prob_vec = model.computeFullProbabilities(cloneset_aa);

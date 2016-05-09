@@ -111,7 +111,7 @@ namespace ymir {
         const GeneSegment& operator[] (seg_index_t index) const {
 #ifndef DNDEBUG
             check_and_throw(index == 0 || index > _vec.size(), 
-                            "Gene segment alphabet [" + _name + "] error:\tindex " + std::to_string(index) + "is out of bounds");
+                            "Gene segment alphabet [" + _name + "] error:\tindex " + std::to_string(index) + " is out of bounds");
 #endif
             return _vec[index - 1];
         }

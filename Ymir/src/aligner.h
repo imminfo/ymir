@@ -570,7 +570,7 @@ namespace ymir {
                     this->alignVar(clonotype.getVar(id));
                 }
                 for (seg_index_t id = 0; id < clonotype.nJoi(); ++id) {
-                    this->alignVar(clonotype.getJoi(id));
+                    this->alignJoi(clonotype.getJoi(id));
                 }
             } else {
                 this->alignVar();

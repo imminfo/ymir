@@ -71,16 +71,16 @@ int main(int argc, char* argv[]) {
                                     "Dgene",
                                     BENCH_DATA_FOLDER + "trbd.txt");
 
-    ClonesetNuc cloneset_vdj;
-    YMIR_BENCHMARK("Parsing VDJ",
-                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
-                                       &cloneset_vdj,
-                                       vdj_single_genes,
-                                       VDJ_RECOMB,
-                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
-                                                              AlignmentColumnOptions::OVERWRITE,
-                                                              AlignmentColumnOptions::OVERWRITE),
-                                       VDJAlignerParameters(3)))
+//    ClonesetNuc cloneset_vdj;
+//    YMIR_BENCHMARK("Parsing VDJ",
+//                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
+//                                       &cloneset_vdj,
+//                                       vdj_single_genes,
+//                                       VDJ_RECOMB,
+//                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+//                                                              AlignmentColumnOptions::OVERWRITE,
+//                                                              AlignmentColumnOptions::OVERWRITE),
+//                                       VDJAlignerParameters(3)))
 
     //
     // VJ MAAG
@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
     YMIR_BENCHMARK("VJ EM",
                    logLvec = EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
                                                                 EMAlgorithm::AlgorithmParameters()
-                                                                        .set("niter", 10)
+                                                                        .set("niter", 15)
                                                                         .set("sample", 100000),
                                                                 NO_ERRORS))
 //

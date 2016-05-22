@@ -339,7 +339,7 @@ namespace ymir {
 //                                         * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i)
 //                                         * (maag.errors(err_node_i, fb_mat_i, row_i, col_i) / maag.n_poses());
                             _err_prob += (*_forward_acc)(node_i, fb_mat_i, row_i, col_i)
-                                         * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i)
+                                         * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i);
                         }
                     }
                 }

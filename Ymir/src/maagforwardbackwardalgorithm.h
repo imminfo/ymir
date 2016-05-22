@@ -207,7 +207,7 @@ namespace ymir {
                                     ++n;
                                 }
 
-                                _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1) / maag.n_poses();
+//                                _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1) / maag.n_poses();
                             }
 
 //                            std::cout << "nucs" << std::endl;
@@ -335,9 +335,11 @@ namespace ymir {
                 for (dim_t row_i = 0; row_i < maag.nodeRows(node_i); ++row_i) {
                     for (dim_t col_i = 0; col_i < maag.nodeColumns(node_i); ++col_i) {
                         if (maag.errors(err_node_i, fb_mat_i, row_i, col_i)) {
+//                            _err_prob += (*_forward_acc)(node_i, fb_mat_i, row_i, col_i)
+//                                         * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i)
+//                                         * (maag.errors(err_node_i, fb_mat_i, row_i, col_i) / maag.n_poses());
                             _err_prob += (*_forward_acc)(node_i, fb_mat_i, row_i, col_i)
                                          * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i)
-                                         * (maag.errors(err_node_i, fb_mat_i, row_i, col_i) / maag.n_poses());
                         }
                     }
                 }
@@ -363,6 +365,8 @@ namespace ymir {
                     _nuc_arr2[i] /= _full_prob;
                 }
             }
+
+            _err_prob /= _full_prob;
 
             _pairs.reserve(_pair_map.size() + 40);
             for (auto it = _pair_map.begin(); it != _pair_map.end(); ++it) {

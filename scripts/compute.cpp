@@ -101,45 +101,45 @@ int main(int argc, char* argv[]) {
         //
         // Amino acid
         //
-        else {
-            ParserNuc parser;
-            ClonesetNuc cloneset;
-
-            if (parser.openAndParse(in_file_path,
-                                    &cloneset,
-                                    model.gene_segments(),
-                                    model.recombination(),
-                                    AlignmentColumnOptions(AlignmentColumnOptions::USE_PROVIDED,
-                                                           AlignmentColumnOptions::USE_PROVIDED,
-                                                           AlignmentColumnOptions::OVERWRITE))) {
-//                if (recompute_genes) {
-//                    std::cout << std::endl;
-//                    std::cout << "Recomputing gene usage on " << (size_t) cloneset.noncoding().size() << " clonotypes." << std::endl;
-//                    model.updateGeneUsage(cloneset);
+//        else {
+//            ParserAA parser;
+//            ClonesetAA cloneset;
+//
+//            if (parser.openAndParse(in_file_path,
+//                                    &cloneset,
+//                                    model.gene_segments(),
+//                                    model.recombination(),
+//                                    AlignmentColumnOptions(AlignmentColumnOptions::USE_PROVIDED,
+//                                                           AlignmentColumnOptions::USE_PROVIDED,
+//                                                           AlignmentColumnOptions::OVERWRITE))) {
+////                if (recompute_genes) {
+////                    std::cout << std::endl;
+////                    std::cout << "Recomputing gene usage on " << (size_t) cloneset.noncoding().size() << " clonotypes." << std::endl;
+////                    model.updateGeneUsage(cloneset);
+////                }
+//
+//                std::cout << std::endl;
+//                auto prob_vec = model.computeFullProbabilities(cloneset);
+//
+//                std::ofstream ofs;
+//                ofs.open(out_file_path);
+//
+//                std::cout << std::endl;
+//                std::cout << "Generation probabilities statistics:" << std::endl;
+//                prob_summary(prob_vec);
+//
+//                if (ofs.is_open()) {
+//                    for (auto i = 0; i < prob_vec.size(); ++i) {
+//                        ofs << prob_vec[i] << std::endl;
+//                    }
+//                } else {
+//                    std::cout << "Problems with the output stream. Terminating..." << std::endl;
 //                }
-
-                std::cout << std::endl;
-                auto prob_vec = model.computeFullProbabilities(cloneset);
-
-                std::ofstream ofs;
-                ofs.open(out_file_path);
-
-                std::cout << std::endl;
-                std::cout << "Generation probabilities statistics:" << std::endl;
-                prob_summary(prob_vec);
-
-                if (ofs.is_open()) {
-                    for (auto i = 0; i < prob_vec.size(); ++i) {
-                        ofs << prob_vec[i] << std::endl;
-                    }
-                } else {
-                    std::cout << "Problems with the output stream. Terminating..." << std::endl;
-                }
-                ofs.close();
-            } else {
-                std::cout << "Problems in parsing the input file. Terminating..." << std::endl;
-            }
-        }
+//                ofs.close();
+//            } else {
+//                std::cout << "Problems in parsing the input file. Terminating..." << std::endl;
+//            }
+//        }
 
     } else {
         std::cout << "Problems with the model. Terminating..." << std::endl;

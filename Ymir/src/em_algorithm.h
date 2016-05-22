@@ -159,8 +159,8 @@ namespace ymir {
                          size_t removed,
                          ErrorMode error_mode) const
         {
-//            if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() / (maag_rep.size() - removed)); }
-            new_param_vec.set_error_prob(.0003);
+            if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() / (maag_rep.size() - removed)); }
+//            new_param_vec.set_error_prob(.0003);
 
             new_param_vec.normaliseEventFamilies();
 

@@ -86,29 +86,28 @@ int main(int argc, char* argv[]) {
     // VJ MAAG
     //
     ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA", EMPTY);
-    return 0;
-    YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS))
-    YMIR_BENCHMARK("VJ prob", vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS))
+//    YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS))
+//    YMIR_BENCHMARK("VJ prob", vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS))
 
 
     //
     // VDJ MAAG
     //
-    ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
+//    ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
 
-    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS))
-    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS))
+//    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS))
+//    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS))
 
 
     //
     // VJ inference
     //
-//    YMIR_BENCHMARK("VJ EM",
-//                   logLvec = EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
-//                                                                EMAlgorithm::AlgorithmParameters()
-//                                                                        .set("niter", 10)
-//                                                                        .set("sample", 100000),
-//                                                                NO_ERRORS))
+    YMIR_BENCHMARK("VJ EM",
+                   logLvec = EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
+                                                                EMAlgorithm::AlgorithmParameters()
+                                                                        .set("niter", 10)
+                                                                        .set("sample", 100000),
+                                                                NO_ERRORS))
 //
 //    YMIR_BENCHMARK("VJ SG",
 //                   logLvec = SGAlgorithm().statisticalInference(cloneset_vj, vj_single_model,

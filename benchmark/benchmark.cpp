@@ -37,7 +37,8 @@ int main(int argc, char* argv[]) {
     std::string BENCH_DATA_FOLDER = argv[1];
 
 
-    ParserNuc parser(new NaiveCDR3NucleotideAligner());
+//    ParserNuc parser(new NaiveCDR3NucleotideAligner());
+    ParserNuc parser(new CDR3NucleotideAligner());
 
     string input_alpha_file = "alpha.100k.txt";
     string input_beta_file = "beta.100k.txt";

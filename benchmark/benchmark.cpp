@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
                    logLvec = EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
                                                                 EMAlgorithm::AlgorithmParameters()
                                                                         .set("niter", 15)
-                                                                        .set("sample", 100000),
+                                                                        .set("sample", 20000),
                                                                 NO_ERRORS))
 //
 //    YMIR_BENCHMARK("VJ SG",

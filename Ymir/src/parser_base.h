@@ -92,11 +92,13 @@ namespace ymir {
          * or use found (USE_PROVIDED) alignments in the input file.
         */
         enum Action {
-            OVERWRITE,
-            USE_PROVIDED
+            OVERWRITE,        // Try to align all gene segments
+            USE_PROVIDED,     // Use information about aligned gene segments - start / end / length (no errors)
+            REALIGN_PROVIDED  // Re-align aligned gene segments using start / end (with errors)
         };
 
         Action align_V, align_J, align_D;
+
 
         AlignmentColumnOptions() {}
 
@@ -295,9 +297,9 @@ namespace ymir {
                     start_bracket = '(',
                     end_bracket = ')';
 
-            bool do_align_V = _opts.align_V == AlignmentColumnOptions::OVERWRITE,
-                    do_align_J = _opts.align_J == AlignmentColumnOptions::OVERWRITE,
-                    do_align_D = _opts.align_D == AlignmentColumnOptions::OVERWRITE;
+            AlignmentColumnOptions::Action align_V_opt = _opts.align_V,
+                    align_J_opt = _opts.align_J,
+                    align_D_opt = _opts.align_D;
 
             stringstream column_stream, symbol_stream, temp_stream;
             string line, segment_word, sequence;
@@ -345,7 +347,7 @@ namespace ymir {
                     //
                     // Parse Variable genes
                     //
-                    if (do_align_V) {
+                    if (align_V_opt == OVERWRITE) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         getline(column_stream, segment_word, column_sep);
@@ -358,7 +360,7 @@ namespace ymir {
                     if (_recomb == VJ_RECOMB) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
-                        if (do_align_D) {
+                        if (align_D_opt == OVERWRITE) {
                             column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                         } else {
                             getline(column_stream, segment_word, column_sep);
@@ -369,7 +371,7 @@ namespace ymir {
                     //
                     // Parse Joining genes
                     //
-                    if (do_align_J) {
+                    if (align_J_opt == OVERWRITE) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         getline(column_stream, segment_word, column_sep);
@@ -429,6 +431,7 @@ namespace ymir {
                     // TODO: remove bad clonotypes here ???
                     //
                     vec.push_back(_aligner->buildClonotype());
+                    std::cout << vec[vec.size() - 1].toString(_genes) << std::endl;
                 }
             }
         }

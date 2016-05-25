@@ -69,6 +69,50 @@ namespace ymir {
         ///@}
 
 
+        std::string toString(const VDJRecombinationGenes &genes) const {
+            std::string res = _sequence;
+
+            res += "\n";
+
+            for (int i = 0; i < this->nVar(); ++i) {
+                for (int j = 0; j < this->getVarSeqStart(i) - 1; ++j) {
+                    res += " ";
+                }
+                for (int j = this->getVarGeneStart(i); j <= this->getVarGeneEnd(i); ++j) {
+                    res += genes.V()[this->getVar(i)].sequence[j - 1];
+                }
+                res += "\n";
+
+                for (int j = 0; j < this->getVarSeqStart(i) - 1; ++j) {
+                    res += " ";
+                }
+                for (int j = this->getVarSeqStart(i); j <= this->getVarSeqEnd(i); ++j) {
+                    res += this->isVarMismatch(i, j) ? "1" : "0";
+                }
+                res += "\n";
+
+                res += " | "
+                       + std::to_string(this->getVar(i))
+                       + "("
+                       + std::to_string(this->getVarSeqStart(i))
+                       + ";"
+                       + std::to_string(this->getVarSeqEnd(i))
+                       + ") ("
+                       + std::to_string(this->getVarGeneStart(i))
+                       + ";"
+                       + std::to_string(this->getVarGeneEnd(i))
+                       + ")";
+                res += "\n";
+            }
+
+//            for (int i = 0; i < this->nJoi(); ++i) {
+//                res += "\n";
+//            }
+
+            return res;
+        }
+
+
     protected:
 
         ClonotypeNuc()

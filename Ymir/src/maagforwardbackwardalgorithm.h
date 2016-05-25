@@ -207,6 +207,7 @@ namespace ymir {
                                     ++n;
                                 }
 
+                                // TODO: fix this
 //                                _err_prob += scenario_prob * (maag.position(right_pos) - maag.position(left_pos) - 1) / maag.n_poses();
                             }
 
@@ -339,7 +340,7 @@ namespace ymir {
 //                                         * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i)
 //                                         * (maag.errors(err_node_i, fb_mat_i, row_i, col_i) / maag.n_poses());
                             _err_prob += (*_forward_acc)(node_i, fb_mat_i, row_i, col_i)
-                                         * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i);
+                                         * (*_backward_acc)(node_i, fb_mat_i, row_i, col_i) / maag.n_poses();
                         }
                     }
                 }

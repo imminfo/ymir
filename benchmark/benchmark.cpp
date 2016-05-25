@@ -38,7 +38,8 @@ int main(int argc, char* argv[]) {
 
 
 //    ParserNuc parser(new NaiveCDR3NucleotideAligner());
-    ParserNuc parser(new CDR3NucleotideAligner());
+//    ParserNuc parser(new CDR3NucleotideAligner());
+    ParserNuc parser(new SmithWatermanNoGapAligner());
 
     string input_alpha_file = "alpha.100k.txt";
     string input_beta_file = "beta.100k.txt";

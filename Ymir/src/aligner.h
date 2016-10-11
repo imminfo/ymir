@@ -158,6 +158,13 @@ namespace ymir {
             return vec.size() != 0;
         }
 
+        bool alignDiv(seg_index_t id) {
+            alignment_vector_t vec;
+            this->_alignDiv(id, _genes.D()[id].sequence, this->sequence(), &vec);
+            this->addDivAlignment(vec);
+            return vec.size() != 0;
+        }
+
         bool alignJoi() {
             alignment_vector_t vec;
             for (seg_index_t id = 1; id <= _genes.J().max(); ++id) {
@@ -172,6 +179,19 @@ namespace ymir {
             this->_alignJoi(id, _genes.J()[id].sequence, this->sequence(), &vec);
             this->addJoiAlignment(vec);
             return vec.size() != 0;
+        }
+
+        bool align(GeneSegments gene_segment, seg_index_t id) {
+            switch (gene_segment) {
+                case VARIABLE:
+                    return this->alignVar(id);
+                case JOINING:
+                    return this->alignJoi(id);
+                case DIVERSITY:
+                    return this->alignDiv(id);
+                default:
+                    return false;
+            }
         }
         ///@}
 

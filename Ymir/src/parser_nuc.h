@@ -118,8 +118,51 @@ namespace ymir {
         }
 
 
-        std::string get_prefix(const string &filename) const {
-            return "[" + filename + "]: ";
+        void parseAlignmentAndRealign(stringstream &symbol_stream,
+                                      const string &segment_word,
+                                      const vector<seg_index_t> &segvec,
+                                      GeneSegments gene,
+                                      const GeneSegmentAlphabet &gsa,
+                                      size_t line_num,
+                                      char segment_sep,
+                                      char internal_sep,
+                                      string &temp_str,
+                                      stringstream &temp_stream)
+        {
+            symbol_stream.clear();
+            symbol_stream.str(segment_word);
+
+            int gene_start, seq_start, alignment_len;
+            seg_index_t seg_order = 0;
+
+            while (!symbol_stream.eof()) {
+                getline(symbol_stream, temp_str, segment_sep);
+
+                temp_stream.clear();
+                temp_stream.str(temp_str);
+
+                getline(temp_stream, temp_str, internal_sep);
+                gene_start = std::atoi(temp_str.c_str());
+
+                getline(temp_stream, temp_str, internal_sep);
+                seq_start = std::atoi(temp_str.c_str());
+
+                getline(temp_stream, temp_str, internal_sep);
+                alignment_len = std::atoi(temp_str.c_str());
+
+                if (alignment_len > gsa[segvec[seg_order]].sequence.size()) {
+                    alignment_len = gsa[segvec[seg_order]].sequence.size();
+                    if (gene == VARIABLE) {
+                        ++_stats.bad_V_len;
+                    } else if (gene == JOINING) {
+                        ++_stats.bad_J_len;
+                    }
+                }
+
+                _aligner->align(gene, segvec[seg_order]);
+
+                ++seg_order;
+            }
         }
 
     };

@@ -64,12 +64,13 @@ int main(int argc, char* argv[]) {
             }
             std::cout << std::endl;
 
-            ClonesetAA cloneset_aa;
             std::vector<prob_t> prob_vec;
 
             if (argv[5][0] == 'n') {
                 prob_vec = model.computeFullProbabilities(cloneset, NO_ERRORS);
             } else {
+                ClonesetAA cloneset_aa;
+
                 std::cout << "Converting nucleotide clonotypes to amino acid clonotypes..." << std::endl;
                 CDR3AminoAcidAligner(model.gene_segments(), VDJAlignerParameters(3)).toAminoAcid(cloneset, &cloneset_aa, true);
                 std::cout << "Done." << std::endl << std::endl;

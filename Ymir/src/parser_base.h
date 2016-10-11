@@ -347,7 +347,7 @@ namespace ymir {
                     //
                     // Parse Variable genes
                     //
-                    if (align_V_opt == OVERWRITE) {
+                    if (align_V_opt == AlignmentColumnOptions::OVERWRITE) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         getline(column_stream, segment_word, column_sep);
@@ -360,7 +360,7 @@ namespace ymir {
                     if (_recomb == VJ_RECOMB) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
-                        if (align_D_opt == OVERWRITE) {
+                        if (align_D_opt == AlignmentColumnOptions::OVERWRITE) {
                             column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                         } else {
                             getline(column_stream, segment_word, column_sep);
@@ -371,7 +371,7 @@ namespace ymir {
                     //
                     // Parse Joining genes
                     //
-                    if (align_J_opt == OVERWRITE) {
+                    if (align_J_opt == AlignmentColumnOptions::OVERWRITE) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
                         getline(column_stream, segment_word, column_sep);
@@ -381,11 +381,14 @@ namespace ymir {
                     //
                     // Parse Variable alignments
                     //
-                    if (do_align_V) {
+                    if (align_V_opt == AlignmentColumnOptions::OVERWRITE) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                         if (!_aligner->alignVar()) {
                             _stats.update_no_algn<VARIABLE>();
                         }
+                    } else if (align_V_opt == AlignmentColumnOptions::REALIGN_PROVIDED) {
+                        getline(column_stream, segment_word, column_sep);
+                        this->parseAlignmentAndRealign(symbol_stream, segment_word, vseg, VARIABLE, _genes.V(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
                     } else {
                         getline(column_stream, segment_word, column_sep);
                         this->parseAlignment(symbol_stream, segment_word, vseg, VARIABLE, _genes.V(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
@@ -397,11 +400,13 @@ namespace ymir {
                     if (_recomb == VJ_RECOMB) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                     } else {
-                        if (do_align_D) {
-                            column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
+                        if (align_D_opt == AlignmentColumnOptions::OVERWRITE) {
                             if (!_aligner->alignDiv()) {
                                 _stats.update_no_algn<DIVERSITY>();
                             }
+                        } else if (align_D_opt == AlignmentColumnOptions::REALIGN_PROVIDED) {
+                            getline(column_stream, segment_word, column_sep);
+                            this->parseAlignmentAndRealign(symbol_stream, segment_word, dseg, DIVERSITY, _genes.D(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
                         } else {
                             getline(column_stream, segment_word, column_sep);
                             this->parseAlignment(symbol_stream, segment_word, dseg, DIVERSITY, _genes.D(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
@@ -411,11 +416,14 @@ namespace ymir {
                     //
                     // Parse Joining alignments
                     //
-                    if (do_align_J) {
+                    if (align_J_opt == AlignmentColumnOptions::OVERWRITE) {
                         column_stream.ignore(numeric_limits<streamsize>::max(), column_sep);
                         if (!_aligner->alignJoi()) {
                             _stats.update_no_algn<JOINING>();
                         }
+                    } else if (align_J_opt == AlignmentColumnOptions::REALIGN_PROVIDED) {
+                        getline(column_stream, segment_word, column_sep);
+                        this->parseAlignmentAndRealign(symbol_stream, segment_word, jseg, JOINING, _genes.J(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
                     } else {
                         getline(column_stream, segment_word, column_sep);
                         this->parseAlignment(symbol_stream, segment_word, jseg, JOINING, _genes.J(), line_num, segment_sep, internal_sep, temp_str, temp_stream);
@@ -457,6 +465,19 @@ namespace ymir {
                             char internal_sep,
                             string &temp_str,
                             stringstream &temp_stream) = 0;
+
+
+        virtual void parseAlignmentAndRealign(stringstream &symbol_stream,
+                                           const string &segment_word,
+                                           const vector<seg_index_t> &segvec,
+                                           GeneSegments gene,
+                                           const GeneSegmentAlphabet &gsa,
+                                           size_t line_num,
+                                           char segment_sep,
+                                           char internal_sep,
+                                           string &temp_str,
+                                           stringstream &temp_stream) = 0;
+
 
 
         std::string get_prefix(const string &filename) const {

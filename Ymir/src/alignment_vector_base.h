@@ -134,6 +134,9 @@ namespace ymir {
         }
 
 
+        bool hasEvents() const { return static_cast<bool>(_events.size()); }
+
+
     protected:
 
         std::vector<seq_len_t> _data;  /// Vector of 4-tpuples - pattern start, text start, alignment length and a text ID.

@@ -87,7 +87,11 @@ namespace ymir {
                     res += " ";
                 }
                 for (int j = this->getVarSeqStart(i); j <= this->getVarSeqEnd(i); ++j) {
-                    res += this->isVarMismatch(i, j) ? "1" : "0";
+                    if (this->hasEvents()) {
+                        res += this->isVarMismatch(i, j) ? "1" : "0";
+                    } else {
+                        res += "-";
+                    }
                 }
                 res += "\n";
 

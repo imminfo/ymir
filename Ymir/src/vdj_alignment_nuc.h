@@ -48,6 +48,8 @@ namespace ymir {
         error_num_t numDivMismatches(seg_index_t dgene, seg_index_t align_i, seq_len_t start, seq_len_t end) const {
             return _alignments.numMismatches(_segments[0] + _segments[1] + _n_D_alignments[dgene] + align_i, start, end);
         }
+
+        bool hasEvents() const { return _alignments.hasEvents(); }
         ///@}
 
 

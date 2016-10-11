@@ -111,7 +111,13 @@ namespace ymir {
         const GeneSegment& operator[] (seg_index_t index) const {
 #ifndef DNDEBUG
             check_and_throw(index == 0 || index > _vec.size(), 
-                            "Gene segment alphabet [" + _name + "] error:\tindex " + std::to_string(index) + " is out of bounds");
+                            "Gene segment alphabet ["
+                            + _name
+                            + "] error:\tindex "
+                            + std::to_string(index)
+                            + " is out of bounds (max - "
+                            + std::to_string(_vec.size())
+                            + ")");
 #endif
             return _vec[index - 1];
         }
@@ -119,7 +125,12 @@ namespace ymir {
         const GeneSegment& operator[] (const std::string& name) const {
 #ifndef DNDEBUG
             check_and_throw(_map.find(name) == _map.end(), 
-                            "Gene segment alphabet [" + _name + "] error:\tcan't find allele " + name);
+                            "Gene segment alphabet ["
+                            + _name
+                            + "] error:\tcan't find allele "
+                            + "'"
+                            + name
+                            + "'");
 #endif
             return _vec[_map.at(name)];
         }

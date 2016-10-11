@@ -116,11 +116,6 @@ namespace ymir {
             }
         }
 
-
-        std::string get_prefix(const string &filename) const {
-            return "[" + filename + "]: ";
-        }
-
     };
 
 }

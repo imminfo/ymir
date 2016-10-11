@@ -674,6 +674,8 @@ namespace ymir {
                     }
                 }
 
+                std::cout << (int) num_codons << std::endl;
+
                 // remove trailing zeros
                 for (int codon_i = 0; codon_i < num_codons; ++codon_i) {
                     int bitsum = 0;
@@ -691,7 +693,7 @@ namespace ymir {
                 if (stop) { break; }
             }
 
-            if (bits.size() / 6 >= 4) { avec->addAlignment(gene, 1, 1, bits); }
+            if (bits.size() / 6 >= _params.threshold.v_threshold) { avec->addAlignment(gene, 1, 1, bits); }
 //            avec->addAlignment(gene, 1, 1, bits);
         }
 
@@ -800,7 +802,7 @@ namespace ymir {
                 bits2[bit_i + 5] = bits[bits.size() - bit_i - 1];
             }
 
-            if (bits2.size() / 6 >= 4) { avec->addAlignment(gene, p_size + 1 - bits2.size() / 6, t_size*3 + 1 - all_codons, bits2); }
+            if (bits2.size() / 6 >= _params.threshold.j_threshold) { avec->addAlignment(gene, p_size + 1 - bits2.size() / 6, t_size*3 + 1 - all_codons, bits2); }
 //            avec->addAlignment(gene, p_size + 1 - bits2.size() / 6, t_size*3 + 1 - all_codons, bits2);
         }
         ///@}

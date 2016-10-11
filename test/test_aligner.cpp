@@ -311,8 +311,8 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
 
     CodonAlignmentVector vec;
 
-    vector<string> avec1 {"V1", "V2", "V3"};
-    vector<string> svec1 {"TCGTT", "TCGT", "TCGTTC"};
+    vector<string> avec1 {"V1", "V2", "V3", "V4", "V5"};
+    vector<string> svec1 {"TCGTT", "TCGT", "TCGTTC", "TGGG", "TCGG"};
 
     vector<string> avec2 {"J1", "J2", "J3", "J4", "J5", "J6"};
     vector<string> svec2 {"CTTTA", "CCTT", "AGCCTG", "AGGCTG", "AATT", "TTT"};
@@ -321,7 +321,11 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     vector<string> svec3 {"AA", "AACCTT", "ACT"};
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
-    CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3));
+    CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3,
+                                                             VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
+                                                                                    AlignmentEventScore(1, -1, 1),
+                                                                                    AlignmentEventScore(1, -1, 1)),
+                                                             VDJAlignmentScoreThreshold(2, 2, 2)));
 
     // {'S', "TCT"}, {'S', "TCC"}, {'S', "TCA"}, {'S', "TCG"}, {'S', "AGT"}, {'S', "AGC"},
     // {'L', "TTA"}, {'L', "TTG"}, {'L', "CTT"}, {'L', "CTC"}, {'L', "CTA"}, {'L', "CTG"},
@@ -357,6 +361,23 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
     YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
     YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({true, true, false, false, false, false}, 0))
+
+    // {'C', "TGT"}, {'C', "TGC"},
+    // TG.GG
+    // TG.T
+    alignment = aligner.alignVar(4, "CL");
+    YMIR_ASSERT2(alignment.id(0), 4)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 2)
+
+    // TCG.C
+    // TCG.G
+    alignment = aligner.alignVar(5, "SL");
+    YMIR_ASSERT2(alignment.id(0), 5)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 3)
 
     // {'S', "TCT"}, {'S', "TCC"}, {'S', "TCA"}, {'S', "TCG"}, {'S', "AGT"}, {'S', "AGC"},
     // {'L', "TTA"}, {'L', "TTG"}, {'L', "CTT"}, {'L', "CTC"}, {'L', "CTA"}, {'L', "CTG"},
@@ -416,12 +437,14 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     // S: TCT TCC TCA TCG AGT AGC
     // F: TTT TTC
     alignment = aligner.alignJoi(5, "SF");
+    YMIR_ASSERT2(alignment.size(), 1)
     YMIR_ASSERT2(alignment.id(0), 5)
     YMIR_ASSERT2(alignment.pattern_start(0), 3)
     YMIR_ASSERT2(alignment.text_start(0), 5)
     YMIR_ASSERT2(alignment.len(0), 2)
 
     alignment = aligner.alignJoi(6, "ASF");
+    YMIR_ASSERT2(alignment.size(), 1)
     YMIR_ASSERT2(alignment.id(0), 6)
     YMIR_ASSERT2(alignment.pattern_start(0), 1)
     YMIR_ASSERT2(alignment.text_start(0), 7)

@@ -43,12 +43,15 @@ namespace ymir {
         typedef typename vdj_alignment_t::alignment_vector_t alignment_vector_t;
 
 
+        typedef VDJAlignmentBase<typename VDJAlignmentType::alignment_vector_t> base_class;
+
+
         /**
          * \brief Move constructor for _segments, _alignments and _n_D_alignments.
          */
         VDJAlignmentBuilder()
         {
-            vdj_alignment_t::_segments.fill(0);
+            base_class::_segments.fill(0);
             _n_Dalign.push_back(0);
         }
 
@@ -60,9 +63,9 @@ namespace ymir {
 
         VDJAlignmentType buildAlignment() {
             typename vdj_alignment_t::segments_storage_t segments;
-            segments[0] = vdj_alignment_t::_segments[0];
-            segments[1] = vdj_alignment_t::_segments[1];
-            segments[2] = vdj_alignment_t::_segments[2];
+            segments[0] = base_class::_segments[0];
+            segments[1] = base_class::_segments[1];
+            segments[2] = base_class::_segments[2];
 
             typename vdj_alignment_t::n_D_alignments_storage_t nDs = _n_Dalign;
             for (size_t i = 1; i < nDs.size(); ++i) {
@@ -79,7 +82,7 @@ namespace ymir {
             _Jalign.clear();
             _Dalign.clear();
 
-            vdj_alignment_t::_segments.fill(0);
+            base_class::_segments.fill(0);
             _n_Dalign.resize(1);
 
             // return std::move(VDJAlignment(std::move(segments), std::move(avec), std::move(nDs)));
@@ -93,14 +96,14 @@ namespace ymir {
          */
         ///@{
         VDJAlignmentBuilder& addVarAlignment(seg_index_t vseg, seq_len_t vstart, seq_len_t seqstart, seq_len_t alignment_len) {
-            ++vdj_alignment_t::_segments[0];
+            ++base_class::_segments[0];
             _Valign.addAlignment(vseg, vstart, seqstart, alignment_len);
             return *this;
         }
 
 
         VDJAlignmentBuilder& addJoiAlignment(seg_index_t jseg, seq_len_t jstart, seq_len_t seqstart, seq_len_t alignment_len) {
-            ++vdj_alignment_t::_segments[1];
+            ++base_class::_segments[1];
             _Jalign.addAlignment(jseg, jstart, seqstart, alignment_len);
             return *this;
         }
@@ -109,7 +112,7 @@ namespace ymir {
             if (_Dseg.size() == 0 || dseg != _Dseg[_Dseg.size() - 1]) {
                 _n_Dalign.push_back(0);
                 _Dseg.push_back(dseg);
-                ++vdj_alignment_t::_segments[2];
+                ++base_class::_segments[2];
             }
 
             ++_n_Dalign[_n_Dalign.size() - 1];
@@ -130,19 +133,19 @@ namespace ymir {
         ///@{
         VDJAlignmentBuilder& addVarAlignment(const AlignmentVectorBase &vec) {
             _Valign.extend(vec);
-            vdj_alignment_t::_segments[0] += vec.size();
+            base_class::_segments[0] += vec.size();
             return *this;
         }
 
         VDJAlignmentBuilder& addJoiAlignment(const AlignmentVectorBase &vec) {
             _Jalign.extend(vec);
-            vdj_alignment_t::_segments[1] += vec.size();
+            base_class::_segments[1] += vec.size();
             return *this;
         }
 
         VDJAlignmentBuilder& addDivAlignment(const AlignmentVectorBase &vec) {
             _n_Dalign.push_back(vec.size());
-            ++vdj_alignment_t::_segments[2];
+            ++base_class::_segments[2];
             _Dalign.extend(vec);
             return *this;
         }

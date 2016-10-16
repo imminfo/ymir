@@ -59,12 +59,12 @@ namespace ymir {
 
 
         VDJAlignmentType buildAlignment() {
-            typename VDJAlignmentType::segments_storage_t segments;
-            segments[0] = VDJAlignmentType::_segments[0];
-            segments[1] = VDJAlignmentType::_segments[1];
-            segments[2] = VDJAlignmentType::_segments[2];
+            typename vdj_alignment_t::segments_storage_t segments;
+            segments[0] = vdj_alignment_t::_segments[0];
+            segments[1] = vdj_alignment_t::_segments[1];
+            segments[2] = vdj_alignment_t::_segments[2];
 
-            typename VDJAlignmentType::n_D_alignments_storage_t nDs = _n_Dalign;
+            typename vdj_alignment_t::n_D_alignments_storage_t nDs = _n_Dalign;
             for (size_t i = 1; i < nDs.size(); ++i) {
                 nDs[i] += nDs[i-1];
             }
@@ -79,12 +79,12 @@ namespace ymir {
             _Jalign.clear();
             _Dalign.clear();
 
-            VDJAlignmentType::_segments.fill(0);
+            vdj_alignment_t::_segments.fill(0);
             _n_Dalign.resize(1);
 
             // return std::move(VDJAlignment(std::move(segments), std::move(avec), std::move(nDs)));
             // return VDJAlignment(std::move(segments), std::move(avec), std::move(nDs));
-            return VDJAlignmentType(segments, avec, nDs);
+            return vdj_alignment_t(segments, avec, nDs);
         }
 
 

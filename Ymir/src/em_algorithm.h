@@ -179,9 +179,19 @@ namespace ymir {
             model.updateModelParameterVector(new_param_vec);
             model.updateEventProbabilities(&maag_rep);
 
+            std::cout << "Recomputing generation probabilities...";
+#ifdef USE_OMP
+            #if OMP_THREADS == -1
+            #pragma omp parallel for
+#else
+            #pragma omp parallel for num_threads(OMP_THREADS)
+#endif
+#endif
             for (size_t i = 0; i < maag_rep.size(); ++i) {
                 prob_vec[i] = maag_rep[i].fullProbability();
             }
+            std::cout << " Done." << std::endl;
+
             prob_summary(prob_vec, prev_ll);
             prev_ll = loglikelihood(prob_vec);
         }

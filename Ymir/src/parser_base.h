@@ -439,7 +439,7 @@ namespace ymir {
                     // TODO: remove bad clonotypes here ???
                     //
                     vec.push_back(_aligner->buildClonotype());
-                    std::cout << vec[vec.size() - 1].toString(_genes) << std::endl;
+//                    std::cout << vec[vec.size() - 1].toString(_genes) << std::endl;
                 }
             }
         }

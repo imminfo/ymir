@@ -51,7 +51,14 @@ namespace ymir {
 
             ModelParameterVector new_param_vec = model.event_probabilities();
             new_param_vec.fill(1);
+
+
+            //
+            // SET ERROR HERE
+            //
             new_param_vec.set_error_prob(.0003);
+
+
             new_param_vec.normaliseEventFamilies();
             model.updateModelParameterVector(new_param_vec);
 

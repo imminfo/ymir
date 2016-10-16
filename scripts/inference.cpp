@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
         infer_algo = new EMAlgorithm();
         algo_name = "EM-algorithm";
         params = params.set("niter", std::stoi(argv[6]));  // argv[5] == "niter"
+//        params = params.set("sample", std::stoi(argv[7]));  // argv[6] == "niter"
     }
 
     std::cout << "Input cloneset file:\t" << in_file_path << std::endl;

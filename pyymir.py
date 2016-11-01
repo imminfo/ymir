@@ -118,7 +118,7 @@ def parse_format(args):
     return res, flag
 
 
-def parse_output_files(infiles, args):
+def parse_output_files(infiles, args, seq_type):
     """
     Create the output folder for output files.
     """
@@ -126,7 +126,8 @@ def parse_output_files(infiles, args):
     args_out = args.output
     if not os.path.exists(args_out):
         os.makedirs(args_out)
-    return [args_out + "/" + x[x.rfind("/") + 1:] + ".ymir_out.txt" for x in infiles], True
+    postfix = "nuc" if seq_type == "n" else "aa";
+    return [args_out + "/" + x[x.rfind("/") + 1:] + ".ymir_probs_" + postfix + ".txt" for x in infiles], True
 
 
 def parse_output_models(infiles, args):

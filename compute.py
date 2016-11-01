@@ -16,12 +16,12 @@ if __name__ == "__main__":
     files, input_check = parse_input(args)
     model, model_check = parse_model(args)
     converter, format_check = parse_format(args)
-    out_files, out_check = parse_output_files(files, args)
+    out_files, out_check = parse_output_files(files, args, "n" if not args.aa else "a")
 
     print()
     if model_check and input_check and format_check and out_check:
         for i in range(len(files)):
-            print(i + 1, ":")
+            print(i + 1, " / ", len(files). ":")
             conv_file, convert_flag = convert(files[i], converter)
             if convert_flag:
                 print()

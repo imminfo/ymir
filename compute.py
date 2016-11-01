@@ -21,7 +21,7 @@ if __name__ == "__main__":
     print()
     if model_check and input_check and format_check and out_check:
         for i in range(len(files)):
-            print(i + 1, " / ", len(files). ":")
+            print(i + 1, " / ", len(files), ":")
             conv_file, convert_flag = convert(files[i], converter)
             if convert_flag:
                 print()

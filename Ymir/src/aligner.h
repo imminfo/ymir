@@ -582,7 +582,7 @@ namespace ymir {
         }
 
 
-        ClonotypeAA toAminoAcid(const ClonotypeNuc &clonotype, bool use_aligned_segments = false) {
+        ClonotypeAA toAminoAcid(const ClonotypeNuc &clonotype, bool use_aligned_segments = true) {
             this->setSequence(clonotype.aa_sequence());
             this->setRecombination(clonotype.recombination());
             if (use_aligned_segments) {
@@ -602,25 +602,38 @@ namespace ymir {
         }
 
 
-        void toAminoAcid(const ClonesetViewNuc &cloneset, ClonesetAA *cloneset_aa, bool use_aligned_segments = false) {
+        std::vector<size_t> toAminoAcid(const ClonesetViewNuc &cloneset, ClonesetAA *cloneset_aa, bool use_aligned_segments = true) {
             ClonotypeAAVector vec;
             vec.reserve(cloneset.size());
-            int stats = 0;
+            std::vector<size_t> noncoding_indices;
+            noncoding_indices.reserve(cloneset.size());
+            size_t stats_bad_v = 0, stats_bad_j = 0, stats_bad_both = 0;
             for (size_t i = 0; i < cloneset.size(); ++i) {
                 if (cloneset[i].isCoding()) {
                     auto res = this->toAminoAcid(cloneset[i], use_aligned_segments);
                     if (res.nVar() && res.nJoi()) {
                         vec.push_back(res);
                     } else {
-                        ++stats;
+                        stats_bad_v    += (!res.nVar()) &&   res.nJoi();
+                        stats_bad_j    +=   res.nVar()  && (!res.nJoi());
+                        stats_bad_both += (!res.nVar()) && (!res.nJoi());
                     }
+                } else {
+                    noncoding_indices.push_back(i);
                 }
+
                 if ((i+1) % 50000 == 0) {
-                    std::cout << "converted " << (int) i << " clonotypes" << std::endl;
+                    std::cout << "converted " << (size_t) (i+1) << " clonotypes" << std::endl;
                 }
             }
-            std::cout << "bad clonotypes " << (int) stats << " clonotypes" << std::endl;
+            std::cout << "err. clonotypes: " << std::endl <<
+                    "\toverall: " << (size_t) (stats_bad_v + stats_bad_j + stats_bad_both) << std::endl <<
+                    "\tbad V:   "   << (size_t) (stats_bad_v) << std::endl <<
+                    "\tbad J:   "   << (size_t) (stats_bad_j) << std::endl <<
+                    "\tbad V+J: " << (size_t) (stats_bad_both) << std::endl;
             cloneset_aa->swap(vec);
+
+            return noncoding_indices;
         }
 
 
@@ -674,7 +687,7 @@ namespace ymir {
                     }
                 }
 
-                std::cout << (int) num_codons << std::endl;
+//                std::cout << (int) num_codons << std::endl;
 
                 // remove trailing zeros
                 for (int codon_i = 0; codon_i < num_codons; ++codon_i) {

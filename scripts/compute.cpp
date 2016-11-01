@@ -50,13 +50,29 @@ int main(int argc, char* argv[]) {
         ParserNuc parser(new NaiveCDR3NucleotideAligner(model.gene_segments(), VDJAlignerParameters(3)));
         ClonesetNuc cloneset;
 
+        auto alignment_column_options = AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
+                                                               AlignmentColumnOptions::OVERWRITE,
+                                                               AlignmentColumnOptions::REALIGN_PROVIDED);
+
+        auto vdj_aligner_parameters_nuc = VDJAlignerParameters(3,
+                                                               VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
+                                                                                      AlignmentEventScore(1, -1, 1),
+                                                                                      AlignmentEventScore(1, -1, 1)),
+                                                               VDJAlignmentScoreThreshold(2, 2, 2));
+
+        auto vdj_aligner_parameters_aa =  VDJAlignerParameters(3,
+                                                               VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
+                                                                                      AlignmentEventScore(1, -1, 1),
+                                                                                      AlignmentEventScore(1, -1, 1)),
+                                                               VDJAlignmentScoreThreshold(1, 1, 1));
+
         if (parser.openAndParse(in_file_path,
                                 &cloneset,
                                 model.gene_segments(),
                                 model.recombination(),
-                                AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
-                                                       AlignmentColumnOptions::OVERWRITE,
-                                                       AlignmentColumnOptions::REALIGN_PROVIDED))) {
+                                alignment_column_options,
+                                vdj_aligner_parameters_nuc))
+        {
             if (recompute_genes) {
                 std::cout << std::endl;
                 std::cout << "Recomputing gene usage on " << (size_t) cloneset.noncoding().size() << " clonotypes." << std::endl;
@@ -65,6 +81,8 @@ int main(int argc, char* argv[]) {
             std::cout << std::endl;
 
             std::vector<prob_t> prob_vec;
+            std::vector<size_t> noncoding_indices;
+            std::vector<prob_t> coding_probs;
 
             if (argv[5][0] == 'n') {
                 prob_vec = model.computeFullProbabilities(cloneset, NO_ERRORS);
@@ -72,10 +90,10 @@ int main(int argc, char* argv[]) {
                 ClonesetAA cloneset_aa;
 
                 std::cout << "Converting nucleotide clonotypes to amino acid clonotypes..." << std::endl;
-                CDR3AminoAcidAligner(model.gene_segments(), VDJAlignerParameters(3)).toAminoAcid(cloneset, &cloneset_aa, true);
+                noncoding_indices = CDR3AminoAcidAligner(model.gene_segments(), vdj_aligner_parameters_aa).toAminoAcid(cloneset, &cloneset_aa, true);
                 std::cout << "Done." << std::endl << std::endl;
 
-                prob_vec = model.computeFullProbabilities(cloneset_aa);
+                coding_probs = model.computeFullProbabilities(cloneset_aa);
             }
 
             std::ofstream ofs;
@@ -86,8 +104,25 @@ int main(int argc, char* argv[]) {
             prob_summary(prob_vec);
 
             if (ofs.is_open()) {
-                for (auto i = 0; i < prob_vec.size(); ++i) {
-                    ofs << prob_vec[i] << std::endl;
+                // Write nucleotide probabilities.
+                if (prob_vec.size()) {
+                    for (auto i = 0; i < prob_vec.size(); ++i) {
+                        ofs << prob_vec[i] << std::endl;
+                    }
+                }
+
+                // Write amino acid probabilities.
+                else {
+                    size_t k = 0, j = 0;
+                    for (auto i = 0; i < cloneset.size(); ++i) {
+                        if (k != noncoding_indices.size() && i == noncoding_indices[k]) {
+                            ofs << "-1" << std::endl;
+                            ++k;
+                        } else {
+                            ofs << coding_probs[j] << std::endl;
+                            ++j;
+                        }
+                    }
                 }
             } else {
                 std::cout << "Problems with the output stream. Terminating..." << std::endl;

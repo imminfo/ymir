@@ -159,7 +159,13 @@ namespace ymir {
                     }
                 }
 
-                _aligner->align(gene, segvec[seg_order]);
+                if (!_aligner->align(gene, segvec[seg_order])) {
+                    if (gene == VARIABLE) {
+                        _stats.update_no_algn<VARIABLE>();
+                    } else if (gene == JOINING) {
+                        _stats.update_no_algn<JOINING>();
+                    }
+                }
 
                 ++seg_order;
             }

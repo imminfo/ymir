@@ -744,8 +744,9 @@ namespace ymir {
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
                 tp2 = std::chrono::system_clock::now();
-                cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "<< "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs. " << (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1)) << endl;
-                tp1 = std::chrono::system_clock::now();
+                cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
+                << "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs. "
+                << "ETA: " << (int) ((cloneset.size() - i) / i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))) << endl;
             }
 #endif
         }
@@ -796,8 +797,9 @@ namespace ymir {
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
                 tp2 = std::chrono::system_clock::now();
-                std::cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] " << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities. " << (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1)) << endl;
-                tp1 = std::chrono::system_clock::now();
+                cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
+                << "Computed " << (int) (i+1) << " / " << (int) (cloneset.size()) << " assembling probabilities. "
+                << "ETA: " << (int) ((cloneset.size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))) << endl;
             }
 #endif
         }

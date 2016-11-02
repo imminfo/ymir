@@ -426,11 +426,7 @@ namespace ymir {
         MAAGNucRepertoire res;
         res.resize(cloneset.size());
 #ifdef USE_OMP
-        #if OMP_THREADS == -1
-            #pragma omp parallel for
-#else
-            #pragma omp parallel for  num_threads(OMP_THREADS)
-#endif
+        #pragma omp parallel for
 #endif
         for (size_t i = 0; i < cloneset.size(); ++i) {
             res[i] = this->build(cloneset[i], metadata_mode, error_mode);
@@ -468,11 +464,7 @@ namespace ymir {
         }
 
 #ifdef USE_OMP
-        #if OMP_THREADS == -1
-            #pragma omp parallel for
-#else
-            #pragma omp parallel for  num_threads(OMP_THREADS)
-#endif
+        #pragma omp parallel for
 #endif
         for (size_t i = 0; i < cloneset.size(); ++i) {
             res.push_back(buildAndCompute(cloneset[i], error_mode, action));
@@ -630,11 +622,7 @@ namespace ymir {
         }
 
 #ifdef USE_OMP
-        #if OMP_THREADS == -1
-            #pragma omp parallel for
-#else
-            #pragma omp parallel for num_threads(OMP_THREADS)
-#endif
+        #pragma omp parallel for
 #endif
         for (size_t i = 0; i < repertoire->size(); ++i) {
             this->updateEventProbabilities(&(*repertoire)[i]);
@@ -732,11 +720,7 @@ namespace ymir {
         res.resize(cloneset.size());
         tp1 = std::chrono::system_clock::now();
 #ifdef USE_OMP
-        #if OMP_THREADS == -1
-            #pragma omp parallel for
-        #else
-            #pragma omp parallel for  num_threads(OMP_THREADS)
-        #endif
+        #pragma omp parallel for
 #endif
         for (size_t i = 0; i < cloneset.size(); ++i) {
             res[i] = this->build(cloneset[i]);
@@ -782,11 +766,7 @@ namespace ymir {
         tp1 = std::chrono::system_clock::now();
 
 #ifdef USE_OMP
-        #if OMP_THREADS == -1
-            #pragma omp parallel for
-#else
-            #pragma omp parallel for  num_threads(OMP_THREADS)
-#endif
+        #pragma omp parallel for
 #endif
         for (size_t i = 0; i < cloneset.size(); ++i) {
 //            std::cout << "i:" << i << std::endl;

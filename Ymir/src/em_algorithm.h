@@ -44,7 +44,7 @@ namespace ymir {
                 return std::vector<prob_t>();
             }
 
-            cout << "\t# iterations"
+            cout << "\t#iterations:"
                  << (int) algo_param["niter"].asUInt()
                  << std::endl;
 
@@ -98,17 +98,12 @@ namespace ymir {
                 new_param_vec.fill(0);
 
 #ifdef USE_OMP
-#if OMP_THREADS == -1
-            #pragma omp parallel
-#else
-            #pragma omp parallel num_threads(OMP_THREADS)
-#endif
                 {
                     auto local_param_vec = new_param_vec;
                     int tid = omp_get_thread_num();
 
-                    size_t start_i = tid * (maag_rep.size() / OMP_THREADS),
-                           end_i = std::min((tid + 1) * maag_rep.size() / OMP_THREADS, maag_rep.size());
+                    size_t start_i = tid * (maag_rep.size() / omp_get_max_threads()),
+                           end_i = std::min((tid + 1) * maag_rep.size() / omp_get_max_threads(), maag_rep.size());
                     #pragma omp for nowait
                     for (size_t i = start_i; i < end_i; ++i) {
                         this->updateTempVec(fb, maag_rep[i], local_param_vec, error_mode);
@@ -212,11 +207,7 @@ namespace ymir {
 
             std::cout << "Recomputing generation probabilities...";
 #ifdef USE_OMP
-            #if OMP_THREADS == -1
             #pragma omp parallel for
-#else
-            #pragma omp parallel for num_threads(OMP_THREADS)
-#endif
 #endif
             for (size_t i = 0; i < maag_rep.size(); ++i) {
                 prob_vec[i] = maag_rep[i].fullProbability();

@@ -7,6 +7,9 @@
 
 
 #include "statisticalinferencealgorithm.h"
+#ifdef USE_OMP
+#include <omp.h>
+#endif
 
 
 namespace ymir {
@@ -41,10 +44,13 @@ namespace ymir {
                 return std::vector<prob_t>();
             }
 
+            cout << "\t# iterations"
+                 << (int) algo_param["niter"].asUInt()
+                 << std::endl;
 
             size_t sample = algo_param["sample"].asUInt();
             if (sample) {
-                std::cout << "\tsample size: "
+                std::cout << "\tsample size (doesn't work yet): "
                           << (int) sample
                           << std::endl;
             }
@@ -87,9 +93,32 @@ namespace ymir {
             std::chrono::system_clock::time_point tp1, tp2;
             MAAGForwardBackwardAlgorithm fb;
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
-                cout << endl << "Iteration:\t" << (size_t) iter << endl;
+                cout << endl << "Iteration:\t" << (size_t) iter << " / " << (size_t) algo_param["niter"].asUInt() << endl;
 
                 new_param_vec.fill(0);
+
+#ifdef USE_OMP
+#if OMP_THREADS == -1
+            #pragma omp parallel
+#else
+            #pragma omp parallel num_threads(OMP_THREADS)
+#endif
+                {
+                    auto local_param_vec = new_param_vec;
+                    int tid = omp_get_thread_num();
+
+                    #pragma omp for nowait
+                    size_t start_i = 0, end_i = 0;
+                    for (size_t i = start_i; i < end_i; ++i) {
+                        this->updateTempVec(fb, maag_rep[i], local_param_vec, error_mode);
+                    }
+
+                    for (size_t i = 0; i < new_param_vec.size(); ++i) {
+                        #pragma omp atomic
+                        new_param_vec[i] += local_param_vec[i];
+                    }
+                }
+#else
 
                 tp1 = std::chrono::system_clock::now();
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
@@ -102,6 +131,7 @@ namespace ymir {
                         }
                     }
                 }
+#endif
 
                 this->updateModel(model, new_param_vec, maag_rep, prob_vec, prev_ll, removed, error_mode);
 

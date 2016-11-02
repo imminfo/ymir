@@ -97,6 +97,8 @@ namespace ymir {
                 new_param_vec.fill(0);
 
 #ifdef USE_OMP
+                tp1 = std::chrono::system_clock::now();
+
                 auto max_thrs = omp_get_max_threads();
 
                 std::vector<size_t> blocks;
@@ -130,6 +132,8 @@ namespace ymir {
                         new_param_vec[i] += local_param_vec[tid][i];
                     }
                 }
+
+                std::cout << (std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - std::chrono::system_clock::to_time_t(tp1)) << " sec. per iteration" << std::endl;
 #else
                 MAAGForwardBackwardAlgorithm fb;
                 tp1 = std::chrono::system_clock::now();

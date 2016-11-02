@@ -107,7 +107,8 @@ namespace ymir {
                     auto local_param_vec = new_param_vec;
                     int tid = omp_get_thread_num();
 
-                    size_t start_i = 0, end_i = 0;
+                    size_t start_i = tid * (maag_rep.size() / OMP_THREADS),
+                           end_i = std::min((tid + 1) * maag_rep.size() / OMP_THREADS, maag_rep.size());
                     #pragma omp for nowait
                     for (size_t i = start_i; i < end_i; ++i) {
                         this->updateTempVec(fb, maag_rep[i], local_param_vec, error_mode);

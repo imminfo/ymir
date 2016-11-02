@@ -44,7 +44,7 @@ namespace ymir {
                 return std::vector<prob_t>();
             }
 
-            cout << "\t#iterations:"
+            cout << "\t#iterations: "
                  << (int) algo_param["niter"].asUInt()
                  << std::endl;
 
@@ -99,32 +99,38 @@ namespace ymir {
 #ifdef USE_OMP
                 auto max_thrs = omp_get_max_threads();
 
+                std::vector<size_t> blocks;
+                size_t block_step = std::min(maag_rep.size() / max_thrs + 1, maag_rep.size());
+                blocks.push_back(0);
+                blocks.push_back(block_step);
+                for (auto i = 1; i < max_thrs; ++i) {
+                    blocks.push_back(*--blocks.end());
+                    blocks.push_back(std::min(*--blocks.end() + block_step, maag_rep.size()));
+                }
+
                 #pragma omp parallel
                 {
-                    MAAGForwardBackwardAlgorithm fb;
-
-                    auto local_param_vec = new_param_vec;
-                    local_param_vec.fill(0);
+                    vector<MAAGForwardBackwardAlgorithm> fb(max_thrs);
+                    vector<ModelParameterVector> local_param_vec;
+                    for (auto i = 0; i < max_thrs; ++i) { local_param_vec.push_back(new_param_vec); }
 
                     int tid = omp_get_thread_num();
 
-                    size_t start_i = tid * (maag_rep.size() / max_thrs),
-                           end_i = std::min((tid + 1) * maag_rep.size() / max_thrs, maag_rep.size());
+                    size_t start_i = blocks[tid*2],
+                           end_i = blocks[tid*2 + 1];
 
-                    #pragma omp for nowait
                     for (size_t i = start_i; i < end_i; ++i) {
                         if (good_clonotypes[i]) {
-                            this->updateTempVec(fb, maag_rep[i], local_param_vec, error_mode);
+                            this->updateTempVec(fb[tid], maag_rep[i], local_param_vec[tid], error_mode);
                         }
                     }
 
                     for (size_t i = 0; i < new_param_vec.size(); ++i) {
                         #pragma omp atomic
-                        new_param_vec[i] += local_param_vec[i];
+                        new_param_vec[i] += local_param_vec[tid][i];
                     }
                 }
 #else
-
                 MAAGForwardBackwardAlgorithm fb;
                 tp1 = std::chrono::system_clock::now();
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
@@ -168,6 +174,7 @@ namespace ymir {
                 new_param_vec[ep.first] += ep.second;
 
                 if (std::isnan(ep.second)) {
+                    cout << "NaNs in the forw-back!" << endl;
                     return false;
                 }
             }

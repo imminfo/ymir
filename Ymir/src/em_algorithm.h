@@ -91,22 +91,31 @@ namespace ymir {
             logLvec.push_back(prev_ll);
 
             std::chrono::system_clock::time_point tp1, tp2;
-            MAAGForwardBackwardAlgorithm fb;
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
                 cout << endl << "Iteration:\t" << (size_t) iter << " / " << (size_t) algo_param["niter"].asUInt() << endl;
 
                 new_param_vec.fill(0);
 
 #ifdef USE_OMP
+                auto max_thrs = omp_get_max_threads();
+
+                #pragma omp parallel
                 {
+                    MAAGForwardBackwardAlgorithm fb;
+
                     auto local_param_vec = new_param_vec;
+                    local_param_vec.fill(0);
+
                     int tid = omp_get_thread_num();
 
-                    size_t start_i = tid * (maag_rep.size() / omp_get_max_threads()),
-                           end_i = std::min((tid + 1) * maag_rep.size() / omp_get_max_threads(), maag_rep.size());
+                    size_t start_i = tid * (maag_rep.size() / max_thrs),
+                           end_i = std::min((tid + 1) * maag_rep.size() / max_thrs, maag_rep.size());
+
                     #pragma omp for nowait
                     for (size_t i = start_i; i < end_i; ++i) {
-                        this->updateTempVec(fb, maag_rep[i], local_param_vec, error_mode);
+                        if (good_clonotypes[i]) {
+                            this->updateTempVec(fb, maag_rep[i], local_param_vec, error_mode);
+                        }
                     }
 
                     for (size_t i = 0; i < new_param_vec.size(); ++i) {
@@ -116,6 +125,7 @@ namespace ymir {
                 }
 #else
 
+                MAAGForwardBackwardAlgorithm fb;
                 tp1 = std::chrono::system_clock::now();
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
                     if ((i+1) % 25000 == 0) {
@@ -145,7 +155,7 @@ namespace ymir {
     protected:
 
         bool updateTempVec(MAAGForwardBackwardAlgorithm &fb,
-                           MAAGnuc &maag,
+                           const MAAGnuc &maag,
                            ModelParameterVector &new_param_vec,
                            ErrorMode error_mode) const
         {

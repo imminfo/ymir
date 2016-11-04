@@ -11,8 +11,6 @@
 #include "maag.h"
 #include "modelparametervector.h"
 #include "repertoire.h"
-#include <chrono>
-#include <ctime>
 
 
 namespace ymir {
@@ -425,6 +423,9 @@ namespace ymir {
 
         MAAGNucRepertoire res;
         res.resize(cloneset.size());
+
+        std::chrono::system_clock::time_point tp1, tp2;
+        tp1 = std::chrono::system_clock::now();
 #ifdef USE_OMP
         #pragma omp parallel for
 #endif
@@ -433,13 +434,16 @@ namespace ymir {
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
-                cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "<< "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs." << endl;
+                tp2 = std::chrono::system_clock::now();
+                cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
+                     << "Build " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs. "
+                     << "ETA: " << time_format(static_cast<std::time_t>(((cloneset.size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))))) << endl;
             }
 #endif
         }
 
         if (verbose) {
-            cout << "[100%] Built " << (int) (cloneset.size()) << " MAAGs." << endl;
+            cout << "[100%] Built " << (int) (cloneset.size()) << " MAAGs in " << time_diff_now(tp1) << endl;
         }
 
         return res;
@@ -463,6 +467,8 @@ namespace ymir {
             verbose_step = cloneset.size() / 10;
         }
 
+        std::chrono::system_clock::time_point tp1, tp2;
+        tp1 = std::chrono::system_clock::now();
 #ifdef USE_OMP
         #pragma omp parallel for
 #endif
@@ -471,13 +477,16 @@ namespace ymir {
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
-                std::cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] " << "Computed " << (int) (i+1) << " / " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
+                tp2 = std::chrono::system_clock::now();
+                cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
+                     << "Computed " << (int) (i+1) << " / " << (int) (cloneset.size()) << " assembling probabilities. "
+                     << "ETA: " << time_format(static_cast<std::time_t>(((cloneset.size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))))) << endl;
             }
 #endif
         }
 
         if (verbose) {
-            std::cout << "[100%] Computed " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
+            std::cout << "[100%] Computed " << (size_t) cloneset.size() << " assembling probabilities in " << time_diff_now(tp1) << std::endl;
         }
 
         return res;
@@ -621,6 +630,8 @@ namespace ymir {
             verbose_step = repertoire->size() / 10;
         }
 
+        std::chrono::system_clock::time_point tp1, tp2;
+        tp1 = std::chrono::system_clock::now();
 #ifdef USE_OMP
         #pragma omp parallel for
 #endif
@@ -629,13 +640,16 @@ namespace ymir {
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != repertoire->size()) {
-                cout << "[" << (int) ((100*(i+1)) / repertoire->size()) << "%] " << "Updated " << (size_t) (i+1) << " / " << (size_t) repertoire->size() << " MAAGs." << endl;
+                tp2 = std::chrono::system_clock::now();
+                cout << "[" << (int) ((100*(i+1)) / repertoire->size()) << "%] "
+                     << "Updated " << (int) (i+1) << " / " << (int) (repertoire->size()) << " MAAGs. "
+                     << "ETA: " << time_format(static_cast<std::time_t>(((repertoire->size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))))) << endl;
             }
 #endif
         }
 
         if (verbose) {
-            cout << "[100%] Updated " << (int) (repertoire->size()) << " MAAGs." << endl;
+            std::cout << "[100%] Updated " << (int) (repertoire->size()) << " MAAGs in " << time_diff_now(tp1) << std::endl;
         }
     }
 
@@ -714,10 +728,10 @@ namespace ymir {
             verbose_step = cloneset.size() / 10;
         }
 
-        std::chrono::system_clock::time_point tp1, tp2;
-
         MAAGAARepertoire res;
         res.resize(cloneset.size());
+
+        std::chrono::system_clock::time_point tp1, tp2;
         tp1 = std::chrono::system_clock::now();
 #ifdef USE_OMP
         #pragma omp parallel for
@@ -729,14 +743,14 @@ namespace ymir {
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
                 tp2 = std::chrono::system_clock::now();
                 cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
-                << "Built " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs. "
-                << "ETA: " << (int) ((cloneset.size() - i) / i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))) << endl;
+                     << "Build " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs. "
+                     << "ETA: " << time_format(static_cast<std::time_t>(((cloneset.size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))))) << endl;
             }
 #endif
         }
 
         if (verbose) {
-            cout << "[100%] Built " << (int) (cloneset.size()) << " MAAGs." << endl;
+            std::cout << "[100%] Built " << (int) (cloneset.size()) << " MAAGs in " << time_diff_now(tp1) << std::endl;
         }
 
         return res;
@@ -778,14 +792,14 @@ namespace ymir {
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
                 tp2 = std::chrono::system_clock::now();
                 cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
-                << "Computed " << (int) (i+1) << " / " << (int) (cloneset.size()) << " assembling probabilities. "
-                << "ETA: " << (int) ((cloneset.size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))) << endl;
+                     << "Computed " << (int) (i+1) << " / " << (int) (cloneset.size()) << " assembling probabilities. "
+                     << "ETA: " << time_format(static_cast<std::time_t>(((cloneset.size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))))) << endl;
             }
 #endif
         }
 
         if (verbose) {
-            std::cout << "[100%] Computed " << (size_t) cloneset.size() << " assembling probabilities." << std::endl;
+            std::cout << "[100%] Computed " << (size_t) cloneset.size() << " assembling probabilities in " << time_diff_now(tp1) << std::endl;
         }
 
         return res;

@@ -27,6 +27,8 @@
 
 #include <string>
 #include <vector>
+#include <chrono>
+#include <ctime>
 #include "math.h"
 
 #include "types.h"
@@ -159,6 +161,25 @@ namespace ymir {
         return false;
     }
 
+
+    inline std::string time_format(std::time_t some_time) {
+        struct std::tm *ptm = std::gmtime(&some_time);
+        char buffer[30];
+        std::strftime(buffer, 30, "%Hh%Mm%Ss", ptm);
+//        delete ptm;
+        return std::string(buffer);
+    }
+
+
+    inline std::string time_diff(std::chrono::system_clock::time_point tp1, std::chrono::system_clock::time_point tp2) {
+        std::time_t diff = std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1);
+        return time_format(diff);
+    }
+
+
+    inline std::string time_diff_now(std::chrono::system_clock::time_point tp1) {
+        return time_diff(tp1, std::chrono::system_clock::now());
+    }
 
 }
 

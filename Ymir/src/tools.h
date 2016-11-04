@@ -181,6 +181,12 @@ namespace ymir {
         return time_diff(tp1, std::chrono::system_clock::now());
     }
 
+
+    inline std::string est_time(std::chrono::system_clock::time_point tp1, size_t n_objects, size_t cur_object) {
+        return time_format(static_cast<std::time_t>(((n_objects - cur_object) / (float) cur_object
+                                                     * (std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - std::chrono::system_clock::to_time_t(tp1)))));
+    }
+
 }
 
 #endif

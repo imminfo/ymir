@@ -7,9 +7,6 @@
 
 
 #include "statisticalinferencealgorithm.h"
-#ifdef USE_OMP
-#include <omp.h>
-#endif
 
 
 namespace ymir {
@@ -91,14 +88,19 @@ namespace ymir {
             logLvec.push_back(prev_ll);
 
             std::chrono::system_clock::time_point tp1, tp2;
+            tp1 = std::chrono::system_clock::now();
             for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
-                cout << endl << "Iteration:\t" << (size_t) iter << " / " << (size_t) algo_param["niter"].asUInt() << endl;
+                if (iter == 1) {
+                    cout << endl << "Iteration:\t1 / " << (size_t) algo_param["niter"].asUInt() << endl;
+                } else {
+                    cout << endl << "Iteration:\t" << (size_t) iter << " / " << (size_t) algo_param["niter"].asUInt()
+                    << "ETA: " << est_time(tp1, algo_param["niter"].asUInt(), iter)
+                    << endl;
+                }
 
                 new_param_vec.fill(0);
 
 #ifdef USE_OMP
-                tp1 = std::chrono::system_clock::now();
-
                 auto max_thrs = omp_get_max_threads();
 
                 std::vector<size_t> blocks;
@@ -132,14 +134,12 @@ namespace ymir {
                         new_param_vec[i] += local_param_vec[tid][i];
                     }
                 }
-
-                std::cout << (std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - std::chrono::system_clock::to_time_t(tp1)) << " sec. per iteration" << std::endl;
 #else
                 MAAGForwardBackwardAlgorithm fb;
                 tp1 = std::chrono::system_clock::now();
                 for (size_t i = 0; i < maag_rep.size(); ++i) {
                     if ((i+1) % 25000 == 0) {
-                        cout << "Processed " << (int) i << " / " << (int) maag_rep.size() << " MAAGs.\t" << (std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - std::chrono::system_clock::to_time_t(tp1)) << " sec." << endl;
+                        cout << "Processed " << (int) i << " / " << (int) maag_rep.size() << " MAAGs.\t" << endl;
                     }
                     if (good_clonotypes[i]) {
                         if(!this->updateTempVec(fb, maag_rep[i], new_param_vec, error_mode)) {

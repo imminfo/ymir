@@ -424,8 +424,7 @@ namespace ymir {
         MAAGNucRepertoire res;
         res.resize(cloneset.size());
 
-        std::chrono::system_clock::time_point tp1, tp2;
-        tp1 = std::chrono::system_clock::now();
+        std::chrono::system_clock::time_point tp1 = std::chrono::system_clock::now();
 #ifdef USE_OMP
         #pragma omp parallel for
 #endif
@@ -434,10 +433,9 @@ namespace ymir {
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
-                tp2 = std::chrono::system_clock::now();
                 cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
                      << "Build " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs. "
-                     << "ETA: " << time_format(static_cast<std::time_t>(((cloneset.size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))))) << endl;
+                     << "ETA: " << est_time(tp1, cloneset.size(), i) << endl;
             }
 #endif
         }
@@ -467,8 +465,7 @@ namespace ymir {
             verbose_step = cloneset.size() / 10;
         }
 
-        std::chrono::system_clock::time_point tp1, tp2;
-        tp1 = std::chrono::system_clock::now();
+        std::chrono::system_clock::time_point tp1 = std::chrono::system_clock::now();
 #ifdef USE_OMP
         #pragma omp parallel for
 #endif
@@ -477,10 +474,9 @@ namespace ymir {
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
-                tp2 = std::chrono::system_clock::now();
                 cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
                      << "Computed " << (int) (i+1) << " / " << (int) (cloneset.size()) << " assembling probabilities. "
-                     << "ETA: " << time_format(static_cast<std::time_t>(((cloneset.size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))))) << endl;
+                     << "ETA: " << est_time(tp1, cloneset.size(), i) << endl;
             }
 #endif
         }
@@ -630,7 +626,7 @@ namespace ymir {
             verbose_step = repertoire->size() / 10;
         }
 
-        std::chrono::system_clock::time_point tp1, tp2;
+        std::chrono::system_clock::time_point tp1;
         tp1 = std::chrono::system_clock::now();
 #ifdef USE_OMP
         #pragma omp parallel for
@@ -640,10 +636,9 @@ namespace ymir {
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != repertoire->size()) {
-                tp2 = std::chrono::system_clock::now();
                 cout << "[" << (int) ((100*(i+1)) / repertoire->size()) << "%] "
                      << "Updated " << (int) (i+1) << " / " << (int) (repertoire->size()) << " MAAGs. "
-                     << "ETA: " << time_format(static_cast<std::time_t>(((repertoire->size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))))) << endl;
+                     << "ETA: " << est_time(tp1, repertoire->size(), i) << endl;
             }
 #endif
         }
@@ -731,8 +726,7 @@ namespace ymir {
         MAAGAARepertoire res;
         res.resize(cloneset.size());
 
-        std::chrono::system_clock::time_point tp1, tp2;
-        tp1 = std::chrono::system_clock::now();
+        std::chrono::system_clock::time_point tp1 = std::chrono::system_clock::now();
 #ifdef USE_OMP
         #pragma omp parallel for
 #endif
@@ -741,10 +735,9 @@ namespace ymir {
 
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
-                tp2 = std::chrono::system_clock::now();
                 cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
                      << "Build " << (int) (i+1) << " / " << (int) (cloneset.size()) << " MAAGs. "
-                     << "ETA: " << time_format(static_cast<std::time_t>(((cloneset.size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))))) << endl;
+                     << "ETA: " << est_time(tp1, cloneset.size(), i) << endl;
             }
 #endif
         }
@@ -793,7 +786,7 @@ namespace ymir {
                 tp2 = std::chrono::system_clock::now();
                 cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
                      << "Computed " << (int) (i+1) << " / " << (int) (cloneset.size()) << " assembling probabilities. "
-                     << "ETA: " << time_format(static_cast<std::time_t>(((cloneset.size() - i) / (float) i * (std::chrono::system_clock::to_time_t(tp2) - std::chrono::system_clock::to_time_t(tp1))))) << endl;
+                     << "ETA: " << est_time(tp1, cloneset.size(), i) << endl;
             }
 #endif
         }

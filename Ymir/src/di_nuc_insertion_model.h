@@ -298,8 +298,12 @@ namespace ymir {
 
             for (auto it_prev: CodonTable::table().aminoacids()) {
                 int16_t val_prev, val_next;
+                auto codon_prev = CodonTable::table().codons(it_prev.first),
+                        codon_next = CodonTable::table().codons(it_prev.first);
 
                 for (auto it_next: CodonTable::table().aminoacids()) {
+                    codon_next = CodonTable::table().codons(it_prev.next);
+
                     if (it_prev.first != '*' || it_next.first != "*") {
                         for (codon_hash hash_value_prev = 0; hash_value_prev <= 63; ++hash_value_prev) {
                             for (codon_hash hash_value_next = 0; hash_value_next <= 63; ++hash_value_next) {
@@ -308,9 +312,11 @@ namespace ymir {
 
                                 res_vec.fill(0);
 
+                                for (int i = 0; i < 6; ++i) { res_vec[i] = bithash[5 - i]; }
+
                                 for (int i = 0; i < 6; ++i) {
                                     for (int j = 0; j < 6; ++j) {
-                                        res_vec
+                                        res_vec[i] *= (*this)(nuc_hash(codon_prev.codon()[2]), nuc_hash(codon_next.codon()[0]));
                                     }
                                 }
 
@@ -330,6 +336,8 @@ namespace ymir {
                     // there are two different modes to process the codons.
                     // is start pos == 0 then hash value should reflect the _previous_ codon's hash value.
                     // is start pos == 1 or 2 then hash values should reflect the _actual_ codon's hash value
+                    // is start pos == 2 than all probs are 1s because _aa_probs_neis will reflect the
+                    // transition probabilities to the next codon if needed
                     for (codon_hash hash_value = 0; hash_value <= 63; ++hash_value) {
                         bitset6 bithash = hash_value;
 
@@ -344,6 +352,15 @@ namespace ymir {
                         (*_aa_probs_from)[val + (hash_value << 2) + 0] = res_vec;
 
                         // start_pos == 1 or 2
+                        (*this)(nuc_hash(codon.codon()[0]), nuc_hash(codon.codon()[1]))
+                        * (*this)(nuc_hash(codon.codon()[1]), nuc_hash(codon.codon()[2]));
+
+                        (*_aa_probs_from)[val + (hash_value << 2) + 1] = res_vec;
+
+
+                        (*_aa_probs_from)[val + (hash_value << 2) + 2] = res_vec;
+
+
 
 
                         for (int start_pos = 0; start_pos <= 2; ++start_pos) {

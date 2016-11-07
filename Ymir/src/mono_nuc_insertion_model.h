@@ -210,8 +210,7 @@ namespace ymir {
     private:
 
         // aminoacid + codon hash -> prob
-        // (aminoacid << 8) + codon_hash_value + start position
-        // reverse or not???
+        // (aminoacid << 8) + codon_hash_value + start (from) / end (to) position
         typedef shared_ptr<std::unordered_map<int16_t, prob_t>> shared_aa_ins_t;
 
         shared_aa_ins_t _aa_probs_from, _aa_probs_to;

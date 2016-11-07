@@ -641,6 +641,12 @@ namespace ymir {
 
         /**
          *
+         * For Diversity gene each inner codon's position corresponds to possible codons
+         * on the corresponding position on the D gene sequence, i.e., without any modification
+         * from neighbor positions. But each outer positions undergone modifications same as for
+         * V / J sequences. For the D3' side i-th position depends on i+1-th position.
+         * For the D5' side i+1-th position depends on i-th position.
+         *
          */
         ///@{
         void _alignVar(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
@@ -711,33 +717,34 @@ namespace ymir {
         }
 
         void _alignDiv(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
-//            seq_len_t match_min_len = _params.min_D_len;
-//            seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
-//            seq_len_t p_start, t_start;
-//            AlignmentVectorBase::events_storage_t bitvec;
-//            bitvec.reserve(p_size + 1);
-//
-//            for (seq_len_t pattern_i = 0; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
-//                min_subsize = min(p_size - pattern_i, (int) t_size);
-//                if (min_subsize >= match_min_len) {
-//                    bitvec.resize(min_subsize);
-//                    for (seq_len_t i = 0; i < min_subsize; ++i) {
-//                        bitvec[i] = pattern[pattern_i + i] != text[i];
-//                    }
-//                    avec->addAlignment(gene, pattern_i + 1, 1, bitvec);
-//                }
-//            }
-//
-//            for (seq_len_t text_i = 1; text_i < t_size - match_min_len + 1; ++text_i) {
-//                min_subsize = min((int) p_size, t_size - text_i);
-//                if (min_subsize >= match_min_len) {
-//                    bitvec.resize(min_subsize);
-//                    for (seq_len_t i = 0; i < min_subsize; ++i) {
-//                        bitvec[i] = pattern[i] != text[text_i + i];
-//                    }
-//                    avec->addAlignment(gene, 1, text_i + 1, bitvec);
-//                }
-//            }
+            seq_len_t match_min_len = _params.min_D_len;
+            seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
+            seq_len_t p_start, t_start;
+            AlignmentVectorBase::events_storage_t bitvec;
+            bitvec.reserve(p_size + 1);
+
+            int max_iter = std::min((seq_len_t) (p_size / 3 + static_cast<seq_len_t>((p_size % 3) != 0)), t_size);
+            for (seq_len_t pattern_i = 0; pattern_i < max_iter; ++pattern_i) {
+                min_subsize = min(p_size - pattern_i, (int) t_size);
+                if (min_subsize >= match_min_len) {
+                    bitvec.resize(min_subsize);
+                    for (seq_len_t i = 0; i < min_subsize; ++i) {
+                        bitvec[i] = pattern[pattern_i + i] != text[i];
+                    }
+                    avec->addAlignment(gene, pattern_i + 1, 1, bitvec);
+                }
+            }
+
+            for (seq_len_t text_i = 1; text_i < t_size - match_min_len + 1; ++text_i) {
+                min_subsize = min((int) p_size, t_size - text_i);
+                if (min_subsize >= match_min_len) {
+                    bitvec.resize(min_subsize);
+                    for (seq_len_t i = 0; i < min_subsize; ++i) {
+                        bitvec[i] = pattern[i] != text[text_i + i];
+                    }
+                    avec->addAlignment(gene, 1, text_i + 1, bitvec);
+                }
+            }
         }
 
         void _alignJoi(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {

@@ -94,13 +94,15 @@ namespace ymir {
                     cout << endl << "Iteration:\t1 / " << (size_t) algo_param["niter"].asUInt() << endl;
                 } else {
                     cout << endl << "Iteration:\t" << (size_t) iter << " / " << (size_t) algo_param["niter"].asUInt()
-                    << "ETA: " << est_time(tp1, algo_param["niter"].asUInt(), iter)
+                    << " ETA: " << est_time(tp1, algo_param["niter"].asUInt(), iter)
                     << endl;
                 }
 
                 new_param_vec.fill(0);
 
 #ifdef USE_OMP
+                std::cout << "Infer parameters..." << std::endl;
+
                 auto max_thrs = omp_get_max_threads();
 
                 std::vector<size_t> blocks;

@@ -36,12 +36,15 @@ namespace ymir {
          */
         MAAGBuilder(const ModelParameterVector &param_vec, const VDJRecombinationGenes &genes)
             : _param_vec(new ModelParameterVector(param_vec)),
-              _genes(new VDJRecombinationGenes(genes)) {
+              _genes(new VDJRecombinationGenes(genes))
+        {
+            // this->update_insertion_models();
         }
 
 
         void updateModelParameterVector(const ModelParameterVector &param_vec) {
             *(_param_vec.get()) = param_vec;
+            // this->update_insertion_models();
         }
 
 
@@ -121,6 +124,21 @@ namespace ymir {
 
         unique_ptr<ModelParameterVector> _param_vec;
         unique_ptr<VDJRecombinationGenes> _genes;
+//        MonoNucInsertionModel _vj_ins;
+//        DiNucInsertionModel _vdj_forw_ins;
+//        DiNucInsertionModel _vdj_back_ins;
+
+
+    // TODO: optimize the builder via incapsulated insertion models
+        /**
+         *
+         */
+        /*
+        void update_insertion_models() {
+            _vj_ins = MonoNucInsertionModel();
+            ...
+        }
+         */
 
 
         /**

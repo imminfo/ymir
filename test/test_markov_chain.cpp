@@ -298,6 +298,9 @@ YMIR_TEST_START(test_markovchain_aa_di)
 
 
     // neighbour aminoacids
+    YMIR_ASSERT(false)
+
+    // exact same aminoacid
     // {'M', "ATG"}
     YMIR_ASSERT3(m.aaProbability("M", 1, 1, 0, 0), 0)
     YMIR_ASSERT3(m.aaProbability("M", 1, 2, 0, 0), 0)
@@ -308,9 +311,6 @@ YMIR_TEST_START(test_markovchain_aa_di)
     YMIR_ASSERT3(m.aaProbability("M", 1, 3, 63, 63), .25 * .4 * .3)
     YMIR_ASSERT3(m.aaProbability("M", 2, 3, 63, 63), .4 * .3)
     YMIR_ASSERT3(m.aaProbability("M", 3, 3, 63, 63), .3)
-
-    // exact same aminoacid
-    YMIR_ASSERT(false)
 
     // distant aminoacids
     YMIR_ASSERT(false)

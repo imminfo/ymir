@@ -286,6 +286,7 @@ namespace ymir {
     protected:
 
         CodonMMC _codons;
+        // TODO: make this shared_ptr and compare speed / memory. Maybe big overhead due to hash tables
         unique_ptr<AbstractInsertionModel> _insertions;
         std::vector<prob_t>::const_iterator _ins_start;
         seq_len_t _max_ins_len;

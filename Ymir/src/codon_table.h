@@ -145,6 +145,14 @@ namespace ymir {
         }
 
 
+        int num_codons(char aminoacid) const {
+            auto codon = Codons(_aa2codon.equal_range(aminoacid));
+            int res = 1;
+            while (codon.next()) { ++res; }
+            return res;
+        }
+
+
         std::string translate(const std::string &nuc_seq) const {
             if (nuc_seq.size() % 3 == 0 && !nuc_seq.empty()) {
                 std::string res = "";

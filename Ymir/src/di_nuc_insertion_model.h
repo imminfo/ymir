@@ -192,33 +192,40 @@ namespace ymir {
 
             // if the same codon
             if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
+                bitset6 bithash = first_aa_codons & last_aa_codons;
+
                 // if start pos is the very first amino acid, than we process this case separately
-                if (first_nuc_pos == 0) {
-                    res_vec = {.25, .25, .25, .25, .25, .25};
-                    ++first_nuc_pos;
+                if (first_nuc_pos == 0 || first_nuc_pos == 1) {
+                    res_vec = (*_aa_probs_init)[sequence[0]];
+                    first_nuc_pos = 1;
                 }
                 // if start pos is 0 than we need to take into the account the previous codon
                 else if ((first_nuc_pos - 1) % 3 == 0) {
                     res_vec = (*_aa_probs_trans)[(((sequence[(first_nuc_pos - 2) % 3] << 8) + prev_aa_codons) << 16)
                                               + ((sequence[(first_nuc_pos - 1) % 3] << 8) + (first_aa_codons & last_aa_codons))];
+                    ++first_nuc_pos;
                 }
                 else {
-                    res_vec = (*_aa_probs_forw_from)[(sequence[(first_nuc_pos - 2) % 3] << 8) + (first_aa_codons << 2) + ((first_nuc_pos - 2) % 3)];
+                    res_vec = {1, 1, 1, 1, 1, 1};
+                    --first_nuc_pos;
                 }
 
-                bitset6 bithash = first_aa_codons & last_aa_codons;
+                for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
 
-                std::cout << (int) first_nuc_pos << ":" << (int) last_nuc_pos << std::endl;
-                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << std::endl; }
+//                std::cout << (int) first_nuc_pos << ":" << (int) last_nuc_pos << std::endl;
+//                std::cout << (int) first_aa_codons << ":" << (int) last_aa_codons << std::endl;
+//                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
+//                std::cout << sequence[(aa_i - 1) / 3] << ";" << (int) ((aa_i - 1) % 3) << std::endl;
 
                 for (int aa_i = first_nuc_pos; aa_i < last_nuc_pos; ++aa_i) {
                     auto prev_nuc_ids = CodonTable::table().which_nucl(sequence[(aa_i - 1) / 3], (aa_i - 1) % 3);
                     auto next_nuc_ids = CodonTable::table().which_nucl(sequence[aa_i / 3], aa_i % 3);
                     for (int i = 0; i < 6; ++i) {
-                        res_vec[i] *= bithash[5 - i]
-                                      * arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
+                        res_vec[i] *= arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
                     }
                 }
+
+                for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
             }
             // if codons are different
             else {
@@ -288,6 +295,10 @@ namespace ymir {
         // (amino acid1 << 8 + hash1) << 16 + (amino acid2 << 8 + hash2)
         typedef shared_ptr<std::unordered_map<int32_t, codon_prob_arr>> shared_aa_pair_t;
 
+        // initial probabilities for starting pos == 0 (i.e., when the first aminoacid
+        // is beyond the sequence. Fill the vector with .25 then).
+        typedef shared_ptr<std::unordered_map<char, codon_prob_arr>> shared_aa_init_t;
+
         // therefore the formula of probs for a pair of amino acids for each exit codon is following:
         // R[0] = sum[i=0..5](_aa_probs_forw_from(aa1+hash1+start_pos)[i] * _aa_probs_trans(aa1+hash1+aa2+hash2)[i] * _aa_probs_forw_to(aa2+hash2+to_pos)[0])
         // R[1] = sum[i=0..5](_aa_probs_forw_from(aa1+hash1+start_pos)[i] * _aa_probs_trans(aa1+hash1+aa2+hash2)[i] * _aa_probs_forw_to(aa2+hash2+to_pos)[1])
@@ -297,6 +308,7 @@ namespace ymir {
         shared_aa_ins_t _aa_probs_forw_from, _aa_probs_forw_to;
         shared_aa_ins_t _aa_probs_back_from, _aa_probs_back_to;
         shared_aa_pair_t _aa_probs_trans;
+        shared_aa_init_t _aa_probs_init;
 
 
         /**
@@ -358,6 +370,7 @@ namespace ymir {
             _aa_probs_back_from = std::make_shared<std::unordered_map<int16_t, codon_prob_arr>>();
             _aa_probs_back_to = std::make_shared<std::unordered_map<int16_t, codon_prob_arr>>();
             _aa_probs_trans = std::make_shared<std::unordered_map<int32_t, codon_prob_arr>>();
+            _aa_probs_init = std::make_shared<std::unordered_map<char, codon_prob_arr>>();
 
             codon_prob_arr res_vec;
 
@@ -399,6 +412,10 @@ namespace ymir {
 
             for (auto it: CodonTable::table().aminoacids()) {
                 if (it.first != '*') {
+                    res_vec.fill(0);
+                    for (int i = 0; i < CodonTable::table().num_codons(it.first); ++i) { res_vec[i] = .25; }
+                    (*_aa_probs_init)[it.first] = res_vec;
+
                     int16_t val = it.first << 8;
 
                     res_vec.fill(0);

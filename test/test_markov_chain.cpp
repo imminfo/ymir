@@ -274,25 +274,25 @@ YMIR_TEST_START(test_markovchain_aa_di)
     event_matrix_t mat;
     mat.resize(4, 4);
     // A
-    mat(0, 0) = .1;
-    mat(1, 0) = .2;
-    mat(2, 0) = .3;
-    mat(3, 0) = .4;
+    mat(0, 0) = .1; // A->A
+    mat(1, 0) = .2; // C->A
+    mat(2, 0) = .3; // G->A
+    mat(3, 0) = .4; // T->A
     // C
-    mat(0, 1) = .5;
-    mat(1, 1) = .1;
-    mat(2, 1) = .3;
-    mat(3, 1) = .1;
+    mat(0, 1) = .5; // A->C
+    mat(1, 1) = .1; // C->C
+    mat(2, 1) = .3; // G->C
+    mat(3, 1) = .1; // T->C
     // G
-    mat(0, 2) = .1;
-    mat(1, 2) = .5;
-    mat(2, 2) = .1;
-    mat(3, 2) = .3;
+    mat(0, 2) = .1; // A->G
+    mat(1, 2) = .5; // C->G
+    mat(2, 2) = .1; // G->G
+    mat(3, 2) = .3; // T->G
     // T
-    mat(0, 3) = .4;
-    mat(1, 3) = .3;
-    mat(2, 3) = .2;
-    mat(3, 3) = .1;
+    mat(0, 3) = .4; // A->T
+    mat(1, 3) = .3; // C->T
+    mat(2, 3) = .2; // G->T
+    mat(3, 3) = .1; // T->T
 
     DiNucInsertionModel m(mat, .5);
 
@@ -306,13 +306,50 @@ YMIR_TEST_START(test_markovchain_aa_di)
     YMIR_ASSERT3(m.aaProbability("M", 1, 2, 0, 0), 0)
     YMIR_ASSERT3(m.aaProbability("M", 1, 3, 0, 0), 0)
 
+    YMIR_ASSERT3(m.aaProbability("M", 0, 1, 63, 63), .25)
     YMIR_ASSERT3(m.aaProbability("M", 1, 1, 63, 63), .25)
     YMIR_ASSERT3(m.aaProbability("M", 1, 2, 63, 63), .25 * .4)
     YMIR_ASSERT3(m.aaProbability("M", 1, 3, 63, 63), .25 * .4 * .3)
     YMIR_ASSERT3(m.aaProbability("M", 2, 3, 63, 63), .4 * .3)
     YMIR_ASSERT3(m.aaProbability("M", 3, 3, 63, 63), .3)
 
+//     {'I', "ATT"}, {'I', "ATC"}, {'I', "ATA"}
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 0, 0), 0)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 0, 0), 0)
+//
+//    // 111000
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 56, 56), 3 * .1)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 56, 56), .1*.4 + .1*.4 + .1*.4)
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 56, 56), .1*.4*.4 + .1*.4*.2 + .1*.4*.1)
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 56, 56), (3 * .4))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 56, 56), .4 * (.4 + .2 + .1))
+    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 56, 56), (.1 + .2 + .4))
+//
+//    // 101000
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 40, 40), 2 * .1)
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 40, 40), .1*.4 + .1*.4)
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 40, 40), .1*.4*.4 + .1*.4*.1)
+//    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 40, 40), .4*2)
+//    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 40, 40), .4*.4 + .4*.1)
+//    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 40, 40), .4 + .1)
+//
+//    // 110000 and 011000 -> 010000
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 48, 24), .1)
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 48, 24), .1 * .4)
+//    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 48, 24), .1 * .4 * .2)
+//    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 48, 24), .4)
+//    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 48, 24), .4 * .2)
+//    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 48, 24), .2)
+
     // distant aminoacids
+    YMIR_ASSERT(false)
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_markovchain_aa_di_rev)
+
     YMIR_ASSERT(false)
 
 YMIR_TEST_END
@@ -429,6 +466,7 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_markovchain_nuc_di())
     YMIR_TEST(test_markovchain_aa_mono())
     YMIR_TEST(test_markovchain_aa_di())
+    YMIR_TEST(test_markovchain_aa_di_rev())
     YMIR_TEST(test_markovchain_nuc_mono_err())
     YMIR_TEST(test_markovchain_nuc_di_err())
 

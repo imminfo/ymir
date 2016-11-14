@@ -317,30 +317,30 @@ YMIR_TEST_START(test_markovchain_aa_di)
     YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 0, 0), 0)
     YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 0, 0), 0)
     YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 0, 0), 0)
-//
-//    // 111000
-    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 56, 56), 3 * .1)
-    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 56, 56), .1*.4 + .1*.4 + .1*.4)
-    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 56, 56), .1*.4*.4 + .1*.4*.2 + .1*.4*.1)
-    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 56, 56), (3 * .4))
-    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 56, 56), .4 * (.4 + .2 + .1))
-    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 56, 56), (.1 + .2 + .4))
-//
-//    // 101000
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 40, 40), 2 * .1)
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 40, 40), .1*.4 + .1*.4)
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 40, 40), .1*.4*.4 + .1*.4*.1)
-//    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 40, 40), .4*2)
-//    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 40, 40), .4*.4 + .4*.1)
-//    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 40, 40), .4 + .1)
-//
-//    // 110000 and 011000 -> 010000
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 48, 24), .1)
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 48, 24), .1 * .4)
-//    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 48, 24), .1 * .4 * .2)
-//    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 48, 24), .4)
-//    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 48, 24), .4 * .2)
-//    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 48, 24), .2)
+
+    // 111000
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 56, 56), mat(2, 0) + mat(2, 0) + mat(2, 0))
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 56, 56), mat(2, 0) * mat(0, 3) + mat(2, 0) * mat(0, 3) + mat(2, 0) * mat(0, 3))
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 56, 56), mat(2, 0) * mat(0, 3) * mat(3, 3) + mat(2, 0) * mat(0, 3) * mat(3, 1) + mat(2, 0) * mat(0, 3) * mat(3, 0))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 56, 56), mat(0, 3) + mat(0, 3) + mat(0, 3))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 56, 56), mat(0, 3) * mat(3, 3) + mat(0, 3) * mat(3, 1) + mat(0, 3) * mat(3, 0))
+    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 56, 56), mat(3, 3) + mat(3, 1) + mat(3, 0))
+
+    // 101000
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 40, 40), mat(2, 0) + mat(2, 0))
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 40, 40), mat(2, 0) * mat(0, 3) + mat(2, 0) * mat(0, 3))
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 40, 40), mat(2, 0) * mat(0, 3) * mat(3, 3) + mat(2, 0) * mat(0, 3) * mat(3, 0))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 40, 40), mat(0, 3) + mat(0, 3))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 40, 40), mat(0, 3) * mat(3, 3) + mat(0, 3) * mat(3, 0))
+    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 40, 40), mat(3, 3) + mat(3, 0))
+
+    // 110000 and 011000 -> 010000
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 48, 24), mat(2, 0))
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 48, 24), mat(2, 0) * mat(0, 3))
+    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 48, 24), mat(2, 0) * mat(0, 3) * mat(3, 1))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 5, 48, 24), mat(0, 3))
+    YMIR_ASSERT3(m.aaProbability("MI", 5, 6, 48, 24), mat(0, 3) * mat(3, 1))
+    YMIR_ASSERT3(m.aaProbability("MI", 6, 6, 48, 24), mat(3, 1))
 
     // distant aminoacids
     YMIR_ASSERT(false)
@@ -462,13 +462,13 @@ int main(int argc, char* argv[]) {
     //**************  TEST CASES  **************//
 
     // Tests for markov chain.
-    YMIR_TEST(test_markovchain_nuc_mono())
-    YMIR_TEST(test_markovchain_nuc_di())
-    YMIR_TEST(test_markovchain_aa_mono())
+//    YMIR_TEST(test_markovchain_nuc_mono())
+//    YMIR_TEST(test_markovchain_nuc_di())
+//    YMIR_TEST(test_markovchain_aa_mono())
     YMIR_TEST(test_markovchain_aa_di())
-    YMIR_TEST(test_markovchain_aa_di_rev())
-    YMIR_TEST(test_markovchain_nuc_mono_err())
-    YMIR_TEST(test_markovchain_nuc_di_err())
+//    YMIR_TEST(test_markovchain_aa_di_rev())
+//    YMIR_TEST(test_markovchain_nuc_mono_err())
+//    YMIR_TEST(test_markovchain_nuc_di_err())
 
     //**************  **************//
 

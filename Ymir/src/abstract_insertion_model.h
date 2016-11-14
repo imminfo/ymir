@@ -27,6 +27,9 @@ namespace ymir {
     public:
 
 
+        typedef std::bitset<6> bitset6;
+
+
         typedef unique_ptr<prob_t[]> prob_array_t;
 
 

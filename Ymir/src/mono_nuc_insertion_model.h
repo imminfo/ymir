@@ -134,9 +134,10 @@ namespace ymir {
             assert(first_nuc_pos <= 3*sequence.size() + 1);
             assert(last_nuc_pos <= 3*sequence.size() + 1);
 #endif
-            if (first_nuc_pos > last_nuc_pos) {
-                return 1;
-            }
+            assert(first_nuc_pos <= last_nuc_pos);
+//            if (first_nuc_pos > last_nuc_pos) {
+//                return 0;  // TODO: changed this to zero, something may fail
+//            }
 
             prob_t res = 0, nuc_prob;
             std::array<prob_t, 6> res_vec = {1, 1, 1, 1, 1, 1};
@@ -177,6 +178,7 @@ namespace ymir {
 
                 res *= (*_aa_probs_to)[(sequence[(last_nuc_pos - 1) / 3] << 8) + (last_aa_codons << 2) + ((last_nuc_pos - 1) % 3)];
             }
+
             return res;
         }
 

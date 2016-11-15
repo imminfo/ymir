@@ -192,7 +192,7 @@ namespace ymir {
             std::array<prob_t, 6> res_vec, tmp_res_vec;
             prob_t res = 0;
 
-            bitset6 bithash = first_aa_codons & last_aa_codons;
+            bitset6 bithash;
             codon_hash new_first_aa_codons = ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) ? (first_aa_codons & last_aa_codons) : first_aa_codons;
 
             // if start pos is the very first amino acid, than we process this case separately
@@ -205,7 +205,7 @@ namespace ymir {
                 res_vec.fill(0);
 
                 res_mat = (*_aa_probs_trans)[(((sequence[(first_nuc_pos - 2) / 3] << 8) + prev_aa_codons) << 16)
-                                             + ((sequence[(first_nuc_pos - 1) / 3] << 8) + new_first_aa_codons)];
+                                             + ((sequence[(first_nuc_pos - 1) / 3] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
 
                 // i - next codon index
                 // j - prev codon index
@@ -217,14 +217,16 @@ namespace ymir {
             }
             else {
                 res_vec.fill(1);
-                --first_nuc_pos;
+//                --first_nuc_pos;
             }
 
-            for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
-
+            for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
 
             // if the same codon
             if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
+                bithash = new_first_aa_codons;
+                for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
+
                 for (seq_len_t aa_i = first_nuc_pos; aa_i < last_nuc_pos; ++aa_i) {
                     auto prev_nuc_ids = CodonTable::table().which_nucl(sequence[(aa_i - 1) / 3], (aa_i - 1) % 3);
                     auto next_nuc_ids = CodonTable::table().which_nucl(sequence[aa_i / 3], aa_i % 3);
@@ -245,7 +247,7 @@ namespace ymir {
                 //
                 // process the first_nuc_pos
                 //
-                // transition probabilities was processed earlier, they are stored in res_vec
+                // transition probabilities were processed earlier, they are stored in res_vec
                 // full codon probabilities
                 tmp_res_vec = (*_aa_probs_forw_from)[(sequence[(first_nuc_pos - 1) / 3] << 8) + (first_aa_codons) + ((first_nuc_pos - 1) % 3)];
                 // resulting probabilities

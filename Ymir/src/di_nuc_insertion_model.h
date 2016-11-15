@@ -205,6 +205,8 @@ namespace ymir {
                 auto res_mat = (*_aa_probs_trans)[(((sequence[(first_nuc_pos - 2) / 3] << 8) + prev_aa_codons) << 16)
                                                   + ((sequence[(first_nuc_pos - 1) / 3] << 8) + new_first_aa_codons)];
 
+                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
+
                 // i - next codon index
                 // j - prev codon index
                 for (int i = 0; i < 6; ++i) {
@@ -212,6 +214,8 @@ namespace ymir {
                         res_vec[i] += res_mat[j*6 + i];
                     }
                 }
+
+                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
             }
             else {
                 res_vec.fill(1);

@@ -187,25 +187,25 @@ namespace ymir {
             arr_prob[24] = 0;
 
 
-            std::array<prob_t, 6> res_vec;
+            codon_prob_mat_flatten res_mat;
+
+            std::array<prob_t, 6> res_vec, tmp_res_vec;
             prob_t res = 0;
 
             bitset6 bithash = first_aa_codons & last_aa_codons;
-            codon_hash new_first_aa_codons = ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) ? first_aa_codons : (first_aa_codons & last_aa_codons);
+            codon_hash new_first_aa_codons = ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) ? (first_aa_codons & last_aa_codons) : first_aa_codons;
 
             // if start pos is the very first amino acid, than we process this case separately
             if (first_nuc_pos == 0 || first_nuc_pos == 1) {
                 res_vec = (*_aa_probs_init)[sequence[0]];
                 first_nuc_pos = 1;
             }
-                // if start pos is 0 than we need to take into the account the previous codon
+            // if start pos is 0 than we need to take into the account the previous codon
             else if ((first_nuc_pos - 1) % 3 == 0) {
                 res_vec.fill(0);
 
-                auto res_mat = (*_aa_probs_trans)[(((sequence[(first_nuc_pos - 2) / 3] << 8) + prev_aa_codons) << 16)
-                                                  + ((sequence[(first_nuc_pos - 1) / 3] << 8) + new_first_aa_codons)];
-
-                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
+                res_mat = (*_aa_probs_trans)[(((sequence[(first_nuc_pos - 2) / 3] << 8) + prev_aa_codons) << 16)
+                                             + ((sequence[(first_nuc_pos - 1) / 3] << 8) + new_first_aa_codons)];
 
                 // i - next codon index
                 // j - prev codon index
@@ -214,8 +214,6 @@ namespace ymir {
                         res_vec[i] += res_mat[j*6 + i];
                     }
                 }
-
-                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
             }
             else {
                 res_vec.fill(1);
@@ -224,9 +222,10 @@ namespace ymir {
 
             for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
 
+
             // if the same codon
             if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
-                for (int aa_i = first_nuc_pos; aa_i < last_nuc_pos; ++aa_i) {
+                for (seq_len_t aa_i = first_nuc_pos; aa_i < last_nuc_pos; ++aa_i) {
                     auto prev_nuc_ids = CodonTable::table().which_nucl(sequence[(aa_i - 1) / 3], (aa_i - 1) % 3);
                     auto next_nuc_ids = CodonTable::table().which_nucl(sequence[aa_i / 3], aa_i % 3);
                     for (int i = 0; i < 6; ++i) {
@@ -242,7 +241,65 @@ namespace ymir {
 //                std::cout << (int) first_aa_codons << ":" << (int) last_aa_codons << std::endl;
 //                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
 //                std::cout << sequence[(aa_i - 1) / 3] << ";" << (int) ((aa_i - 1) % 3) << std::endl;
-//                auto from_vec = (*_aa_probs_forw_from)[];
+
+                //
+                // process the first_nuc_pos
+                //
+                // transition probabilities was processed earlier, they are stored in res_vec
+                // full codon probabilities
+                tmp_res_vec = (*_aa_probs_forw_from)[(sequence[(first_nuc_pos - 1) / 3] << 8) + (first_aa_codons) + ((first_nuc_pos - 1) % 3)];
+                // resulting probabilities
+                for (int i = 0; i < 6; ++i) {
+                    res_vec[i] *= tmp_res_vec[i];
+                }
+
+                //
+                // process all codons from first_nuc_pos to last_nuc_pos (exc.)
+                //
+                for (seq_len_t aa_i = (first_nuc_pos + 1 - 1) / 3; aa_i < (last_nuc_pos - 1) / 3; ++aa_i) {
+                    // transition probabilities
+                    res_mat = (*_aa_probs_trans)[(((sequence[(aa_i - 1) / 3] << 8) + prev_aa_codons) << 16)
+                                                 + ((sequence[aa_i / 3] << 8) + new_first_aa_codons)];
+                    tmp_res_vec.fill(0);
+                    for (int i = 0; i < 6; ++i) {
+                        for (int j = 0; j < 6; ++j) {
+                            tmp_res_vec[i] += res_mat[j*6 + i] * res_vec[j];
+                        }
+                    }
+                    tmp_res_vec.swap(res_vec);
+
+                    // full codon probabilities
+                    tmp_res_vec = (*_aa_probs_forw_from)[(sequence[(aa_i - 1) / 3] << 8) + 63 + 0];
+
+                    // resulting probabilities
+                    for (int i = 0; i < 6; ++i) {
+                        res_vec[i] *= tmp_res_vec[i];
+                    }
+                }
+
+                //
+                // process the last_nuc_pos
+                //
+                // transition probabilities
+                codon_hash prev_last_codons = ((first_nuc_pos - 1) / 3) + 1 == ((last_nuc_pos - 1) / 3) ? first_aa_codons : 63;
+                res_mat = (*_aa_probs_trans)[(((sequence[(last_nuc_pos - 2) / 3] << 8) + prev_last_codons) << 16)
+                                             + ((sequence[(last_nuc_pos - 1) / 3] << 8) + last_aa_codons)];
+                tmp_res_vec.fill(0);
+                for (int i = 0; i < 6; ++i) {
+                    for (int j = 0; j < 6; ++j) {
+                        tmp_res_vec[i] += res_mat[j*6 + i] * res_vec[j];
+                    }
+                }
+                tmp_res_vec.swap(res_vec);
+                // full codon probabilities
+                tmp_res_vec = (*_aa_probs_forw_to)[(sequence[(last_nuc_pos - 1) / 3] << 8) + (last_aa_codons) + ((last_nuc_pos - 1) % 3)];
+                // resulting probabilities
+                for (int i = 0; i < 6; ++i) {
+                    res_vec[i] *= tmp_res_vec[i];
+                }
+
+                // final result
+                for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
             }
 
             return res;

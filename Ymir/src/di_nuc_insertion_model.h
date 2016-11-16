@@ -318,7 +318,7 @@ namespace ymir {
                                         seq_len_t last_nuc_pos,
                                         codon_hash first_aa_codons,
                                         codon_hash last_aa_codons,
-                                        codon_hash prev_aa_codons = 1) const
+                                        codon_hash prev_aa_codons = 63) const
         {
 #ifndef DNDEBUG
             assert(first_nuc_pos <= 3*sequence.size() + 1);
@@ -370,17 +370,21 @@ namespace ymir {
             bitset6 bithash;
             codon_hash new_first_aa_codons = (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) ? (first_aa_codons & last_aa_codons) : first_aa_codons;
 
-            // if start pos is the very first amino acid, than we process this case separately
+            // if start pos is the last amino acid, than we process this case separately
             if (first_nuc_pos >= sequence.size() * 3) {
                 res_vec = (*_aa_probs_init)[sequence[sequence.size() - 1]];
                 first_nuc_pos = sequence.size() * 3;
             }
-                // if start pos is 0 than we need to take into the account the previous codon
+            // if start pos is 2 than we need to take into the account the previous codon
             else if (in_codon0(first_nuc_pos) == 2) {
                 res_vec.fill(0);
 
-                res_mat = (*_aa_probs_back_trans)[(((sequence[pos_codon0(first_nuc_pos - 1)] << 8) + prev_aa_codons) << 16)
+                std::cout << sequence[pos_codon0(first_nuc_pos) + 1] << ":" << sequence[pos_codon0(first_nuc_pos)] << std::endl;
+                std::cout << (int) prev_aa_codons << ":" << (int) first_aa_codons << std::endl;
+                res_mat = (*_aa_probs_back_trans)[(((sequence[pos_codon0(first_nuc_pos) + 1] << 8) + prev_aa_codons) << 16)
                                                   + ((sequence[pos_codon0(first_nuc_pos)] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
+
+                for (int i = 0; i < 36; ++i) { std::cout << res_mat[i] << " "; } std::cout << std::endl;
 
                 // i - next codon index
                 // j - prev codon index
@@ -393,7 +397,7 @@ namespace ymir {
             else {
                 res_vec.fill(1);
                 if (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) {
-                    --first_nuc_pos;
+                    ++first_nuc_pos;
                 }
             }
 
@@ -708,7 +712,9 @@ namespace ymir {
                     for (codon_hash hash_value = 0; hash_value <= 63; ++hash_value) {
                         bitset6 bithash = hash_value;
 
+                        //
                         // from -> forward direction
+                        //
                         // start_pos == 0 or 1
                         auto prev_nuc_ids = CodonTable::table().which_nucl(it.first, 0);
                         auto next_nuc_ids = CodonTable::table().which_nucl(it.first, 1);
@@ -733,8 +739,9 @@ namespace ymir {
                         }
                         (*_aa_probs_forw_from)[val + (hash_value << 2) + 2] = res_vec;
 
-
+                        //
                         // to -> forward direction
+                        //
                         // last_pos == 2
                         prev_nuc_ids = CodonTable::table().which_nucl(it.first, 0);
                         next_nuc_ids = CodonTable::table().which_nucl(it.first, 1);
@@ -764,8 +771,9 @@ namespace ymir {
                         }
                         (*_aa_probs_forw_to)[val + (hash_value << 2) + 0] = res_vec;
 
-
+                        //
                         // from <- backward direction
+                        //
                         // start_pos == 1 or 2
                         prev_nuc_ids = CodonTable::table().which_nucl(it.first, 2);
                         next_nuc_ids = CodonTable::table().which_nucl(it.first, 1);
@@ -790,8 +798,9 @@ namespace ymir {
                         }
                         (*_aa_probs_back_from)[val + (hash_value << 2) + 2] = res_vec;
 
-
+                        //
                         // to <- backward direction
+                        //
                         // last_pos == 0
                         prev_nuc_ids = CodonTable::table().which_nucl(it.first, 1);
                         next_nuc_ids = CodonTable::table().which_nucl(it.first, 0);

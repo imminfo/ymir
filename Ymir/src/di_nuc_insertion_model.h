@@ -52,7 +52,8 @@ namespace ymir {
               _aa_probs_forw_to(other._aa_probs_forw_to),
               _aa_probs_back_from(other._aa_probs_back_from),
               _aa_probs_back_to(other._aa_probs_back_to),
-              _aa_probs_trans(other._aa_probs_trans)
+              _aa_probs_forw_trans(other._aa_probs_forw_trans),
+              _aa_probs_back_trans(other._aa_probs_back_trans)
         {
         }
 
@@ -68,7 +69,8 @@ namespace ymir {
             _aa_probs_forw_to = other._aa_probs_forw_to;
             _aa_probs_back_from = other._aa_probs_back_from;
             _aa_probs_back_to = other._aa_probs_back_to;
-            _aa_probs_trans = other._aa_probs_trans;
+            _aa_probs_forw_trans = other._aa_probs_forw_trans;
+            _aa_probs_back_trans = other._aa_probs_back_trans;
             return *this;
         }
 
@@ -204,7 +206,7 @@ namespace ymir {
             else if (in_codon0(first_nuc_pos) == 0) {
                 res_vec.fill(0);
 
-                res_mat = (*_aa_probs_trans)[(((sequence[pos_codon0(first_nuc_pos - 1)] << 8) + prev_aa_codons) << 16)
+                res_mat = (*_aa_probs_forw_trans)[(((sequence[pos_codon0(first_nuc_pos - 1)] << 8) + prev_aa_codons) << 16)
                                              + ((sequence[pos_codon0(first_nuc_pos)] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
 
                 // i - next codon index
@@ -227,9 +229,9 @@ namespace ymir {
                 bithash = new_first_aa_codons;
                 for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
 
-                for (seq_len_t aa_i = first_nuc_pos; aa_i < last_nuc_pos; ++aa_i) {
-                    auto prev_nuc_ids = CodonTable::table().which_nucl(sequence[(aa_i - 1) / 3], (aa_i - 1) % 3);
-                    auto next_nuc_ids = CodonTable::table().which_nucl(sequence[aa_i / 3], aa_i % 3);
+                for (seq_len_t nuc_i = first_nuc_pos; nuc_i < last_nuc_pos; ++nuc_i) {
+                    auto prev_nuc_ids = CodonTable::table().which_nucl(sequence[nuc_i / 3], in_codon0(nuc_i));
+                    auto next_nuc_ids = CodonTable::table().which_nucl(sequence[nuc_i / 3], in_codon0(nuc_i + 1));
                     for (int i = 0; i < 6; ++i) {
                         res_vec[i] *= arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
                     }
@@ -239,11 +241,6 @@ namespace ymir {
             }
             // if codons are different
             else {
-//                std::cout << (int) first_nuc_pos << ":" << (int) last_nuc_pos << std::endl;
-//                std::cout << (int) first_aa_codons << ":" << (int) last_aa_codons << std::endl;
-//                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
-//                std::cout << sequence[(aa_i - 1) / 3] << ";" << (int) ((aa_i - 1) % 3) << std::endl;
-
                 //
                 // process the first_nuc_pos
                 //
@@ -263,7 +260,7 @@ namespace ymir {
                 codon_hash prev_last_codons = first_aa_codons;
                 for (seq_len_t aa_i = pos_codon0(first_nuc_pos) + 1; aa_i < pos_codon0(last_nuc_pos); ++aa_i) {
                     // transition probabilities
-                    res_mat = (*_aa_probs_trans)[ (((sequence[aa_i - 1] << 8) + prev_last_codons) << 16)
+                    res_mat = (*_aa_probs_forw_trans)[ (((sequence[aa_i - 1] << 8) + prev_last_codons) << 16)
                                                  + ((sequence[aa_i] << 8) + 63)];
 
                     tmp_res_vec.fill(0);
@@ -290,7 +287,7 @@ namespace ymir {
                 //
                 // transition probabilities
                 prev_last_codons = (pos_codon0(first_nuc_pos)) + 1 == (pos_codon0(last_nuc_pos)) ? first_aa_codons : 63;
-                res_mat = (*_aa_probs_trans)[(((sequence[pos_codon0(last_nuc_pos) - 1] << 8) + prev_last_codons) << 16)
+                res_mat = (*_aa_probs_forw_trans)[(((sequence[pos_codon0(last_nuc_pos) - 1] << 8) + prev_last_codons) << 16)
                                              + ((sequence[pos_codon0(last_nuc_pos)] << 8) + last_aa_codons)];
 
                 tmp_res_vec.fill(0);
@@ -323,7 +320,175 @@ namespace ymir {
                                         codon_hash last_aa_codons,
                                         codon_hash prev_aa_codons = 1) const
         {
-            return 0;
+#ifndef DNDEBUG
+            assert(first_nuc_pos <= 3*sequence.size() + 1);
+            assert(last_nuc_pos <= 3*sequence.size() + 1);
+#endif
+            assert(first_nuc_pos >= last_nuc_pos);
+//            if (first_nuc_pos > last_nuc_pos) {
+//                return 0;
+//            }
+
+            // TODO: make _arr like that
+            prob_t arr_prob[25];
+            arr_prob[0] = _arr[0];
+            arr_prob[1] = _arr[1];
+            arr_prob[2] = _arr[2];
+            arr_prob[3] = _arr[3];
+            arr_prob[4] = 0;
+
+            arr_prob[5] = _arr[4];
+            arr_prob[6] = _arr[5];
+            arr_prob[7] = _arr[6];
+            arr_prob[8] = _arr[7];
+            arr_prob[9] = 0;
+
+            arr_prob[10] = _arr[8];
+            arr_prob[11] = _arr[9];
+            arr_prob[12] = _arr[10];
+            arr_prob[13] = _arr[11];
+            arr_prob[14] = 0;
+
+            arr_prob[15] = _arr[12];
+            arr_prob[16] = _arr[13];
+            arr_prob[17] = _arr[14];
+            arr_prob[18] = _arr[15];
+            arr_prob[19] = 0;
+
+            arr_prob[20] = 0;
+            arr_prob[21] = 0;
+            arr_prob[22] = 0;
+            arr_prob[23] = 0;
+            arr_prob[24] = 0;
+
+
+            codon_prob_mat_flatten res_mat;
+
+            std::array<prob_t, 6> res_vec, tmp_res_vec;
+            prob_t res = 0;
+
+            bitset6 bithash;
+            codon_hash new_first_aa_codons = (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) ? (first_aa_codons & last_aa_codons) : first_aa_codons;
+
+            // if start pos is the very first amino acid, than we process this case separately
+            if (first_nuc_pos >= sequence.size() * 3) {
+                res_vec = (*_aa_probs_init)[sequence[sequence.size() - 1]];
+                first_nuc_pos = sequence.size() * 3;
+            }
+                // if start pos is 0 than we need to take into the account the previous codon
+            else if (in_codon0(first_nuc_pos) == 2) {
+                res_vec.fill(0);
+
+                res_mat = (*_aa_probs_back_trans)[(((sequence[pos_codon0(first_nuc_pos - 1)] << 8) + prev_aa_codons) << 16)
+                                                  + ((sequence[pos_codon0(first_nuc_pos)] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
+
+                // i - next codon index
+                // j - prev codon index
+                for (int i = 0; i < 6; ++i) {
+                    for (int j = 0; j < 6; ++j) {
+                        res_vec[i] += res_mat[j*6 + i];
+                    }
+                }
+            }
+            else {
+                res_vec.fill(1);
+                if (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) {
+                    --first_nuc_pos;
+                }
+            }
+
+            // if the same codon
+            if (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) {
+                bithash = new_first_aa_codons;
+                for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
+
+                std::cout << (int) first_nuc_pos << ":" << last_nuc_pos << std::endl;
+                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; } std::cout << std::endl;
+
+                for (seq_len_t nuc_i = first_nuc_pos; nuc_i > last_nuc_pos; --nuc_i) {
+                    std::cout << (int) nuc_i << "->" << (int) (nuc_i-1) << std::endl;
+                    auto prev_nuc_ids = CodonTable::table().which_nucl(sequence[pos_codon0(nuc_i)], in_codon0(nuc_i));
+                    auto next_nuc_ids = CodonTable::table().which_nucl(sequence[pos_codon0(nuc_i)], in_codon0(nuc_i - 1));
+                    for (int i = 0; i < 6; ++i) {
+                        res_vec[i] *= arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
+                    }
+                }
+
+                for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
+            }
+            // if codons are different
+            else {
+                std::cout << "here" << std::endl;
+                //
+                // process the first_nuc_pos
+                //
+                // transition probabilities were processed earlier, they are stored in res_vec
+                // full codon probabilities
+                tmp_res_vec = (*_aa_probs_back_from)[(sequence[pos_codon0(first_nuc_pos)] << 8)
+                                                     + (first_aa_codons << 2)
+                                                     + (in_codon0(first_nuc_pos))];
+                // resulting probabilities
+                for (int i = 0; i < 6; ++i) {
+                    res_vec[i] *= tmp_res_vec[i];
+                }
+
+                //
+                // process all codons from first_nuc_pos to last_nuc_pos (exc.)
+                //
+                codon_hash prev_last_codons = first_aa_codons;
+                for (seq_len_t aa_i = pos_codon0(first_nuc_pos) - 1; aa_i > pos_codon0(last_nuc_pos); --aa_i) {
+                    // transition probabilities
+                    res_mat = (*_aa_probs_back_trans)[ (((sequence[aa_i + 1] << 8) + prev_last_codons) << 16)
+                                                       + ((sequence[aa_i] << 8) + 63)];
+
+                    tmp_res_vec.fill(0);
+                    for (int i = 0; i < 6; ++i) {
+                        for (int j = 0; j < 6; ++j) {
+                            tmp_res_vec[i] += res_mat[j*6 + i] * res_vec[j];
+                        }
+                    }
+                    tmp_res_vec.swap(res_vec);
+
+                    // full codon probabilities
+                    tmp_res_vec = (*_aa_probs_back_from)[(sequence[aa_i] << 8) + (63 << 2) + 0];
+
+                    // resulting probabilities
+                    for (int i = 0; i < 6; ++i) {
+                        res_vec[i] *= tmp_res_vec[i];
+                    }
+
+                    prev_last_codons = 63;
+                }
+
+                //
+                // process the last_nuc_pos
+                //
+                // transition probabilities
+                prev_last_codons = (pos_codon0(first_nuc_pos)) - 1 == (pos_codon0(last_nuc_pos)) ? first_aa_codons : 63;
+                res_mat = (*_aa_probs_back_trans)[(((sequence[pos_codon0(last_nuc_pos) + 1] << 8) + prev_last_codons) << 16)
+                                                  + ((sequence[pos_codon0(last_nuc_pos)] << 8) + last_aa_codons)];
+
+                tmp_res_vec.fill(0);
+                for (int i = 0; i < 6; ++i) {
+                    for (int j = 0; j < 6; ++j) {
+                        tmp_res_vec[i] += res_mat[j*6 + i] * res_vec[j];
+                    }
+                }
+                tmp_res_vec.swap(res_vec);
+                // full codon probabilities
+                tmp_res_vec = (*_aa_probs_back_to)[(sequence[pos_codon0(last_nuc_pos)] << 8)
+                                                   + (last_aa_codons << 2)
+                                                   + (in_codon0(last_nuc_pos))];
+                // resulting probabilities
+                for (int i = 0; i < 6; ++i) {
+                    res_vec[i] *= tmp_res_vec[i];
+                }
+
+                // final result
+                for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
+            }
+
+            return res;
         }
         ///@}
 
@@ -382,14 +547,14 @@ namespace ymir {
         typedef shared_ptr<std::unordered_map<char, codon_prob_arr>> shared_aa_init_t;
 
         // therefore the formula of probs for a pair of amino acids for each exit codon is following:
-        // R[0] = sum[i=0..5](_aa_probs_forw_from(aa1+hash1+start_pos)[i] * _aa_probs_trans(aa1+hash1+aa2+hash2)[i] * _aa_probs_forw_to(aa2+hash2+to_pos)[0])
-        // R[1] = sum[i=0..5](_aa_probs_forw_from(aa1+hash1+start_pos)[i] * _aa_probs_trans(aa1+hash1+aa2+hash2)[i] * _aa_probs_forw_to(aa2+hash2+to_pos)[1])
+        // R[0] = sum[i=0..5](_aa_probs_forw_from(aa1+hash1+start_pos)[i] * _aa_probs_forw_trans(aa1+hash1+aa2+hash2)[i] * _aa_probs_forw_to(aa2+hash2+to_pos)[0])
+        // R[1] = sum[i=0..5](_aa_probs_forw_from(aa1+hash1+start_pos)[i] * _aa_probs_forw_trans(aa1+hash1+aa2+hash2)[i] * _aa_probs_forw_to(aa2+hash2+to_pos)[1])
         // ...
 
 
         shared_aa_ins_t _aa_probs_forw_from, _aa_probs_forw_to;
         shared_aa_ins_t _aa_probs_back_from, _aa_probs_back_to;
-        shared_aa_pair_t _aa_probs_trans;
+        shared_aa_pair_t _aa_probs_forw_trans, _aa_probs_back_trans;
         shared_aa_init_t _aa_probs_init;
 
 
@@ -451,7 +616,8 @@ namespace ymir {
             _aa_probs_forw_to = std::make_shared<std::unordered_map<int16_t, codon_prob_arr>>();
             _aa_probs_back_from = std::make_shared<std::unordered_map<int16_t, codon_prob_arr>>();
             _aa_probs_back_to = std::make_shared<std::unordered_map<int16_t, codon_prob_arr>>();
-            _aa_probs_trans = std::make_shared<std::unordered_map<int32_t, codon_prob_mat_flatten>>();
+            _aa_probs_forw_trans = std::make_shared<std::unordered_map<int32_t, codon_prob_mat_flatten>>();
+            _aa_probs_back_trans = std::make_shared<std::unordered_map<int32_t, codon_prob_mat_flatten>>();
             _aa_probs_init = std::make_shared<std::unordered_map<char, codon_prob_arr>>();
 
             for (auto it_prev: CodonTable::table().aminoacids()) {
@@ -474,6 +640,9 @@ namespace ymir {
                                 bitset6 bithash_prev = hash_value_prev;
                                 bitset6 bithash_next = hash_value_next;
 
+                                //
+                                // forward pass
+                                //
                                 res_mat.fill(0);
 
                                 for (int i = 0; i < 6; ++i) {
@@ -490,7 +659,28 @@ namespace ymir {
                                     }
                                 }
 
-                                (*_aa_probs_trans)[((val_prev + hash_value_prev) << 16) + (val_next + hash_value_next)] = res_mat;
+                                (*_aa_probs_forw_trans)[((val_prev + hash_value_prev) << 16) + (val_next + hash_value_next)] = res_mat;
+
+                                //
+                                // backward pass
+                                //
+                                res_mat.fill(0);
+
+                                for (int i = 0; i < 6; ++i) {
+                                    for (int j = 0; j < 6; ++j) {
+                                        res_mat[j*6 + i] = bithash_prev[5 - j] & bithash_next[5 - i];
+                                    }
+                                }
+
+                                prev_nuc_ids = CodonTable::table().which_nucl(it_prev.first, 0);
+                                next_nuc_ids = CodonTable::table().which_nucl(it_next.first, 2);
+                                for (int i = 0; i < 6; ++i) {
+                                    for (int j = 0; j < 6; ++j) {
+                                        res_mat[j*6 + i] *= arr_prob[prev_nuc_ids[j]*5 + next_nuc_ids[i]];
+                                    }
+                                }
+
+                                (*_aa_probs_back_trans)[((val_prev + hash_value_prev) << 16) + (val_next + hash_value_next)] = res_mat;
                             }
                         }
                     }
@@ -510,7 +700,7 @@ namespace ymir {
                     res_vec.fill(0);
 
                     // there are two different modes to process the codons.
-                    // if start pos == 0 then don't forget to multiply by _aa_probs_trans (i.e., by transition
+                    // if start pos == 0 then don't forget to multiply by _aa_probs_forw_trans (i.e., by transition
                     // probabilities from the previous amino acid).
                     // if start pos == 1 or 2 then hash values reflect the _actual_ codon's hash value
                     // and they reflected the transition probabilities internally.

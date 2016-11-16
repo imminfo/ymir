@@ -207,6 +207,8 @@ namespace ymir {
                 res_mat = (*_aa_probs_trans)[(((sequence[(first_nuc_pos - 2) / 3] << 8) + prev_aa_codons) << 16)
                                              + ((sequence[(first_nuc_pos - 1) / 3] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
 
+                for (int i = 0; i < 6*6; ++i) { std::cout << res_mat[i] << " "; }; std::cout << std::endl;
+
                 // i - next codon index
                 // j - prev codon index
                 for (int i = 0; i < 6; ++i) {
@@ -217,7 +219,9 @@ namespace ymir {
             }
             else {
                 res_vec.fill(1);
-//                --first_nuc_pos;
+                if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
+                    --first_nuc_pos;
+                }
             }
 
             std::cout << "start" << std::endl;
@@ -235,6 +239,8 @@ namespace ymir {
                         res_vec[i] *= arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
                     }
                 }
+
+                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
 
                 for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
             }
@@ -265,9 +271,10 @@ namespace ymir {
                 //
                 // process all codons from first_nuc_pos to last_nuc_pos (exc.)
                 //
+                codon_hash prev_last_codons = first_aa_codons;
                 for (seq_len_t aa_i = (first_nuc_pos - 1) / 3 + 1; aa_i < (last_nuc_pos - 1) / 3; ++aa_i) {
                     // transition probabilities
-                    res_mat = (*_aa_probs_trans)[(((sequence[(aa_i - 1) / 3] << 8) + prev_aa_codons) << 16)
+                    res_mat = (*_aa_probs_trans)[(((sequence[(aa_i - 1) / 3] << 8) + prev_last_codons) << 16)
                                                  + ((sequence[aa_i / 3] << 8) + new_first_aa_codons)];
                     tmp_res_vec.fill(0);
                     for (int i = 0; i < 6; ++i) {
@@ -284,6 +291,8 @@ namespace ymir {
                     for (int i = 0; i < 6; ++i) {
                         res_vec[i] *= tmp_res_vec[i];
                     }
+
+                    prev_last_codons = 63;
                 }
 
                 std::cout << "after middle aa" << std::endl;
@@ -293,7 +302,8 @@ namespace ymir {
                 // process the last_nuc_pos
                 //
                 // transition probabilities
-                codon_hash prev_last_codons = ((first_nuc_pos - 1) / 3) + 1 == ((last_nuc_pos - 1) / 3) ? first_aa_codons : 63;
+                prev_last_codons = ((first_nuc_pos - 1) / 3) + 1 == ((last_nuc_pos - 1) / 3) ? first_aa_codons : 63;
+                std::cout << (int) prev_last_codons << ":" << (int) last_aa_codons << std::endl;
                 res_mat = (*_aa_probs_trans)[(((sequence[(last_nuc_pos - 2) / 3] << 8) + prev_last_codons) << 16)
                                              + ((sequence[(last_nuc_pos - 1) / 3] << 8) + last_aa_codons)];
 
@@ -313,10 +323,14 @@ namespace ymir {
                 tmp_res_vec = (*_aa_probs_forw_to)[(sequence[(last_nuc_pos - 1) / 3] << 8)
                                                    + (last_aa_codons << 2)
                                                    + ((last_nuc_pos - 1) % 3)];
+                for (int i = 0; i < 6; ++i) { std::cout << tmp_res_vec[i] << " "; }; std::cout << std::endl;
                 // resulting probabilities
                 for (int i = 0; i < 6; ++i) {
                     res_vec[i] *= tmp_res_vec[i];
                 }
+
+                std::cout << "final" << std::endl;
+                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
 
                 // final result
                 for (int i = 0; i < 6; ++i) { res += res_vec[i]; }
@@ -487,7 +501,7 @@ namespace ymir {
 
                                 for (int i = 0; i < 6; ++i) {
                                     for (int j = 0; j < 6; ++j) {
-                                        res_mat[j*6 + i] = bithash_prev[5 - i] & bithash_next[5 - j];
+                                        res_mat[j*6 + i] = bithash_prev[5 - j] & bithash_next[5 - i];
                                     }
                                 }
 
@@ -548,7 +562,7 @@ namespace ymir {
 //                        next_nuc_ids = CodonTable::table().which_nucl(it.first, 2);
                         for (int i = 0; i < 6; ++i) {
                             res_vec[i] = bithash[5 - i]
-                                         * arr_prob[prev_nuc_ids[1]*5 + next_nuc_ids[2]];
+                                         * arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
                         }
                         (*_aa_probs_forw_from)[val + (hash_value << 2) + 2] = res_vec;
 
@@ -559,7 +573,7 @@ namespace ymir {
                         next_nuc_ids = CodonTable::table().which_nucl(it.first, 1);
                         for (int i = 0; i < 6; ++i) {
                             res_vec[i] = bithash[5 - i]
-                                         * arr_prob[prev_nuc_ids[0]*5 + next_nuc_ids[1]];
+                                         * arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
                         }
                         prev_nuc_ids = CodonTable::table().which_nucl(it.first, 1);
                         next_nuc_ids = CodonTable::table().which_nucl(it.first, 2);
@@ -572,7 +586,8 @@ namespace ymir {
                         prev_nuc_ids = CodonTable::table().which_nucl(it.first, 0);
                         next_nuc_ids = CodonTable::table().which_nucl(it.first, 1);
                         for (int i = 0; i < 6; ++i) {
-                            res_vec[i] = bithash[5 - i] * arr_prob[prev_nuc_ids[0]*5 + next_nuc_ids[1]];
+                            res_vec[i] = bithash[5 - i]
+                                         * arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
                         }
                         (*_aa_probs_forw_to)[val + (hash_value << 2) + 1] = res_vec;
 
@@ -604,7 +619,7 @@ namespace ymir {
 //                        next_nuc_ids = CodonTable::table().which_nucl(it.first, 0);
                         for (int i = 0; i < 6; ++i) {
                             res_vec[i] = bithash[5 - i]
-                                         * arr_prob[prev_nuc_ids[1]*5 + next_nuc_ids[2]];
+                                         * arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
                         }
                         (*_aa_probs_back_from)[val + (hash_value << 2) + 2] = res_vec;
 
@@ -635,7 +650,7 @@ namespace ymir {
 
                         // last_pos == 2
                         for (int i = 0; i < 6; ++i) {
-                            res_vec[i] = 1;
+                            res_vec[i] = bithash[5 - i];
                         }
                         (*_aa_probs_back_to)[val + (hash_value << 2) + 2] = res_vec;
                     }

@@ -342,7 +342,7 @@ YMIR_TEST_START(test_markovchain_aa_di)
 //    YMIR_ASSERT3(m.aaProbability("M", 2, 3, 63, 63), .4 * .3)
 //    YMIR_ASSERT3(m.aaProbability("M", 3, 3, 63, 63), .3)
 //
-////     {'I', "ATT"}, {'I', "ATC"}, {'I', "ATA"}
+//    // {'I', "ATT"}, {'I', "ATC"}, {'I', "ATA"}
 //    YMIR_ASSERT3(m.aaProbability("MI", 4, 4, 0, 0), 0)
 //    YMIR_ASSERT3(m.aaProbability("MI", 4, 5, 0, 0), 0)
 //    YMIR_ASSERT3(m.aaProbability("MI", 4, 6, 0, 0), 0)
@@ -386,9 +386,9 @@ YMIR_TEST_START(test_markovchain_aa_di)
 //                                                          + comp_prob("TATC", m_)
 //                                                          + comp_prob("TATT", m_))
 //    // 100000 x 101000
-//    YMIR_ASSERT3(m.aaProbability("HI", 4, 4, 40, 40, 32), m_["TA"])
-//    YMIR_ASSERT3(m.aaProbability("HI", 4, 5, 40, 40, 32), comp_prob("TAT", m_))
-//    YMIR_ASSERT3(m.aaProbability("HI", 4, 6, 40, 40, 32), comp_prob("TATT", m_))
+//    YMIR_ASSERT3(m.aaProbability("HI", 4, 4, 40, 40, 32), 2 * m_["TA"])
+//    YMIR_ASSERT3(m.aaProbability("HI", 4, 5, 40, 40, 32), 2 * comp_prob("TAT", m_))
+//    YMIR_ASSERT3(m.aaProbability("HI", 4, 6, 40, 40, 32), comp_prob("TATT", m_) + comp_prob("TATA", m_))
 //
 //
 //    //
@@ -405,46 +405,73 @@ YMIR_TEST_START(test_markovchain_aa_di)
 //    YMIR_ASSERT3(m.aaProbability("AF", 3, 4, 0, 0), 0)
 //    YMIR_ASSERT3(m.aaProbability("AF", 3, 5, 0, 0), 0)
 //    YMIR_ASSERT3(m.aaProbability("AF", 3, 6, 0, 0), 0)
-
-    // 100000 and 100000
+//
+//    // 100000 and 100000
 //    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 32, 32), .25 * comp_prob("GCTT", m_))
-//    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 63, 32), .25 * comp_prob("GCTT", m_))
-//    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 32, 63), .25 * comp_prob("GCTT", m_))
-
-    // 110000 and 100000
-    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 48, 32), .25 * (comp_prob("GCTT", m_) + comp_prob("GCCT", m_)))
-
-    // 100000 and 110000
-    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 32, 48), .25 * (comp_prob("GCTT", m_) * 2))
-
-    // 111100 and 110000 (full)
-    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 60, 48), .25 * 2 * (comp_prob("GCTT", m_)
-                                                                 + comp_prob("GCCT", m_)
-                                                                 + comp_prob("GCAT", m_)
-                                                                 + comp_prob("GCGT", m_)))
+//    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 33, 32), .25 * comp_prob("GCTT", m_))
+//    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 32, 33), .25 * comp_prob("GCTT", m_))
+//
+//    // 010000 and 010000
+//    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 16, 16), .25 * comp_prob("GCCT", m_))
+//
+//    // 100000 and 010000
+//    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 32, 16), .25 * comp_prob("GCTT", m_))
+//
+//    // 110000 and 100000
+//    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 48, 32), .25 * (comp_prob("GCTT", m_) + comp_prob("GCCT", m_)))
+//
+//    // 100000 and 110000
+//    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 32, 48), .25 * (comp_prob("GCTT", m_) * 2))
+//
+//    // 111100 and 110000 (full)
+//    YMIR_ASSERT3(m.aaProbability("AF", 1, 4, 60, 48), .25 * 2 * (comp_prob("GCTT", m_)
+//                                                                 + comp_prob("GCCT", m_)
+//                                                                 + comp_prob("GCAT", m_)
+//                                                                 + comp_prob("GCGT", m_)))
     YMIR_ASSERT3(m.aaProbability("AF", 1, 5, 60, 48), .25 * 2 * (comp_prob("GCTTT", m_)
                                                                  + comp_prob("GCCTT", m_)
                                                                  + comp_prob("GCATT", m_)
                                                                  + comp_prob("GCGTT", m_)))
-//    YMIR_ASSERT3(m.aaProbability("AF", 1, 6, 60, 48), 0)
+    YMIR_ASSERT3(m.aaProbability("AF", 1, 6, 60, 48), .25 * (comp_prob("GCTTTT", m_)
+                                                             + comp_prob("GCTTTC", m_)
+                                                             + comp_prob("GCCTTT", m_)
+                                                             + comp_prob("GCCTTC", m_)
+                                                             + comp_prob("GCATTT", m_)
+                                                             + comp_prob("GCATTC", m_)
+                                                             + comp_prob("GCGTTT", m_)
+                                                             + comp_prob("GCGTTC", m_)))
     YMIR_ASSERT3(m.aaProbability("AF", 2, 4, 60, 48), 2 * (comp_prob("GCTT", m_)
                                                            + comp_prob("GCCT", m_)
                                                            + comp_prob("GCAT", m_)
                                                            + comp_prob("GCGT", m_)))
-//    YMIR_ASSERT3(m.aaProbability("AF", 2, 5, 60, 48), 2 * (comp_prob("GCTTT", m_)
-//                                                           + comp_prob("GCCTT", m_)
-//                                                           + comp_prob("GCATT", m_)
-//                                                           + comp_prob("GCGTT", m_)))
-//    YMIR_ASSERT3(m.aaProbability("AF", 2, 6, 60, 48), 0)
-//    YMIR_ASSERT3(m.aaProbability("AF", 3, 4, 60, 48), 2 * (comp_prob("CTT", m_)
-//                                                           + comp_prob("CCT", m_)
-//                                                           + comp_prob("CAT", m_)
-//                                                           + comp_prob("CGT", m_)))
-//    YMIR_ASSERT3(m.aaProbability("AF", 3, 5, 60, 48), 2 * (comp_prob("CTTT", m_)
-//                                                           + comp_prob("CCTT", m_)
-//                                                           + comp_prob("CATT", m_)
-//                                                           + comp_prob("CGTT", m_)))
-//    YMIR_ASSERT3(m.aaProbability("AF", 3, 6, 60, 48), 0)
+    YMIR_ASSERT3(m.aaProbability("AF", 2, 5, 60, 48), 2 * (comp_prob("GCTTT", m_)
+                                                           + comp_prob("GCCTT", m_)
+                                                           + comp_prob("GCATT", m_)
+                                                           + comp_prob("GCGTT", m_)))
+    YMIR_ASSERT3(m.aaProbability("AF", 2, 6, 60, 48), (comp_prob("GCTTTT", m_)
+                                                       + comp_prob("GCTTTC", m_)
+                                                       + comp_prob("GCCTTT", m_)
+                                                       + comp_prob("GCCTTC", m_)
+                                                       + comp_prob("GCATTT", m_)
+                                                       + comp_prob("GCATTC", m_)
+                                                       + comp_prob("GCGTTT", m_)
+                                                       + comp_prob("GCGTTC", m_)))
+    YMIR_ASSERT3(m.aaProbability("AF", 3, 4, 60, 48), 2 * (comp_prob("CTT", m_)
+                                                           + comp_prob("CCT", m_)
+                                                           + comp_prob("CAT", m_)
+                                                           + comp_prob("CGT", m_)))
+    YMIR_ASSERT3(m.aaProbability("AF", 3, 5, 60, 48), 2 * (comp_prob("CTTT", m_)
+                                                           + comp_prob("CCTT", m_)
+                                                           + comp_prob("CATT", m_)
+                                                           + comp_prob("CGTT", m_)))
+    YMIR_ASSERT3(m.aaProbability("AF", 3, 6, 60, 48), (comp_prob("CTTTT", m_)
+                                                       + comp_prob("CTTTC", m_)
+                                                       + comp_prob("CCTTT", m_)
+                                                       + comp_prob("CCTTC", m_)
+                                                       + comp_prob("CATTT", m_)
+                                                       + comp_prob("CATTC", m_)
+                                                       + comp_prob("CGTTT", m_)
+                                                       + comp_prob("CGTTC", m_)))
 
 
     // distant aminoacids

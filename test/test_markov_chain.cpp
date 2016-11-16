@@ -650,33 +650,33 @@ YMIR_TEST_START(test_markovchain_aa_di_rev)
 //    YMIR_ASSERT3(m.aaProbabilityRev("IM", 6, 4, 0, 0), 0)
 
     // 111000
-    YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 3, 56, 56), m_["AT"] + m_["AC"] + m_["AA"])
+    YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 3, 56, 56), aapr("TA", m_) + aapr("CA", m_) + aapr("AA", m_))
     YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 2, 56, 56), aapr("TTA", m_) + aapr("TCA", m_) + aapr("TAA", m_))
     YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 1, 56, 56), aapr("ATTA", m_) + aapr("ATCA", m_) + aapr("ATAA", m_))
-    YMIR_ASSERT3(m.aaProbabilityRev("IM", 2, 2, 56, 56), m_["TT"] + m_["TC"] + m_["TA"])
+    YMIR_ASSERT3(m.aaProbabilityRev("IM", 2, 2, 56, 56), aapr("TT", m_) + aapr("TC", m_) + aapr("TA", m_))
     YMIR_ASSERT3(m.aaProbabilityRev("IM", 2, 1, 56, 56), aapr("ATT", m_) + aapr("ATC", m_) + aapr("ATA", m_))
-    YMIR_ASSERT3(m.aaProbabilityRev("IM", 1, 1, 56, 56), 3 * m_["AT"])
+    YMIR_ASSERT3(m.aaProbabilityRev("IM", 1, 1, 56, 56), 3 * aapr("AT", m_))
 
     // 101000
-    YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 3, 40, 40), m_["AT"] + m_["AA"])
+    YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 3, 40, 40), aapr("AT", m_) + aapr("AA", m_))
     YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 2, 40, 40), aapr("TTA", m_) + aapr("TAA", m_))
     YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 1, 40, 40), aapr("ATTA", m_) + aapr("ATAA", m_))
-    YMIR_ASSERT3(m.aaProbabilityRev("IM", 2, 2, 40, 40), m_["TT"] + m_["TA"])
+    YMIR_ASSERT3(m.aaProbabilityRev("IM", 2, 2, 40, 40), aapr("TT", m_) + aapr("TA", m_))
     YMIR_ASSERT3(m.aaProbabilityRev("IM", 2, 1, 40, 40), aapr("ATT", m_) + aapr("ATA", m_))
-    YMIR_ASSERT3(m.aaProbabilityRev("IM", 1, 1, 40, 40), 2 * m_["AT"])
+    YMIR_ASSERT3(m.aaProbabilityRev("IM", 1, 1, 40, 40), 2 * aapr("TA", m_))
 
     // 110000 and 011000 -> 010000
-    YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 3, 48, 24), m_["TC"])
+    YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 3, 48, 24), aapr("CA", m_))
     YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 2, 48, 24), aapr("TCA", m_))
     YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 1, 48, 24), aapr("ATCA", m_))
-    YMIR_ASSERT3(m.aaProbabilityRev("IM", 2, 2, 48, 24), m_["TC"])
+    YMIR_ASSERT3(m.aaProbabilityRev("IM", 2, 2, 48, 24), aapr("TC", m_))
     YMIR_ASSERT3(m.aaProbabilityRev("IM", 2, 1, 48, 24), aapr("ATC", m_))
-    YMIR_ASSERT3(m.aaProbabilityRev("IM", 1, 1, 48, 24), m_["AT"])
+    YMIR_ASSERT3(m.aaProbabilityRev("IM", 1, 1, 48, 24), aapr("AT", m_))
 
-//    // 100000 and 101000 -> 100000
-//    YMIR_ASSERT3(m.aaProbabilityRev("IM", 4, 4, 32, 40), m_["GA"])
-//    YMIR_ASSERT3(m.aaProbabilityRev("IM", 4, 5, 48, 40), aapr("GAT", m_))
-//    YMIR_ASSERT3(m.aaProbabilityRev("IM", 4, 6, 48, 40), aapr("GATT", m_))
+    // 100000 and 101000 -> 100000
+//    YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 3, 32, 40), m_["GA"])
+//    YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 2, 48, 40), aapr("GAT", m_))
+//    YMIR_ASSERT3(m.aaProbabilityRev("IM", 3, 1, 48, 40), aapr("GATT", m_))
 //
 //    // prev: {'H', "CAT"}, {'H', "CAC"},
 //    // 110000 x 110000

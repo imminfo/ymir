@@ -273,6 +273,7 @@ namespace ymir {
                 //
                 codon_hash prev_last_codons = first_aa_codons;
                 for (seq_len_t aa_i = (first_nuc_pos - 1) / 3 + 1; aa_i < (last_nuc_pos - 1) / 3; ++aa_i) {
+                    std::cout << "here" << std::endl;
                     // transition probabilities
                     res_mat = (*_aa_probs_trans)[(((sequence[(aa_i - 1) / 3] << 8) + prev_last_codons) << 16)
                                                  + ((sequence[aa_i / 3] << 8) + new_first_aa_codons)];
@@ -303,8 +304,7 @@ namespace ymir {
                 //
                 // transition probabilities
                 prev_last_codons = ((first_nuc_pos - 1) / 3) + 1 == ((last_nuc_pos - 1) / 3) ? first_aa_codons : 63;
-                std::cout << (int) prev_last_codons << ":" << (int) last_aa_codons << std::endl;
-                res_mat = (*_aa_probs_trans)[(((sequence[(last_nuc_pos - 2) / 3] << 8) + prev_last_codons) << 16)
+                res_mat = (*_aa_probs_trans)[(((sequence[(last_nuc_pos - 1) / 3 - 1] << 8) + prev_last_codons) << 16)
                                              + ((sequence[(last_nuc_pos - 1) / 3] << 8) + last_aa_codons)];
 
                 for (int i = 0; i < 6*6; ++i) { std::cout << res_mat[i] << " "; }; std::cout << std::endl;

@@ -187,6 +187,15 @@ namespace ymir {
                                                      * (std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - std::chrono::system_clock::to_time_t(tp1)))));
     }
 
+
+    inline seq_len_t pos_codon0(seq_len_t nuc_pos) {
+        return (nuc_pos - 1) / 3;
+    }
+
+    inline seq_len_t in_codon0(seq_len_t nuc_pos) {
+        return (nuc_pos - 1) % 3;
+    }
+
 }
 
 #endif

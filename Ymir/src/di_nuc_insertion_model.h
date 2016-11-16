@@ -193,7 +193,7 @@ namespace ymir {
             prob_t res = 0;
 
             bitset6 bithash;
-            codon_hash new_first_aa_codons = ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) ? (first_aa_codons & last_aa_codons) : first_aa_codons;
+            codon_hash new_first_aa_codons = (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) ? (first_aa_codons & last_aa_codons) : first_aa_codons;
 
             // if start pos is the very first amino acid, than we process this case separately
             if (first_nuc_pos == 0 || first_nuc_pos == 1) {
@@ -201,11 +201,11 @@ namespace ymir {
                 first_nuc_pos = 1;
             }
             // if start pos is 0 than we need to take into the account the previous codon
-            else if ((first_nuc_pos - 1) % 3 == 0) {
+            else if (in_codon0(first_nuc_pos) == 0) {
                 res_vec.fill(0);
 
-                res_mat = (*_aa_probs_trans)[(((sequence[(first_nuc_pos - 2) / 3] << 8) + prev_aa_codons) << 16)
-                                             + ((sequence[(first_nuc_pos - 1) / 3] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
+                res_mat = (*_aa_probs_trans)[(((sequence[pos_codon0(first_nuc_pos - 1)] << 8) + prev_aa_codons) << 16)
+                                             + ((sequence[pos_codon0(first_nuc_pos)] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
 
                 for (int i = 0; i < 6*6; ++i) { std::cout << res_mat[i] << " "; }; std::cout << std::endl;
 
@@ -219,7 +219,7 @@ namespace ymir {
             }
             else {
                 res_vec.fill(1);
-                if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
+                if (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) {
                     --first_nuc_pos;
                 }
             }
@@ -228,7 +228,7 @@ namespace ymir {
             for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
 
             // if the same codon
-            if ((first_nuc_pos - 1) / 3 == (last_nuc_pos - 1) / 3) {
+            if (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) {
                 bithash = new_first_aa_codons;
                 for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
 
@@ -256,9 +256,9 @@ namespace ymir {
                 //
                 // transition probabilities were processed earlier, they are stored in res_vec
                 // full codon probabilities
-                tmp_res_vec = (*_aa_probs_forw_from)[(sequence[(first_nuc_pos - 1) / 3] << 8)
+                tmp_res_vec = (*_aa_probs_forw_from)[(sequence[pos_codon0(first_nuc_pos)] << 8)
                                                      + (first_aa_codons << 2)
-                                                     + ((first_nuc_pos - 1) % 3)];
+                                                     + (in_codon0(first_nuc_pos))];
                 // resulting probabilities
                 for (int i = 0; i < 6; ++i) {
                     res_vec[i] *= tmp_res_vec[i];
@@ -272,7 +272,7 @@ namespace ymir {
                 // process all codons from first_nuc_pos to last_nuc_pos (exc.)
                 //
                 codon_hash prev_last_codons = first_aa_codons;
-                for (seq_len_t aa_i = (first_nuc_pos - 1) / 3 + 1; aa_i < (last_nuc_pos - 1) / 3; ++aa_i) {
+                for (seq_len_t aa_i = pos_codon0(first_nuc_pos) + 1; aa_i < pos_codon0(last_nuc_pos); ++aa_i) {
                     std::cout << "here" << std::endl;
                     // transition probabilities
                     res_mat = (*_aa_probs_trans)[(((sequence[(aa_i - 1) / 3] << 8) + prev_last_codons) << 16)
@@ -303,9 +303,9 @@ namespace ymir {
                 // process the last_nuc_pos
                 //
                 // transition probabilities
-                prev_last_codons = ((first_nuc_pos - 1) / 3) + 1 == ((last_nuc_pos - 1) / 3) ? first_aa_codons : 63;
-                res_mat = (*_aa_probs_trans)[(((sequence[(last_nuc_pos - 1) / 3 - 1] << 8) + prev_last_codons) << 16)
-                                             + ((sequence[(last_nuc_pos - 1) / 3] << 8) + last_aa_codons)];
+                prev_last_codons = (pos_codon0(first_nuc_pos)) + 1 == (pos_codon0(last_nuc_pos)) ? first_aa_codons : 63;
+                res_mat = (*_aa_probs_trans)[(((sequence[pos_codon0(last_nuc_pos) - 1] << 8) + prev_last_codons) << 16)
+                                             + ((sequence[pos_codon0(last_nuc_pos)] << 8) + last_aa_codons)];
 
                 for (int i = 0; i < 6*6; ++i) { std::cout << res_mat[i] << " "; }; std::cout << std::endl;
 
@@ -320,9 +320,9 @@ namespace ymir {
                 for (int i = 0; i < 6; ++i) { std::cout << tmp_res_vec[i] << " "; }; std::cout << std::endl;
                 for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; }; std::cout << std::endl;
                 // full codon probabilities
-                tmp_res_vec = (*_aa_probs_forw_to)[(sequence[(last_nuc_pos - 1) / 3] << 8)
+                tmp_res_vec = (*_aa_probs_forw_to)[(sequence[pos_codon0(last_nuc_pos)] << 8)
                                                    + (last_aa_codons << 2)
-                                                   + ((last_nuc_pos - 1) % 3)];
+                                                   + (in_codon0(last_nuc_pos))];
                 for (int i = 0; i < 6; ++i) { std::cout << tmp_res_vec[i] << " "; }; std::cout << std::endl;
                 // resulting probabilities
                 for (int i = 0; i < 6; ++i) {

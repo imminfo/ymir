@@ -379,8 +379,6 @@ namespace ymir {
             else if (in_codon0(first_nuc_pos) == 2) {
                 res_vec.fill(0);
 
-                std::cout << sequence[pos_codon0(first_nuc_pos) + 1] << ":" << sequence[pos_codon0(first_nuc_pos)] << std::endl;
-                std::cout << (int) prev_aa_codons << ":" << (int) first_aa_codons << std::endl;
                 res_mat = (*_aa_probs_back_trans)[(((sequence[pos_codon0(first_nuc_pos) + 1] << 8) + prev_aa_codons) << 16)
                                                   + ((sequence[pos_codon0(first_nuc_pos)] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
 
@@ -796,7 +794,7 @@ namespace ymir {
                             res_vec[i] = bithash[5 - i]
                                          * arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
                         }
-                        (*_aa_probs_back_from)[val + (hash_value << 2) + 2] = res_vec;
+                        (*_aa_probs_back_from)[val + (hash_value << 2) + 0] = res_vec;
 
                         //
                         // to <- backward direction

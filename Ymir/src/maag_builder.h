@@ -286,16 +286,31 @@ namespace ymir {
                                 bool reversed = false) const;
 
 
+        /**
+         *
+         */
         void buildAAVariable(const ClonotypeAA &clonotype,
                              ProbMMC &probs,
                              CodonMMC &codons,
                              vector<seq_len_t> &seq_poses) const;
 
 
+        /**
+         *
+         */
         void buildAAJoining(const ClonotypeAA &clonotype,
                             ProbMMC &probs,
                             CodonMMC &codons,
                             vector<seq_len_t> &seq_poses) const;
+
+
+        /**
+         *
+         */
+        void buildAADiversity(const ClonotypeAA &clonotype,
+                              ProbMMC &probs,
+                              CodonMMC &codons,
+                              vector<seq_len_t> &seq_poses) const;
 
     };
 
@@ -707,9 +722,7 @@ namespace ymir {
                 maag._insertions.reset(new MonoNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), 0));
             } else if (clonotype.recombination() == VDJ_RECOMB) {
                 check_and_throw(true, "MAAGBuilder: VDJ is not implemented yet.");
-//                this->buildNucDiversity(clonotype, probs, events, errors, seq_poses, metadata_mode, error_mode);
-//                this->buildNucVDinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
-//                this->buildNucDJinsertions(clonotype, probs, events, seq_poses, metadata_mode, error_mode);
+                this->buildAADiversity(clonotype, probs, codons, seq_poses);
             }
 
             probs.finish();

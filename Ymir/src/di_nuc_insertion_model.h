@@ -814,8 +814,8 @@ namespace ymir {
                         (*_aa_probs_back_to)[val + (hash_value << 2) + 0] = res_vec;
 
                         // last_pos == 1
-                        prev_nuc_ids = CodonTable::table().which_nucl(it.first, 1);
-                        next_nuc_ids = CodonTable::table().which_nucl(it.first, 0);
+                        prev_nuc_ids = CodonTable::table().which_nucl(it.first, 2);
+                        next_nuc_ids = CodonTable::table().which_nucl(it.first, 1);
                         for (int i = 0; i < 6; ++i) {
                             res_vec[i] = bithash[5 - i]
                                          * arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];

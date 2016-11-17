@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 2.8.4)
 
 project(Ymir)
 
-add_definitions(-DUSE_OMP)
+#add_definitions(-DUSE_OMP)
 
-if (USE_OMP)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-endif()
+#if (USE_OMP)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+#endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++11 -fopenmp")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++11 -fopenmp")
 
 # /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
 # /usr/local/Cellar/clang-omp/2015-04-01/bin/clang-omp++

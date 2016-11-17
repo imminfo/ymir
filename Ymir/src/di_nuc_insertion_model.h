@@ -382,8 +382,6 @@ namespace ymir {
                 res_mat = (*_aa_probs_back_trans)[(((sequence[pos_codon0(first_nuc_pos) + 1] << 8) + prev_aa_codons) << 16)
                                                   + ((sequence[pos_codon0(first_nuc_pos)] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
 
-                for (int i = 0; i < 36; ++i) { std::cout << res_mat[i] << " "; } std::cout << std::endl;
-
                 // i - next codon index
                 // j - prev codon index
                 for (int i = 0; i < 6; ++i) {
@@ -404,11 +402,7 @@ namespace ymir {
                 bithash = new_first_aa_codons;
                 for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
 
-                std::cout << (int) first_nuc_pos << ":" << last_nuc_pos << std::endl;
-                for (int i = 0; i < 6; ++i) { std::cout << res_vec[i] << " "; } std::cout << std::endl;
-
                 for (seq_len_t nuc_i = first_nuc_pos; nuc_i > last_nuc_pos; --nuc_i) {
-                    std::cout << (int) nuc_i << "->" << (int) (nuc_i-1) << std::endl;
                     auto prev_nuc_ids = CodonTable::table().which_nucl(sequence[pos_codon0(nuc_i)], in_codon0(nuc_i));
                     auto next_nuc_ids = CodonTable::table().which_nucl(sequence[pos_codon0(nuc_i)], in_codon0(nuc_i - 1));
                     for (int i = 0; i < 6; ++i) {
@@ -420,7 +414,6 @@ namespace ymir {
             }
             // if codons are different
             else {
-                std::cout << "here" << std::endl;
                 //
                 // process the first_nuc_pos
                 //
@@ -452,7 +445,7 @@ namespace ymir {
                     tmp_res_vec.swap(res_vec);
 
                     // full codon probabilities
-                    tmp_res_vec = (*_aa_probs_back_from)[(sequence[aa_i] << 8) + (63 << 2) + 0];
+                    tmp_res_vec = (*_aa_probs_back_from)[(sequence[aa_i] << 8) + (63 << 2) + 2];
 
                     // resulting probabilities
                     for (int i = 0; i < 6; ++i) {

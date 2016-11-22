@@ -317,8 +317,8 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     vector<string> avec2 {"J1", "J2", "J3", "J4", "J5", "J6"};
     vector<string> svec2 {"CTTTA", "CCTT", "AGCCTG", "AGGCTG", "AATT", "TTT"};
 
-    vector<string> avec3 {"D1", "D2", "D3"};
-    vector<string> svec3 {"AA", "AACCTT", "ACT"};
+    vector<string> avec3 {"D1", "D2", "D3", "D4"};
+    vector<string> svec3 {"AAA", "AACCACT", "ACT", "TGC"};
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
     CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3,
@@ -335,32 +335,32 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.pattern_start(0), 1)
     YMIR_ASSERT2(alignment.text_start(0), 1)
     YMIR_ASSERT2(alignment.len(0), 5)
-    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 5), compute_codon_hash({true, true, false, false, false, false}, 0))
 
     alignment = aligner.alignVar(2, "SL");
     YMIR_ASSERT2(alignment.id(0), 2)
     YMIR_ASSERT2(alignment.pattern_start(0), 1)
     YMIR_ASSERT2(alignment.text_start(0), 1)
     YMIR_ASSERT2(alignment.len(0), 4)
-    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
 
     alignment = aligner.alignVar(3, "SL");
     YMIR_ASSERT2(alignment.id(0), 3)
     YMIR_ASSERT2(alignment.pattern_start(0), 1)
     YMIR_ASSERT2(alignment.text_start(0), 1)
     YMIR_ASSERT2(alignment.len(0), 5)
-    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 5), compute_codon_hash({true, true, false, false, false, false}, 0))
 
     // {'C', "TGT"}, {'C', "TGC"},
     // TG.GG
@@ -388,11 +388,11 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.pattern_start(0), 1)
     YMIR_ASSERT2(alignment.text_start(0), 2)
     YMIR_ASSERT2(alignment.len(0), 5)
-    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({true, false, false, false, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({true, false, false, false, true, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({true, false, false, false, true, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({true, false, false, false, true, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, false, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, false, false, false, true, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 4), compute_codon_hash({true, false, false, false, true, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 5), compute_codon_hash({true, false, false, false, true, false}, 0))
 
     // J2: C.CTT
     //   TCC.CTT
@@ -402,10 +402,10 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.pattern_start(0), 1)
     YMIR_ASSERT2(alignment.text_start(0), 3)
     YMIR_ASSERT2(alignment.len(0), 4)
-    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({false, true, false, false, false, true}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({false, false, true, false, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, false, true, false, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({false, false, true, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({false, true, false, false, false, true}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({false, false, true, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, false, true, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 4), compute_codon_hash({false, false, true, false, false, false}, 0))
 
     // J3: AGC.CTG
     //     AGC.CTG
@@ -414,12 +414,12 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.pattern_start(0), 1)
     YMIR_ASSERT2(alignment.text_start(0), 1)
     YMIR_ASSERT2(alignment.len(0), 6)
-    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({false, false, false, false, false, true}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({false, false, false, false, false, true}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, true, false, false, false, true}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({false, false, false, false, false, true}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 6), compute_codon_hash({false, true, false, false, false, true}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 5), compute_codon_hash({false, true, false, false, false, true}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({false, false, false, false, false, true}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({false, false, false, false, false, true}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, true, false, false, false, true}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 4), compute_codon_hash({false, false, false, false, false, true}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 6), compute_codon_hash({false, true, false, false, false, true}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 5), compute_codon_hash({false, true, false, false, false, true}, 0))
 
     // J4: AGG.CTG
     //     TCG.CTG
@@ -428,10 +428,10 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.pattern_start(0), 3)
     YMIR_ASSERT2(alignment.text_start(0), 3)
     YMIR_ASSERT2(alignment.len(0), 4)
-    YMIR_ASSERT2(alignment.getCodon(0, 1), compute_codon_hash({false, false, false, true, false, false}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 2), compute_codon_hash({false, false, false, false, false, true}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 3), compute_codon_hash({false, true, false, false, false, true}, 0))
-    YMIR_ASSERT2(alignment.getCodon(0, 4), compute_codon_hash({false, true, false, false, false, true}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({false, false, false, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({false, false, false, false, false, true}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, true, false, false, false, true}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 4), compute_codon_hash({false, true, false, false, false, true}, 0))
 
     // J5: AATT
     // S: TCT TCC TCA TCG AGT AGC
@@ -450,7 +450,154 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERT2(alignment.text_start(0), 7)
     YMIR_ASSERT2(alignment.len(0), 3)
 
-    YMIR_ASSERT2("cdr aa div aligner is implemented", "cdr aa div aligner is not implemented")
+    // "D1", "D2", "D3"
+    // "AAA", "AACCACT", "ACT", "TGC"
+    // one aminoacid
+    // {'K', "AAA"}, {'K', "AAG"}
+    // {'Q', "CAA"}, {'Q', "CAG"}
+    // {'H', "CAT"}, {'H', "CAC"}
+    // {'T', "ACT"}, {'T', "ACC"}, {'T', "ACA"}, {'T', "ACG"}
+    // {'S', "TCT"}, {'S', "TCC"}, {'S', "TCA"}, {'S', "TCG"}, {'S', "AGT"}, {'S', "AGC"}
+    alignment = aligner.alignDiv(1, "Q");
+    YMIR_ASSERT2(alignment.size(), 0)
+
+    alignment = aligner.alignDiv(1, "K");
+    YMIR_ASSERT2(alignment.size(), 1)
+    YMIR_ASSERT2(alignment.id(0), 1)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
+
+    alignment = aligner.alignDiv(1, "HK");
+    YMIR_ASSERT2(alignment.size(), 1)
+    YMIR_ASSERT2(alignment.id(0), 1)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 4)
+    YMIR_ASSERT2(alignment.len(0), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
+
+
+    alignment = aligner.alignDiv(2, "T");
+    YMIR_ASSERT2(alignment.size(), 2)
+
+    YMIR_ASSERT2(alignment.id(0), 2)
+    YMIR_ASSERT2(alignment.pattern_start(0), 2)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, true, false, false, false, false}, 0))
+
+    YMIR_ASSERT2(alignment.id(1), 2)
+    YMIR_ASSERT2(alignment.pattern_start(1), 5)
+    YMIR_ASSERT2(alignment.text_start(1), 1)
+    YMIR_ASSERT2(alignment.len(1), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(1, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(1, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(1, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
+
+
+    alignment = aligner.alignDiv(3, "T");
+    YMIR_ASSERT2(alignment.size(), 1)
+    YMIR_ASSERT2(alignment.id(0), 3)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
+
+
+    alignment = aligner.alignDiv(4, "S");
+    YMIR_ASSERT2(alignment.size(), 0)
+
+    // neighbour aminoacids
+    // "D1", "D2", "D3"
+    // "AAA", "AACCACT", "ACT"
+    //
+    // {'Q', "CAA"}, {'Q', "CAG"}
+    // {'R', "CGT"}, {'R', "CGC"}, {'R', "CGA"}, {'R', "CGG"}, {'R', "AGA"}, {'R', "AGG"}
+    // {'K', "AAA"}, {'K', "AAG"}
+    alignment = aligner.alignDiv(1, "QRK");
+    YMIR_ASSERT2(alignment.size(), 3)
+
+    YMIR_ASSERT2(alignment.id(0), 1)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 2)
+    YMIR_ASSERT2(alignment.len(0), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, false, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, false, true, true}, 0))
+
+    YMIR_ASSERT2(alignment.id(1), 1)
+    YMIR_ASSERT2(alignment.pattern_start(1), 1)
+    YMIR_ASSERT2(alignment.text_start(1), 6)
+    YMIR_ASSERT2(alignment.len(1), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(1, 1), compute_codon_hash({false, false, true, false, true, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(1, 2), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(1, 3), compute_codon_hash({true, true, false, false, false, false}, 0))
+
+    YMIR_ASSERT2(alignment.id(2), 1)
+    YMIR_ASSERT2(alignment.pattern_start(2), 1)
+    YMIR_ASSERT2(alignment.text_start(2), 7)
+    YMIR_ASSERT2(alignment.len(2), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(2, 1), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(2, 2), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(2, 3), compute_codon_hash({true, false, false, false, false, false}, 0))
+
+    // three aminoacids
+    // "D1", "D2", "D3"
+    // "AAA", "AACCACT", "ACT"
+    //
+    // {'N', "AAT"}, {'N', "AAC"},
+    // {'H', "CAT"}, {'H', "CAC"},
+    // {'F', "TTT"}, {'F', "TTC"},
+    // {'N', "AAT"}, {'N', "AAC"},
+    // {'T', "ACT"}, {'T', "ACC"}, {'T', "ACA"}, {'T', "ACG"}
+    alignment = aligner.alignDiv(2, "NHFNT");
+    YMIR_ASSERT2(alignment.size(), 4)
+
+    YMIR_ASSERT2(alignment.id(0), 2)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 1)
+    YMIR_ASSERT2(alignment.len(0), 7)
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 4), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 5), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 6), compute_codon_hash({false, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 7), compute_codon_hash({true, true, false, false, false, false}, 0))
+
+    YMIR_ASSERT2(alignment.id(1), 2)
+    YMIR_ASSERT2(alignment.pattern_start(1), 4)
+    YMIR_ASSERT2(alignment.text_start(1), 12)
+    YMIR_ASSERT2(alignment.len(1), 4)
+    YMIR_ASSERTCOD(alignment.getCodon(1, 1), compute_codon_hash({false, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(1, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(1, 3), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(1, 4), compute_codon_hash({true, false, false, false, false, false}, 0))
+
+    YMIR_ASSERT2(alignment.id(2), 2)
+    YMIR_ASSERT2(alignment.pattern_start(2), 1)
+    YMIR_ASSERT2(alignment.text_start(2), 10)
+    YMIR_ASSERT2(alignment.len(2), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(2, 1), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(2, 2), compute_codon_hash({true, true, false, false, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(2, 3), compute_codon_hash({false, true, false, false, false, false}, 0))
+
+    YMIR_ASSERT2(alignment.id(3), 2)
+    YMIR_ASSERT2(alignment.pattern_start(3), 2)
+    YMIR_ASSERT2(alignment.text_start(3), 13)
+    YMIR_ASSERT2(alignment.len(3), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(3, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(3, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(3, 3), compute_codon_hash({false, true, false, false, false, false}, 0))
 
 YMIR_TEST_END
 
@@ -762,7 +909,7 @@ int main(int argc, char* argv[]) {
 //    YMIR_TEST(test_swng_aligner())
 
     // Error corrector test
-    YMIR_TEST(test_errcorr_aligner())
+//    YMIR_TEST(test_errcorr_aligner())
 
     //**************  **************//
 

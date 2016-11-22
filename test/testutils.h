@@ -27,6 +27,7 @@ namespace ymir {
 #define YMIR_ASSERT(expr) { if (!(expr)) { _failed_cases.push_back(#expr); } };
 #define YMIR_ASSERT2(expr1, expr2) { if ((expr1) != (expr2)) { std::stringstream ss; ss << #expr1 << " == " << #expr2 << "  (result: " << (expr1) << ", need: " << (expr2) << ")";_failed_cases.push_back(ss.str()); } };
 #define YMIR_ASSERT3(expr1, expr2) { if (abs((expr1) - (expr2)) > YMIR_TEST_PRECISION) { std::stringstream ss; ss << #expr1 << " == " << #expr2 << "  (result: " << (expr1) << ", need: " << (expr2) << ")";_failed_cases.push_back(ss.str()); } };
+#define YMIR_ASSERTCOD(expr1, expr2) { if (abs((expr1) - (expr2)) > YMIR_TEST_PRECISION) { std::stringstream ss; ss << #expr1 << " == " << #expr2 << "  (result: " << std::bitset<6>(expr1).to_string() << ", need: " << std::bitset<6>(expr2).to_string() << ")";_failed_cases.push_back(ss.str()); } };
 #define YMIR_TEST_END std::cout << std::endl; return _failed_cases; }
 
     struct TestInfo {

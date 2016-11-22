@@ -718,31 +718,91 @@ namespace ymir {
 
         void _alignDiv(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, CodonAlignmentVector *avec) const {
             seq_len_t match_min_len = _params.min_D_len;
-            seq_len_t t_size = text.size(), p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
+            seq_len_t t_size = text.size() * 3, p_size = pattern.size(), min_size = min(t_size, p_size), min_subsize;
+            bool open_match;
             seq_len_t p_start, t_start;
-            AlignmentVectorBase::events_storage_t bitvec;
-            bitvec.reserve(p_size + 1);
+            CodonAlignmentVector bits;
+            std::vector<bool> nucbits;
+            bool is_ok;
+            int bitsum;
 
-            int max_iter = std::min((seq_len_t) (p_size / 3 + static_cast<seq_len_t>((p_size % 3) != 0)), t_size);
-            for (seq_len_t pattern_i = 0; pattern_i < max_iter; ++pattern_i) {
+            for (seq_len_t pattern_i = 0; pattern_i < p_size - match_min_len + 1; ++pattern_i) {
+                nucbits.clear();
+
+                open_match = false;
                 min_subsize = min(p_size - pattern_i, (int) t_size);
-                if (min_subsize >= match_min_len) {
-                    bitvec.resize(min_subsize);
-                    for (seq_len_t i = 0; i < min_subsize; ++i) {
-                        bitvec[i] = pattern[pattern_i + i] != text[i];
+                for (seq_len_t i = 0; i < min_subsize; ++i) {
+                    is_ok = CodonTable::table().check_nucl(text[i / 3], pattern[pattern_i + i], i % 3, &nucbits);
+
+                    // find intersected codons, if the i-th position isn't the first one in the processed codon
+                    if ((nucbits.size() > 6) && ((i % 3) > 0)) {
+                        bitsum = 0;
+                        for (int bit_i = 1; bit_i <= 6; ++bit_i) {
+                            bitsum += nucbits[nucbits.size() - bit_i] & nucbits[nucbits.size() - 6 - bit_i];
+                        }
+                        is_ok &= static_cast<bool>(bitsum);
                     }
-                    avec->addAlignment(gene, pattern_i + 1, 1, bitvec);
+
+                    if (is_ok) {
+                        if (!open_match) {
+                            p_start = pattern_i + i;
+                            t_start = i;
+                            open_match = true;
+                        }
+                    } else {
+                        if (open_match) {
+                            if (nucbits.size()) { nucbits.resize(nucbits.size() - 6); }
+                            if ((pattern_i + i - p_start) >= match_min_len) {
+                                // Save each of the 6 codon bits for each nucleotide position
+                                avec->addAlignment(gene, p_start + 1, t_start + 1, nucbits);
+                            }
+                            open_match = false;
+                        }
+                        nucbits.clear();
+                    }
+                }
+                if (open_match && (pattern_i + min_subsize - p_start) >= match_min_len) {
+                    avec->addAlignment(gene, p_start + 1, t_start + 1, nucbits);
+                    nucbits.clear();
                 }
             }
 
             for (seq_len_t text_i = 1; text_i < t_size - match_min_len + 1; ++text_i) {
+                nucbits.clear();
+
+                open_match = false;
                 min_subsize = min((int) p_size, t_size - text_i);
-                if (min_subsize >= match_min_len) {
-                    bitvec.resize(min_subsize);
-                    for (seq_len_t i = 0; i < min_subsize; ++i) {
-                        bitvec[i] = pattern[i] != text[text_i + i];
+                for (seq_len_t i = 0; i < min_subsize; ++i) {
+                    is_ok = CodonTable::table().check_nucl(text[(text_i + i) / 3], pattern[i], (text_i + i) % 3, &nucbits);
+
+                    if ((nucbits.size() > 6) && (((text_i + i) % 3) > 0)) {
+                        bitsum = 0;
+                        for (int bit_i = 1; bit_i <= 6; ++bit_i) {
+                            bitsum += nucbits[nucbits.size() - bit_i] & nucbits[nucbits.size() - 6 - bit_i];
+                        }
+                        is_ok &= static_cast<bool>(bitsum);
                     }
-                    avec->addAlignment(gene, 1, text_i + 1, bitvec);
+
+                    if (is_ok) {
+                        if (!open_match) {
+                            p_start = i;
+                            t_start = text_i + i;
+                            open_match = true;
+                        }
+                    } else {
+                        if (open_match) {
+                            if (nucbits.size()) { nucbits.resize(nucbits.size() - 6); }
+                            if ((i - p_start) >= match_min_len) {
+                                avec->addAlignment(gene, p_start + 1, t_start + 1, nucbits);
+                            }
+                            open_match = false;
+                        }
+                        nucbits.clear();
+                    }
+                }
+                if (open_match && (min_subsize - p_start) >= match_min_len) {
+                    avec->addAlignment(gene, p_start + 1, t_start + 1, nucbits);
+                    nucbits.clear();
                 }
             }
         }

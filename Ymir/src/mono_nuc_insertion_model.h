@@ -134,10 +134,10 @@ namespace ymir {
             assert(first_nuc_pos <= 3*sequence.size() + 1);
             assert(last_nuc_pos <= 3*sequence.size() + 1);
 #endif
-            assert(first_nuc_pos <= last_nuc_pos);
-//            if (first_nuc_pos > last_nuc_pos) {
-//                return 0;  // TODO: changed this to zero, something may fail
-//            }
+//            assert(first_nuc_pos <= last_nuc_pos);
+            if (first_nuc_pos > last_nuc_pos) {
+                return 0;  // TODO: changed this to zero, something may fail
+            }
 
             prob_t res = 0, nuc_prob;
             std::array<prob_t, 6> res_vec = {1, 1, 1, 1, 1, 1};

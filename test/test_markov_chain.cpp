@@ -1002,13 +1002,13 @@ int main(int argc, char* argv[]) {
     //**************  TEST CASES  **************//
 
     // Tests for markov chain.
-    YMIR_TEST(test_markovchain_nuc_mono())
-    YMIR_TEST(test_markovchain_nuc_di())
-    YMIR_TEST(test_markovchain_aa_mono())
+//    YMIR_TEST(test_markovchain_nuc_mono())
+//    YMIR_TEST(test_markovchain_nuc_di())
+//    YMIR_TEST(test_markovchain_aa_mono())
     YMIR_TEST(test_markovchain_aa_di())
-    YMIR_TEST(test_markovchain_aa_di_rev())
-    YMIR_TEST(test_markovchain_nuc_mono_err())
-    YMIR_TEST(test_markovchain_nuc_di_err())
+//    YMIR_TEST(test_markovchain_aa_di_rev())
+//    YMIR_TEST(test_markovchain_nuc_mono_err())
+//    YMIR_TEST(test_markovchain_nuc_di_err())
 
     //**************  **************//
 

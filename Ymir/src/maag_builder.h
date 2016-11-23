@@ -530,8 +530,6 @@ namespace ymir {
             for (int node_i = 0; node_i < maag->chainSize(); ++node_i) {
                 // either rebuild all insertions
                 if (maag->is_vj() && node_i == VarJoi_INSERTIONS_MATRIX_INDEX) {
-                    MonoNucInsertionModel im(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0))); // TODO: add errors here?
-
                     seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                             j_vertices = maag->nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
 
@@ -548,12 +546,10 @@ namespace ymir {
                                           v_vertices - 1,
                                           v_vertices,
                                           v_vertices + j_vertices - 1,
-                                          im,
+                                          *_vj_ins,
                                           false);
 
                 } else if (maag->is_vdj() && node_i == VarDiv_INSERTIONS_MATRIX_INDEX) {
-                    DiNucInsertionModel im(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));  // TODO: add errors here?
-
                     seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                             d3_vertices = maag->nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
 
@@ -570,12 +566,10 @@ namespace ymir {
                                           v_vertices - 1,
                                           v_vertices,
                                           v_vertices + d3_vertices - 1,
-                                          im,
+                                          *_vd_ins,
                                           false);
 
                 } else if (maag->is_vdj() && node_i == DivJoi_INSERTIONS_MATRIX_INDEX) {
-                    DiNucInsertionModel im(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
-
                     seq_len_t v_vertices = maag->nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                             d3_vertices = maag->nodeRows(DIVERSITY_GENES_MATRIX_INDEX),
                             d5_vertices = maag->nodeColumns(DIVERSITY_GENES_MATRIX_INDEX),
@@ -594,7 +588,7 @@ namespace ymir {
                                           v_vertices + d3_vertices + d5_vertices - 1,
                                           v_vertices + d3_vertices + d5_vertices,
                                           v_vertices + d3_vertices + d5_vertices + j_vertices - 1,
-                                          im,
+                                          *_dj_ins,
                                           true);
 
                 } else {

@@ -40,8 +40,11 @@ namespace ymir {
                 : MAAGBase(other),
                   _codons(other._codons),
                   _insertions(other._insertions->clone()),
+                  _insertions_rev(other._insertions_rev->clone()),
                   _max_ins_len(other._max_ins_len),
-                  _ins_start(other._ins_start)
+                  _max_ins_len_rev(other._max_ins_len_rev),
+                  _ins_start(other._ins_start),
+                  _ins_start_rev(other._ins_start_rev)
         {
 
         }
@@ -52,8 +55,11 @@ namespace ymir {
         {
             _codons.swap(other._codons);
             _insertions.swap(other._insertions);
+            _insertions_rev.swap(other._insertions_rev);
             std::swap(_max_ins_len, other._max_ins_len);
+            std::swap(_max_ins_len_rev, other._max_ins_len_rev);
             std::swap(_ins_start, other._ins_start);
+            std::swap(_ins_start_rev, other._ins_start_rev);
         }
 
 
@@ -67,8 +73,11 @@ namespace ymir {
             MAAGBase::operator=(other);
             _codons = other._codons;
             _insertions.reset(other._insertions->clone());
+            _insertions_rev.reset(other._insertions_rev->clone());
             _max_ins_len = other._max_ins_len;
+            _max_ins_len_rev = other._max_ins_len_rev;
             _ins_start = other._ins_start;
+            _ins_start_rev = other._ins_start_rev;
             return *this;
         }
 
@@ -77,8 +86,11 @@ namespace ymir {
             MAAGBase::operator=(other);
             _codons.swap(other._codons);
             _insertions.swap(other._insertions);
+            _insertions_rev.swap(other._insertions_rev);
             std::swap(_max_ins_len, other._max_ins_len);
+            std::swap(_max_ins_len_rev, other._max_ins_len_rev);
             std::swap(_ins_start, other._ins_start);
+            std::swap(_ins_start_rev, other._ins_start_rev);
             return *this;
         }
 
@@ -156,56 +168,112 @@ namespace ymir {
         }
 
         prob_t fullProbability(event_ind_t v_index, event_ind_t d_index, event_ind_t j_index) {
-//            if (_recomb == VDJ_RECOMB) {
-//
-//                //                            std::cout << "before:" << this->at(2, 0, row_i, col_i) << std::endl;
-////                this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
-////                                               * _insertions->aaProbability(*_sequence,
-////                                                                            _seq_poses[row_i] + 1,
-////                                                                            _seq_poses[this->nodeColumns(1) + col_i] - 1,
-////                                                                            left_codon,
-////                                                                            right_codon);
-////
-////                auto prob = _insertions->aaProbability(*_sequence,
-////                                                       _seq_poses[row_i] + 1,
-////                                                       _seq_poses[this->nodeColumns(1) + col_i] - 1,
-////                                                       left_codon,
-////                                                       right_codon);
-////                            if (prob == 0) {
-////                            if (row_i == 5 && col_i == 1) {
-////                                std::cout << "--------" << std::endl;
-////                                std::cout << row_i << ":" << col_i << std::endl;
-////                                std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << "=" << prob << std::endl;
-////                                std::cout << insertion_len << "(" << (*(_ins_start + insertion_len)) << ")" << std::endl;
-////                                std::cout << std::bitset<6>(left_codon).to_string() << ":" << std::bitset<6>(right_codon).to_string()  << std::endl;
-////                                std::cout << "final:\t" << this->at(2, 0, row_i, col_i) << std::endl;
-////                                std::cout << "--------" << std::endl;
-////                            }
-////                            }
-//            }
-//
-////                        std::cout << (int) insertion_len << std::endl;
-////                        std::cout << row_i << ":" << col_i << std::endl;
-////                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << std::endl;
-////                        std::cout << "=" << this->at(2, 0, row_i, col_i) << std::endl << std::endl;
-//
-////                        std::cout << row_i << ":" << col_i << ":" << insertion_len << "=" << this->at(2, 0, row_i, col_i) << std::endl;
-////                        std::cout << _seq_poses[row_i] << ":" << _seq_poses[this->nodeColumns(1) + col_i] << std::endl;
-////                        std::cout << (int) _codons(0, v_index, 0, row_i) << ":" << (int) _codons(1, j_index, col_i, 0) << std::endl;
-////                        std::cout << std::endl;
-//
-//                // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
-//                return (matrix(0, v_index) *      // P(Vi)
-//                        matrix(1, v_index) *      // P(#dels | Vi)
-//                        matrix(2, 0) *            // P(V-D3' insertion seq)
-//                        matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
-//                        matrix(4, 0) *            // P(D5'-J insertion seq)
-//                        matrix(5, j_index) *      // P(#dels | Ji)
-//                        matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
-//            } else {
-//                return 0;
-//            }
-            return 0;
+            if (_recomb == VDJ_RECOMB) {
+                // build insertion matrices
+                this->fill(2, 0, 0);
+                this->fill(4, 0, 0);
+
+                for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
+                    for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
+                        int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i] - 1;
+                        if (insertion_len >= 0 && insertion_len <= _max_ins_len) {
+                            codon_hash left_codon, right_codon;
+                            ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i))
+                                                                                       : 63;
+
+                            if (_seq_poses[row_i] == 0) {
+                                left_codon = 63;
+                            } else {
+                                if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
+                                    left_codon = _codons(0, v_index, 0, row_i);
+                                } else {
+                                    left_codon = 63;
+                                }
+                            }
+
+                            if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size() * 3 + 1) {
+                                right_codon = 63;
+                            } else {
+                                if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
+                                    right_codon = 63;
+                                } else {
+                                    if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) ==
+                                        ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
+                                        right_codon = _codons(1, d_index, col_i, 0);
+                                    } else {
+                                        right_codon = 63;
+                                    }
+                                }
+                            }
+
+                            this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
+                                                           * _insertions->aaProbability(*_sequence,
+                                                                                        _seq_poses[row_i] + 1,
+                                                                                        _seq_poses[
+                                                                                                this->nodeColumns(1) +
+                                                                                                col_i] - 1,
+                                                                                        left_codon,
+                                                                                        right_codon);
+                        }
+                    }
+                }
+
+                for (dim_t row_i = 0; row_i < this->nodeRows(4); ++row_i) {
+                    for (dim_t col_i = 0; col_i < this->nodeColumns(4); ++col_i) {
+                        int insertion_len = _seq_poses[this->nodeColumns(3) + col_i] - _seq_poses[row_i] - 1;
+                        if (insertion_len >= 0 && insertion_len <= _max_ins_len_rev) {
+                            codon_hash left_codon, right_codon;
+                            ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i))
+                                                                                       : 63;
+
+                            if (_seq_poses[row_i] == 0) {
+                                left_codon = 63;
+                            } else {
+                                if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
+                                    left_codon = _codons(0, v_index, 0, row_i);
+                                } else {
+                                    left_codon = 63;
+                                }
+                            }
+
+                            if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size() * 3 + 1) {
+                                right_codon = 63;
+                            } else {
+                                if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
+                                    right_codon = 63;
+                                } else {
+                                    if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) ==
+                                        ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
+                                        right_codon = _codons(1, d_index, col_i, 0);
+                                    } else {
+                                        right_codon = 63;
+                                    }
+                                }
+                            }
+
+                            this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
+                                                           * _insertions->aaProbability(*_sequence,
+                                                                                        _seq_poses[row_i] + 1,
+                                                                                        _seq_poses[
+                                                                                                this->nodeColumns(1) +
+                                                                                                col_i] - 1,
+                                                                                        left_codon,
+                                                                                        right_codon);
+                        }
+                    }
+                }
+
+                // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
+                return (matrix(0, v_index) *      // P(Vi)
+                        matrix(1, v_index) *      // P(#dels | Vi)
+                        matrix(2, 0) *            // P(V-D3' insertion seq)
+                        matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
+                        matrix(4, 0) *            // P(D5'-J insertion seq)
+                        matrix(5, j_index) *      // P(#dels | Ji)
+                        matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
+            } else {
+                return 0;
+            }
         }
 
         prob_t fullProbability(MAAGComputeProbAction action = SUM_PROBABILITY) {
@@ -286,10 +354,9 @@ namespace ymir {
     protected:
 
         CodonMMC _codons;
-        // TODO: make this shared_ptr and compare speed / memory. Maybe big overhead due to hash tables
-        unique_ptr<AbstractInsertionModel> _insertions;
-        std::vector<prob_t>::const_iterator _ins_start;
-        seq_len_t _max_ins_len;
+        unique_ptr<AbstractInsertionModel> _insertions, _insertions_rev;
+        std::vector<prob_t>::const_iterator _ins_start, _ins_start_rev;
+        seq_len_t _max_ins_len, _max_ins_len_rev;
 
     };
 

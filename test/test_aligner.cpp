@@ -317,8 +317,8 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     vector<string> avec2 {"J1", "J2", "J3", "J4", "J5", "J6"};
     vector<string> svec2 {"CTTTA", "CCTT", "AGCCTG", "AGGCTG", "AATT", "TTT"};
 
-    vector<string> avec3 {"D1", "D2", "D3", "D4"};
-    vector<string> svec3 {"AAA", "AACCACT", "ACT", "TGC"};
+    vector<string> avec3 {"D1", "D2", "D3", "D4", "D5", "D6"};
+    vector<string> svec3 {"AAA", "AACCACT", "ACT", "TGC", "GGCA", "GGTT"};
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
     CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3,
@@ -897,7 +897,7 @@ int main(int argc, char* argv[]) {
 
     //**************  TEST CASES  **************//
     // Test for CodonTable.
-    YMIR_TEST(test_codon_table())
+//    YMIR_TEST(test_codon_table())
 
     // Tests for sequences aligners.
 //    YMIR_TEST(test_naive_cdr3_nuc_aligner())

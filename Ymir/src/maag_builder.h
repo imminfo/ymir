@@ -136,9 +136,10 @@ namespace ymir {
 
         void update_insertion_models() {
             if (_param_vec) {
+                assert(_param_vec->recombination() == VJ_RECOMB || _param_vec->recombination() == VDJ_RECOMB);
                 if (_param_vec->recombination() == VJ_RECOMB) {
                     _vj_ins.reset(new MonoNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), _param_vec->error_prob()));
-                } else if (_param_vec->recombination() == VJ_RECOMB) {
+                } else if (_param_vec->recombination() == VDJ_RECOMB) {
                     _vd_ins.reset(new DiNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)), _param_vec->error_prob()));
                     _dj_ins.reset(new DiNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)), _param_vec->error_prob()));
                 } else {
@@ -1473,12 +1474,14 @@ namespace ymir {
         }
 
         probs.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
-        codons.initNode(1, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
+        codons.initNode(1, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros); // start codons
+        codons.initNode(2, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros); // end codons
 
 
         seg_index_t d_index, d_gene;
         seq_len_t d_len;
         seq_len_t d_seq_start, d_seq_end, d_gene_start, d_gene_end;
+        codon_hash left_codon, right_codon;
 
         for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
             d_gene = clonotype.getDiv(d_index);
@@ -1500,8 +1503,8 @@ namespace ymir {
                                                          d_gene_start + left_pos - d_seq_start,
                                                          d_len - (d_gene_end - (d_seq_end - right_pos)));
 
-                        codons(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
-                                = 0;
+                        codons(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) = 0;
+                        codons(2, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) = 0;
                     }
                 }
             }

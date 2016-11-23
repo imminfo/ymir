@@ -1386,7 +1386,7 @@ int main(int argc, char* argv[]) {
 //    mpreal::set_default_prec(200);
 
     //
-    // MEGA TO-DO: make good tests with some unit-testing framework (CTest)
+    // MEGA Todo: make good tests with some unit-testing framework (CTest)
     //
 
     //**************  INITIALISATION  **************//
@@ -1404,7 +1404,7 @@ int main(int argc, char* argv[]) {
     // Tests for MAAG / MAAG builder
     YMIR_TEST(test_maag_vj())
     YMIR_TEST(test_maag_vj_err())
-    YMIR_TEST(test_maag_vdj())
+    YMIR_TEST(test_maag_vdj()) // <- error here
     YMIR_TEST(test_maag_vdj_err())
     YMIR_TEST(test_maag_builder_replace_vj())
     YMIR_TEST(test_maag_builder_replace_vdj())

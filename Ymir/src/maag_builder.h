@@ -38,13 +38,13 @@ namespace ymir {
             : _param_vec(new ModelParameterVector(param_vec)),
               _genes(new VDJRecombinationGenes(genes))
         {
-            // this->update_insertion_models();
+             this->update_insertion_models();
         }
 
 
         void updateModelParameterVector(const ModelParameterVector &param_vec) {
             *(_param_vec.get()) = param_vec;
-            // this->update_insertion_models();
+             this->update_insertion_models();
         }
 
 
@@ -124,27 +124,28 @@ namespace ymir {
 
         unique_ptr<ModelParameterVector> _param_vec;
         unique_ptr<VDJRecombinationGenes> _genes;
-//        MonoNucInsertionModel _vj_ins;
-//        DiNucInsertionModel _vdj_forw_ins;
-//        DiNucInsertionModel _vdj_back_ins;
-
-
-    // TODO: optimize the builder via incapsulated insertion models
-        /**
-         *
-         */
-        /*
-        void update_insertion_models() {
-            _vj_ins = MonoNucInsertionModel();
-            ...
-        }
-         */
+        unique_ptr<MonoNucInsertionModel> _vj_ins;
+        unique_ptr<DiNucInsertionModel> _vd_ins, _dj_ins;
 
 
         /**
          * \brief Private default constructor.
          */
         MAAGBuilder() : _param_vec(nullptr), _genes(nullptr) { }
+
+
+        void update_insertion_models() {
+            if (_param_vec) {
+                if (_param_vec->recombination() == VJ_RECOMB) {
+                    _vj_ins.reset(new MonoNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), _param_vec->error_prob()));
+                } else if (_param_vec->recombination() == VJ_RECOMB) {
+                    _vd_ins.reset(new DiNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)), _param_vec->error_prob()));
+                    _dj_ins.reset(new DiNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)), _param_vec->error_prob()));
+                } else {
+                    std::cerr << "Wrong recombination" << std::endl;
+                }
+            }
+        }
 
 
         /**
@@ -698,7 +699,7 @@ namespace ymir {
 
                 case VDJ_RECOMB:
                     resize_size = VDJ_CHAIN_SIZE;
-                    e_resize_size = 3;
+                    e_resize_size = 4; // 2 matrices for the start and the end of D segments
                     break;
 
                 default:
@@ -719,10 +720,22 @@ namespace ymir {
                                1,
                                probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                                probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX));
-                maag._insertions.reset(new MonoNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), 0));
-            } else if (clonotype.recombination() == VDJ_RECOMB) {
-                check_and_throw(true, "MAAGBuilder: VDJ is not implemented yet.");
-                this->buildAADiversity(clonotype, probs, codons, seq_poses);
+
+                maag._insertions.reset(_vj_ins->clone());
+            }
+            else if (clonotype.recombination() == VDJ_RECOMB) {
+//                this->buildAADiversity(clonotype, probs, codons, seq_poses);
+//
+//                probs.initNode(VarJoi_INSERTIONS_MATRIX_INDEX,
+//                               1,
+//                               probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+//                               probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX));
+//                probs.initNode(VarDiv_INSERTIONS_MATRIX_INDEX,
+//                               1,
+//                               probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+//                               probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX));
+//
+//                maag._insertions.reset(new DiNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), 0));
             }
 
             probs.finish();
@@ -736,8 +749,13 @@ namespace ymir {
             maag._seq_poses.swap(seq_poses_arr);
             maag._n_poses = seq_poses.size();
 
-            maag._ins_start = _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0));
-            maag._max_ins_len = _param_vec->max_VJ_ins_len();
+            if (clonotype.recombination() == VJ_RECOMB) {
+                maag._ins_start = _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0));
+                maag._max_ins_len = _param_vec->max_VJ_ins_len();
+            } else if (clonotype.recombination() == VDJ_RECOMB) {
+                maag._ins_start = _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_LEN, 0, 0));
+                maag._max_ins_len = _param_vec->max_VD_ins_len(); // TODO: fix this, allow different max lengths
+            }
 
             return maag;
         } else {
@@ -1139,8 +1157,6 @@ namespace ymir {
     void MAAGBuilder::buildNucVJinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
                                            const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
                                            ErrorMode error_mode) const {
-        MonoNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
-
         seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                 j_vertices = probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX);
 
@@ -1163,7 +1179,7 @@ namespace ymir {
                               v_vertices - 1,
                               v_vertices,
                               v_vertices + j_vertices - 1,
-                              mc,
+                              *_vj_ins,
                               false);
     }
 
@@ -1171,8 +1187,6 @@ namespace ymir {
     void MAAGBuilder::buildNucVDinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
                                            const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
                                            ErrorMode error_mode) const {
-        DiNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
-
         seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                 d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX);
 
@@ -1195,7 +1209,7 @@ namespace ymir {
                               v_vertices - 1,
                               v_vertices,
                               v_vertices + d3_vertices - 1,
-                              mc,
+                              *_vd_ins,
                               false);
     }
 
@@ -1203,8 +1217,6 @@ namespace ymir {
     void MAAGBuilder::buildNucDJinsertions(const ClonotypeNuc &clonotype, ProbMMC &probs, EventIndMMC &events,
                                            const vector<seq_len_t> &seq_poses, MetadataMode metadata_mode,
                                            ErrorMode error_mode) const {
-        DiNucInsertionModel mc(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)), error_mode ? _param_vec->error_prob() : 0);
-
         seq_len_t v_vertices = probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
                 d3_vertices = probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX),
                 d5_vertices = probs.nodeColumns(DIVERSITY_GENES_MATRIX_INDEX),
@@ -1229,7 +1241,7 @@ namespace ymir {
                               v_vertices + d3_vertices + d5_vertices - 1,
                               v_vertices + d3_vertices + d5_vertices,
                               v_vertices + d3_vertices + d5_vertices + j_vertices - 1,
-                              mc,
+                              *_dj_ins,
                               true);
     }
 
@@ -1398,11 +1410,112 @@ namespace ymir {
         for (seq_len_t i = 3 * clonotype.sequence().size() - len + 1; i <= 3 * clonotype.sequence().size() + 1; ++i) {
             seq_poses.push_back(i);
         }
+    }
 
-//        for (auto &i: seq_poses) {
-//            std::cout << (int) i << "\t";
-//        }
-//        std::cout << std::endl;
+
+    void MAAGBuilder::buildAADiversity(const ClonotypeAA &clonotype, ProbMMC &probs, CodonMMC &codons,
+                                       vector<seq_len_t> &seq_poses) const
+    {
+        seq_len_t min_D_len;
+
+        // vector seq_start -> 0 means no such index in the matrix, 1 otherwise.
+        seq_len_t seq_arr_size = clonotype.sequence().size() + 1;
+        unique_ptr<seq_len_t[]> seq_row(new seq_len_t[seq_arr_size]);
+        std::fill(seq_row.get(), seq_row.get() + seq_arr_size, 0);
+
+        // vector seq_end -> 0 means no such index in the matrix, 1 otherwise.
+        unique_ptr<seq_len_t[]> seq_col(new seq_len_t[seq_arr_size]);
+        std::fill(seq_col.get(), seq_col.get() + seq_arr_size, 0);
+
+        for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+            min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
+
+            for (seg_index_t j = 0; j < clonotype.numDivAlignments(d_index); ++j) {
+                seq_len_t d_seq_start = clonotype.getDivSeqStart(d_index, j),
+                        d_seq_end = clonotype.getDivSeqEnd(d_index, j);
+
+                // yes-yes, I know that it could be done more efficiently. But I don't want to.
+                for (seq_len_t i = d_seq_start; i <= d_seq_end - min_D_len + 1; ++i) {
+                    seq_row[i] = 1;
+                }
+
+                for (seq_len_t i = d_seq_start + min_D_len - (seq_len_t) 1; i <= d_seq_end; ++i) {
+                    seq_col[i] = 1;
+                }
+            }
+        }
+
+        // make new vector seq_start -> 1based index in rows of Ddel matrices
+        seq_len_t seq_ind = 1;
+        for (seq_len_t i = 0; i < seq_arr_size; ++i) {
+            if (seq_row[i]) {
+                seq_row[i] = seq_ind;
+                ++seq_ind;
+            }
+        }
+
+        // make new vector seq_end -> 1based index in columns of Ddel matrices
+        seq_ind = 1;
+        for (seq_len_t i = 0; i < seq_arr_size; ++i) {
+            if (seq_col[i]) {
+                seq_col[i] = seq_ind;
+                ++seq_ind;
+            }
+        }
+
+        // find indices of D alignments and use only them to reduce memory usage.
+        seq_len_t last_max_seq_start = 0, last_max_seq_end = 0, seq_row_ind = 0, seq_col_ind = 0;
+
+        seq_len_t seq_row_nonzeros = 0, seq_col_nonzeros = 0;
+        for (seq_len_t i = 0; i < seq_arr_size; ++i) {
+            seq_row_nonzeros += seq_row[i] != 0;
+            seq_col_nonzeros += seq_col[i] != 0;
+        }
+
+        probs.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
+        codons.initNode(1, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
+
+
+        seg_index_t d_index, d_gene;
+        seq_len_t d_len;
+        seq_len_t d_seq_start, d_seq_end, d_gene_start, d_gene_end;
+
+        for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+            d_gene = clonotype.getDiv(d_index);
+            d_len = _genes->D()[d_gene].sequence.size();
+            min_D_len = _param_vec->D_min_len(d_gene);
+
+            // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
+            for (seg_index_t j = 0; j < clonotype.numDivAlignments(d_index); ++j) {
+                d_seq_start = clonotype.getDivSeqStart(d_index, j);
+                d_seq_end = clonotype.getDivSeqEnd(d_index, j);
+                d_gene_start = clonotype.getDivGeneStart(d_index, j);
+                d_gene_end = clonotype.getDivGeneEnd(d_index, j);
+
+                for (seq_len_t left_pos = d_seq_start; left_pos <= d_seq_end - min_D_len + 1; ++left_pos) {
+                    for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_seq_end; ++right_pos) {
+                        probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
+                                = _param_vec->event_prob(VDJ_DIV_DEL,
+                                                         d_gene - 1,
+                                                         d_gene_start + left_pos - d_seq_start,
+                                                         d_len - (d_gene_end - (d_seq_end - right_pos)));
+
+                        codons(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
+                                = 0;
+                    }
+                }
+            }
+        }
+
+        // insert D3 and D5 positions
+        vector<seq_len_t> D35_poses;
+        D35_poses.reserve(seq_row_nonzeros + seq_col_nonzeros + 2);
+        for (seq_len_t i = 1; i < seq_arr_size; ++i) { if (seq_row[i]) { D35_poses.push_back(i); } }
+        for (seq_len_t i = 1; i < seq_arr_size; ++i) { if (seq_col[i]) { D35_poses.push_back(i); } }
+
+        // Note! insert diversity gene seq poses BEFORE joining gene seq poses
+        seq_poses.reserve(seq_poses.size() + D35_poses.size() + 2);  // +2 -> just in case (:
+        seq_poses.insert(seq_poses.begin() + probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX), D35_poses.begin(), D35_poses.end());
     }
 
 }

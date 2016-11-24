@@ -108,8 +108,16 @@ namespace ymir {
         ///@{
         prob_t fullProbability(event_ind_t v_index, event_ind_t j_index) {
             if (_recomb == VJ_RECOMB) {
-                // build insertion matrix
-                this->fill(2, 0, 0);
+                std::vector<prob_t> arr_prob1(std::max(this->nodeRows(2), this->nodeColumns(2)), 0);
+                std::vector<prob_t> arr_prob2(std::max(this->nodeRows(2), this->nodeColumns(2)), 0);
+
+                arr_prob1[0] = this->at(0, 0, v_index, j_index);
+                for (dim_t i = 0; i < this->nodeColumns(1); ++i) {
+                    arr_prob2[i] = arr_prob1[0] * this->at(1, v_index, 0, i);
+                }
+
+                arr_prob1[0] = 0;
+
                 for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
                     for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
                         int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i] - 1;
@@ -143,25 +151,77 @@ namespace ymir {
                                 }
                             }
 
-                            this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
-                                                           * _insertions->aaProbability(*_sequence,
-                                                                                        _seq_poses[row_i] + 1,
-                                                                                        _seq_poses[
-                                                                                                this->nodeColumns(1) +
-                                                                                                col_i] - 1,
-                                                                                        left_codon,
-                                                                                        right_codon);
+                            prob_t prob_val = *(_ins_start + insertion_len)
+                                              * _insertions->aaProbability(*_sequence,
+                                                                           _seq_poses[row_i] + 1,
+                                                                           _seq_poses[this->nodeColumns(1) + col_i] - 1,
+                                                                           left_codon,
+                                                                           right_codon);
+
+                            arr_prob1[col_i] += prob_val * arr_prob2[row_i];
                         }
                     }
                 }
 
-                // compute the full probability
-                // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
-                return (matrix(0, 0)(v_index, j_index) *   // P(Vi & Ji)
-                        matrix(1, v_index) *               // P(#dels | Vi)
-                        matrix(2, 0) *                     // P(V-J insertion seq)
-                        matrix(3, j_index))(0, 0);         // P(#dels | Ji)
+                arr_prob2[0] = 0;
+                for (dim_t i = 0; i < this->nodeRows(3); ++i) {
+                    arr_prob2[0] += arr_prob1[i] * this->at(3, j_index, i, 0);
+                }
 
+                return arr_prob2[0];
+//                // build insertion matrix
+//                this->fill(2, 0, 0);
+//                for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
+//                    for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
+//                        int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i] - 1;
+//                        if (insertion_len >= 0 && insertion_len <= _max_ins_len) {
+//                            codon_hash left_codon, right_codon;
+//                            ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i))
+//                                                                                       : 63;
+//
+//                            if (_seq_poses[row_i] == 0) {
+//                                left_codon = 63;
+//                            } else {
+//                                if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
+//                                    left_codon = _codons(0, v_index, 0, row_i);
+//                                } else {
+//                                    left_codon = 63;
+//                                }
+//                            }
+//
+//                            if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size() * 3 + 1) {
+//                                right_codon = 63;
+//                            } else {
+//                                if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
+//                                    right_codon = 63;
+//                                } else {
+//                                    if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) ==
+//                                        ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
+//                                        right_codon = _codons(1, j_index, col_i, 0);
+//                                    } else {
+//                                        right_codon = 63;
+//                                    }
+//                                }
+//                            }
+//
+//                            this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
+//                                                           * _insertions->aaProbability(*_sequence,
+//                                                                                        _seq_poses[row_i] + 1,
+//                                                                                        _seq_poses[
+//                                                                                                this->nodeColumns(1) +
+//                                                                                                col_i] - 1,
+//                                                                                        left_codon,
+//                                                                                        right_codon);
+//                        }
+//                    }
+//                }
+//
+//                // compute the full probability
+//                // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
+//                return (matrix(0, 0)(v_index, j_index) *   // P(Vi & Ji)
+//                        matrix(1, v_index) *               // P(#dels | Vi)
+//                        matrix(2, 0) *                     // P(V-J insertion seq)
+//                        matrix(3, j_index))(0, 0);         // P(#dels | Ji)
             } else {
                 return 0;
             }

@@ -914,7 +914,7 @@ YMIR_TEST_START(test_vdj_alignment_aa_vector_vdj)
     YMIR_ASSERT2(algn.getDivGeneStart(0, 0), 8)
     YMIR_ASSERT2(algn.getDivSeqStart(0, 0), 9)
     YMIR_ASSERT2(algn.getDivLen(0, 0), 3)
-    YMIR_ASSERT2(algn.getDivCodon(0, 0, 1), 50)
+    YMIR_ASSERT2(algn.getDivCodon(0, 0, 1), 49)
     YMIR_ASSERT2(algn.getDivCodon(0, 0, 2), 25)
     YMIR_ASSERT2(algn.getDivCodon(0, 0, 3), 15)
 

@@ -107,239 +107,159 @@ namespace ymir {
          */
         ///@{
         prob_t fullProbability(event_ind_t v_index, event_ind_t j_index) {
-            if (_recomb == VJ_RECOMB) {
-                std::vector<prob_t> arr_prob1(std::max(this->nodeRows(2), this->nodeColumns(2)), 0);
-                std::vector<prob_t> arr_prob2(std::max(this->nodeRows(2), this->nodeColumns(2)), 0);
+#ifndef DNDEBUG
+            if (_recomb != VJ_RECOMB) { return 0; }
+#endif
+            dim_t max_dim = std::max(this->nodeRows(2), this->nodeColumns(2));
 
-                arr_prob1[0] = this->at(0, 0, v_index, j_index);
-                for (dim_t i = 0; i < this->nodeColumns(1); ++i) {
-                    arr_prob2[i] = arr_prob1[0] * this->at(1, v_index, 0, i);
-                }
+            std::vector<prob_t> arr_prob1(max_dim);
+            std::vector<prob_t> arr_prob2(max_dim);
 
-                arr_prob1[0] = 0;
+            arr_prob1[0] = this->at(0, 0, v_index, j_index);
+            for (dim_t i = 0; i < this->nodeColumns(1); ++i) {
+                arr_prob2[i] = arr_prob1[0] * this->at(1, v_index, 0, i);
+            }
 
-                for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
-                    for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
-                        int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i] - 1;
-                        if (insertion_len >= 0 && insertion_len <= _max_ins_len) {
-                            codon_hash left_codon, right_codon;
-                            ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i))
-                                                                                       : 63;
+            std::fill(arr_prob1.begin(), arr_prob1.end(), 0);
 
-                            if (_seq_poses[row_i] == 0) {
-                                left_codon = 63;
+            for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
+                for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
+                    int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i] - 1;
+                    if (insertion_len >= 0 && insertion_len <= _max_ins_len) {
+                        codon_hash left_codon, right_codon;
+                        ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i))
+                                                                                   : 63;
+
+                        if (_seq_poses[row_i] == 0) {
+                            left_codon = 63;
+                        } else {
+                            if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
+                                left_codon = _codons(0, v_index, 0, row_i);
                             } else {
-                                if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
-                                    left_codon = _codons(0, v_index, 0, row_i);
-                                } else {
-                                    left_codon = 63;
-                                }
+                                left_codon = 63;
                             }
+                        }
 
-                            if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size() * 3 + 1) {
+                        if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size() * 3 + 1) {
+                            right_codon = 63;
+                        } else {
+                            if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
                                 right_codon = 63;
                             } else {
-                                if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
-                                    right_codon = 63;
+                                if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) ==
+                                    ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
+                                    right_codon = _codons(1, j_index, col_i, 0);
                                 } else {
-                                    if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) ==
-                                        ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
-                                        right_codon = _codons(1, j_index, col_i, 0);
-                                    } else {
-                                        right_codon = 63;
-                                    }
+                                    right_codon = 63;
                                 }
                             }
-
-                            prob_t prob_val = *(_ins_start + insertion_len)
-                                              * _insertions->aaProbability(*_sequence,
-                                                                           _seq_poses[row_i] + 1,
-                                                                           _seq_poses[this->nodeColumns(1) + col_i] - 1,
-                                                                           left_codon,
-                                                                           right_codon);
-
-                            arr_prob1[col_i] += prob_val * arr_prob2[row_i];
                         }
+
+                        prob_t prob_val = *(_ins_start + insertion_len)
+                                          * _insertions->aaProbability(*_sequence,
+                                                                       _seq_poses[row_i] + 1,
+                                                                       _seq_poses[this->nodeColumns(1) + col_i] - 1,
+                                                                       left_codon,
+                                                                       right_codon);
+
+                        arr_prob1[col_i] += prob_val * arr_prob2[row_i];
                     }
                 }
-
-                arr_prob2[0] = 0;
-                for (dim_t i = 0; i < this->nodeRows(3); ++i) {
-                    arr_prob2[0] += arr_prob1[i] * this->at(3, j_index, i, 0);
-                }
-
-                return arr_prob2[0];
-//                // build insertion matrix
-//                this->fill(2, 0, 0);
-//                for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
-//                    for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
-//                        int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i] - 1;
-//                        if (insertion_len >= 0 && insertion_len <= _max_ins_len) {
-//                            codon_hash left_codon, right_codon;
-//                            ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i))
-//                                                                                       : 63;
-//
-//                            if (_seq_poses[row_i] == 0) {
-//                                left_codon = 63;
-//                            } else {
-//                                if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
-//                                    left_codon = _codons(0, v_index, 0, row_i);
-//                                } else {
-//                                    left_codon = 63;
-//                                }
-//                            }
-//
-//                            if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size() * 3 + 1) {
-//                                right_codon = 63;
-//                            } else {
-//                                if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
-//                                    right_codon = 63;
-//                                } else {
-//                                    if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) ==
-//                                        ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
-//                                        right_codon = _codons(1, j_index, col_i, 0);
-//                                    } else {
-//                                        right_codon = 63;
-//                                    }
-//                                }
-//                            }
-//
-//                            this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
-//                                                           * _insertions->aaProbability(*_sequence,
-//                                                                                        _seq_poses[row_i] + 1,
-//                                                                                        _seq_poses[
-//                                                                                                this->nodeColumns(1) +
-//                                                                                                col_i] - 1,
-//                                                                                        left_codon,
-//                                                                                        right_codon);
-//                        }
-//                    }
-//                }
-//
-//                // compute the full probability
-//                // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
-//                return (matrix(0, 0)(v_index, j_index) *   // P(Vi & Ji)
-//                        matrix(1, v_index) *               // P(#dels | Vi)
-//                        matrix(2, 0) *                     // P(V-J insertion seq)
-//                        matrix(3, j_index))(0, 0);         // P(#dels | Ji)
-            } else {
-                return 0;
             }
+
+            arr_prob2[0] = 0;
+            for (dim_t i = 0; i < this->nodeRows(3); ++i) {
+                arr_prob2[0] += arr_prob1[i] * this->at(3, j_index, i, 0);
+            }
+
+            return arr_prob2[0];
         }
 
         prob_t fullProbability(event_ind_t v_index, event_ind_t d_index, event_ind_t j_index) {
-            if (_recomb == VDJ_RECOMB) {
-                // build insertion matrices
-                this->fill(2, 0, 0);
-                this->fill(4, 0, 0);
+#ifndef DNDEBUG
+            if (_recomb != VDJ_RECOMB) { return 0; }
+#endif
+//                return (matrix(0, v_index) *      // P(Vi)
+//                        matrix(1, v_index) *      // P(#dels | Vi)
+//                        matrix(2, 0) *            // P(V-D3' insertion seq)
+//                        matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
+//                        matrix(4, 0) *            // P(D5'-J insertion seq)
+//                        matrix(5, j_index) *      // P(#dels | Ji)
+//                        matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
 
-                for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
-                    for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
-                        int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i] - 1;
-                        if (insertion_len >= 0 && insertion_len <= _max_ins_len) {
-                            codon_hash left_codon, right_codon;
-                            ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i))
-                                                                                       : 63;
+            dim_t max_dim = std::max(this->nodeRows(2), this->nodeColumns(2));
+            max_dim = std::max(max_dim, this->nodeRows(4));
+            max_dim = std::max(max_dim, this->nodeColumns(4));
 
-                            if (_seq_poses[row_i] == 0) {
-                                left_codon = 63;
-                            } else {
-                                if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
-                                    left_codon = _codons(0, v_index, 0, row_i);
-                                } else {
-                                    left_codon = 63;
-                                }
-                            }
+            std::vector<prob_t> arr_prob1(max_dim);
+            std::vector<prob_t> arr_prob2(max_dim);
 
-                            if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size() * 3 + 1) {
-                                right_codon = 63;
-                            } else {
-                                if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
-                                    right_codon = 63;
-                                } else {
-                                    if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) ==
-                                        ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
-                                        right_codon = _codons(1, d_index, col_i, 0);
-                                    } else {
-                                        right_codon = 63;
-                                    }
-                                }
-                            }
-
-                            this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
-                                                           * _insertions->aaProbability(*_sequence,
-                                                                                        _seq_poses[row_i] + 1,
-                                                                                        _seq_poses[
-                                                                                                this->nodeColumns(1) +
-                                                                                                col_i] - 1,
-                                                                                        left_codon,
-                                                                                        right_codon);
-                        }
-                    }
-                }
-
-                for (dim_t row_i = 0; row_i < this->nodeRows(4); ++row_i) {
-                    for (dim_t col_i = 0; col_i < this->nodeColumns(4); ++col_i) {
-                        int insertion_len = _seq_poses[this->nodeColumns(3) + col_i] - _seq_poses[row_i] - 1;
-                        if (insertion_len >= 0 && insertion_len <= _max_ins_len_rev) {
-                            codon_hash left_codon, right_codon;
-                            ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i))
-                                                                                       : 63;
-
-                            if (_seq_poses[row_i] == 0) {
-                                left_codon = 63;
-                            } else {
-                                if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
-                                    left_codon = _codons(0, v_index, 0, row_i);
-                                } else {
-                                    left_codon = 63;
-                                }
-                            }
-
-                            if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size() * 3 + 1) {
-                                right_codon = 63;
-                            } else {
-                                if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
-                                    right_codon = 63;
-                                } else {
-                                    if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) ==
-                                        ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
-                                        right_codon = _codons(1, d_index, col_i, 0);
-                                    } else {
-                                        right_codon = 63;
-                                    }
-                                }
-                            }
-
-                            this->at(2, 0, row_i, col_i) = *(_ins_start + insertion_len)
-                                                           * _insertions->aaProbability(*_sequence,
-                                                                                        _seq_poses[row_i] + 1,
-                                                                                        _seq_poses[
-                                                                                                this->nodeColumns(1) +
-                                                                                                col_i] - 1,
-                                                                                        left_codon,
-                                                                                        right_codon);
-                        }
-                    }
-                }
-
-                // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
-                return (matrix(0, v_index) *      // P(Vi)
-                        matrix(1, v_index) *      // P(#dels | Vi)
-                        matrix(2, 0) *            // P(V-D3' insertion seq)
-                        matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
-                        matrix(4, 0) *            // P(D5'-J insertion seq)
-                        matrix(5, j_index) *      // P(#dels | Ji)
-                        matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
-            } else {
-                return 0;
+            arr_prob1[0] = this->at(0, v_index, 0, 0);
+            for (dim_t i = 0; i < this->nodeColumns(1); ++i) {
+                arr_prob2[i] = arr_prob1[0] * this->at(1, v_index, 0, i);
             }
+
+            std::fill(arr_prob1.begin(), arr_prob1.end(), 0);
+
+            for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
+                for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
+                    int insertion_len = _seq_poses[this->nodeColumns(1) + col_i] - _seq_poses[row_i] - 1;
+                    if (insertion_len >= 0 && insertion_len <= _max_ins_len) {
+                        codon_hash left_codon, right_codon;
+                        ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i))
+                                                                                   : 63;
+
+                        if (_seq_poses[row_i] == 0) {
+                            left_codon = 63;
+                        } else {
+                            if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
+                                left_codon = _codons(0, v_index, 0, row_i);
+                            } else {
+                                left_codon = 63;
+                            }
+                        }
+
+                        if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size() * 3 + 1) {
+                            right_codon = 63;
+                        } else {
+                            if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
+                                right_codon = 63;
+                            } else {
+                                if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) ==
+                                    ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
+                                    right_codon = _codons(1, d_index, col_i, 0);
+                                } else {
+                                    right_codon = 63;
+                                }
+                            }
+                        }
+
+                        prob_t prob_val = *(_ins_start + insertion_len)
+                                          * _insertions->aaProbability(*_sequence,
+                                                                       _seq_poses[row_i] + 1,
+                                                                       _seq_poses[this->nodeColumns(1) + col_i] - 1,
+                                                                       left_codon,
+                                                                       right_codon);
+
+                        arr_prob1[col_i] += prob_val * arr_prob2[row_i];
+                    }
+                }
+            }
+
+            arr_prob2[0] = 0;
+            for (dim_t i = 0; i < this->nodeRows(3); ++i) {
+                arr_prob2[0] += arr_prob1[i] * this->at(3, j_index, i, 0);
+            }
+
+            return arr_prob2[0];
         }
 
         prob_t fullProbability(MAAGComputeProbAction action = SUM_PROBABILITY) {
-            // choose the max full probability from all possible recombinations of V(D)J gene segment indices
-//            assert(_recomb != UNDEF_RECOMB);
+            if (_recomb == UNDEF_RECOMB) {
+                return 0;
+            }
 
+            // choose the max full probability from all possible recombinations of V(D)J gene segment indices
             if (action == MAX_PROBABILITY) {
                 prob_t max_prob = 0, cur_prob = 0;
                 if (_recomb == VJ_RECOMB) {

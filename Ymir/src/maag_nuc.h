@@ -130,55 +130,55 @@ namespace ymir {
          */
         ///@{
         prob_t fullProbability(event_ind_t v_index, event_ind_t j_index) const {
-            if (_recomb == VJ_RECOMB) {
-                std::vector<prob_t> arr_prob1(std::max(this->nodeRows(2), this->nodeColumns(2)), 0);
-                std::vector<prob_t> arr_prob2(std::max(this->nodeRows(2), this->nodeColumns(2)), 0);
+#ifndef DNDEBUG
+            if (_recomb != VJ_RECOMB) { return 0; }
+#endif
+            dim_t max_dim = std::max(this->nodeRows(2), this->nodeColumns(2));
 
-                arr_prob1[0] = this->at(0, 0, v_index, j_index);
-                for (dim_t i = 0; i < this->nodeColumns(1); ++i) {
-                    arr_prob2[i] = arr_prob1[0] * this->at(1, v_index, 0, i);
-                }
+            std::vector<prob_t> arr_prob1(max_dim);
+            std::vector<prob_t> arr_prob2(max_dim);
 
-                arr_prob1[0] = 0;
-
-                for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
-                    for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
-                        arr_prob1[col_i] += this->at(2, 0, row_i, col_i) * arr_prob2[row_i];
-                    }
-                }
-
-                arr_prob2[0] = 0;
-                for (dim_t i = 0; i < this->nodeRows(3); ++i) {
-                    arr_prob2[0] += arr_prob1[i] * this->at(3, j_index, i, 0);
-                }
-
-                return arr_prob2[0];
-            } else {
-                return 0;
+            arr_prob1[0] = this->at(0, 0, v_index, j_index);
+            for (dim_t i = 0; i < this->nodeColumns(1); ++i) {
+                arr_prob2[i] = arr_prob1[0] * this->at(1, v_index, 0, i);
             }
+
+            std::fill(arr_prob1.begin(), arr_prob1.end(), 0);
+
+            for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
+                for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
+                    arr_prob1[col_i] += this->at(2, 0, row_i, col_i) * arr_prob2[row_i];
+                }
+            }
+
+            arr_prob2[0] = 0;
+            for (dim_t i = 0; i < this->nodeRows(3); ++i) {
+                arr_prob2[0] += arr_prob1[i] * this->at(3, j_index, i, 0);
+            }
+
+            return arr_prob2[0];
         }
 
         prob_t fullProbability(event_ind_t v_index, event_ind_t d_index, event_ind_t j_index) const {
-            if (_recomb == VDJ_RECOMB) {
-                // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
-                return (matrix(0, v_index) *      // P(Vi)
-                        matrix(1, v_index) *      // P(#dels | Vi)
-                        matrix(2, 0) *            // P(V-D3' insertion seq)
-                        matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
-                        matrix(4, 0) *            // P(D5'-J insertion seq)
-                        matrix(5, j_index) *      // P(#dels | Ji)
-                        matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
-            } else {
-                return 0;
-            }
+#ifndef DNDEBUG
+            if (_recomb != VDJ_RECOMB) { return 0; }
+#endif
+            // P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
+            return (matrix(0, v_index) *      // P(Vi)
+                    matrix(1, v_index) *      // P(#dels | Vi)
+                    matrix(2, 0) *            // P(V-D3' insertion seq)
+                    matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
+                    matrix(4, 0) *            // P(D5'-J insertion seq)
+                    matrix(5, j_index) *      // P(#dels | Ji)
+                    matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
         }
 
         prob_t fullProbability(MAAGComputeProbAction action = SUM_PROBABILITY) const {
-            // choose the max full probability from all possible recombinations of V(D)J gene segment indices
             if (_recomb == UNDEF_RECOMB) {
                 return 0;
             }
 
+            // choose the max full probability from all possible recombinations of V(D)J gene segment indices
             if (action == MAX_PROBABILITY) {
                 prob_t max_prob = 0, cur_prob = 0;
                 if (_recomb == VJ_RECOMB) {
@@ -200,7 +200,7 @@ namespace ymir {
                 }
                 return max_prob;
             }
-                // compute the sum of full probabilities of all possible recombinations of V(D)J gene segment indices
+            // compute the sum of full probabilities of all possible recombinations of V(D)J gene segment indices
             else {
                 prob_t sum_prob = 0;
                 if (_recomb == VJ_RECOMB) {

@@ -130,16 +130,28 @@ namespace ymir {
          */
         ///@{
         prob_t fullProbability(event_ind_t v_index, event_ind_t j_index) const {
-            if (_recomb == VJ_RECOMB) {
-                // P(Vi, Ji) * P(#dels | Vi) * P(V-J insertion seq) * P(#dels | Ji)
-                return (matrix(0, 0)(v_index, j_index) *   // P(Vi & Ji)
-                        matrix(1, v_index) *               // P(#dels | Vi)
-                        matrix(2, 0) *                     // P(V-J insertion seq)
-                        matrix(3, j_index))(0, 0);         // P(#dels | Ji)
+            std::vector<prob_t> arr_prob1(std::max(this->nodeRows(2), this->nodeColumns(2)), 0);
+            std::vector<prob_t> arr_prob2(std::max(this->nodeRows(2), this->nodeColumns(2)), 0);
 
-            } else {
-                return 0;
+            arr_prob1[0] = this->at(0, 0, v_index, j_index);
+            for (dim_t i = 0; i < this->nodeColumns(1); ++i) {
+                arr_prob2[i] = arr_prob1[0] * this->at(1, v_index, 0, i);
             }
+
+            arr_prob1[0] = 0;
+
+            for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
+                for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
+                    arr_prob1[col_i] += this->at(2, 0, row_i, col_i) * arr_prob2[row_i];
+                }
+            }
+
+            arr_prob2[0] = 0;
+            for (dim_t i = 0; i < this->nodeRows(3); ++i) {
+                arr_prob2[0] += arr_prob1[i] * this->at(3, j_index, i, 0);
+            }
+
+            return arr_prob2[0];
         }
 
         prob_t fullProbability(event_ind_t v_index, event_ind_t d_index, event_ind_t j_index) const {

@@ -719,18 +719,19 @@ namespace ymir {
                 maag._insertions.reset(_vj_ins->clone());
             }
             else if (clonotype.recombination() == VDJ_RECOMB) {
-//                this->buildAADiversity(clonotype, probs, codons, seq_poses);
-//
-//                probs.initNode(VarJoi_INSERTIONS_MATRIX_INDEX,
-//                               1,
-//                               probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
-//                               probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX));
-//                probs.initNode(VarDiv_INSERTIONS_MATRIX_INDEX,
-//                               1,
-//                               probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
-//                               probs.nodeRows(JOINING_DELETIONS_VJ_MATRIX_INDEX));
-//
-//                maag._insertions.reset(new DiNucInsertionModel(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)), 0));
+                this->buildAADiversity(clonotype, probs, codons, seq_poses);
+
+                probs.initNode(VarDiv_INSERTIONS_MATRIX_INDEX,
+                               2,
+                               probs.nodeColumns(VARIABLE_DELETIONS_MATRIX_INDEX),
+                               probs.nodeRows(DIVERSITY_GENES_MATRIX_INDEX));
+                probs.initNode(DivJoi_INSERTIONS_MATRIX_INDEX,
+                               4,
+                               probs.nodeColumns(DIVERSITY_GENES_MATRIX_INDEX),
+                               probs.nodeRows(JOINING_DELETIONS_VDJ_MATRIX_INDEX));
+
+                maag._insertions.reset(_vd_ins->clone());
+                maag._insertions_rev.reset(_dj_ins->clone());
             }
 
             probs.finish();
@@ -749,7 +750,9 @@ namespace ymir {
                 maag._max_ins_len = _param_vec->max_VJ_ins_len();
             } else if (clonotype.recombination() == VDJ_RECOMB) {
                 maag._ins_start = _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_LEN, 0, 0));
-                maag._max_ins_len = _param_vec->max_VD_ins_len(); // TODO: fix this, allow different max lengths
+                maag._ins_start_rev = _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_LEN, 0, 0));
+                maag._max_ins_len = _param_vec->max_VD_ins_len();
+                maag._max_ins_len_rev = _param_vec->max_DJ_ins_len();
             }
 
             return maag;
@@ -1094,13 +1097,20 @@ namespace ymir {
         seq_len_t d_len;
         seq_len_t d_seq_start, d_seq_end, d_gene_start, d_gene_end;
 
+        std::cout << "---------------------------" << std::endl;
+
         for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+            std::cout << "---------" << std::endl;
+            std::cout << (int) d_index << std::endl;
+            std::cout << "---------" << std::endl;
+
             d_gene = clonotype.getDiv(d_index);
             d_len = _genes->D()[d_gene].sequence.size();
             min_D_len = _param_vec->D_min_len(d_gene);
 
             // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
             for (seg_index_t j = 0; j < clonotype.numDivAlignments(d_index); ++j) {
+
                 d_seq_start = clonotype.getDivSeqStart(d_index, j);
                 d_seq_end = clonotype.getDivSeqEnd(d_index, j);
                 d_gene_start = clonotype.getDivGeneStart(d_index, j);
@@ -1108,8 +1118,17 @@ namespace ymir {
 
                 for (seq_len_t left_pos = d_seq_start; left_pos <= d_seq_end - min_D_len + 1; ++left_pos) {
                     for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_seq_end; ++right_pos) {
+                        // Todo: "=" or "+=" ? What to do in case of homological substrings like
+                        // GGGG, which could be aligned to the same positions, but with different probabilities?
+                        if (probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) != 0) {
+                            std::cout << probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) << std::endl;
+                            std::cout << (int) d_seq_start << ":" << (int) d_seq_end << std::endl;
+                            std::cout << (int) d_gene_start << ":" << (int) d_gene_end << std::endl;
+                            std::cout << (int) left_pos << ":" << (int) right_pos << std::endl;
+                        }
+
                         probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
-                                = _param_vec->event_prob(VDJ_DIV_DEL,
+                                =  _param_vec->event_prob(VDJ_DIV_DEL,
                                                          d_gene - 1,
                                                          d_gene_start + left_pos - d_seq_start,
                                                          d_len - (d_gene_end - (d_seq_end - right_pos)));
@@ -1490,15 +1509,28 @@ namespace ymir {
                 d_gene_end = clonotype.getDivGeneEnd(d_index, j);
 
                 for (seq_len_t left_pos = d_seq_start; left_pos <= d_seq_end - min_D_len + 1; ++left_pos) {
+                    std::cout << (int) d_index << ":" << (int) j << std::endl;
+                    std::cout << d_seq_start << ":" << d_seq_end << ":" << d_gene_start << ":" << std::endl;
+                    std::cout << "left " << (int) left_pos << std::endl;
+                    left_codon = clonotype.getDivCodon(d_index, j, left_pos - d_seq_start + 1);
+
                     for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_seq_end; ++right_pos) {
+                        std::cout << "right " << (int) right_pos << std::endl;
+
+                        std::cout << std::bitset<6>(left_codon).to_string() << std::endl;
+
+                        right_codon = clonotype.getDivCodon(d_index, j, right_pos - (left_pos + min_D_len - 1) + 1);
+
+                        std::cout << std::bitset<6>(right_codon).to_string() << std::endl;
+
                         probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                 = _param_vec->event_prob(VDJ_DIV_DEL,
                                                          d_gene - 1,
                                                          d_gene_start + left_pos - d_seq_start,
                                                          d_len - (d_gene_end - (d_seq_end - right_pos)));
 
-                        codons(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) = 0;
-                        codons(2, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) = 0;
+                        codons(1, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) = left_codon;
+                        codons(2, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) = right_codon;
                     }
                 }
             }

@@ -1100,7 +1100,11 @@ YMIR_TEST_START(test_maag_vj_aa)
     // A: GCT GCC GCA GCG
     // S: TCT TCC TCA TCG AGT AGC
     // F: TTT TTC
-    CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3));
+    CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3,
+                                                             VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
+                                                                                    AlignmentEventScore(1, -1, 1),
+                                                                                    AlignmentEventScore(1, -1, 1)),
+                                                             VDJAlignmentScoreThreshold(2, 2, 2)));
     aligner.setSequence("CASF").setRecombination(VJ_RECOMB);
     YMIR_ASSERT(aligner.alignVar())
     YMIR_ASSERT(aligner.alignJoi())
@@ -1253,8 +1257,9 @@ YMIR_TEST_START(test_maag_vdj_aa)
     std::vector<ClonotypeNuc> clonotype_vec;
     NaiveCDR3NucleotideAligner naligner(genes, VDJAlignerParameters(3));
     for (auto &seq: rev_nuc) {
-        naligner.setSequence(seq).setRecombination(VJ_RECOMB);
+        naligner.setSequence(seq).setRecombination(VDJ_RECOMB);
         YMIR_ASSERT(naligner.alignVar())
+        YMIR_ASSERT(naligner.alignDiv())
         YMIR_ASSERT(naligner.alignJoi())
         clonotype_vec.push_back(naligner.buildClonotype());
     }
@@ -1263,13 +1268,14 @@ YMIR_TEST_START(test_maag_vdj_aa)
     std::vector<prob_t> prob_vec;
     for (int i = 0; i < clonotype_vec.size(); ++i) {
         sum_prob += maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS);
-        for (int v_i = 0; v_i < 3; ++v_i) {
-            for (int d_i = 0; d_i < 2; ++d_i) {
-                for (int j_i = 0; j_i < 3; ++j_i) {
-                    prob_vec.push_back(maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS).fullProbability(v_i, d_i, j_i));
-                }
-            }
-        }
+//        auto tmp_maag = maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS);
+//        for (int v_i = 0; v_i < tmp_maag.nVar(); ++v_i) {
+//            for (int d_i = 0; d_i < tmp_maag.nDiv(); ++d_i) {
+//                for (int j_i = 0; j_i < tmp_maag.nJoi(); ++j_i) {
+//                    prob_vec.push_back(tmp_maag.fullProbability(v_i, d_i, j_i));
+//                }
+//            }
+//        }
     }
 
     YMIR_ASSERT3(sum_prob, std::accumulate(prob_vec.begin(), prob_vec.end(), .0))
@@ -1480,7 +1486,7 @@ int main(int argc, char* argv[]) {
 //    YMIR_TEST(test_maag_builder_replace_vj())
 //    YMIR_TEST(test_maag_builder_replace_vdj())
 
-    YMIR_TEST(test_maag_vj_aa())
+//    YMIR_TEST(test_maag_vj_aa())
     YMIR_TEST(test_maag_vdj_aa())
 
     // Tests for forward-backward algorithms

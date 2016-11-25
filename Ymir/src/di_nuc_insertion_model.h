@@ -153,10 +153,10 @@ namespace ymir {
             assert(first_nuc_pos <= 3*sequence.size() + 1);
             assert(last_nuc_pos <= 3*sequence.size() + 1);
 #endif
-            assert(first_nuc_pos <= last_nuc_pos);
-//            if (first_nuc_pos > last_nuc_pos) {
-//                return 0;
-//            }
+//            assert(first_nuc_pos <= last_nuc_pos);
+            if (first_nuc_pos > last_nuc_pos) {
+                return 0;
+            }
 
 //            std::cout << (size_t) this->_aa_probs_init->size() << " char + 6*double " << (size_t) (this->_aa_probs_init->size() * (sizeof(char) + 6*sizeof(prob_t))) << std::endl;
 //            std::cout << (size_t) this->_aa_probs_forw_from->size() << " 16 + 6*double " << (size_t) (this->_aa_probs_forw_from->size() * (sizeof(int16_t) + 6*sizeof(prob_t))) << std::endl;
@@ -338,10 +338,10 @@ namespace ymir {
             assert(first_nuc_pos <= 3*sequence.size() + 1);
             assert(last_nuc_pos <= 3*sequence.size() + 1);
 #endif
-            assert(first_nuc_pos >= last_nuc_pos);
-//            if (first_nuc_pos > last_nuc_pos) {
-//                return 0;
-//            }
+//            assert(first_nuc_pos >= last_nuc_pos);
+            if (first_nuc_pos > last_nuc_pos) {
+                return 0;
+            }
 
             // TODO: make _arr like that
             prob_t arr_prob[25];

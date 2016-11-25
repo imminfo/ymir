@@ -56,12 +56,12 @@ namespace ymir {
             check_and_throw(_events.size() == 0, "Codon alignment vector: no codons stored in the vector.");
 
             if (_starts[i] + 6 * (j - 1) >= _events.size()) {
-                std::cout << (int) (_starts[i] + 6 * (j - 1)) << std::endl;
-                std::cout << (int) _starts.size() << std::endl;
-                std::cout << (int) i << std::endl;
-                std::cout << (int) _starts[i] << std::endl;
-                std::cout << (int) j << std::endl;
-                std::cout << (int) _events.size() << std::endl;
+                std::cout << "actual:   " << (int) (_starts[i] + 6 * (j - 1)) << std::endl;
+                std::cout << "#starts:  " << (int) _starts.size() << std::endl;
+                std::cout << "i:        " << (int) i << std::endl;
+                std::cout << "starts_i: " << (int) _starts[i] << std::endl;
+                std::cout << "j:        " << (int) j << std::endl;
+                std::cout << "#events:  " << (int) _events.size() << std::endl;
                 throw(std::runtime_error("Codon alignment vector: codon index is out of bounds."));
             }
 #endif

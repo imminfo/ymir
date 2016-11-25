@@ -53,7 +53,8 @@ namespace ymir {
               _aa_probs_back_from(other._aa_probs_back_from),
               _aa_probs_back_to(other._aa_probs_back_to),
               _aa_probs_forw_trans(other._aa_probs_forw_trans),
-              _aa_probs_back_trans(other._aa_probs_back_trans)
+              _aa_probs_back_trans(other._aa_probs_back_trans),
+              _aa_probs_init(other._aa_probs_init)
         {
         }
 
@@ -71,6 +72,7 @@ namespace ymir {
             _aa_probs_back_to = other._aa_probs_back_to;
             _aa_probs_forw_trans = other._aa_probs_forw_trans;
             _aa_probs_back_trans = other._aa_probs_back_trans;
+            _aa_probs_init = other._aa_probs_init;
             return *this;
         }
 
@@ -156,13 +158,13 @@ namespace ymir {
 //                return 0;
 //            }
 
-            std::cout << (size_t) this->_aa_probs_init->size() << " char + 6*double " << (size_t) (this->_aa_probs_init->size() * (sizeof(char) + 6*sizeof(prob_t))) << std::endl;
-            std::cout << (size_t) this->_aa_probs_forw_from->size() << " 16 + 6*double " << (size_t) (this->_aa_probs_forw_from->size() * (sizeof(int16_t) + 6*sizeof(prob_t))) << std::endl;
-            std::cout << (size_t) this->_aa_probs_forw_to->size() << " 16 + 6*double " << (size_t) (this->_aa_probs_forw_to->size() * (sizeof(int16_t) + 6*sizeof(prob_t))) << std::endl;
-            std::cout << (size_t) this->_aa_probs_back_from->size() << " 16 + 6*double " << (size_t) (this->_aa_probs_back_from->size() * (sizeof(int16_t) + 6*sizeof(prob_t))) << std::endl;
-            std::cout << (size_t) this->_aa_probs_forw_to->size() << " 16 + 6*double " << (size_t) (this->_aa_probs_back_to->size() * (sizeof(int16_t) + 6*sizeof(prob_t))) << std::endl;
-            std::cout << (size_t) this->_aa_probs_forw_trans->size() << " 32 + 36*double " << (size_t) (this->_aa_probs_forw_trans->size() * (sizeof(int32_t) + 36*sizeof(prob_t))) << std::endl;
-            std::cout << (size_t) this->_aa_probs_back_trans->size() << " 32 + 36*double " << (size_t) (this->_aa_probs_forw_trans->size() * (sizeof(int32_t) + 36*sizeof(prob_t))) << std::endl;
+//            std::cout << (size_t) this->_aa_probs_init->size() << " char + 6*double " << (size_t) (this->_aa_probs_init->size() * (sizeof(char) + 6*sizeof(prob_t))) << std::endl;
+//            std::cout << (size_t) this->_aa_probs_forw_from->size() << " 16 + 6*double " << (size_t) (this->_aa_probs_forw_from->size() * (sizeof(int16_t) + 6*sizeof(prob_t))) << std::endl;
+//            std::cout << (size_t) this->_aa_probs_forw_to->size() << " 16 + 6*double " << (size_t) (this->_aa_probs_forw_to->size() * (sizeof(int16_t) + 6*sizeof(prob_t))) << std::endl;
+//            std::cout << (size_t) this->_aa_probs_back_from->size() << " 16 + 6*double " << (size_t) (this->_aa_probs_back_from->size() * (sizeof(int16_t) + 6*sizeof(prob_t))) << std::endl;
+//            std::cout << (size_t) this->_aa_probs_forw_to->size() << " 16 + 6*double " << (size_t) (this->_aa_probs_back_to->size() * (sizeof(int16_t) + 6*sizeof(prob_t))) << std::endl;
+//            std::cout << (size_t) this->_aa_probs_forw_trans->size() << " 32 + 36*double " << (size_t) (this->_aa_probs_forw_trans->size() * (sizeof(int32_t) + 36*sizeof(prob_t))) << std::endl;
+//            std::cout << (size_t) this->_aa_probs_back_trans->size() << " 32 + 36*double " << (size_t) (this->_aa_probs_forw_trans->size() * (sizeof(int32_t) + 36*sizeof(prob_t))) << std::endl;
 
             // TODO: make _arr like that
             prob_t arr_prob[25];

@@ -1097,12 +1097,12 @@ namespace ymir {
         seq_len_t d_len;
         seq_len_t d_seq_start, d_seq_end, d_gene_start, d_gene_end;
 
-        std::cout << "---------------------------" << std::endl;
+//        std::cout << "---------------------------" << std::endl;
 
         for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
-            std::cout << "---------" << std::endl;
-            std::cout << (int) d_index << std::endl;
-            std::cout << "---------" << std::endl;
+//            std::cout << "---------" << std::endl;
+//            std::cout << (int) d_index << std::endl;
+//            std::cout << "---------" << std::endl;
 
             d_gene = clonotype.getDiv(d_index);
             d_len = _genes->D()[d_gene].sequence.size();
@@ -1120,12 +1120,12 @@ namespace ymir {
                     for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_seq_end; ++right_pos) {
                         // Todo: "=" or "+=" ? What to do in case of homological substrings like
                         // GGGG, which could be aligned to the same positions, but with different probabilities?
-                        if (probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) != 0) {
-                            std::cout << probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) << std::endl;
-                            std::cout << (int) d_seq_start << ":" << (int) d_seq_end << std::endl;
-                            std::cout << (int) d_gene_start << ":" << (int) d_gene_end << std::endl;
-                            std::cout << (int) left_pos << ":" << (int) right_pos << std::endl;
-                        }
+//                        if (probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) != 0) {
+//                            std::cout << probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1) << std::endl;
+//                            std::cout << (int) d_seq_start << ":" << (int) d_seq_end << std::endl;
+//                            std::cout << (int) d_gene_start << ":" << (int) d_gene_end << std::endl;
+//                            std::cout << (int) left_pos << ":" << (int) right_pos << std::endl;
+//                        }
 
                         probs(DIVERSITY_GENES_MATRIX_INDEX, d_index, seq_row[left_pos] - 1, seq_col[right_pos] - 1)
                                 =  _param_vec->event_prob(VDJ_DIV_DEL,

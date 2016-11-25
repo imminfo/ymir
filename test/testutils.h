@@ -694,7 +694,7 @@ namespace ymir {
         v2.push_back(5);
 
         // AATT
-        v1.push_back(.11); v1.push_back(.1); v1.push_back(.02); v1.push_back(.02); v1.push_back(.05); v1.push_back(.7);
+        v1.push_back(.21); v1.push_back(.3); v1.push_back(.22); v1.push_back(.12); v1.push_back(.15);
         v2.push_back(5);
 
         v3.push_back(5);
@@ -800,7 +800,6 @@ namespace ymir {
         v4.push_back(0);
 
         vector<seq_len_t> v5; // min D genes len == 3
-        v5.push_back(3);
         v5.push_back(3);
         v5.push_back(3);
 

@@ -139,11 +139,11 @@ namespace ymir {
          * \return Number of the aligned specific gene segments.
          */
         ///@{
-        event_ind_t nVar() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeRows(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_VAR_GEN_I); }
+        event_ind_t nVar() const { return (_recomb == VJ_RECOMB) ? this->nodeRows(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_VAR_GEN_I); }
 
-        event_ind_t nJoi() const { return (_chain.size() == VJ_CHAIN_SIZE) ? this->nodeColumns(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_JOI_DEL_I); }
+        event_ind_t nJoi() const { return (_recomb == VJ_RECOMB) ? this->nodeColumns(VJ_VAR_JOI_GEN_I) : this->nodeSize(VDJ_JOI_DEL_I); }
 
-        event_ind_t nDiv() const { return (_chain.size() == VJ_CHAIN_SIZE) ? 0 : _chain[VDJ_DIV_DEL_I].size(); }
+        event_ind_t nDiv() const { return (_recomb == VJ_RECOMB) ? 0 : _chain[VDJ_DIV_DEL_I].size(); }
         ///@}
 
 

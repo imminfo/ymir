@@ -1,11 +1,14 @@
 import argparse
 import json
 import os
+import sys
 
 import converters
 
 
-INFO_JSON = "./.info.json"
+DIRNAME = os.path.dirname(sys.argv[0])
+DIRNAME = DIRNAME if DIRNAME else "./"
+INFO_JSON = DIRNAME + "/.info.json"
 
 
 def make_workpath(script_run_path):

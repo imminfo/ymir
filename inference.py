@@ -1,4 +1,11 @@
+import os
+import sys
+
 from pyymir import *
+
+
+DIRNAME = os.path.dirname(sys.argv[0])
+DIRNAME = DIRNAME if DIRNAME else "./"
 
 
 if __name__ == "__main__":
@@ -23,6 +30,6 @@ if __name__ == "__main__":
             conv_file, convert_flag = convert(files[i], converter)
             if convert_flag:
                 print()
-                os.system(" ".join(["./build/scripts/Inference", conv_file, model, out_models[i], args.algorithm, "niter", algo_params["niter"]]))
+                os.system(" ".join([DIRNAME + "/build/scripts/Inference", conv_file, model, out_models[i], args.algorithm, "niter", algo_params["niter"]]))
     else:
         print("Can't process further, too many errors for me! T_T")

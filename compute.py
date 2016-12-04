@@ -1,5 +1,11 @@
+import os
+import sys
+
 from pyymir import *
 
+
+DIRNAME = os.path.dirname(sys.argv[0])
+DIRNAME = DIRNAME if DIRNAME else "./"
 
 if __name__ == "__main__":
     ap = default_ymir_ap()
@@ -25,7 +31,7 @@ if __name__ == "__main__":
             conv_file, convert_flag = convert(files[i], converter)
             if convert_flag:
                 print()
-                os.system(" ".join(["./build/scripts/Compute", conv_file, model, out_files[i], "0" if args.predefined else "1", "n" if not args.aa else "a"]))
+                os.system(" ".join([DIRNAME + "/build/scripts/Compute", conv_file, model, out_files[i], "0" if args.predefined else "1", "n" if not args.aa else "a"]))
 
                 if not args.leave and args.format != 'ymir':
                     os.remove(conv_file)

@@ -188,6 +188,16 @@ namespace ymir {
     }
 
 
+    inline std::string tot_time(std::chrono::system_clock::time_point tp1, size_t n_objects, size_t cur_object) {
+        return time_format(static_cast<std::time_t>(((std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - std::chrono::system_clock::to_time_t(tp1)) / ((float) cur_object / n_objects))));
+    }
+
+
+    inline std::string print_time(std::chrono::system_clock::time_point tp1, size_t n_objects, size_t cur_object) {
+        return std::string("(pass.: ") + time_diff_now(tp1) + std::string("; est.: ") + est_time(tp1, n_objects, cur_object) + std::string("; tot.: ") + tot_time(tp1, n_objects, cur_object);
+    }
+
+
     inline seq_len_t pos_codon0(seq_len_t nuc_pos) {
         return (nuc_pos - 1) / 3;
     }

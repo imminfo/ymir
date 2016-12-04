@@ -193,8 +193,17 @@ namespace ymir {
     }
 
 
+    inline std::string iter_time(std::chrono::system_clock::time_point tp1, size_t cur_object) {
+        return std::to_string( std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - tp1).count() / cur_object);
+    }
+
+
     inline std::string print_time(std::chrono::system_clock::time_point tp1, size_t n_objects, size_t cur_object) {
-        return std::string("(pass.: ") + time_diff_now(tp1) + std::string("; est.: ") + est_time(tp1, n_objects, cur_object) + std::string("; tot.: ") + tot_time(tp1, n_objects, cur_object) + std::string(")");
+        return std::string("(pass.: ") + time_diff_now(tp1)
+               + std::string("; est.: ") + est_time(tp1, n_objects, cur_object)
+               + std::string("; tot.: ") + tot_time(tp1, n_objects, cur_object)
+               + std::string("; iter.: ") + iter_time(tp1, cur_object)
+               + std::string("mus)");
     }
 
 

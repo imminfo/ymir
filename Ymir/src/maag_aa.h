@@ -197,29 +197,17 @@ namespace ymir {
                         ((_seq_poses[row_i] / 3) == ((_seq_poses[row_i] + 1) / 3)) ? (_codons(0, v_index, 0, row_i))
                                                                                    : 63;
 
-                        if (_seq_poses[row_i] == 0) {
-                            left_codon = 63;
-                        } else {
-                            if (((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
-                                left_codon = _codons(0, v_index, 0, row_i);
-                            } else {
-                                left_codon = 63;
-                            }
+                        left_codon = 63;
+                        if ((_seq_poses[row_i] != 0) && ((_seq_poses[row_i] - 1) / 3) == ((_seq_poses[row_i]) / 3)) {
+                            left_codon = _codons(0, v_index, 0, row_i);
                         }
 
-                        if (_seq_poses[this->nodeColumns(1) + col_i] == _sequence->size() * 3 + 1) {
-                            right_codon = 63;
-                        } else {
-                            if (_seq_poses[this->nodeColumns(1) + col_i] <= 2) {
-                                right_codon = 63;
-                            } else {
-                                if (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) ==
-                                    ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)) {
-                                    right_codon = _codons(1, d_index, col_i, 0);
-                                } else {
-                                    right_codon = 63;
-                                }
-                            }
+                        right_codon = 63;
+                        if ((_seq_poses[this->nodeColumns(1) + col_i] != _sequence->size() * 3 + 1)
+                            && (_seq_poses[this->nodeColumns(1) + col_i] > 2)
+                            && (((_seq_poses[this->nodeColumns(1) + col_i] - 2) / 3) == ((_seq_poses[this->nodeColumns(1) + col_i] - 1) / 3)))
+                        {
+                            right_codon = _codons(1, d_index, col_i, 0);
                         }
 
                         prob_t prob_val = *(_ins_start + insertion_len)

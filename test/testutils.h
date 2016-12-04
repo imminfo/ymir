@@ -351,38 +351,41 @@ namespace ymir {
         v4.push_back(0);
         v4.push_back(0);
 
-        // D1 dels
-        // max 1 D3' del
-        // max 1 D5' del
-        v1.push_back(.17); // first row
-        v1.push_back(.27);
-        v1.push_back(.37); // second row
-        v1.push_back(.19);
+        // D1 dels GTTT
+        // #dels 0 1
+        //   0   x x
+        //   1   x 0
+        v1.push_back(.3); v1.push_back(.5);
+        v1.push_back(.2); v1.push_back(0);
 
         v2.push_back(4);
         v4.push_back(2);
 
-        // D2 dels
-        // max 2 D3' del
-        // max 1 D5' del
-        // 3 rows 2 columns
-        v1.push_back(.11); v1.push_back(.12);
-        v1.push_back(.13); v1.push_back(.14);
-        v1.push_back(.15); v1.push_back(.35);
+        // D2 dels ACCGT
+        // #dels 0 1 2
+        //   0   x x x
+        //   1   x x 0
+        //   2   x 0 0
+        v1.push_back(.11); v1.push_back(.12); v1.push_back(.13);
+        v1.push_back(.14); v1.push_back(.15); v1.push_back(0);
+        v1.push_back(.35); v1.push_back(0);   v1.push_back(0);
 
-        v2.push_back(6);
-        v4.push_back(2);
+        v2.push_back(9);
+        v4.push_back(3);
 
-        // D3 dels
-        // max 1 D3' del
-        // max 1 D5' del
-        v1.push_back(.11); // first row
-        v1.push_back(.22);
-        v1.push_back(.33); // second row
-        v1.push_back(.34);
+        // D3 dels ACCACC
+        // #dels 0 1 2 3
+        //   0   x x x x
+        //   1   x x x 0
+        //   2   x x 0 0
+        //   3   x 0 0 0
+        v1.push_back(.05); v1.push_back(.06); v1.push_back(.07); v1.push_back(.08);
+        v1.push_back(.09); v1.push_back(.11); v1.push_back(.12); v1.push_back(0);
+        v1.push_back(.13); v1.push_back(.14); v1.push_back(0); v1.push_back(0);
+        v1.push_back(.15); v1.push_back(0); v1.push_back(0); v1.push_back(0);
 
-        v2.push_back(4);
-        v4.push_back(2);
+        v2.push_back(16);
+        v4.push_back(4);
 
         v3.push_back(8);
 

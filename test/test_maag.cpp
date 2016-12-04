@@ -430,8 +430,8 @@ YMIR_TEST_START(test_maag_vdj)
     alvec3.push_back("Dseg2");
     alvec3.push_back("Dseg3");
     seqvec3.push_back("GTTT");
-    seqvec3.push_back("ACCGGT");
-    seqvec3.push_back("CCCGGAC");
+    seqvec3.push_back("ACCGT");
+    seqvec3.push_back("ACCACC");
 
     VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
 
@@ -441,48 +441,44 @@ YMIR_TEST_START(test_maag_vdj)
 
     /*
      D1:
-            CCGTTT
-             |||||
-            AGGTTT
-       CCCGACGGTTT
-             .GTTT
-             .GTT.T
-             G.TTT
+     CCCGACCGGTTT
+             GTTT
+
      D2:
-       CCCGACGGTTT
-      A.CCG.GT
-         AC.CGGT
+     CCCGACCGGTTT
+         ACCG.T
+    A.CCG.T
 
      D3:
-       CCCGACGGTTT
-     CCCG.GAC
-       CCCG.GAC
-         CC.CGG.AC
+       CCCGACCGGTTT
+           ACC.ACC
+       ACC.ACC
     */
-    cl_builder.setSequence("CCCGACGGTTT")
+    cl_builder.setSequence("CCCGACCGGTTT")
             .addVarAlignment(1, 1, 1, 4)
             .addVarAlignment(3, 1, 1, 5)
-            .addJoiAlignment(1, 3, 8, 4)
-            .addJoiAlignment(2, 2, 9, 3)
-            .addJoiAlignment(3, 2, 7, 5)
+
+            .addJoiAlignment(1, 3, 9, 4)
+            .addJoiAlignment(2, 2, 10, 3)
+            .addJoiAlignment(3, 2, 8, 5)
+
+            .addDivAlignment(2, 1, 5, 4)
             .addDivAlignment(2, 2, 2, 3)
-            .addDivAlignment(2, 3, 6, 4)
-            .addDivAlignment(3, 5, 4, 3)
-            .addDivAlignment(3, 1, 1, 4)
-            .addDivAlignment(3, 3, 6, 3)
-            .addDivAlignment(1, 1, 8, 4);
+            .addDivAlignment(3, 1, 5, 3)
+            .addDivAlignment(3, 4, 5, 3)
+            .addDivAlignment(1, 1, 9, 4);
     cl_builder.setRecombination(VDJ_RECOMB);
     ClonotypeNuc clonotype = cl_builder.buildClonotype();
 
     MAAGnuc maag = maag_builder.build(clonotype, SAVE_METADATA, NO_ERRORS);
 
-//    cout << "V 0:" << maag.rows(0) << ":" << maag.cols(0) << endl;
-//    cout << "Vdel 1:" << maag.rows(1) << ":" << maag.cols(1) << endl;
-//    cout << "VDins 2:" << maag.rows(2) << ":" << maag.cols(2) << endl;
-//    cout << "Ddel 3:" << maag.rows(3) << ":" << maag.cols(3) << endl;
-//    cout << "DJins 4:" << maag.rows(4) << ":" << maag.cols(4) << endl;
-//    cout << "Jdel 5:" << maag.rows(5) << ":" << maag.cols(5) << endl;
-//    cout << "JD 6:" << maag.rows(6) << ":" << maag.cols(6) << endl;
+    cout << "V :" << maag.rows(0) << ":" << maag.cols(0) << endl;
+    cout << "Vdel :" << maag.rows(1) << ":" << maag.cols(1) << endl;
+    cout << "VDins :" << maag.rows(2) << ":" << maag.cols(2) << endl;
+    cout << "Ddel :" << maag.rows(3) << ":" << maag.cols(3) << endl;
+    cout << "DJins :" << maag.rows(4) << ":" << maag.cols(4) << endl;
+    cout << "Jdel :" << maag.rows(5) << ":" << maag.cols(5) << endl;
+    cout << "JD :" << maag.rows(6) << ":" << maag.cols(6) << endl;
 
     YMIR_ASSERT2(maag.nVar(), 2)
     YMIR_ASSERT2(maag.nJoi(), 3)
@@ -505,33 +501,34 @@ YMIR_TEST_START(test_maag_vdj)
     YMIR_ASSERT2(maag.event_index(1, 1, 0, 4), mvec.event_index(VDJ_VAR_DEL, 2, 2))
     YMIR_ASSERT2(maag.event_index(1, 1, 0, 5), mvec.event_index(VDJ_VAR_DEL, 2, 1))
 
-    // seq: 1 2 4 6 7 8 9
-    YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 0))
-    YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 1))
-    YMIR_ASSERT2(maag.event_index(2, 0, 0, 2), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 3))
-    YMIR_ASSERT2(maag.event_index(2, 0, 0, 3), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 5))
-    YMIR_ASSERT2(maag.event_index(2, 0, 2, 2), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 1))
-
-    // rows 1 2 3 4 5 | cols 3 4 5 6 7
-    // TODO: check D deletions indices
-    YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
-    YMIR_ASSERT2(maag.event_index(3, 0, 0, 1), 0)
-    YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), 0)
-    YMIR_ASSERT2(maag.event_index(3, 0, 1, 1), mvec.event_index(VDJ_DIV_DEL, 1, 2, 2))
-    YMIR_ASSERT2(maag.event_index(3, 0, 2, 2), 0)
-    YMIR_ASSERT2(maag.event_index(3, 0, 3, 3), mvec.event_index(VDJ_DIV_DEL, 1, 3, 1))
-    YMIR_ASSERT2(maag.event_index(3, 0, 3, 4), mvec.event_index(VDJ_DIV_DEL, 1, 3, 0))
-    YMIR_ASSERT2(maag.event_index(3, 0, 4, 4), mvec.event_index(VDJ_DIV_DEL, 1, 4, 0))
-
-    YMIR_ASSERT2(maag.event_index(3, 2, 5, 5), mvec.event_index(VDJ_DIV_DEL, 0, 0, 3))
-    YMIR_ASSERT2(maag.event_index(3, 2, 6, 5), 0)
-    YMIR_ASSERT2(maag.event_index(3, 2, 5, 6), mvec.event_index(VDJ_DIV_DEL, 0, 1, 0))
-
-    // row: 3 4 6 7 8 10 11
-    // col: 7 8 9 10 11 [12]
-    YMIR_ASSERT2(maag.event_index(4, 0, 0, 0), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 3))
-    YMIR_ASSERT2(maag.event_index(4, 0, 1, 1), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 3))
-    YMIR_ASSERT2(maag.event_index(4, 0, 3, 0), 0)
+//    // seq: 1 2 4 6 7 8 9
+//    YMIR_ASSERT2(maag.event_index(2, 0, 0, 0), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 0))
+//    YMIR_ASSERT2(maag.event_index(2, 0, 0, 1), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 1))
+//    YMIR_ASSERT2(maag.event_index(2, 0, 0, 2), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 3))
+//    YMIR_ASSERT2(maag.event_index(2, 0, 0, 3), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 5))
+//    YMIR_ASSERT2(maag.event_index(2, 0, 2, 2), mvec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 1))
+//
+//    rows: 2 5 5 6 9 10
+//    // rows 1 2 3 4 5 | cols 3 4 5 6 7
+//    // TODO: check D deletions indices
+//    YMIR_ASSERT2(maag.event_index(3, 0, 0, 0), 0)
+//    YMIR_ASSERT2(maag.event_index(3, 0, 0, 1), 0)
+//    YMIR_ASSERT2(maag.event_index(3, 0, 1, 0), 0)
+//    YMIR_ASSERT2(maag.event_index(3, 0, 1, 1), mvec.event_index(VDJ_DIV_DEL, 1, 2, 2))
+//    YMIR_ASSERT2(maag.event_index(3, 0, 2, 2), 0)
+//    YMIR_ASSERT2(maag.event_index(3, 0, 3, 3), mvec.event_index(VDJ_DIV_DEL, 1, 3, 1))
+//    YMIR_ASSERT2(maag.event_index(3, 0, 3, 4), mvec.event_index(VDJ_DIV_DEL, 1, 3, 0))
+//    YMIR_ASSERT2(maag.event_index(3, 0, 4, 4), mvec.event_index(VDJ_DIV_DEL, 1, 4, 0))
+//
+//    YMIR_ASSERT2(maag.event_index(3, 2, 5, 5), mvec.event_index(VDJ_DIV_DEL, 0, 0, 3))
+//    YMIR_ASSERT2(maag.event_index(3, 2, 6, 5), 0)
+//    YMIR_ASSERT2(maag.event_index(3, 2, 5, 6), mvec.event_index(VDJ_DIV_DEL, 0, 1, 0))
+//
+//    // row: 3 4 6 7 8 10 11
+//    // col: 7 8 9 10 11 [12]
+//    YMIR_ASSERT2(maag.event_index(4, 0, 0, 0), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 3))
+//    YMIR_ASSERT2(maag.event_index(4, 0, 1, 1), mvec.event_index(VDJ_DIV_JOI_INS_LEN, 0, 3))
+//    YMIR_ASSERT2(maag.event_index(4, 0, 3, 0), 0)
 
     YMIR_ASSERT2(maag.event_index(5, 0, 0, 0), 0)
     YMIR_ASSERT2(maag.event_index(5, 0, 1, 0), mvec.event_index(VDJ_JOI_DEL, 0, 2))
@@ -1481,13 +1478,13 @@ int main(int argc, char* argv[]) {
     // Tests for MAAG / MAAG builder
 //    YMIR_TEST(test_maag_vj())
 //    YMIR_TEST(test_maag_vj_err())
-//    YMIR_TEST(test_maag_vdj())
+    YMIR_TEST(test_maag_vdj())
 //    YMIR_TEST(test_maag_vdj_err())
 //    YMIR_TEST(test_maag_builder_replace_vj())
 //    YMIR_TEST(test_maag_builder_replace_vdj())
 
 //    YMIR_TEST(test_maag_vj_aa())
-    YMIR_TEST(test_maag_vdj_aa())
+//    YMIR_TEST(test_maag_vdj_aa())
 
     // Tests for forward-backward algorithms
 //    YMIR_TEST(test_maag_forward_backward_vj())

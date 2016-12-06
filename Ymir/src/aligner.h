@@ -403,6 +403,7 @@ namespace ymir {
                     for (seq_len_t i = 0; i < min_subsize; ++i) {
                         bitvec[i] = pattern[i] != text[text_i + i];
                     }
+                    // TODO: check for mid D len / min threshold
                     avec->addAlignment(gene, 1, text_i + 1, bitvec);
                 }
             }
@@ -542,6 +543,7 @@ namespace ymir {
                     for (seq_len_t i = 0; i < min_subsize; ++i) {
                         bitvec[i] = pattern[i] != text[text_i + i];
                     }
+                    // check for min D len / min threshold
                     avec->addAlignment(gene, 1, text_i + 1, bitvec);
                 }
             }

@@ -214,7 +214,7 @@ namespace ymir {
 
     protected:
 
-        unique_ptr<seq_len_t[]> _seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. */
+        unique_ptr<seq_len_t[]> _seq_poses;  /** Vector of the initial clonotype sequence's positions for each vertex. 0-based */
         unique_ptr<sequence_t> _sequence;  /** Nucleotide or amino acid CDR3 sequence. */
 
         SequenceType _seq_type;

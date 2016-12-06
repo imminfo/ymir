@@ -339,7 +339,7 @@ namespace ymir {
             assert(last_nuc_pos <= 3*sequence.size() + 1);
 #endif
 //            assert(first_nuc_pos >= last_nuc_pos);
-            if (first_nuc_pos > last_nuc_pos) {
+            if (first_nuc_pos < last_nuc_pos) {
                 return 0;
             }
 
@@ -385,16 +385,17 @@ namespace ymir {
             codon_hash new_first_aa_codons = (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) ? (first_aa_codons & last_aa_codons) : first_aa_codons;
 
             // if start pos is the last amino acid, than we process this case separately
-            if (first_nuc_pos >= sequence.size() * 3) {
+            if (first_nuc_pos >= sequence.size()*3) {
                 res_vec = (*_aa_probs_init)[sequence[sequence.size() - 1]];
-                first_nuc_pos = sequence.size() * 3;
+                first_nuc_pos = sequence.size()*3;
             }
             // if start pos is 2 than we need to take into the account the previous codon
             else if (in_codon0(first_nuc_pos) == 2) {
                 res_vec.fill(0);
 
-                res_mat = (*_aa_probs_back_trans)[(((sequence[pos_codon0(first_nuc_pos) + 1] << 8) + prev_aa_codons) << 16)
-                                                  + ((sequence[pos_codon0(first_nuc_pos)] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
+//                res_mat = (*_aa_probs_back_trans)[(((sequence[pos_codon0(first_nuc_pos) + 1] << 8) + prev_aa_codons) << 16)
+//                                                  + ((sequence[pos_codon0(first_nuc_pos)] << 8) + first_aa_codons)]; // TODO: here should be new_first_aa_codons, but it doesn't work
+                back_trans_probabilities(sequence[pos_codon0(first_nuc_pos) + 1], sequence[pos_codon0(first_nuc_pos)], prev_aa_codons, first_aa_codons, res_mat);
 
                 // i - next codon index
                 // j - prev codon index
@@ -414,6 +415,7 @@ namespace ymir {
             // if the same codon
             if (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) {
                 bithash = new_first_aa_codons;
+
                 for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
 
                 for (seq_len_t nuc_i = first_nuc_pos; nuc_i > last_nuc_pos; --nuc_i) {
@@ -447,8 +449,9 @@ namespace ymir {
                 codon_hash prev_last_codons = first_aa_codons;
                 for (seq_len_t aa_i = pos_codon0(first_nuc_pos) - 1; aa_i > pos_codon0(last_nuc_pos); --aa_i) {
                     // transition probabilities
-                    res_mat = (*_aa_probs_back_trans)[ (((sequence[aa_i + 1] << 8) + prev_last_codons) << 16)
-                                                       + ((sequence[aa_i] << 8) + 63)];
+//                    res_mat = (*_aa_probs_back_trans)[ (((sequence[aa_i + 1] << 8) + prev_last_codons) << 16)
+//                                                       + ((sequence[aa_i] << 8) + 63)];
+                    back_trans_probabilities(sequence[aa_i + 1], sequence[aa_i], prev_last_codons, 63, res_mat);
 
                     tmp_res_vec.fill(0);
                     for (int i = 0; i < 6; ++i) {
@@ -474,8 +477,9 @@ namespace ymir {
                 //
                 // transition probabilities
                 prev_last_codons = (pos_codon0(first_nuc_pos)) - 1 == (pos_codon0(last_nuc_pos)) ? first_aa_codons : 63;
-                res_mat = (*_aa_probs_back_trans)[(((sequence[pos_codon0(last_nuc_pos) + 1] << 8) + prev_last_codons) << 16)
-                                                  + ((sequence[pos_codon0(last_nuc_pos)] << 8) + last_aa_codons)];
+//                res_mat = (*_aa_probs_back_trans)[(((sequence[pos_codon0(last_nuc_pos) + 1] << 8) + prev_last_codons) << 16)
+//                                                  + ((sequence[pos_codon0(last_nuc_pos)] << 8) + last_aa_codons)];
+                back_trans_probabilities(sequence[pos_codon0(last_nuc_pos) + 1], sequence[pos_codon0(last_nuc_pos)], prev_last_codons, last_aa_codons, res_mat);
 
                 tmp_res_vec.fill(0);
                 for (int i = 0; i < 6; ++i) {
@@ -623,6 +627,51 @@ namespace ymir {
 
             auto prev_nuc_ids = CodonTable::table().which_nucl(char_prev, 2);
             auto next_nuc_ids = CodonTable::table().which_nucl(char_next, 0);
+            for (int i = 0; i < 6; ++i) {
+                for (int j = 0; j < 6; ++j) {
+                    res_mat[j*6 + i] = (bithash_prev[5 - j] & bithash_next[5 - i]) * (arr_prob[prev_nuc_ids[j]*5 + next_nuc_ids[i]]);
+                }
+            }
+        }
+
+
+        void back_trans_probabilities(char char_prev, char char_next, codon_hash hash_prev, codon_hash hash_next, codon_prob_mat_flatten &res_mat) const {
+            prob_t arr_prob[25];
+            arr_prob[0] = _arr[0];
+            arr_prob[1] = _arr[1];
+            arr_prob[2] = _arr[2];
+            arr_prob[3] = _arr[3];
+            arr_prob[4] = 0;
+
+            arr_prob[5] = _arr[4];
+            arr_prob[6] = _arr[5];
+            arr_prob[7] = _arr[6];
+            arr_prob[8] = _arr[7];
+            arr_prob[9] = 0;
+
+            arr_prob[10] = _arr[8];
+            arr_prob[11] = _arr[9];
+            arr_prob[12] = _arr[10];
+            arr_prob[13] = _arr[11];
+            arr_prob[14] = 0;
+
+            arr_prob[15] = _arr[12];
+            arr_prob[16] = _arr[13];
+            arr_prob[17] = _arr[14];
+            arr_prob[18] = _arr[15];
+            arr_prob[19] = 0;
+
+            arr_prob[20] = 0;
+            arr_prob[21] = 0;
+            arr_prob[22] = 0;
+            arr_prob[23] = 0;
+            arr_prob[24] = 0;
+
+            bitset6 bithash_prev = hash_prev;
+            bitset6 bithash_next = hash_next;
+
+            auto prev_nuc_ids = CodonTable::table().which_nucl(char_prev, 0);
+            auto next_nuc_ids = CodonTable::table().which_nucl(char_next, 2);
             for (int i = 0; i < 6; ++i) {
                 for (int j = 0; j < 6; ++j) {
                     res_mat[j*6 + i] = (bithash_prev[5 - j] & bithash_next[5 - i]) * (arr_prob[prev_nuc_ids[j]*5 + next_nuc_ids[i]]);

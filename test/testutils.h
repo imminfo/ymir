@@ -17,9 +17,10 @@ namespace ymir {
 
 #define YMIR_TEST_PRECISION 1e-14
 
-#define YMIR_TEST(res) { all_tests += 1; if (res.size() == 0) {tests_passed += 1;} \
+#define YMIR_TEST(res) {auto tmp_res(res); \
+                        all_tests += 1; if (tmp_res.size() == 0) {tests_passed += 1;} \
                         else { \
-                        failed_test_info.push_back(TestInfo(#res, res)); \
+                        failed_test_info.push_back(TestInfo(#res, tmp_res)); \
                         } \
                         }
 

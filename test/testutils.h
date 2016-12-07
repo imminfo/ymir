@@ -900,72 +900,72 @@ namespace ymir {
         v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
         v2.push_back(7);
 
-        v3.push_back(11);
+        v3.push_back(10);
         v4.push_back(0);
 
         // DJ ins len
         v1.push_back(.1); v1.push_back(.24); v1.push_back(.25); v1.push_back(.05); v1.push_back(.01); v1.push_back(.15); v1.push_back(.2);
         v2.push_back(7);
 
-        v3.push_back(12);
+        v3.push_back(11);
         v4.push_back(0);
 
         // VD ins nuc
         // prev A
-        v1.push_back(.04); v1.push_back(.09); v1.push_back(.03); v1.push_back(.84);
+        v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+        v2.push_back(4);
+
+        v3.push_back(12);
+        v4.push_back(0);
+
+        // prev C
+        v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
         v2.push_back(4);
 
         v3.push_back(13);
         v4.push_back(0);
 
-        // prev C
-        v1.push_back(.4); v1.push_back(.2); v1.push_back(.2); v1.push_back(.2);
+        // prev G
+        v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
         v2.push_back(4);
 
         v3.push_back(14);
         v4.push_back(0);
 
-        // prev G
-        v1.push_back(.25); v1.push_back(.15); v1.push_back(.1); v1.push_back(.5);
+        // prev T
+        v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
         v2.push_back(4);
 
         v3.push_back(15);
         v4.push_back(0);
 
-        // prev T
-        v1.push_back(.15); v1.push_back(.15); v1.push_back(.2); v1.push_back(.5);
+        // DJ ins nuc
+        // prev A
+        v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
         v2.push_back(4);
 
         v3.push_back(16);
         v4.push_back(0);
 
-        // DJ ins nuc
-        // prev A
-        v1.push_back(.23); v1.push_back(.2); v1.push_back(.17); v1.push_back(.4);
+        // prev C
+        v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
         v2.push_back(4);
 
         v3.push_back(17);
         v4.push_back(0);
 
-        // prev C
-        v1.push_back(.16); v1.push_back(.1); v1.push_back(.24); v1.push_back(.5);
+        // prev G
+        v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
         v2.push_back(4);
 
         v3.push_back(18);
         v4.push_back(0);
 
-        // prev G
-        v1.push_back(.04); v1.push_back(.09); v1.push_back(.03); v1.push_back(.84);
+        // prev T
+        v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
         v2.push_back(4);
 
         v3.push_back(19);
-        v4.push_back(0);
-
-        // prev T
-        v1.push_back(.4); v1.push_back(.11); v1.push_back(.29); v1.push_back(.2);
-        v2.push_back(4);
-
-        v3.push_back(20);
         v4.push_back(0);
 
         vector<seq_len_t> v5; // min D genes len == 3

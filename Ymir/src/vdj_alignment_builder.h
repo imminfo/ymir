@@ -78,16 +78,22 @@ namespace ymir {
             avec.extend(_Jalign);
             avec.extend(_Dalign);
 
+            this->clear();
+
+            // return std::move(VDJAlignment(std::move(segments), std::move(avec), std::move(nDs)));
+            // return VDJAlignment(std::move(segments), std::move(avec), std::move(nDs));
+            return vdj_alignment_t(segments, avec, nDs);
+        }
+
+
+        void clear() {
             _Valign.clear();
             _Jalign.clear();
             _Dalign.clear();
 
             base_class::_segments.fill(0);
             _n_Dalign.resize(1);
-
-            // return std::move(VDJAlignment(std::move(segments), std::move(avec), std::move(nDs)));
-            // return VDJAlignment(std::move(segments), std::move(avec), std::move(nDs));
-            return vdj_alignment_t(segments, avec, nDs);
+            _n_Dalign[0] = 0; // just in case
         }
 
 

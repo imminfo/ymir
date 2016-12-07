@@ -1,4 +1,4 @@
 D genes	Sequences
 Dseg1	GTTT
-Dseg2	ACCGGT
-Dseg3	CCCGGAC
+Dseg2	ACCGT
+Dseg3	ACCACC

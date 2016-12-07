@@ -237,7 +237,7 @@ int main(int argc, char* argv[]) {
     YMIR_TEST(test_model_vdj_file())
     YMIR_TEST(test_model_vj_save_load())
     YMIR_TEST(test_model_vdj_save_load())
-    YMIR_TEST(test_model_gene_usage())
+//    YMIR_TEST(test_model_gene_usage())
 //    YMIR_TEST(test_model_vj_maag())
 //    YMIR_TEST(test_model_vdj_maag())
     

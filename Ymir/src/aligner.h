@@ -148,14 +148,16 @@ namespace ymir {
 
         bool alignDiv() {
             alignment_vector_t vec;
+            bool flag = false;
             for (seg_index_t id = 1; id <= _genes.D().max(); ++id) {
                 vec.clear(); // TODO: some strange behaviour here after I added this line. Be careful. Maybe there is some bug in clear().
                 this->_alignDiv(id, _genes.D()[id].sequence, this->sequence(), &vec);
                 if (vec.size()) {
                     this->addDivAlignment(vec);
+                    flag = true;
                 }
             }
-            return vec.size() != 0;
+            return flag;
         }
 
         bool alignDiv(seg_index_t id) {

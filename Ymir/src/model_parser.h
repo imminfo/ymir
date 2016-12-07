@@ -293,15 +293,16 @@ namespace ymir {
                 for (; i+1 != name_order[j] ; ++j) {}
                 prob_data = container->data(j);
 
-                if (prob_data.size() > gsa[name_order[j]].sequence.size() + 1) {
-                    vector<prob_t> new_prob_data((gsa[name_order[j]].sequence.size() + 1) * (gsa[name_order[j]].sequence.size() + 1));
-                    for (auto row_i = 0; row_i < gsa[name_order[j]].sequence.size() + 1; ++row_i) {
-                        for (auto col_i = 0; col_i < gsa[name_order[j]].sequence.size() + 1; ++col_i) {
-                            new_prob_data[row_i * (gsa[name_order[j]].sequence.size() + 1) + col_i] = prob_data[row_i * (gsa[name_order[j]].sequence.size() + 1) + col_i];
-                        }
-                    }
-                    prob_data = new_prob_data;
-                }
+                // TODO: what the hell is this!? Why do I need this?!
+//                if (prob_data.size() > gsa[name_order[j]].sequence.size() + 1) {
+//                    vector<prob_t> new_prob_data((gsa[name_order[j]].sequence.size() + 1) * (gsa[name_order[j]].sequence.size() + 1));
+//                    for (auto row_i = 0; row_i < gsa[name_order[j]].sequence.size() + 1; ++row_i) {
+//                        for (auto col_i = 0; col_i < gsa[name_order[j]].sequence.size() + 1; ++col_i) {
+//                            new_prob_data[row_i * (gsa[name_order[j]].sequence.size() + 1) + col_i] = prob_data[row_i * (gsa[name_order[j]].sequence.size() + 1) + col_i];
+//                        }
+//                    }
+//                    prob_data = new_prob_data;
+//                }
 
                 event_probs.insert(event_probs.end(),
                                    prob_data.begin(),

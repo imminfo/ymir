@@ -343,6 +343,8 @@ namespace ymir {
                 return 0;
             }
 
+//            for (int i = 0; i < 16; ++i) { std::cout << (int)i << ":" <<_arr[i] << std::endl; }
+
             // TODO: make _arr like that
             prob_t arr_prob[25];
             arr_prob[0] = _arr[0];
@@ -384,7 +386,7 @@ namespace ymir {
             bitset6 bithash;
             codon_hash new_first_aa_codons = (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) ? (first_aa_codons & last_aa_codons) : first_aa_codons;
 
-            // if start pos is the last amino acid, than we process this case separately
+            // if start pos is the last amino acid, then we process this case separately
             if (first_nuc_pos >= sequence.size()*3) {
                 res_vec = (*_aa_probs_init)[sequence[sequence.size() - 1]];
                 first_nuc_pos = sequence.size()*3;

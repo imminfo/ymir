@@ -1599,6 +1599,11 @@ namespace ymir {
 
                         right_codon = clonotype.getDivCodon(d_index, j, right_pos - (left_pos + min_D_len - 1) + 1);
 
+//                        std::cout << "---" << std::endl;
+//                        std::cout << (int)left_pos << std::endl;
+//                        std::cout << (int)right_pos << std::endl;
+//                        std::cout << (int)left_codon << std::endl;
+//                        std::cout << (int)right_codon << std::endl;
 //                        std::cout << std::bitset<6>(right_codon).to_string() << std::endl;
 //                        std::cout << "sizes " << (int) seq_row_nonzeros << ":" << (int) seq_col_nonzeros << std::endl;
 

@@ -1204,6 +1204,168 @@ YMIR_TEST_START(test_maag_vj_aa)
 YMIR_TEST_END
 
 
+YMIR_TEST_START(test_maag_vdj_aa_very_simple)
+
+    ModelParameterVector mvec = make_test_events_vdj4();
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1"); seqvec1.push_back("AAAAA");
+    alvec1.push_back("Vseg2"); seqvec1.push_back("GGGG");
+    alvec1.push_back("Vseg3"); seqvec1.push_back("GGG");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1"); seqvec2.push_back("TTT");
+    alvec2.push_back("Jseg2"); seqvec2.push_back("GGGG");
+    alvec2.push_back("Jseg3"); seqvec2.push_back("GGGG");
+
+    vector<string> alvec3;
+    vector<string> seqvec3;
+    alvec3.push_back("Dseg1"); seqvec3.push_back("CCC");
+    alvec3.push_back("Dseg2"); seqvec3.push_back("GGGG");
+
+    VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
+
+    MAAGBuilder maag_builder(mvec, genes);
+
+
+    ClonotypeNucBuilder cl_builder;
+    CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3,
+                                                             VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
+                                                                                    AlignmentEventScore(1, -1, 1),
+                                                                                    AlignmentEventScore(1, -1, 1)),
+                                                             VDJAlignmentScoreThreshold(2, 2, 2)));
+    aligner.setSequence("KPF").setRecombination(VDJ_RECOMB);
+    YMIR_ASSERT(aligner.alignVar())
+    YMIR_ASSERT(aligner.alignDiv())
+    YMIR_ASSERT(aligner.alignJoi())
+
+    std::vector<string> rev_nuc = {"AAACCATTC", "AAGCCATTC", "AAACCCTTC", "AAGCCCTTC", "AAACCGTTC", "AAGCCGTTC", "AAACCTTTC", "AAGCCTTTC", "AAACCATTT", "AAGCCATTT", "AAACCCTTT", "AAGCCCTTT", "AAACCGTTT", "AAGCCGTTT", "AAACCTTTT", "AAGCCTTTT"};
+
+//    std::vector<string> rev_nuc = {"AAACCCTTC", "AAGCCCTTC", "AAACCCTTT", "AAGCCCTTT"};
+
+    ClonotypeAA clonotype = aligner.buildClonotype();
+
+    YMIR_ASSERT2(clonotype.nVar(), 1)
+    YMIR_ASSERT2(clonotype.nDiv(), 1)
+    YMIR_ASSERT2(clonotype.nJoi(), 1)
+
+    MAAGaa maag = maag_builder.build(clonotype);
+
+    std::vector<ClonotypeNuc> clonotype_vec;
+    NaiveCDR3NucleotideAligner naligner(genes, VDJAlignerParameters(3));
+    for (auto &seq: rev_nuc) {
+        naligner.clear();
+        naligner.setSequence(seq).setRecombination(VDJ_RECOMB);
+        if (naligner.alignVar() && naligner.alignDiv() && naligner.alignJoi()) {
+            clonotype_vec.push_back(naligner.buildClonotype());
+        }
+    }
+
+    prob_t sum_prob = 0;
+    std::vector<prob_t> prob_vec;
+    for (int i = 0; i < clonotype_vec.size(); ++i) {
+        sum_prob += maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS);
+        auto tmp_maag = maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS);
+        for (int v_i = 0; v_i < tmp_maag.nVar(); ++v_i) {
+            for (int d_i = 0; d_i < tmp_maag.nDiv(); ++d_i) {
+                for (int j_i = 0; j_i < tmp_maag.nJoi(); ++j_i) {
+                    prob_vec.push_back(tmp_maag.fullProbability(v_i, d_i, j_i));
+                }
+            }
+        }
+    }
+
+    // nuc 5.53191e-07
+    YMIR_ASSERT3(sum_prob, std::accumulate(prob_vec.begin(), prob_vec.end(), .0))
+    YMIR_ASSERT3(maag.fullProbability(), std::accumulate(prob_vec.begin(), prob_vec.end(), .0))
+    YMIR_ASSERT3(maag.fullProbability(), sum_prob)
+    YMIR_ASSERT3(maag.fullProbability(), maag_builder.buildAndCompute(clonotype))
+
+YMIR_TEST_END
+
+
+YMIR_TEST_START(test_maag_vdj_aa_simple_D)
+
+    ModelParameterVector mvec = make_test_events_vdj3();
+
+    vector<string> alvec1;
+    vector<string> seqvec1;
+    alvec1.push_back("Vseg1"); seqvec1.push_back("TGTGC");
+    alvec1.push_back("Vseg2"); seqvec1.push_back("TGCG");
+    alvec1.push_back("Vseg3"); seqvec1.push_back("TGA");
+
+    vector<string> alvec2;
+    vector<string> seqvec2;
+    alvec2.push_back("Jseg1"); seqvec2.push_back("TTT");
+    alvec2.push_back("Jseg2"); seqvec2.push_back("ATTC");
+    alvec2.push_back("Jseg3"); seqvec2.push_back("AATT");
+
+    vector<string> alvec3;
+    vector<string> seqvec3;
+    alvec3.push_back("Dseg1"); seqvec3.push_back("AATT");
+    alvec3.push_back("Dseg2"); seqvec3.push_back("GGGG");
+
+    VDJRecombinationGenes genes("VB", alvec1, seqvec1, "JB", alvec2, seqvec2, "DB", alvec3, seqvec3);
+
+    MAAGBuilder maag_builder(mvec, genes);
+
+
+    ClonotypeNucBuilder cl_builder;
+    CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3,
+                                                             VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
+                                                                                    AlignmentEventScore(1, -1, 1),
+                                                                                    AlignmentEventScore(1, -1, 1)),
+                                                             VDJAlignmentScoreThreshold(2, 2, 2)));
+    aligner.setSequence("CAQF").setRecombination(VDJ_RECOMB);
+    YMIR_ASSERT(aligner.alignVar())
+    YMIR_ASSERT(aligner.alignDiv())
+    YMIR_ASSERT(aligner.alignJoi())
+
+    std::vector<string> rev_nuc = {"TGCGCACAATTC", "TGTGCACAATTC", "TGCGCCCAATTC", "TGTGCCCAATTC", "TGCGCGCAATTC", "TGTGCGCAATTC", "TGCGCTCAATTC", "TGTGCTCAATTC", "TGCGCACAGTTC", "TGTGCACAGTTC", "TGCGCCCAGTTC", "TGTGCCCAGTTC", "TGCGCGCAGTTC", "TGTGCGCAGTTC", "TGCGCTCAGTTC", "TGTGCTCAGTTC", "TGCGCACAATTT", "TGTGCACAATTT", "TGCGCCCAATTT", "TGTGCCCAATTT", "TGCGCGCAATTT", "TGTGCGCAATTT", "TGCGCTCAATTT", "TGTGCTCAATTT", "TGCGCACAGTTT", "TGTGCACAGTTT", "TGCGCCCAGTTT", "TGTGCCCAGTTT", "TGCGCGCAGTTT", "TGTGCGCAGTTT", "TGCGCTCAGTTT", "TGTGCTCAGTTT"};
+
+    ClonotypeAA clonotype = aligner.buildClonotype();
+
+    YMIR_ASSERT2(clonotype.nVar(), 3)
+    YMIR_ASSERT2(clonotype.nDiv(), 1)
+    YMIR_ASSERT2(clonotype.nJoi(), 3)
+
+    MAAGaa maag = maag_builder.build(clonotype);
+
+    std::vector<ClonotypeNuc> clonotype_vec;
+    NaiveCDR3NucleotideAligner naligner(genes, VDJAlignerParameters(3));
+    for (auto &seq: rev_nuc) {
+        naligner.clear();
+        naligner.setSequence(seq).setRecombination(VDJ_RECOMB);
+        if (naligner.alignVar() && naligner.alignDiv() && naligner.alignJoi()) {
+            clonotype_vec.push_back(naligner.buildClonotype());
+        }
+    }
+
+    prob_t sum_prob = 0;
+    std::vector<prob_t> prob_vec;
+    for (int i = 0; i < clonotype_vec.size(); ++i) {
+        sum_prob += maag_builder.buildAndCompute(clonotype_vec[i], NO_ERRORS);
+        auto tmp_maag = maag_builder.build(clonotype_vec[i], NO_METADATA, NO_ERRORS);
+        for (int v_i = 0; v_i < tmp_maag.nVar(); ++v_i) {
+            for (int d_i = 0; d_i < tmp_maag.nDiv(); ++d_i) {
+                for (int j_i = 0; j_i < tmp_maag.nJoi(); ++j_i) {
+                    prob_vec.push_back(tmp_maag.fullProbability(v_i, d_i, j_i));
+                }
+            }
+        }
+    }
+
+    // result: 2.11458e-06
+    YMIR_ASSERT3(sum_prob, std::accumulate(prob_vec.begin(), prob_vec.end(), .0))
+    YMIR_ASSERT3(maag.fullProbability(), std::accumulate(prob_vec.begin(), prob_vec.end(), .0))
+    YMIR_ASSERT3(maag.fullProbability(), sum_prob)
+    YMIR_ASSERT3(maag.fullProbability(), maag_builder.buildAndCompute(clonotype))
+
+YMIR_TEST_END
+
+
 YMIR_TEST_START(test_maag_vdj_aa)
 
     ModelParameterVector mvec = make_test_events_vdj3();
@@ -1258,6 +1420,7 @@ YMIR_TEST_START(test_maag_vdj_aa)
         if (naligner.alignVar() && naligner.alignDiv() && naligner.alignJoi()) {
             clonotype_vec.push_back(naligner.buildClonotype());
         }
+        naligner.clear();
     }
 
     prob_t sum_prob = 0;
@@ -1485,7 +1648,9 @@ int main(int argc, char* argv[]) {
 //    YMIR_TEST(test_maag_builder_replace_vdj())
 
 //    YMIR_TEST(test_maag_vj_aa())
-    YMIR_TEST(test_maag_vdj_aa())
+    YMIR_TEST(test_maag_vdj_aa_very_simple())
+//    YMIR_TEST(test_maag_vdj_aa_simple_D())
+//    YMIR_TEST(test_maag_vdj_aa())
 
     // Tests for forward-backward algorithms
 //    YMIR_TEST(test_maag_forward_backward_vj())

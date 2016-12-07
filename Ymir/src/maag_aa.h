@@ -174,13 +174,6 @@ namespace ymir {
 #ifndef DNDEBUG
             if (_recomb != VDJ_RECOMB) { return 0; }
 #endif
-//                return (matrix(0, v_index) *      // P(Vi)
-//                        matrix(1, v_index) *      // P(#dels | Vi)
-//                        matrix(2, 0) *            // P(V-D3' insertion seq)
-//                        matrix(3, d_index) *      // P(D5'-D3' deletions | Di)
-//                        matrix(4, 0) *            // P(D5'-J insertion seq)
-//                        matrix(5, j_index) *      // P(#dels | Ji)
-//                        matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
 
             codon_hash left_codon, right_codon, prev_codon;
             size_t left_pos, right_pos;
@@ -207,15 +200,16 @@ namespace ymir {
                     insertion_len = right_pos - left_pos - 1;
                     if (insertion_len >= 0 && insertion_len <= _max_ins_len) {
                         if ((left_pos != 0) && ((left_pos - 1) / 3) == (left_pos / 3)) {
-                            left_codon = _codons(0, v_index, 0, row_i - 1);
+                            left_codon = _codons(0, v_index, 0, row_i);
+
+                            if (left_pos >= 1) {
+                                prev_codon = _codons(0, v_index, 0, row_i - 1);
+                            } else {
+                                prev_codon = 63;
+                            }
                         } else {
                             left_codon = 63;
-                        }
-
-                        if (left_pos <= 1) {
                             prev_codon = 63;
-                        } else {
-                            prev_codon = _codons(0, v_index, 0, row_i);
                         }
 
                         for (dim_t d_col_i = 0; d_col_i < this->cols(3); ++d_col_i) {
@@ -227,6 +221,13 @@ namespace ymir {
                             } else {
                                 right_codon = 63;
                             }
+//
+//                            std::cout << "---" << std::endl;
+//                            std::cout << (int)left_pos << std::endl;
+//                            std::cout << (int)right_pos << std::endl;
+//                            std::cout << (int)left_codon << std::endl;
+//                            std::cout << (int)right_codon << std::endl;
+//                            std::cout << (int)prev_codon << std::endl;
 
                             prob_t prob_val = *(_ins_start + insertion_len)
                                               * _insertions->aaProbability(*_sequence,
@@ -236,7 +237,7 @@ namespace ymir {
                                                                            right_codon,
                                                                            prev_codon);
 
-                            arr_prob1[col_i * this->cols(3) + d_col_i] = prob_val * arr_prob2[row_i] * this->at(3, d_index, col_i, d_col_i);
+                            arr_prob1[col_i * this->cols(3) + d_col_i] += prob_val * arr_prob2[row_i] * this->at(3, d_index, col_i, d_col_i);
                         }
                     }
                 }
@@ -259,19 +260,20 @@ namespace ymir {
                             && (((right_pos - 2) / 3) == ((right_pos - 1) / 3)))
                         {
                             right_codon = _codons(3, j_index, col_i, 0);
+
+                            if (right_pos < _sequence->size() * 3) {
+                                prev_codon = _codons(3, j_index, col_i + 1, 0);
+                            } else {
+                                prev_codon = 63;
+                            }
                         } else {
                             right_codon = 63;
-                        }
-
-                        if (right_pos >= _sequence->size()) {
                             prev_codon = 63;
-                        } else {
-                            prev_codon = _codons(3, j_index, col_i + 1, 0);
                         }
 
-                        for (dim_t d_col_i = 0; d_col_i < this->cols(3); ++d_col_i) {
+                        for (dim_t d_row_i = 0; d_row_i < this->rows(3); ++d_row_i) {
                             if ((left_pos != 0) && ((left_pos - 1) / 3) == ((left_pos) / 3)) {
-                                left_codon = _codons(2, d_index, col_i, d_col_i);
+                                left_codon = _codons(2, d_index, d_row_i, row_i);
                             } else {
                                 left_codon = 63;
                             }
@@ -284,7 +286,7 @@ namespace ymir {
                                                                                   left_codon,
                                                                                   prev_codon);
 
-                            arr_prob2[col_i] += prob_val * arr_prob1[row_i * this->cols(3) + d_col_i];
+                            arr_prob2[col_i] += prob_val * arr_prob1[d_row_i * this->cols(3) + row_i];
                         }
                     }
                 }

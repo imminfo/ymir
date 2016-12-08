@@ -135,14 +135,18 @@ namespace ymir {
             for (seg_index_t id = 1; id <= _genes.V().max(); ++id) {
                 this->_alignVar(id, _genes.V()[id].sequence, this->sequence(), &vec);
             }
-            this->addVarAlignment(vec);
+            if (vec.size()) {
+                this->addVarAlignment(vec);
+            }
             return vec.size() != 0;
         }
 
         bool alignVar(seg_index_t id) {
             alignment_vector_t vec;
             this->_alignVar(id, _genes.V()[id].sequence, this->sequence(), &vec);
-            this->addVarAlignment(vec);
+            if (vec.size()) {
+                this->addVarAlignment(vec);
+            }
             return vec.size() != 0;
         }
 
@@ -163,7 +167,9 @@ namespace ymir {
         bool alignDiv(seg_index_t id) {
             alignment_vector_t vec;
             this->_alignDiv(id, _genes.D()[id].sequence, this->sequence(), &vec);
-            this->addDivAlignment(vec);
+            if (vec.size()) {
+                this->addDivAlignment(vec);
+            }
             return vec.size() != 0;
         }
 
@@ -172,14 +178,18 @@ namespace ymir {
             for (seg_index_t id = 1; id <= _genes.J().max(); ++id) {
                 this->_alignJoi(id, _genes.J()[id].sequence, this->sequence(), &vec);
             }
-            this->addJoiAlignment(vec);
+            if (vec.size()) {
+                this->addJoiAlignment(vec);
+            }
             return vec.size() != 0;
         }
 
         bool alignJoi(seg_index_t id) {
             alignment_vector_t vec;
             this->_alignJoi(id, _genes.J()[id].sequence, this->sequence(), &vec);
-            this->addJoiAlignment(vec);
+            if (vec.size()) {
+                this->addJoiAlignment(vec);
+            }
             return vec.size() != 0;
         }
 
@@ -265,7 +275,9 @@ namespace ymir {
                 matches += 1;
             }
 
-            avec->addAlignment(gene, 1, 1, matches);
+            if (matches >= _params.threshold.v_threshold) {
+                avec->addAlignment(gene, 1, 1, matches);
+            }
         }
 
         void _alignDiv(seg_index_t gene, const sequence_t &pattern, const sequence_t &text, NoGapAlignmentVector *avec) const {
@@ -327,7 +339,9 @@ namespace ymir {
                 matches += 1;
             }
 
-            avec->addAlignment(gene, p_size - matches + 1, t_size - matches + 1, matches);
+            if (matches >= _params.threshold.j_threshold) {
+                avec->addAlignment(gene, p_size - matches + 1, t_size - matches + 1, matches);
+            }
         }
         ///@}
 

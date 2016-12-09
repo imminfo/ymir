@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
     YMIR_BENCHMARK("VDJ EM",
                    logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
                                                       EMAlgorithm::AlgorithmParameters()
-                                                              .set("niter", 30)
+                                                              .set("niter", 30),
                                                                 NO_ERRORS))
 //
 //    YMIR_BENCHMARK("VDJ SG",

@@ -133,10 +133,8 @@ namespace ymir {
 #ifndef DNDEBUG
             if (_recomb != VJ_RECOMB) { return 0; }
 #endif
-            dim_t max_dim = std::max(this->nodeRows(2), this->nodeColumns(2));
-
-            std::vector<prob_t> arr_prob1(max_dim);
-            std::vector<prob_t> arr_prob2(max_dim);
+            std::vector<prob_t> arr_prob1(this->nodeColumns(2));
+            std::vector<prob_t> arr_prob2(this->nodeRows(2));
 
             arr_prob1[0] = this->at(0, 0, v_index, j_index);
             for (dim_t i = 0; i < this->nodeColumns(1); ++i) {
@@ -166,11 +164,12 @@ namespace ymir {
 //             P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
 //            return (matrix(0, v_index) *      // P(Vi)
 //                    matrix(1, v_index) *     // P(#dels | Vi)
-//                    matrix(2, 0)       *     // P(V-D3' insertion seq)
+//                    matrix(2, 0)).sum()      ;     // P(V-D3' insertion seq)
 //                    matrix(3, d_index)*      // P(D5'-D3' deletions | Di)
 //                    matrix(4, 0) *            // P(D5'-J insertion seq)
 //                    matrix(5, j_index) *      // P(#dels | Ji)
 //                    matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
+
 
             dim_t max_dim = std::max(std::max(this->nodeRows(2), this->nodeColumns(2)),
                                      std::max(this->nodeRows(4), this->nodeColumns(4)));
@@ -193,7 +192,20 @@ namespace ymir {
                 }
             }
 
-            std::fill(arr_prob2.begin(), arr_prob2.end(), 0);
+//            std::cout << "===" << std::endl;
+//            for (int i = 0; i < arr_prob2.size(); ++i) {
+//                std::cout << arr_prob2[i] << std::endl;
+//            }
+//            std::cout << "===" << std::endl;
+
+//            std::cout << "===" << std::endl;
+//            for (int i = 0; i < arr_prob1.size(); ++i) {
+//                std::cout << arr_prob1[i] << std::endl;
+//            }
+//            std::cout << "===" << std::endl;
+//            std::fill(arr_prob2.begin(), arr_prob2.end(), 0);
+
+//            return std::accumulate(arr_prob1.begin(), arr_prob1.end(), .0);
 
             // D deletions
             for (dim_t row_i = 0; row_i < this->nodeRows(3); ++row_i) {

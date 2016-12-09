@@ -23,26 +23,23 @@ int main(int argc, char* argv[]) {
     std::vector<prob_t> logLvec;
 
     std::string temp_str;
-
-    time_t vj_single_parse, vdj_single_parse,
-            vj_single_prob, vj_single_meta,
-            vj_single_infer, vdj_single_prob,
-            vdj_single_meta, vdj_single_infer;
-
-    time_t vj_good_parse, vdj_good_parse,
-            vj_good_prob, vj_good_meta,
-            vj_good_infer, vdj_good_prob,
-            vdj_good_meta, vdj_good_infer;
     
     std::string BENCH_DATA_FOLDER = argv[1];
 
+    ClonesetNuc cloneset_vj, cloneset_vdj, cloneset_vj_noncoding, cloneset_vdj_noncoding;
 
-//    ParserNuc parser(new NaiveCDR3NucleotideAligner());
-//    ParserNuc parser(new CDR3NucleotideAligner());
-    ParserNuc parser(new SmithWatermanNoGapAligner());
 
-    string input_alpha_file = "alpha.100k.txt";
-    string input_beta_file = "beta.100k.txt";
+    string input_alpha_file = "alpha.full.500k.txt", input_alpha_file_nonc = "alpha.noncoding.100k.txt";
+    string input_beta_file = "beta.noncoding.100k.txt", input_beta_file_nonc = "beta.noncoding.100k.txt";
+
+
+    auto vdj_aligner_parameters_nuc = VDJAlignerParameters(3,
+                                                           VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
+                                                                                  AlignmentEventScore(1, -1, 1),
+                                                                                  AlignmentEventScore(1, -1, 1)),
+                                                           VDJAlignmentScoreThreshold(4, 3, 4));
+
+    ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
 
     //
@@ -53,15 +50,14 @@ int main(int argc, char* argv[]) {
                                    "Jgene",
                                    BENCH_DATA_FOLDER + "traj.txt");
 
-    ClonesetNuc cloneset_vj;
     YMIR_BENCHMARK("Parsing VJ",
                    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file,
                                        &cloneset_vj,
                                        vj_single_genes,
                                        VJ_RECOMB,
-                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
-                                                              AlignmentColumnOptions::OVERWRITE),
-                                       VDJAlignerParameters(2)))
+                                       AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
+                                                              AlignmentColumnOptions::REALIGN_PROVIDED),
+                                       vdj_aligner_parameters_nuc))
 
     //
     // TCR beta chain repertoire - VDJ recombination
@@ -79,37 +75,43 @@ int main(int argc, char* argv[]) {
 //                                       &cloneset_vdj,
 //                                       vdj_single_genes,
 //                                       VDJ_RECOMB,
-//                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+//                                       AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
 //                                                              AlignmentColumnOptions::OVERWRITE,
-//                                                              AlignmentColumnOptions::OVERWRITE),
-//                                       VDJAlignerParameters(3)))
+//                                                              AlignmentColumnOptions::REALIGN_PROVIDED),
+//                                       vdj_aligner_parameters_nuc))
 
     //
     // VJ MAAG
     //
+    vector<prob_t> vec;
     ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA", EMPTY);
-//    YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS))
-//    YMIR_BENCHMARK("VJ prob", vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS))
-
+    YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS, false))
+    YMIR_BENCHMARK("VJ prob", vec = vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS, SUM_PROBABILITY, false))
+    std::cout << loglikelihood(vec) << std::endl;
 
     //
     // VDJ MAAG
     //
 //    ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
-
-//    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS))
-//    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS))
-
+//    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS, false))
+//    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS, SUM_PROBABILITY, false))
 
     //
     // VJ inference
     //
+    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file_nonc,
+                        &cloneset_vj_noncoding,
+                        vj_single_genes,
+                        VJ_RECOMB,
+                        AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
+                                               AlignmentColumnOptions::REALIGN_PROVIDED),
+                        vdj_aligner_parameters_nuc);
+
     YMIR_BENCHMARK("VJ EM",
                    logLvec = EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
                                                                 EMAlgorithm::AlgorithmParameters()
-                                                                        .set("niter", 15)
-                                                                        .set("sample", 5000),
-                                                                COMPUTE_ERRORS))
+                                                                        .set("niter", 30),
+                                                                NO_ERRORS))
 //
 //    YMIR_BENCHMARK("VJ SG",
 //                   logLvec = SGAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
@@ -127,11 +129,19 @@ int main(int argc, char* argv[]) {
     //
     // VDJ inference
     //
+//    parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file_nonc,
+//                        &cloneset_vdj_noncoding,
+//                        vdj_single_genes,
+//                        VDJ_RECOMB,
+//                        AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
+//                                               AlignmentColumnOptions::OVERWRITE,
+//                                               AlignmentColumnOptions::REALIGN_PROVIDED),
+//                        vdj_aligner_parameters_nuc)
+
 //    YMIR_BENCHMARK("VDJ EM",
 //                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
 //                                                      EMAlgorithm::AlgorithmParameters()
-//                                                              .set("niter", 10)
-//                                                              .set("sample", 100000),
+//                                                              .set("niter", 30)
 //                                                                NO_ERRORS))
 //
 //    YMIR_BENCHMARK("VDJ SG",

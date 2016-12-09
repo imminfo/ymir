@@ -318,7 +318,7 @@ namespace ymir {
 
 
     MAAGnuc MAAGBuilder::build(const ClonotypeNuc &clonotype, MetadataMode metadata_mode, ErrorMode error_mode) const {
-        assert(clonotype.is_good());
+//        assert(clonotype.is_good());
 
         if (clonotype.is_good()) {
             ProbMMC probs;

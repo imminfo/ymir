@@ -107,15 +107,13 @@ namespace ymir {
          * \return Vector of full assembling probabilities.
          */
         ///@{
-        vector<prob_t> computeFullProbabilities(const ClonesetViewNuc& repertoire,
-                                                ErrorMode error_mode,
-                                                MAAGComputeProbAction action = SUM_PROBABILITY) const {
-            return _builder->buildAndCompute(repertoire, error_mode, action);
+        vector<prob_t> computeFullProbabilities(const ClonesetViewNuc& repertoire, ErrorMode error_mode,
+                                                MAAGComputeProbAction action = SUM_PROBABILITY, bool verbose = true) const {
+            return _builder->buildAndCompute(repertoire, error_mode, action, verbose);
         }
 
-        vector<prob_t> computeFullProbabilities(const ClonesetViewAA& repertoire,
-                                                MAAGComputeProbAction action = SUM_PROBABILITY) const {
-            return _builder->buildAndCompute(repertoire, action);
+        vector<prob_t> computeFullProbabilities(const ClonesetViewAA& repertoire, bool verbose = true) const {
+            return _builder->buildAndCompute(repertoire, verbose);
         }
         ///@}
 

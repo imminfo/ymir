@@ -94,7 +94,7 @@ namespace ymir {
                     cout << endl << "Iteration:\t1 / " << (size_t) algo_param["niter"].asUInt() << endl;
                 } else {
                     cout << endl << "Iteration:\t" << (size_t) iter << " / " << (size_t) algo_param["niter"].asUInt()
-                    << " ETA: " << est_time(tp1, algo_param["niter"].asUInt(), iter)
+                    << print_time(tp1, algo_param["niter"].asUInt(), iter)
                     << endl;
                 }
 

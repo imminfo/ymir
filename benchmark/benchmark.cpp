@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
                         AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
                                                AlignmentColumnOptions::OVERWRITE,
                                                AlignmentColumnOptions::REALIGN_PROVIDED),
-                        vdj_aligner_parameters_nuc)
+                        vdj_aligner_parameters_nuc);
 
     YMIR_BENCHMARK("VDJ EM",
                    logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,

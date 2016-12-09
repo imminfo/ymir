@@ -30,14 +30,14 @@ int main(int argc, char* argv[]) {
 
 
     string input_alpha_file = "alpha.full.500k.txt", input_alpha_file_nonc = "alpha.noncoding.100k.txt";
-    string input_beta_file = "beta.noncoding.100k.txt", input_beta_file_nonc = "beta.noncoding.100k.txt";
+    string input_beta_file = "beta.noncoding.500k.txt", input_beta_file_nonc = "beta.noncoding.100k.txt";
 
 
     auto vdj_aligner_parameters_nuc = VDJAlignerParameters(3,
                                                            VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
                                                                                   AlignmentEventScore(1, -1, 1),
                                                                                   AlignmentEventScore(1, -1, 1)),
-                                                           VDJAlignmentScoreThreshold(4, 3, 4));
+                                                           VDJAlignmentScoreThreshold(2, 3, 2));
 
     ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
@@ -69,16 +69,15 @@ int main(int argc, char* argv[]) {
                                     "Dgene",
                                     BENCH_DATA_FOLDER + "trbd.txt");
 
-//    ClonesetNuc cloneset_vdj;
-//    YMIR_BENCHMARK("Parsing VDJ",
-//                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
-//                                       &cloneset_vdj,
-//                                       vdj_single_genes,
-//                                       VDJ_RECOMB,
-//                                       AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
-//                                                              AlignmentColumnOptions::OVERWRITE,
-//                                                              AlignmentColumnOptions::REALIGN_PROVIDED),
-//                                       vdj_aligner_parameters_nuc))
+    YMIR_BENCHMARK("Parsing VDJ",
+                   parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
+                                       &cloneset_vdj,
+                                       vdj_single_genes,
+                                       VDJ_RECOMB,
+                                       AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
+                                                              AlignmentColumnOptions::OVERWRITE,
+                                                              AlignmentColumnOptions::REALIGN_PROVIDED),
+                                       vdj_aligner_parameters_nuc))
 
     //
     // VJ MAAG
@@ -92,9 +91,9 @@ int main(int argc, char* argv[]) {
     //
     // VDJ MAAG
     //
-//    ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
-//    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS, false))
-//    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS, SUM_PROBABILITY, false))
+    ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
+    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS, false))
+    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS, SUM_PROBABILITY, false))
 
     //
     // VJ inference
@@ -129,20 +128,20 @@ int main(int argc, char* argv[]) {
     //
     // VDJ inference
     //
-//    parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file_nonc,
-//                        &cloneset_vdj_noncoding,
-//                        vdj_single_genes,
-//                        VDJ_RECOMB,
-//                        AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
-//                                               AlignmentColumnOptions::OVERWRITE,
-//                                               AlignmentColumnOptions::REALIGN_PROVIDED),
-//                        vdj_aligner_parameters_nuc)
+    parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file_nonc,
+                        &cloneset_vdj_noncoding,
+                        vdj_single_genes,
+                        VDJ_RECOMB,
+                        AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
+                                               AlignmentColumnOptions::OVERWRITE,
+                                               AlignmentColumnOptions::REALIGN_PROVIDED),
+                        vdj_aligner_parameters_nuc)
 
-//    YMIR_BENCHMARK("VDJ EM",
-//                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
-//                                                      EMAlgorithm::AlgorithmParameters()
-//                                                              .set("niter", 30)
-//                                                                NO_ERRORS))
+    YMIR_BENCHMARK("VDJ EM",
+                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
+                                                      EMAlgorithm::AlgorithmParameters()
+                                                              .set("niter", 30)
+                                                                NO_ERRORS))
 //
 //    YMIR_BENCHMARK("VDJ SG",
 //                   logLvec = SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,

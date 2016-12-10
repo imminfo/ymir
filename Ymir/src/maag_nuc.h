@@ -162,75 +162,75 @@ namespace ymir {
             if (_recomb != VDJ_RECOMB) { return 0; }
 #endif
 //             P(Vi) * P(#dels | Vi) * P(V-D3' insertion seq) * P(D5'-D3' deletions | Di) * P(D5'-J insertion seq) * P(#dels | Ji) * P(Ji & Di)
-//            return (matrix(0, v_index) *      // P(Vi)
-//                    matrix(1, v_index) *     // P(#dels | Vi)
-//                    matrix(2, 0)).sum()      ;     // P(V-D3' insertion seq)
-//                    matrix(3, d_index)*      // P(D5'-D3' deletions | Di)
-//                    matrix(4, 0) *            // P(D5'-J insertion seq)
-//                    matrix(5, j_index) *      // P(#dels | Ji)
-//                    matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
+            return (matrix(0, v_index) *      // P(Vi)
+                    matrix(1, v_index) *     // P(#dels | Vi)
+                    matrix(2, 0) *           // P(V-D3' insertion seq)
+                    matrix(3, d_index)*      // P(D5'-D3' deletions | Di)
+                    matrix(4, 0) *            // P(D5'-J insertion seq)
+                    matrix(5, j_index) *      // P(#dels | Ji)
+                    matrix(6, 0)(j_index, d_index))(0, 0);  // P(Ji & Di)
 
 
-            dim_t max_dim = std::max(std::max(this->nodeRows(2), this->nodeColumns(2)),
-                                     std::max(this->nodeRows(4), this->nodeColumns(4)));
-
-            std::vector<prob_t> arr_prob1(max_dim);
-            std::vector<prob_t> arr_prob2(max_dim);
-
-            // V gene + V deletions
-            arr_prob1[0] = this->at(0, v_index, 0, 0);
-            for (dim_t i = 0; i < this->cols(1); ++i) {
-                arr_prob2[i] = arr_prob1[0] * this->at(1, v_index, 0, i);
-            }
-
-            std::fill(arr_prob1.begin(), arr_prob1.end(), 0);
-
-            // VD insertions
-            for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
-                for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
-                    arr_prob1[col_i] += this->at(2, 0, row_i, col_i) * arr_prob2[row_i];
-                }
-            }
-
-//            std::cout << "===" << std::endl;
-//            for (int i = 0; i < arr_prob2.size(); ++i) {
-//                std::cout << arr_prob2[i] << std::endl;
+//            dim_t max_dim = std::max(std::max(this->nodeRows(2), this->nodeColumns(2)),
+//                                     std::max(this->nodeRows(4), this->nodeColumns(4)));
+//
+//            std::vector<prob_t> arr_prob1(max_dim);
+//            std::vector<prob_t> arr_prob2(max_dim);
+//
+//            // V gene + V deletions
+//            arr_prob1[0] = this->at(0, v_index, 0, 0);
+//            for (dim_t i = 0; i < this->cols(1); ++i) {
+//                arr_prob2[i] = arr_prob1[0] * this->at(1, v_index, 0, i);
 //            }
-//            std::cout << "===" << std::endl;
-
-//            std::cout << "===" << std::endl;
-//            for (int i = 0; i < arr_prob1.size(); ++i) {
-//                std::cout << arr_prob1[i] << std::endl;
+//
+//            std::fill(arr_prob1.begin(), arr_prob1.end(), 0);
+//
+//            // VD insertions
+//            for (dim_t row_i = 0; row_i < this->nodeRows(2); ++row_i) {
+//                for (dim_t col_i = 0; col_i < this->nodeColumns(2); ++col_i) {
+//                    arr_prob1[col_i] += this->at(2, 0, row_i, col_i) * arr_prob2[row_i];
+//                }
 //            }
-//            std::cout << "===" << std::endl;
+//
+////            std::cout << "===" << std::endl;
+////            for (int i = 0; i < arr_prob2.size(); ++i) {
+////                std::cout << arr_prob2[i] << std::endl;
+////            }
+////            std::cout << "===" << std::endl;
+//
+////            std::cout << "===" << std::endl;
+////            for (int i = 0; i < arr_prob1.size(); ++i) {
+////                std::cout << arr_prob1[i] << std::endl;
+////            }
+////            std::cout << "===" << std::endl;
+////            std::fill(arr_prob2.begin(), arr_prob2.end(), 0);
+//
+////            return std::accumulate(arr_prob1.begin(), arr_prob1.end(), .0);
+//
+//            // D deletions
+//            for (dim_t row_i = 0; row_i < this->nodeRows(3); ++row_i) {
+//                for (dim_t col_i = 0; col_i < this->nodeColumns(3); ++col_i) {
+//                    arr_prob2[col_i] += arr_prob1[row_i] * this->at(3, d_index, row_i, col_i);
+//                }
+//            }
+//
+//            std::fill(arr_prob1.begin(), arr_prob1.end(), 0);
+//
+//            // DJ insertions
+//            for (dim_t row_i = 0; row_i < this->nodeRows(4); ++row_i) {
+//                for (dim_t col_i = 0; col_i < this->nodeColumns(4); ++col_i) {
+//                    arr_prob1[col_i] += this->at(4, 0, row_i, col_i) * arr_prob2[row_i];
+//                }
+//            }
+//
 //            std::fill(arr_prob2.begin(), arr_prob2.end(), 0);
-
-//            return std::accumulate(arr_prob1.begin(), arr_prob1.end(), .0);
-
-            // D deletions
-            for (dim_t row_i = 0; row_i < this->nodeRows(3); ++row_i) {
-                for (dim_t col_i = 0; col_i < this->nodeColumns(3); ++col_i) {
-                    arr_prob2[col_i] += arr_prob1[row_i] * this->at(3, d_index, row_i, col_i);
-                }
-            }
-
-            std::fill(arr_prob1.begin(), arr_prob1.end(), 0);
-
-            // DJ insertions
-            for (dim_t row_i = 0; row_i < this->nodeRows(4); ++row_i) {
-                for (dim_t col_i = 0; col_i < this->nodeColumns(4); ++col_i) {
-                    arr_prob1[col_i] += this->at(4, 0, row_i, col_i) * arr_prob2[row_i];
-                }
-            }
-
-            std::fill(arr_prob2.begin(), arr_prob2.end(), 0);
-
-            arr_prob2[0] = 0;
-            for (dim_t i = 0; i < this->nodeRows(5); ++i) {
-                arr_prob2[0] += arr_prob1[i] * this->at(5, j_index, i, 0);
-            }
-
-            return arr_prob2[0] * this->at(6, 0, j_index, d_index);
+//
+//            arr_prob2[0] = 0;
+//            for (dim_t i = 0; i < this->nodeRows(5); ++i) {
+//                arr_prob2[0] += arr_prob1[i] * this->at(5, j_index, i, 0);
+//            }
+//
+//            return arr_prob2[0] * this->at(6, 0, j_index, d_index);
         }
 
         prob_t fullProbability(MAAGComputeProbAction action = SUM_PROBABILITY) const {

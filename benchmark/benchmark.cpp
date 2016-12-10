@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
                                                            VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
                                                                                   AlignmentEventScore(1, -1, 1),
                                                                                   AlignmentEventScore(1, -1, 1)),
-                                                           VDJAlignmentScoreThreshold(2, 3, 2));
+                                                           VDJAlignmentScoreThreshold(6, 3, 5));
 
     ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
@@ -55,8 +55,8 @@ int main(int argc, char* argv[]) {
                                        &cloneset_vj,
                                        vj_single_genes,
                                        VJ_RECOMB,
-                                       AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
-                                                              AlignmentColumnOptions::REALIGN_PROVIDED),
+                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+                                                              AlignmentColumnOptions::OVERWRITE),
                                        vdj_aligner_parameters_nuc))
 
     //
@@ -74,9 +74,9 @@ int main(int argc, char* argv[]) {
                                        &cloneset_vdj,
                                        vdj_single_genes,
                                        VDJ_RECOMB,
-                                       AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
+                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
                                                               AlignmentColumnOptions::OVERWRITE,
-                                                              AlignmentColumnOptions::REALIGN_PROVIDED),
+                                                              AlignmentColumnOptions::OVERWRITE),
                                        vdj_aligner_parameters_nuc))
 
     //

@@ -102,8 +102,8 @@ int main(int argc, char* argv[]) {
                         &cloneset_vj_noncoding,
                         vj_single_genes,
                         VJ_RECOMB,
-                        AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
-                                               AlignmentColumnOptions::REALIGN_PROVIDED),
+                        AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+                                               AlignmentColumnOptions::OVERWRITE),
                         vdj_aligner_parameters_nuc);
 
     YMIR_BENCHMARK("VJ EM",
@@ -132,9 +132,9 @@ int main(int argc, char* argv[]) {
                         &cloneset_vdj_noncoding,
                         vdj_single_genes,
                         VDJ_RECOMB,
-                        AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
+                        AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
                                                AlignmentColumnOptions::OVERWRITE,
-                                               AlignmentColumnOptions::REALIGN_PROVIDED),
+                                               AlignmentColumnOptions::OVERWRITE),
                         vdj_aligner_parameters_nuc);
 
     YMIR_BENCHMARK("VDJ EM",

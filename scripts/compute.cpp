@@ -93,7 +93,8 @@ int main(int argc, char* argv[]) {
                 noncoding_indices = CDR3AminoAcidAligner(model.gene_segments(), vdj_aligner_parameters_aa).toAminoAcid(cloneset, &cloneset_aa, true);
                 std::cout << "Done." << std::endl << std::endl;
 
-                coding_probs = model.computeFullProbabilities(cloneset_aa);
+//                coding_probs = model.computeFullProbabilities(cloneset_aa);
+                model.buildGraphs(cloneset_aa);
             }
 
             std::ofstream ofs;

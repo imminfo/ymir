@@ -39,45 +39,66 @@ int main(int argc, char* argv[]) {
                                                                                   AlignmentEventScore(1, -1, 1)),
                                                            VDJAlignmentScoreThreshold(6, 3, 5));
 
+    VDJRecombinationGenes vj_single_genes("Vgene",
+                                          BENCH_DATA_FOLDER + "trav.txt",
+                                          "Jgene",
+                                          BENCH_DATA_FOLDER + "traj.txt");
+
+    VDJRecombinationGenes vdj_single_genes("Vgene",
+                                           BENCH_DATA_FOLDER + "trbv.txt",
+                                           "Jgene",
+                                           BENCH_DATA_FOLDER + "trbj.txt",
+                                           "Dgene",
+                                           BENCH_DATA_FOLDER + "trbd.txt");
+
     ParserNuc parser(new NaiveCDR3NucleotideAligner());
+
+
+//    auto align_col_options = AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
+//                                                    AlignmentColumnOptions::OVERWRITE,
+//                                                    AlignmentColumnOptions::REALIGN_PROVIDED);
+
+
+    auto align_col_options = AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+                                                    AlignmentColumnOptions::OVERWRITE,
+                                                    AlignmentColumnOptions::OVERWRITE);
 
 
     //
     // TCR alpha chain repertoire - VJ recombination
     //
-    VDJRecombinationGenes vj_single_genes("Vgene",
-                                   BENCH_DATA_FOLDER + "trav.txt",
-                                   "Jgene",
-                                   BENCH_DATA_FOLDER + "traj.txt");
-
     YMIR_BENCHMARK("Parsing VJ",
                    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file,
                                        &cloneset_vj,
                                        vj_single_genes,
                                        VJ_RECOMB,
-                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
-                                                              AlignmentColumnOptions::OVERWRITE),
+                                       align_col_options,
                                        vdj_aligner_parameters_nuc))
+
+    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file_nonc,
+                        &cloneset_vj_noncoding,
+                        vj_single_genes,
+                        VJ_RECOMB,
+                        align_col_options,
+                        vdj_aligner_parameters_nuc);
 
     //
     // TCR beta chain repertoire - VDJ recombination
     //
-    VDJRecombinationGenes vdj_single_genes("Vgene",
-                                    BENCH_DATA_FOLDER + "trbv.txt",
-                                    "Jgene",
-                                    BENCH_DATA_FOLDER + "trbj.txt",
-                                    "Dgene",
-                                    BENCH_DATA_FOLDER + "trbd.txt");
-
     YMIR_BENCHMARK("Parsing VDJ",
                    parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
                                        &cloneset_vdj,
                                        vdj_single_genes,
                                        VDJ_RECOMB,
-                                       AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
-                                                              AlignmentColumnOptions::OVERWRITE,
-                                                              AlignmentColumnOptions::OVERWRITE),
+                                       align_col_options,
                                        vdj_aligner_parameters_nuc))
+
+    parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file_nonc,
+                        &cloneset_vdj_noncoding,
+                        vdj_single_genes,
+                        VDJ_RECOMB,
+                        align_col_options,
+                        vdj_aligner_parameters_nuc);
 
     //
     // VJ MAAG
@@ -98,62 +119,20 @@ int main(int argc, char* argv[]) {
     //
     // VJ inference
     //
-    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file_nonc,
-                        &cloneset_vj_noncoding,
-                        vj_single_genes,
-                        VJ_RECOMB,
-                        AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
-                                               AlignmentColumnOptions::OVERWRITE),
-                        vdj_aligner_parameters_nuc);
-
     YMIR_BENCHMARK("VJ EM",
-                   logLvec = EMAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
+                   logLvec = EMAlgorithm().statisticalInference(cloneset_vj_noncoding, vj_single_model,
                                                                 EMAlgorithm::AlgorithmParameters()
                                                                         .set("niter", 30),
                                                                 NO_ERRORS))
-//
-//    YMIR_BENCHMARK("VJ SG",
-//                   logLvec = SGAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
-//                                                                SGAlgorithm::AlgorithmParameters()
-//                                                                        .set("niter", 10)
-//                                                                        .set("block.size", 5000)
-//                                                                        .set("alpha", .7)
-//                                                                        .set("beta", 1.)
-//                                                                        .set("K", 2.)
-//                                                                        .set("prebuild", false)
-//                                                                        .set("sample", 100000),
-//                                                                NO_ERRORS))
-
 
     //
     // VDJ inference
     //
-    parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file_nonc,
-                        &cloneset_vdj_noncoding,
-                        vdj_single_genes,
-                        VDJ_RECOMB,
-                        AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
-                                               AlignmentColumnOptions::OVERWRITE,
-                                               AlignmentColumnOptions::OVERWRITE),
-                        vdj_aligner_parameters_nuc);
-
     YMIR_BENCHMARK("VDJ EM",
-                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
-                                                      EMAlgorithm::AlgorithmParameters()
-                                                              .set("niter", 30),
+                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj_noncoding, vdj_single_model,
+                                                                EMAlgorithm::AlgorithmParameters()
+                                                                        .set("niter", 30),
                                                                 NO_ERRORS))
-//
-//    YMIR_BENCHMARK("VDJ SG",
-//                   logLvec = SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
-//                                                      SGAlgorithm::AlgorithmParameters()
-//                                                              .set("niter", 10)
-//                                                              .set("block.size", 5000)
-//                                                              .set("alpha", .7)
-//                                                              .set("beta", 1.)
-//                                                              .set("K", 2.)
-//                                                              .set("prebuild", false)
-//                                                              .set("sample", 100000),
-//                                                                NO_ERRORS))
 
     //
     // Results
@@ -171,3 +150,30 @@ int main(int argc, char* argv[]) {
 }
 
 #endif //_BENCHMARK_H_
+
+
+
+//
+//    YMIR_BENCHMARK("VJ SG",
+//                   logLvec = SGAlgorithm().statisticalInference(cloneset_vj, vj_single_model,
+//                                                                SGAlgorithm::AlgorithmParameters()
+//                                                                        .set("niter", 10)
+//                                                                        .set("block.size", 5000)
+//                                                                        .set("alpha", .7)
+//                                                                        .set("beta", 1.)
+//                                                                        .set("K", 2.)
+//                                                                        .set("prebuild", false)
+//                                                                        .set("sample", 100000),
+//                                                                NO_ERRORS))
+//
+//    YMIR_BENCHMARK("VDJ SG",
+//                   logLvec = SGAlgorithm().statisticalInference(cloneset_vdj, vdj_single_model,
+//                                                      SGAlgorithm::AlgorithmParameters()
+//                                                              .set("niter", 10)
+//                                                              .set("block.size", 5000)
+//                                                              .set("alpha", .7)
+//                                                              .set("beta", 1.)
+//                                                              .set("K", 2.)
+//                                                              .set("prebuild", false)
+//                                                              .set("sample", 100000),
+//                                                                NO_ERRORS))

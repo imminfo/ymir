@@ -60,11 +60,11 @@ int main(int argc, char* argv[]) {
                                                                                       AlignmentEventScore(1, -1, 1)),
                                                                VDJAlignmentScoreThreshold(2, 3, 2));
 
-//        auto vdj_aligner_parameters_aa =  VDJAlignerParameters(3,
-//                                                               VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
-//                                                                                      AlignmentEventScore(1, -1, 1),
-//                                                                                      AlignmentEventScore(1, -1, 1)),
-//                                                               VDJAlignmentScoreThreshold(1, 1, 1));
+        auto vdj_aligner_parameters_aa =  VDJAlignerParameters(3,
+                                                               VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
+                                                                                      AlignmentEventScore(1, -1, 1),
+                                                                                      AlignmentEventScore(1, -1, 1)),
+                                                               VDJAlignmentScoreThreshold(1, 1, 1));
 
         if (parser.openAndParse(in_file_path,
                                 &cloneset,

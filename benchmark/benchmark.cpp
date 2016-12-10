@@ -54,14 +54,14 @@ int main(int argc, char* argv[]) {
     ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
 
-//    auto align_col_options = AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
-//                                                    AlignmentColumnOptions::OVERWRITE,
-//                                                    AlignmentColumnOptions::REALIGN_PROVIDED);
-
-
-    auto align_col_options = AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+    auto align_col_options = AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
                                                     AlignmentColumnOptions::OVERWRITE,
-                                                    AlignmentColumnOptions::OVERWRITE);
+                                                    AlignmentColumnOptions::REALIGN_PROVIDED);
+
+
+//    auto align_col_options = AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+//                                                    AlignmentColumnOptions::OVERWRITE,
+//                                                    AlignmentColumnOptions::OVERWRITE);
 
 
     //
@@ -105,9 +105,9 @@ int main(int argc, char* argv[]) {
     //
     vector<prob_t> vec;
     ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA", EMPTY);
-    YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS, false))
-    YMIR_BENCHMARK("VJ prob", vec = vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS, SUM_PROBABILITY, false))
-    std::cout << loglikelihood(vec) << std::endl;
+//    YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS, false))
+//    YMIR_BENCHMARK("VJ prob", vec = vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS, SUM_PROBABILITY, false))
+//    std::cout << loglikelihood(vec) << std::endl;
 
     //
     // VDJ MAAG
@@ -119,11 +119,11 @@ int main(int argc, char* argv[]) {
     //
     // VJ inference
     //
-    YMIR_BENCHMARK("VJ EM",
-                   logLvec = EMAlgorithm().statisticalInference(cloneset_vj_noncoding, vj_single_model,
-                                                                EMAlgorithm::AlgorithmParameters()
-                                                                        .set("niter", 30),
-                                                                NO_ERRORS))
+//    YMIR_BENCHMARK("VJ EM",
+//                   logLvec = EMAlgorithm().statisticalInference(cloneset_vj_noncoding, vj_single_model,
+//                                                                EMAlgorithm::AlgorithmParameters()
+//                                                                        .set("niter", 30),
+//                                                                NO_ERRORS))
 
     //
     // VDJ inference

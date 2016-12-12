@@ -50,15 +50,15 @@ int main(int argc, char* argv[]) {
         ParserNuc parser(new NaiveCDR3NucleotideAligner(model.gene_segments(), VDJAlignerParameters(3)));
         ClonesetNuc cloneset;
 
-        auto alignment_column_options = AlignmentColumnOptions(AlignmentColumnOptions::REALIGN_PROVIDED,
+        auto alignment_column_options = AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
                                                                AlignmentColumnOptions::OVERWRITE,
-                                                               AlignmentColumnOptions::REALIGN_PROVIDED);
+                                                               AlignmentColumnOptions::OVERWRITE);
 
         auto vdj_aligner_parameters_nuc = VDJAlignerParameters(3,
                                                                VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
                                                                                       AlignmentEventScore(1, -1, 1),
                                                                                       AlignmentEventScore(1, -1, 1)),
-                                                               VDJAlignmentScoreThreshold(1, 3, 1));
+                                                               VDJAlignmentScoreThreshold(6, 3, 5));
 
         auto vdj_aligner_parameters_aa =  VDJAlignerParameters(3,
                                                                VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),

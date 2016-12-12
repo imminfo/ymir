@@ -178,7 +178,8 @@ namespace ymir {
             codon_hash left_codon, right_codon, prev_codon;
             size_t left_pos, right_pos;
             int insertion_len;
-            dim_t max_dim = std::max(this->rows(2), std::max(this->cols(2), this->cols(3)));
+            dim_t max_dim = std::max(std::max(this->nodeRows(2), this->nodeColumns(2)),
+                                     std::max(this->nodeRows(4), this->nodeColumns(4)));
 
             std::vector<prob_t> arr_prob1(max_dim);
             std::vector<prob_t> arr_prob2(max_dim);
@@ -190,7 +191,7 @@ namespace ymir {
             }
 
             std::fill(arr_prob1.begin(), arr_prob1.end(), 0);
-            arr_prob1.resize(this->rows(3) * this->cols(3), 0);
+            arr_prob1.resize(std::max(arr_prob1.size(), (size_t) (this->rows(3) * this->cols(3))), 0);
 
             // VD insertions + D deletions
             for (dim_t row_i = 0; row_i < this->rows(2); ++row_i) {
@@ -237,11 +238,27 @@ namespace ymir {
                                                                            right_codon,
                                                                            prev_codon);
 
-                            arr_prob1[col_i * this->cols(3) + d_col_i] += prob_val * arr_prob2[row_i] * this->at(3, d_index, col_i, d_col_i);
+                            // problems with multiplication by .25?
+//                            std::cout << arr_prob1[col_i * this->cols(3) + d_col_i] << " -> ";
+                            arr_prob1[col_i * this->cols(3) + d_col_i] += prob_val * arr_prob2[row_i];// * this->at(3, d_index, col_i, d_col_i);
+//                            std::cout << arr_prob1[col_i * this->cols(3) + d_col_i] << std::endl;
                         }
                     }
                 }
             }
+
+//            std::cout << "***" << std::endl;
+//            for (int i = 0; i < arr_prob2.size(); ++i) {
+//                std::cout << arr_prob2[i] << std::endl;
+//            }
+//            std::cout << "***" << std::endl;
+//
+//            std::cout << "***" << std::endl;
+//            for (int i = 0; i < arr_prob1.size(); ++i) {
+//                std::cout << arr_prob1[i] << std::endl;
+//            }
+//            std::cout << "***" << std::endl;
+//            return std::accumulate(arr_prob1.begin(), arr_prob1.end(), .0);
 
             std::fill(arr_prob2.begin(), arr_prob2.end(), 0);
 

@@ -48,13 +48,20 @@ int main(int argc, char* argv[]) {
         ParserNuc parser(new CDR3NucleotideAligner());
         ClonesetNuc cloneset;
 
+        auto vdj_aligner_parameters_nuc = VDJAlignerParameters(3,
+                                                               VDJAlignmentEventScore(AlignmentEventScore(1, -1, 1),
+                                                                                      AlignmentEventScore(1, -1, 1),
+                                                                                      AlignmentEventScore(1, -1, 1)),
+                                                               VDJAlignmentScoreThreshold(6, 3, 5));
+
         if (parser.openAndParse( in_file_path,
                                  &cloneset,
                                  model.gene_segments(),
                                  model.recombination(),
                                  AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
                                                         AlignmentColumnOptions::OVERWRITE,
-                                                        AlignmentColumnOptions::OVERWRITE))) {
+                                                        AlignmentColumnOptions::OVERWRITE), 
+                                 vdj_aligner_parameters_nuc)) {
 
             std::cout << std::endl;
             infer_algo->statisticalInference(cloneset, model, params);

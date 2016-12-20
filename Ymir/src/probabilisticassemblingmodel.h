@@ -100,13 +100,20 @@ namespace ymir {
          * or the max full probability will be chosen.
          *
          * \param repertoire Repertoire with alignments and event indices.
-         * \param aminoacid What probabilities will be computed - of nucleotide or amino acid sequences. If
-         * this parameter is false and some clone will have amino acid sequence, than error message will be generated to the output
-         * and probability of this clone will set to zero.
          *
          * \return Vector of full assembling probabilities.
          */
         ///@{
+        prob_t computeFullProbabilities(const ClonotypeNuc& clonotype,
+                                        ErrorMode error_mode,
+                                        MAAGComputeProbAction action = SUM_PROBABILITY) const {
+            return _builder->buildAndCompute(clonotype, error_mode, action);
+        }
+
+        prob_t computeFullProbabilities(const ClonotypeAA& clonotype) const {
+            return _builder->buildAndCompute(clonotype);
+        }
+
         vector<prob_t> computeFullProbabilities(const ClonesetViewNuc& repertoire, ErrorMode error_mode,
                                                 MAAGComputeProbAction action = SUM_PROBABILITY, bool verbose = true) const {
             return _builder->buildAndCompute(repertoire, error_mode, action, verbose);
@@ -128,6 +135,25 @@ namespace ymir {
          * \return Set of MAAGs.
          */
         ///@{
+        MAAGnuc buildGraphs(const ClonotypeNuc &clonotype, MetadataMode save_metadata,
+                            ErrorMode error_mode) const {
+#ifndef DNDEBUG
+            if (!_status) {
+                throw(std::runtime_error("Can't build graphs due to a model's failed status!"));
+            }
+#endif
+            return _builder->build(clonotype, save_metadata, error_mode);
+        }
+
+        MAAGaa buildGraphs(const ClonotypeAA &clonotype) const {
+#ifndef DNDEBUG
+            if (!_status) {
+                throw(std::runtime_error("Can't build graphs due to a model's failed status!"));
+            }
+#endif
+            return _builder->build(clonotype);
+        }
+
         MAAGNucRepertoire buildGraphs(const ClonesetViewNuc &repertoire, MetadataMode save_metadata,
                                       ErrorMode error_mode, bool verbose = true) const {
 #ifndef DNDEBUG

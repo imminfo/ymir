@@ -91,27 +91,35 @@ namespace ymir {
 
 
         void filterOut(const ClonesetViewNuc &rep_nonc,
+                       ProbabilisticAssemblingModel &model,
                        const MAAGNucRepertoire &maag_rep,
                        vector<prob_t> &prob_vec,
                        vector<bool> &good_clonotypes,
                        size_t &removed,
                        size_t &zero_prob,
-                       size_t &no_alignments) const
+                       size_t &no_alignments,
+                       ErrorMode error_mode,
+                       bool memory_safe) const
         {
-            good_clonotypes.resize(maag_rep.size(), true);
-            prob_vec.resize(maag_rep.size(), 0);
+            good_clonotypes.resize(rep_nonc.size(), true);
+            prob_vec.resize(rep_nonc.size(), 0);
             removed = 0;
             zero_prob = 0;
             no_alignments = 0;
 
+            if (!memory_safe) {
+                cout << "Computing full assembling probabilities..." << endl;
 #ifdef USE_OMP
 #pragma omp parallel for
 #endif
-            for (size_t i = 0; i < maag_rep.size(); ++i) {
-                prob_vec[i] = maag_rep[i].fullProbability();
+                for (size_t i = 0; i < maag_rep.size(); ++i) {
+                    prob_vec[i] = maag_rep[i].fullProbability();
+                }
+            } else {
+                prob_vec = model.computeFullProbabilities(rep_nonc, error_mode);
             }
 
-            for (size_t i = 0; i < maag_rep.size(); ++i) {
+            for (size_t i = 0; i < rep_nonc.size(); ++i) {
                 if (rep_nonc[i].is_good()) {
                     if (std::isnan(prob_vec[i]) || (std::abs(prob_vec[i]) < 1e-80) || (std::abs(prob_vec[i]) >= 1)) {
                         good_clonotypes[i] = false;

@@ -28,7 +28,7 @@ namespace ymir {
          */
         virtual std::vector<prob_t> statisticalInference(const ClonesetViewNuc &repertoire,
                                                          ProbabilisticAssemblingModel &model,
-                                                         const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10).set("sample", 50000),
+                                                         const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10).set("sample", 50000).set("memory-safe", false),
                                                          ErrorMode error_mode = NO_ERRORS) const {
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
             cout << "\tMurugan EM-algorithm.";
@@ -37,7 +37,7 @@ namespace ymir {
             }
             std::cout << std::endl;
 
-            if (!algo_param.check("niter") && !algo_param.check("sample")) {
+            if (!algo_param.check("niter") && !algo_param.check("sample") && !algo_param.check("memory-safe")) {
                 return std::vector<prob_t>();
             }
 
@@ -51,6 +51,16 @@ namespace ymir {
                           << (int) sample
                           << std::endl;
             }
+
+            bool memory_safe = algo_param["memory-safe"].asBool();
+            if (memory_safe) {
+                std::cout << "\tworking in the memory-safe mode: rebuild graphs at each step"
+                          << std::endl;
+            } else {
+                std::cout << "\tworking in the speed-wise mode: build graphs only once"
+                          << std::endl;
+            }
+
             ClonesetViewNuc rep_nonc = repertoire.noncoding();
             cout << "Number of noncoding clonotypes:\t" << (size_t) rep_nonc.size() << endl;
 
@@ -70,16 +80,19 @@ namespace ymir {
             new_param_vec.normaliseEventFamilies();
             model.updateModelParameterVector(new_param_vec);
 
-            MAAGNucRepertoire maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, true);
+            MAAGNucRepertoire maag_rep;
+
+            if (!memory_safe) {
+                maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, true);
+            }
 
             vector<prob_t> prob_vec;
 
             prob_t prev_ll = 0, cur_ll = 0;
 
-            cout << "Computing full assembling probabilities..." << endl;
             vector<bool> good_clonotypes;
             size_t removed, zero_prob, no_alignments;
-            this->filterOut(rep_nonc, maag_rep, prob_vec, good_clonotypes, removed, zero_prob, no_alignments);
+            this->filterOut(rep_nonc, model, maag_rep, prob_vec, good_clonotypes, removed, zero_prob, no_alignments, error_mode, memory_safe);
 
             cout << endl << "Initial data summary:" << endl;
             prob_summary(prob_vec);
@@ -100,58 +113,120 @@ namespace ymir {
 
                 new_param_vec.fill(0);
 
+
+                //
+                // Memory safe inference - rebuild MAAGs at each step
+                //
+                if (memory_safe) {
 #ifdef USE_OMP
-                std::cout << "Infer parameters..." << std::endl;
+                    std::cout << "Infer parameters..." << std::endl;
 
-                auto max_thrs = omp_get_max_threads();
+                    auto max_thrs = omp_get_max_threads();
 
-                std::vector<size_t> blocks;
-                size_t block_step = std::min(maag_rep.size() / max_thrs + 1, maag_rep.size());
-                blocks.push_back(0);
-                blocks.push_back(block_step);
-                for (auto i = 1; i < max_thrs; ++i) {
-                    blocks.push_back(*--blocks.end());
-                    blocks.push_back(std::min(*--blocks.end() + block_step, maag_rep.size()));
-                }
+                    std::vector<size_t> blocks;
+                    size_t block_step = std::min(rep_nonc.size() / max_thrs + 1, rep_nonc.size());
+                    blocks.push_back(0);
+                    blocks.push_back(block_step);
+                    for (auto i = 1; i < max_thrs; ++i) {
+                        blocks.push_back(*--blocks.end());
+                        blocks.push_back(std::min(*--blocks.end() + block_step, rep_nonc.size()));
+                    }
 
-                #pragma omp parallel
-                {
-                    vector<MAAGForwardBackwardAlgorithm> fb(max_thrs);
-                    vector<ModelParameterVector> local_param_vec;
-                    for (auto i = 0; i < max_thrs; ++i) { local_param_vec.push_back(new_param_vec); }
+                    #pragma omp parallel
+                    {
+                        vector<MAAGForwardBackwardAlgorithm> fb(max_thrs);
+                        vector<ModelParameterVector> local_param_vec;
+                        for (auto i = 0; i < max_thrs; ++i) { local_param_vec.push_back(new_param_vec); }
 
-                    int tid = omp_get_thread_num();
+                        int tid = omp_get_thread_num();
 
-                    size_t start_i = blocks[tid*2],
-                           end_i = blocks[tid*2 + 1];
+                        size_t start_i = blocks[tid*2],
+                               end_i = blocks[tid*2 + 1];
 
-                    for (size_t i = start_i; i < end_i; ++i) {
-                        if (good_clonotypes[i]) {
-                            this->updateTempVec(fb[tid], maag_rep[i], local_param_vec[tid], error_mode);
+                        for (size_t i = start_i; i < end_i; ++i) {
+                            if (good_clonotypes[i]) {
+                                this->updateTempVec(fb[tid], model.buildGraphs(rep_nonc[i], SAVE_METADATA, error_mode), local_param_vec[tid], error_mode);
+                            }
+                        }
+
+                        for (size_t i = 0; i < new_param_vec.size(); ++i) {
+                            #pragma omp atomic
+                            new_param_vec[i] += local_param_vec[tid][i];
                         }
                     }
-
-                    for (size_t i = 0; i < new_param_vec.size(); ++i) {
-                        #pragma omp atomic
-                        new_param_vec[i] += local_param_vec[tid][i];
-                    }
-                }
 #else
-                MAAGForwardBackwardAlgorithm fb;
-                tp1 = std::chrono::system_clock::now();
-                for (size_t i = 0; i < maag_rep.size(); ++i) {
-                    if ((i+1) % 25000 == 0) {
-                        cout << "Processed " << (int) i << " / " << (int) maag_rep.size() << " MAAGs.\t" << endl;
-                    }
-                    if (good_clonotypes[i]) {
-                        if(!this->updateTempVec(fb, maag_rep[i], new_param_vec, error_mode)) {
-                            cout << "bad maag:\t" << (int) i << endl;
+                    MAAGForwardBackwardAlgorithm fb;
+                    tp1 = std::chrono::system_clock::now();
+                    for (size_t i = 0; i < rep_nonc.size(); ++i) {
+                        if ((i+1) % 25000 == 0) {
+                            cout << "Processed " << (int) i << " / " << (int) rep_nonc.size() << " MAAGs.\t" << endl;
+                        }
+                        if (good_clonotypes[i]) {
+                            if(!this->updateTempVec(fb, model.buildGraphs(rep_nonc[i], SAVE_METADATA, error_mode), new_param_vec, error_mode)) {
+                                cout << "bad maag:\t" << (int) i << endl;
+                            }
                         }
                     }
-                }
 #endif
+                }
 
-                this->updateModel(model, new_param_vec, maag_rep, prob_vec, prev_ll, removed, error_mode);
+                //
+                // Speed-wise inference - build MAAGs only once
+                //
+                else {
+#ifdef USE_OMP
+                    std::cout << "Infer parameters..." << std::endl;
+
+                    auto max_thrs = omp_get_max_threads();
+
+                    std::vector<size_t> blocks;
+                    size_t block_step = std::min(rep_nonc.size() / max_thrs + 1, rep_nonc.size());
+                    blocks.push_back(0);
+                    blocks.push_back(block_step);
+                    for (auto i = 1; i < max_thrs; ++i) {
+                        blocks.push_back(*--blocks.end());
+                        blocks.push_back(std::min(*--blocks.end() + block_step, rep_nonc.size()));
+                    }
+
+                    #pragma omp parallel
+                    {
+                        vector<MAAGForwardBackwardAlgorithm> fb(max_thrs);
+                        vector<ModelParameterVector> local_param_vec;
+                        for (auto i = 0; i < max_thrs; ++i) { local_param_vec.push_back(new_param_vec); }
+
+                        int tid = omp_get_thread_num();
+
+                        size_t start_i = blocks[tid*2],
+                               end_i = blocks[tid*2 + 1];
+
+                        for (size_t i = start_i; i < end_i; ++i) {
+                            if (good_clonotypes[i]) {
+                                this->updateTempVec(fb[tid], maag_rep[i], local_param_vec[tid], error_mode);
+                            }
+                        }
+
+                        for (size_t i = 0; i < new_param_vec.size(); ++i) {
+                            #pragma omp atomic
+                            new_param_vec[i] += local_param_vec[tid][i];
+                        }
+                    }
+#else
+                    MAAGForwardBackwardAlgorithm fb;
+                    tp1 = std::chrono::system_clock::now();
+                    for (size_t i = 0; i < rep_nonc.size(); ++i) {
+                        if ((i+1) % 25000 == 0) {
+                            cout << "Processed " << (int) i << " / " << (int) rep_nonc.size() << " MAAGs.\t" << endl;
+                        }
+                        if (good_clonotypes[i]) {
+                            if(!this->updateTempVec(fb, maag_rep[i], new_param_vec, error_mode)) {
+                                cout << "bad maag:\t" << (int) i << endl;
+                            }
+                        }
+                    }
+#endif
+                }
+
+                this->updateModel(rep_nonc, model, new_param_vec, maag_rep, prob_vec, prev_ll, removed, error_mode, memory_safe);
 
                 std::cout << new_param_vec.error_prob() << std::endl;
 
@@ -212,13 +287,15 @@ namespace ymir {
         }
 
 
-        void updateModel(ProbabilisticAssemblingModel &model,
+        void updateModel(const ClonesetViewNuc &rep_nonc,
+                         ProbabilisticAssemblingModel &model,
                          ModelParameterVector &new_param_vec,
                          MAAGNucRepertoire &maag_rep,
                          vector<prob_t> &prob_vec,
                          prob_t &prev_ll,
                          size_t removed,
-                         ErrorMode error_mode) const
+                         ErrorMode error_mode,
+                         bool memory_safe) const
         {
             if (error_mode) { new_param_vec.set_error_prob(new_param_vec.error_prob() / (maag_rep.size() - removed)); }
 //            new_param_vec.set_error_prob(.0003);
@@ -226,15 +303,23 @@ namespace ymir {
             new_param_vec.normaliseEventFamilies();
 
             model.updateModelParameterVector(new_param_vec);
-            model.updateEventProbabilities(&maag_rep);
 
-            std::cout << "Recomputing generation probabilities...";
-#ifdef USE_OMP
-            #pragma omp parallel for
-#endif
-            for (size_t i = 0; i < maag_rep.size(); ++i) {
-                prob_vec[i] = maag_rep[i].fullProbability();
+            if (!memory_safe) {
+                model.updateEventProbabilities(&maag_rep);
             }
+
+            if (memory_safe) {
+                prob_vec = model.computeFullProbabilities(rep_nonc, error_mode);
+            } else {
+                std::cout << "Recomputing generation probabilities...";
+#ifdef USE_OMP
+#pragma omp parallel for
+#endif
+                for (size_t i = 0; i < maag_rep.size(); ++i) {
+                    prob_vec[i] = maag_rep[i].fullProbability();
+                }
+            }
+
             std::cout << " Done." << std::endl;
 
             prob_summary(prob_vec, prev_ll);

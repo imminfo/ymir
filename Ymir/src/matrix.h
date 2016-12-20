@@ -187,6 +187,17 @@ namespace ymir {
         }
 
 
+        _Scalar sum() const {
+            _Scalar res = 0;
+            for (_Dim i = 0; i < _rows; ++i) {
+                for (_Dim j = 0; j < _cols; ++j) {
+                    res += (*this)(i, j);
+                }
+            }
+            return res;
+        }
+
+
         std::string print() const {
             std::string res = "";
             for (size_t i = 0; i < _rows; ++i) {

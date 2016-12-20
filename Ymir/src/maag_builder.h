@@ -1597,11 +1597,13 @@ namespace ymir {
 //                        std::cout << "right " << (int) right_pos << std::endl;
 //                        std::cout << std::bitset<6>(left_codon).to_string() << std::endl;
 
-                        right_codon = clonotype.getDivCodon(d_index, j, right_pos - (left_pos + min_D_len - 1) + 1);
+                        right_codon = clonotype.getDivCodon(d_index, j, right_pos - left_pos + 1);
 
 //                        std::cout << "---" << std::endl;
 //                        std::cout << (int)left_pos << std::endl;
 //                        std::cout << (int)right_pos << std::endl;
+//                        std::cout << (int) (left_pos - d_seq_start + 1) << std::endl;
+//                        std::cout << (int) (right_pos - left_pos + 1) << std::endl;
 //                        std::cout << (int)left_codon << std::endl;
 //                        std::cout << (int)right_codon << std::endl;
 //                        std::cout << std::bitset<6>(right_codon).to_string() << std::endl;

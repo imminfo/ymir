@@ -254,9 +254,11 @@ namespace ymir {
 
 
     enum SequenceCodingType {
-        ALL,
-        CODING,
-        NONCODING
+        ALL = 0,
+        CODING = 1,
+        NONCODING = 2,
+        OUTOFFRAME = 3,
+        STOPCODON = 4
     };
 
 }

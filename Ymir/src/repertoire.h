@@ -114,20 +114,35 @@ namespace ymir {
         ClonesetView noncoding(bool out_of_frames_only = false) const {
             std::vector<size_t> inds;
             inds.reserve(this->size() / 3);
-            if (out_of_frames_only) {
-                for (size_t i = 0; i < this->size(); ++i) {
-                    if ((*this)[i].isOutOfFrame()) {
-                        inds.push_back(i);
-                    }
-                }
-            } else {
-                for (size_t i = 0; i < this->size(); ++i) {
-                    if ((*this)[i].isNoncoding()) {
-                        inds.push_back(i);
-                    }
+            for (size_t i = 0; i < this->size(); ++i) {
+                if ((*this)[i].isNoncoding()) {
+                    inds.push_back(i);
                 }
             }
+            return this->subvec(inds);
+        }
 
+
+        ClonesetView outofframes() const {
+            std::vector<size_t> inds;
+            inds.reserve(this->size() / 3);
+            for (size_t i = 0; i < this->size(); ++i) {
+                if ((*this)[i].isOutOfFrame()) {
+                    inds.push_back(i);
+                }
+            }
+            return this->subvec(inds);
+        }
+
+
+        ClonesetView withstopcodons() const {
+            std::vector<size_t> inds;
+            inds.reserve(this->size() / 3);
+            for (size_t i = 0; i < this->size(); ++i) {
+                if ((*this)[i].withStopCodon()) {
+                    inds.push_back(i);
+                }
+            }
             return this->subvec(inds);
         }
 

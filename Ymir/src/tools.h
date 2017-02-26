@@ -130,17 +130,30 @@ namespace ymir {
 
 
     inline bool has_end_codon(const std::string &sequence) {
-        for (size_t i = 0; i < sequence.size(); i += 3) {
-            if (sequence[i] == 'T'
-                && ((sequence[i+1] == 'A' && sequence[i+2] == 'G')
-                    || (sequence[i+1] == 'A' && sequence[i+2] == 'A')
-                    || (sequence[i+1] == 'G' && sequence[i+2] == 'A')))
-            {
+        if (sequence.size() % 3 == 0) {
+            for (size_t i = 0; i < sequence.size(); i += 3) {
+                if (sequence[i] == 'T'
+                    && ((sequence[i+1] == 'A' && sequence[i+2] == 'G')
+                        || (sequence[i+1] == 'A' && sequence[i+2] == 'A')
+                        || (sequence[i+1] == 'G' && sequence[i+2] == 'A')))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    inline bool has_end_codon_aa(const std::string &sequence) {
+        for (size_t i = 0; i < sequence.size(); ++i) {
+            if (sequence[i] == '*') {
                 return true;
             }
         }
         return false;
     }
+
 
     inline bool has_bad_aa_codons(const sequence_t &sequence) {
         for (size_t i = 0; i < sequence.size(); ++i) {

@@ -25,22 +25,30 @@ int main(int argc, char* argv[]) {
     size_t count = std::stoi(argv[2]);
     SequenceCodingType coding_type = SequenceCodingType::ALL;
     if (argc >= 5) {
-        switch (std::stoi(argv[4])) {
-            case 0: {
+        switch(std::stoi(argv[4])) {
+            case 0:
+                std::cout << "Generate all sequence types" << std::endl;
                 coding_type = SequenceCodingType::ALL;
                 break;
-            }
-            case 1: {
+            case 1:
+                std::cout << "Generate only coding sequences" << std::endl;
                 coding_type = SequenceCodingType::CODING;
                 break;
-            }
-            case 2: {
+            case 2:
+                std::cout << "Generate only noncoding sequences" << std::endl;
                 coding_type = SequenceCodingType::NONCODING;
                 break;
-            }
-            default: {
+            case 3:
+                std::cout << "Generate only out-of-frame sequences" << std::endl;
+                coding_type = SequenceCodingType::OUTOFFRAME;
+                break;
+            case 4:
+                std::cout << "Generate only sequences with stop codon" << std::endl;
+                coding_type = SequenceCodingType::STOPCODON;
+                break;
+            default:
+                std::cout << "Default: generate all sequence types" << std::endl;
                 coding_type = SequenceCodingType::ALL;
-            }
         }
     }
 
@@ -70,6 +78,18 @@ int main(int argc, char* argv[]) {
                 generated_coding += gen_rep.size();
             } else if (coding_type == SequenceCodingType::NONCODING) {
                 gen_rep = gen_rep.noncoding();
+                if (gen_rep.size() > to_generate) {
+                    gen_rep = gen_rep.head(to_generate);
+                }
+                generated_noncoding += gen_rep.size();
+            } else if (coding_type == SequenceCodingType::OUTOFFRAME) {
+                gen_rep = gen_rep.outofframes();
+                if (gen_rep.size() > to_generate) {
+                    gen_rep = gen_rep.head(to_generate);
+                }
+                generated_noncoding += gen_rep.size();
+            } else if (coding_type == SequenceCodingType::STOPCODON) {
+                gen_rep = gen_rep.withstopcodons();
                 if (gen_rep.size() > to_generate) {
                     gen_rep = gen_rep.head(to_generate);
                 }

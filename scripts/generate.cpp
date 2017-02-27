@@ -68,35 +68,29 @@ int main(int argc, char* argv[]) {
         bool first_iter = false;
         while (generated < count) {
             to_generate = std::min(count - generated, block_size);
-            ClonesetViewNuc gen_rep = model.generateSequences(to_generate);
-
-            if (coding_type == SequenceCodingType::CODING) {
+            ClonesetViewNuc gen_rep = model.generateSequences(std::max((size_t) 5000, to_generate));
+            if (coding_type == SequenceCodingType::ALL) {
+                if (gen_rep.size() > to_generate) { gen_rep = gen_rep.head(to_generate); }
+                generated_coding +=    gen_rep.coding().size();
+                generated_noncoding += gen_rep.noncoding().size();
+            } else if (coding_type == SequenceCodingType::CODING) {
                 gen_rep = gen_rep.coding();
-                if (gen_rep.size() > to_generate) {
-                    gen_rep = gen_rep.head(to_generate);
-                }
+                if (gen_rep.size() > to_generate) { gen_rep = gen_rep.head(to_generate); }
                 generated_coding += gen_rep.size();
             } else if (coding_type == SequenceCodingType::NONCODING) {
                 gen_rep = gen_rep.noncoding();
-                if (gen_rep.size() > to_generate) {
-                    gen_rep = gen_rep.head(to_generate);
-                }
+                if (gen_rep.size() > to_generate) { gen_rep = gen_rep.head(to_generate); }
                 generated_noncoding += gen_rep.size();
             } else if (coding_type == SequenceCodingType::OUTOFFRAME) {
                 gen_rep = gen_rep.outofframes();
-                if (gen_rep.size() > to_generate) {
-                    gen_rep = gen_rep.head(to_generate);
-                }
+                if (gen_rep.size() > to_generate) { gen_rep = gen_rep.head(to_generate); }
                 generated_noncoding += gen_rep.size();
             } else if (coding_type == SequenceCodingType::STOPCODON) {
                 gen_rep = gen_rep.withstopcodons();
-                if (gen_rep.size() > to_generate) {
-                    gen_rep = gen_rep.head(to_generate);
-                }
+                if (gen_rep.size() > to_generate) { gen_rep = gen_rep.head(to_generate); }
                 generated_noncoding += gen_rep.size();
             } else {
-                generated_coding += gen_rep.coding().size();
-                generated_noncoding += gen_rep.noncoding().size();
+                std::cout << "Something strange happened: no such sequence type." << std::endl;
             }
 
             generated = generated_coding + generated_noncoding;

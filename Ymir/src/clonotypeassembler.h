@@ -23,7 +23,14 @@ namespace ymir {
          */
         ClonotypeAssembler(const ModelParameterVector &param_vec, const VDJRecombinationGenes &genes)
                 : _param_vec(param_vec), _genes(genes)
-        { }
+        {
+            if (_param_vec.recombination() == VJ_RECOMB) {
+                _mc_vj = MonoNucInsertionModel(param_vec.get_iterator(param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
+            } else if (_param_vec.recombination() == VDJ_RECOMB) {
+                _mc_vd = DiNucInsertionModel(param_vec.get_iterator(param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
+                _mc_dj = DiNucInsertionModel(param_vec.get_iterator(param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
+            }
+        }
 
 
         /**
@@ -32,7 +39,15 @@ namespace ymir {
         virtual ~ClonotypeAssembler() { }
 
 
-        void updateModelParameterVector(const ModelParameterVector &param_vec) { _param_vec = param_vec; }
+        void updateModelParameterVector(const ModelParameterVector &param_vec) {
+            _param_vec = param_vec;
+            if (_param_vec.recombination() == VJ_RECOMB) {
+                _mc_vj = MonoNucInsertionModel(param_vec.get_iterator(param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
+            } else if (_param_vec.recombination() == VDJ_RECOMB) {
+                _mc_vd = DiNucInsertionModel(param_vec.get_iterator(param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
+                _mc_dj = DiNucInsertionModel(param_vec.get_iterator(param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
+            }
+        }
 
 
         /**
@@ -71,11 +86,12 @@ namespace ymir {
 
         ModelParameterVector _param_vec;
         VDJRecombinationGenes _genes;
+        MonoNucInsertionModel _mc_vj;
+        DiNucInsertionModel _mc_vd, _mc_dj;
 
 
         ClonotypeNuc generate_vj(std::default_random_engine &rg) const {
             ClonotypeNucBuilder builder;
-            MonoNucInsertionModel mc_vj(_param_vec.get_iterator(_param_vec.event_index(VJ_VAR_JOI_INS_NUC, 0, 0)));
 
             std::discrete_distribution<event_ind_t> vj_genes(_param_vec.get_iterator(_param_vec.event_index(VJ_VAR_JOI_GEN, 0, 0)),
                                                              _param_vec.get_iterator(_param_vec.event_index(VJ_VAR_JOI_GEN, 0, 0)
@@ -103,7 +119,7 @@ namespace ymir {
             builder.addJoiAlignment(jgene, 1, _genes.V()[vgene].sequence.size() - v_del_num + ins_len + 1, _genes.J()[jgene].sequence.size() - j_del_num);
 
             builder.setSequence(_genes.V()[vgene].sequence.substr(0, _genes.V()[vgene].sequence.size() - v_del_num)
-                                  + mc_vj.generate(ins_len, rg)
+                                  + _mc_vj.generate(ins_len, rg)
                                   + _genes.J()[jgene].sequence.substr(j_del_num));
             return builder.buildClonotype();
         }
@@ -111,8 +127,6 @@ namespace ymir {
 
         ClonotypeNuc generate_vdj(std::default_random_engine &rg) const {
             ClonotypeNucBuilder builder;
-            const DiNucInsertionModel mc_vd(_param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_NUC, 0, 0)));
-            const DiNucInsertionModel mc_dj(_param_vec.get_iterator(_param_vec.event_index(VDJ_DIV_JOI_INS_NUC, 0, 0)));
 
             seq_len_t ins_len_vd = std::discrete_distribution<seq_len_t>(_param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 0)),
                                                                          _param_vec.get_iterator(_param_vec.event_index(VDJ_VAR_DIV_INS_LEN, 0, 0)
@@ -164,9 +178,9 @@ namespace ymir {
             char first_j_char = jgene_del.size() ? jgene_del[0]:  NULL_CHAR;
 
             builder.setSequence(vgene_del
-                                + mc_vd.generate(ins_len_vd, rg, last_v_char)
+                                + _mc_vd.generate(ins_len_vd, rg, last_v_char)
                                 + dgene_del
-                                + mc_dj.generate(ins_len_dj, rg, first_j_char, true)
+                                + _mc_dj.generate(ins_len_dj, rg, first_j_char, true)
                                 + jgene_del);
 
             return builder.buildClonotype();

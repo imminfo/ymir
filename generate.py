@@ -7,7 +7,9 @@ if __name__ == "__main__":
     ap.add_argument("-c", "--count", help = "number of clonotypes to generate", default = 10000, type = int)
     ap.add_argument("-o", "--output", help = "output file", type = str, default = "./ymir_artif/out.ymir_gen.txt")
     ap.add_argument("--coding", help = "generate only coding sequences", action = "store_true")
-    ap.add_argument("--noncoding", help = "generate only noncoding", action = "store_true")
+    ap.add_argument("--noncoding", help = "generate only noncoding sequence", action = "store_true")
+    ap.add_argument("--oof", help = "generate only out-of-frame sequences", action = "store_true")
+    ap.add_argument("--stopcodon", help = "generate only sequences with stop-codon", action = "store_true")
     args = ap.parse_args()
 
     model, model_check = parse_model(args)
@@ -27,6 +29,10 @@ if __name__ == "__main__":
         cod_nonc = '1'
     elif args.noncoding:
         cod_nonc = '2'
+    elif args.oof:
+        cod_nonc = '3'
+    elif args.stopcodon:
+        cod_nonc = '4'
 
     if model_check:
         print()

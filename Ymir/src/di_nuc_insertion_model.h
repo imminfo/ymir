@@ -155,7 +155,7 @@ namespace ymir {
 #endif
 //            assert(first_nuc_pos <= last_nuc_pos);
             if (first_nuc_pos > last_nuc_pos) {
-                return 0;
+                return 1;
             }
 
 //            std::cout << (size_t) this->_aa_probs_init->size() << " char + 6*double " << (size_t) (this->_aa_probs_init->size() * (sizeof(char) + 6*sizeof(prob_t))) << std::endl;
@@ -239,12 +239,14 @@ namespace ymir {
             if (pos_codon0(first_nuc_pos) == pos_codon0(last_nuc_pos)) {
                 bithash = new_first_aa_codons;
                 for (int i = 0; i < 6; ++i) { res_vec[i] *= bithash[5 - i]; }
+//                std::cout << bithash.to_string() << std::endl;
 
                 for (seq_len_t nuc_i = first_nuc_pos; nuc_i < last_nuc_pos; ++nuc_i) {
                     auto prev_nuc_ids = CodonTable::table().which_nucl(sequence[nuc_i / 3], in_codon0(nuc_i));
                     auto next_nuc_ids = CodonTable::table().which_nucl(sequence[nuc_i / 3], in_codon0(nuc_i + 1));
                     for (int i = 0; i < 6; ++i) {
                         res_vec[i] *= arr_prob[prev_nuc_ids[i]*5 + next_nuc_ids[i]];
+//                        std::cout << res_vec[i] << std::endl;
                     }
                 }
 
@@ -340,7 +342,7 @@ namespace ymir {
 #endif
 //            assert(first_nuc_pos >= last_nuc_pos);
             if (first_nuc_pos < last_nuc_pos) {
-                return 0;
+                return 1;
             }
 
 //            for (int i = 0; i < 16; ++i) { std::cout << (int)i << ":" <<_arr[i] << std::endl; }

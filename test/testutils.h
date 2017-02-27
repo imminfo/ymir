@@ -871,33 +871,53 @@ namespace ymir {
         v4.push_back(0);
         v4.push_back(0);
 
-        // D1 dels
-        // CCC
-        // max 1 D3' del
-        // max 1 D5' del
-        v1.push_back(.18); // first row
-        v1.push_back(.28);
-        v1.push_back(.36); // second row
-        v1.push_back(.18);
 
-        v2.push_back(4);
-        v4.push_back(2);
+         // D1 dels CCC
+        // #dels 0 1 2 3
+        //   0   x x 0 0
+        //   1   x 0 0 0
+        //   2   0 0 0 0
+        //   3   0 0 0 0
+         v1.push_back(.3); v1.push_back(.5); v1.push_back(0); v1.push_back(0);
+         v1.push_back(.2); v1.push_back(0); v1.push_back(0); v1.push_back(0);
+         v1.push_back(0); v1.push_back(0); v1.push_back(0); v1.push_back(0);
+         v1.push_back(0); v1.push_back(0); v1.push_back(0); v1.push_back(0);
 
-        // D2 dels
-        // GGTT
-        // max 1 D3' del
-        // max 1 D5' del
-        // 3 rows 2 columns
-        v1.push_back(.22); v1.push_back(.21);
-        v1.push_back(.24); v1.push_back(.33);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(0); v1.push_back(0);
+//        v1.push_back(1); v1.push_back(0); v1.push_back(0); v1.push_back(0);
+//        v1.push_back(0); v1.push_back(0); v1.push_back(0); v1.push_back(0);
+//        v1.push_back(0); v1.push_back(0); v1.push_back(0); v1.push_back(0);
 
-        v2.push_back(4);
-        v4.push_back(2);
+        v2.push_back(16);
+        v4.push_back(4);
+
+        // D2 dels GGGG
+        // #dels 0 1 2 3 4
+        //   0   x x x 0 0
+        //   1   x x 0 0 0
+        //   2   x 0 0 0 0
+        //   3   0 0 0 0 0
+        //   4   0 0 0 0 0
+        v1.push_back(.11); v1.push_back(.12); v1.push_back(.13); v1.push_back(0); v1.push_back(0);
+        v1.push_back(.14); v1.push_back(.15); v1.push_back(0);   v1.push_back(0); v1.push_back(0);
+        v1.push_back(.35); v1.push_back(0);   v1.push_back(0);   v1.push_back(0); v1.push_back(0);
+        v1.push_back(0);   v1.push_back(0);   v1.push_back(0);   v1.push_back(0); v1.push_back(0);
+        v1.push_back(0);   v1.push_back(0);   v1.push_back(0);   v1.push_back(0); v1.push_back(0);
+
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(0); v1.push_back(0);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(0);   v1.push_back(0); v1.push_back(0);
+//        v1.push_back(1); v1.push_back(0);   v1.push_back(0);   v1.push_back(0); v1.push_back(0);
+//        v1.push_back(0);   v1.push_back(0);   v1.push_back(0);   v1.push_back(0); v1.push_back(0);
+//        v1.push_back(0);   v1.push_back(0);   v1.push_back(0);   v1.push_back(0); v1.push_back(0);
+
+         v2.push_back(25);
+        v4.push_back(5);
 
         v3.push_back(7);
 
         // VD ins len
         v1.push_back(.05); v1.push_back(.1); v1.push_back(.15); v1.push_back(.2); v1.push_back(.25); v1.push_back(.24); v1.push_back(.01);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1);
         v2.push_back(7);
 
         v3.push_back(10);
@@ -905,6 +925,7 @@ namespace ymir {
 
         // DJ ins len
         v1.push_back(.1); v1.push_back(.24); v1.push_back(.25); v1.push_back(.05); v1.push_back(.01); v1.push_back(.15); v1.push_back(.2);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1);
         v2.push_back(7);
 
         v3.push_back(11);
@@ -913,6 +934,7 @@ namespace ymir {
         // VD ins nuc
         // prev A
         v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1);
         v2.push_back(4);
 
         v3.push_back(12);
@@ -920,6 +942,7 @@ namespace ymir {
 
         // prev C
         v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1);
         v2.push_back(4);
 
         v3.push_back(13);
@@ -927,6 +950,7 @@ namespace ymir {
 
         // prev G
         v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1);
         v2.push_back(4);
 
         v3.push_back(14);
@@ -934,6 +958,7 @@ namespace ymir {
 
         // prev T
         v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1);
         v2.push_back(4);
 
         v3.push_back(15);
@@ -942,6 +967,7 @@ namespace ymir {
         // DJ ins nuc
         // prev A
         v1.push_back(.25); v1.push_back(.1); v1.push_back(.15); v1.push_back(.5);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1);
         v2.push_back(4);
 
         v3.push_back(16);
@@ -949,6 +975,7 @@ namespace ymir {
 
         // prev C
         v1.push_back(.15); v1.push_back(.1); v1.push_back(.25); v1.push_back(.5);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1);
         v2.push_back(4);
 
         v3.push_back(17);
@@ -956,6 +983,7 @@ namespace ymir {
 
         // prev G
         v1.push_back(.05); v1.push_back(.08); v1.push_back(.03); v1.push_back(.84);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1);
         v2.push_back(4);
 
         v3.push_back(18);
@@ -963,6 +991,7 @@ namespace ymir {
 
         // prev T
         v1.push_back(.4); v1.push_back(.1); v1.push_back(.3); v1.push_back(.2);
+//        v1.push_back(1); v1.push_back(1); v1.push_back(1); v1.push_back(1);
         v2.push_back(4);
 
         v3.push_back(19);

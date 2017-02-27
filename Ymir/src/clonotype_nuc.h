@@ -66,6 +66,8 @@ namespace ymir {
         bool isNoncoding() const { return is_out_of_frame(_sequence) || has_end_codon(_sequence); }
 
         bool isOutOfFrame() const { return is_out_of_frame(_sequence); }
+
+        bool withStopCodon() const { return has_end_codon(_sequence); }
         ///@}
 
 

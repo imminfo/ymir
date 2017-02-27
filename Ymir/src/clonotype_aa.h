@@ -61,6 +61,8 @@ namespace ymir {
         bool isNoncoding() const { return has_bad_aa_codons(_sequence); }
 
         bool isOutOfFrame() const { return has_oof_aa_codon(_sequence); }
+
+        bool withStopCodon() const { return has_end_codon_aa(_sequence); }
         ///@}
 
 

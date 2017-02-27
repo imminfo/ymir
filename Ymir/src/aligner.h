@@ -601,7 +601,7 @@ namespace ymir {
 
 
         ClonotypeAA toAminoAcid(const ClonotypeNuc &clonotype, bool use_aligned_segments = true) {
-            this->setSequence(clonotype.aa_sequence());
+            this->setSequence(clonotype.sequence()); // TODO: change back to aa_sequence
             this->setRecombination(clonotype.recombination());
             if (use_aligned_segments) {
                 for (seg_index_t id = 0; id < clonotype.nVar(); ++id) {
@@ -627,7 +627,7 @@ namespace ymir {
             noncoding_indices.reserve(cloneset.size());
             size_t stats_bad_v = 0, stats_bad_j = 0, stats_bad_both = 0;
             for (size_t i = 0; i < cloneset.size(); ++i) {
-                if (cloneset[i].isCoding()) {
+//                if (cloneset[i].isCoding()) {
                     auto res = this->toAminoAcid(cloneset[i], use_aligned_segments);
                     if (res.nVar() && res.nJoi()) {
                         vec.push_back(res);
@@ -636,9 +636,9 @@ namespace ymir {
                         stats_bad_j    +=   res.nVar()  && (!res.nJoi());
                         stats_bad_both += (!res.nVar()) && (!res.nJoi());
                     }
-                } else {
-                    noncoding_indices.push_back(i);
-                }
+//                } else {
+//                    noncoding_indices.push_back(i);
+//                }
 
                 if ((i+1) % 50000 == 0) {
                     std::cout << "converted " << (size_t) (i+1) << " clonotypes" << std::endl;
@@ -646,8 +646,8 @@ namespace ymir {
             }
             std::cout << "err. clonotypes: " << std::endl <<
                     "\toverall: " << (size_t) (stats_bad_v + stats_bad_j + stats_bad_both) << std::endl <<
-                    "\tbad V:   "   << (size_t) (stats_bad_v) << std::endl <<
-                    "\tbad J:   "   << (size_t) (stats_bad_j) << std::endl <<
+                    "\tbad V:   " << (size_t) (stats_bad_v) << std::endl <<
+                    "\tbad J:   " << (size_t) (stats_bad_j) << std::endl <<
                     "\tbad V+J: " << (size_t) (stats_bad_both) << std::endl;
             cloneset_aa->swap(vec);
 
@@ -730,7 +730,25 @@ namespace ymir {
                 if (stop) { break; }
             }
 
-            if (bits.size() / 6 >= _params.threshold.v_threshold) { avec->addAlignment(gene, 1, 1, bits); }
+            if (bits.size() / 6 >= _params.threshold.v_threshold) {
+                // remove codons which can't be aligned due to the limited minimal length
+                for (auto codon_i = 0;
+                     codon_i < (static_cast<int>(_params.threshold.v_threshold) / 3) - 1 + static_cast<int>((static_cast<int>(_params.threshold.v_threshold) % 3) == 0);
+                     ++codon_i) {
+                    for (auto pos = 0; pos < 6; ++pos) {
+                        bits[codon_i*6 + pos]     = bits[codon_i*6 + pos] & bits[(codon_i+2)*6 + pos];
+                        bits[(codon_i+1)*6 + pos] = bits[(codon_i+1)*6 + pos] & bits[(codon_i+2)*6 + pos];
+                    }
+                }
+                // process the last codon separately if it of length 2
+                if ((static_cast<int>(_params.threshold.v_threshold) % 3) == 2) {
+                    auto codon_i = static_cast<int>(_params.threshold.v_threshold) - 2;
+                    for (auto pos = 0; pos < 6; ++pos) {
+                        bits[codon_i*6 + pos] = bits[codon_i*6 + pos] & bits[(codon_i+1)*6 + pos];
+                    }
+                }
+                avec->addAlignment(gene, 1, 1, bits);
+            }
 //            avec->addAlignment(gene, 1, 1, bits);
         }
 

@@ -415,6 +415,7 @@ namespace ymir {
                 maag._events.reset(new EventIndMMC());
                 maag._events->swap(events);
             }
+            maag.write();
             return maag;
 
 

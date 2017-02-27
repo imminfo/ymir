@@ -193,6 +193,7 @@ namespace ymir {
             std::fill(arr_prob1.begin(), arr_prob1.end(), 0);
             arr_prob1.resize(std::max(arr_prob1.size(), (size_t) (this->rows(3) * this->cols(3))), 0);
 
+//            std::cout << "-----" << std::endl;
             // VD insertions + D deletions
             for (dim_t row_i = 0; row_i < this->rows(2); ++row_i) {
                 for (dim_t col_i = 0; col_i < this->cols(2); ++col_i) {
@@ -224,6 +225,8 @@ namespace ymir {
                             }
 //
 //                            std::cout << "---" << std::endl;
+//                            std::cout << (int) insertion_len << std::endl;
+//                            std::cout << *(_ins_start + insertion_len) << std::endl;
 //                            std::cout << (int)left_pos << std::endl;
 //                            std::cout << (int)right_pos << std::endl;
 //                            std::cout << (int)left_codon << std::endl;
@@ -237,11 +240,24 @@ namespace ymir {
                                                                            left_codon,
                                                                            right_codon,
                                                                            prev_codon);
+//                            std::cout << prob_val << std::endl;
+
+//                            std::cout << "1:" << *(_ins_start + insertion_len) << std::endl;
+//                            std::cout << "2:" << _insertions->aaProbability(*_sequence,
+//                                                                    left_pos + 1,
+//                                                                    right_pos - 1,
+//                                                                    left_codon,
+//                                                                    right_codon,
+//                                                                    prev_codon) << std::endl;
+//                            std::cout << "prob_val:" << prob_val << std::endl;
+
 
                             // problems with multiplication by .25?
 //                            std::cout << arr_prob1[col_i * this->cols(3) + d_col_i] << " -> ";
-                            arr_prob1[col_i * this->cols(3) + d_col_i] += prob_val * arr_prob2[row_i];// * this->at(3, d_index, col_i, d_col_i);
+                            arr_prob1[col_i * this->cols(3) + d_col_i] += prob_val * arr_prob2[row_i] * this->at(3, d_index, col_i, d_col_i);
 //                            std::cout << arr_prob1[col_i * this->cols(3) + d_col_i] << std::endl;
+
+                            this->at(2, 0, row_i, col_i) += prob_val;
                         }
                     }
                 }
@@ -265,6 +281,7 @@ namespace ymir {
             int start_dgen_nodes = this->cols(1) + this->cols(2),
                     start_dj_nodes = start_dgen_nodes + this->cols(3);
 
+//            std::cout << "=====" << std::endl;
             // DJ insertions
             for (dim_t row_i = 0; row_i < this->rows(4); ++row_i) {
                 for (dim_t col_i = 0; col_i < this->cols(4); ++col_i) {
@@ -279,7 +296,11 @@ namespace ymir {
                             right_codon = _codons(3, j_index, col_i, 0);
 
                             if (right_pos < _sequence->size() * 3) {
-                                prev_codon = _codons(3, j_index, col_i + 1, 0);
+                                if (((right_pos - 1) / 3) == 1) {
+                                    prev_codon = _codons(3, j_index, col_i + 1, 0) & _codons(3, j_index, col_i + 2, 0);
+                                } else {
+                                    prev_codon = _codons(3, j_index, col_i + 1, 0);
+                                }
                             } else {
                                 prev_codon = 63;
                             }
@@ -303,7 +324,11 @@ namespace ymir {
                                                                                   left_codon,
                                                                                   prev_codon);
 
+//                            std::cout << "prob_val:" << prob_val << std::endl;
+
                             arr_prob2[col_i] += prob_val * arr_prob1[d_row_i * this->cols(3) + row_i];
+
+                            this->at(4, 0, row_i, col_i) += prob_val;
                         }
                     }
                 }
@@ -382,6 +407,9 @@ namespace ymir {
             std::cout << matrix(1, 0).print() << std::endl;
             std::cout << matrix(2, 0).print() << std::endl;
             std::cout << matrix(3, 0).print() << std::endl;
+            std::cout << matrix(4, 0).print() << std::endl;
+            std::cout << matrix(5, 0).print() << std::endl;
+            std::cout << matrix(6, 0).print() << std::endl;
             std::cout << "---------------------" << std::endl;
         }
 
@@ -390,10 +418,8 @@ namespace ymir {
             std::cout << "---------------------" << std::endl;
             std::cout << _codons.matrix(0, 0).print() << std::endl;
             std::cout << _codons.matrix(1, 0).print() << std::endl;
-            std::cout << _codons.matrix(0, 1).print() << std::endl;
-            std::cout << _codons.matrix(1, 1).print() << std::endl;
-            std::cout << _codons.matrix(0, 2).print() << std::endl;
-            std::cout << _codons.matrix(1, 2).print() << std::endl;
+            std::cout << _codons.matrix(2, 0).print() << std::endl;
+            std::cout << _codons.matrix(3, 0).print() << std::endl;
         }
 
 

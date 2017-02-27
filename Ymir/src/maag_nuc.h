@@ -295,6 +295,26 @@ namespace ymir {
             std::cout << matrix(1, 0).print() << std::endl;
             std::cout << matrix(2, 0).print() << std::endl;
             std::cout << matrix(3, 0).print() << std::endl;
+            std::cout << matrix(4, 0).print() << std::endl;
+            std::cout << matrix(5, 0).print() << std::endl;
+            std::cout << matrix(6, 0).print() << std::endl;
+        }
+
+
+        void write() {
+            std::ofstream stream("/Users/vdn/Projects/maag.txt", std::ios::app);
+            stream << (int) this->chainSize() << std::endl;
+            for (int node_i = 0; node_i < this->chainSize(); ++node_i) {
+                stream << (int) this->nodeSize(node_i) << "\t" << (int) this->nodeRows(node_i) << "\t" << (int) this->nodeColumns(node_i) << std::endl;
+                for (int mat_i = 0; mat_i < this->nodeSize(node_i); ++mat_i) {
+                    for (int i = 0; i < this->nodeRows(node_i); ++i) {
+                        for (int j = 0; j < this->nodeColumns(node_i); ++j) {
+                            stream << this->at(node_i, mat_i, i, j) << "\t";
+                        }
+                    }
+                    stream << std::endl;
+                }
+            }
         }
 
 

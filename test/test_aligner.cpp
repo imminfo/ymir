@@ -317,8 +317,8 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     vector<string> avec2 {"J1", "J2", "J3", "J4", "J5", "J6"};
     vector<string> svec2 {"CTTTA", "CCTT", "AGCCTG", "AGGCTG", "AATT", "TTT"};
 
-    vector<string> avec3 {"D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9"};
-    vector<string> svec3 {"AAA", "AACCACT", "ACT", "TGC", "GGCA", "GGTT", "GGGG", "CCCC", "CCC"};
+    vector<string> avec3 {"D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10"};
+    vector<string> svec3 {"AAA", "AACCACT", "ACT", "TGC", "GGCA", "GGTT", "GGGG", "CCCC", "CCC", "GGG"};
     VDJRecombinationGenes genes("V", avec1, svec1, "J", avec2, svec2, "D", avec3, svec3);
 
     CDR3AminoAcidAligner aligner(genes, VDJAlignerParameters(3,
@@ -643,6 +643,15 @@ YMIR_TEST_START(test_cdr3_aa_aligner)
     YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
     YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
     YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, true, false, false, false, false}, 0))
+
+    alignment = aligner.alignDiv(10, "NGW");
+    YMIR_ASSERT2(alignment.size(), 1)
+    YMIR_ASSERT2(alignment.pattern_start(0), 1)
+    YMIR_ASSERT2(alignment.text_start(0), 4)
+    YMIR_ASSERT2(alignment.len(0), 3)
+    YMIR_ASSERTCOD(alignment.getCodon(0, 1), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 2), compute_codon_hash({true, true, true, true, false, false}, 0))
+    YMIR_ASSERTCOD(alignment.getCodon(0, 3), compute_codon_hash({false, false, false, true, false, false}, 0))
 
 YMIR_TEST_END
 

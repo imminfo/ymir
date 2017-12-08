@@ -6,7 +6,7 @@ sg <- list()
 sg.data <- list()
 setwd("~/Projects/ymir/benchmark/")
 sg.df <- matrix(0, 0, 5)
-for (file in list.files("./log", full.names = T)) {
+for (file in list.files("./log/", full.names = T)) {
   spl <- strsplit(file, "_", T)[[1]]
   # vec <- list(as.numeric(readLines(file))[1:9])
   vec <- list(as.numeric(readLines(file)))
@@ -80,7 +80,7 @@ grid.arrange(p1, p2, ncol = 1)
 
 em.pars <- c()
 sg.pars <- list()
-for (file in list.files("./log", full.names = T)) {
+for (file in list.files("./log/", full.names = T)) {
   spl <- strsplit(file, "_", T)[[1]]
   # vec <- list(as.numeric(readLines(file))[1:9])
   vec <- as.numeric(readLines(file))
@@ -95,19 +95,19 @@ for (file in list.files("./log", full.names = T)) {
 }
 
 cor.names <- paste0("m=", sg$block, ";a=", sg$alpha, ";b=", sg$beta, ";k=", sg$K)
-# cor.plots <- lapply(1:length(sg.pars), function (j) { 
-#   df <- data.frame(EM = em.pars, 
-#                    SG = sg.pars[[j]])
-#   ggplot() + geom_point(aes(x = EM, y = SG), data = df) + 
-#     geom_text(aes(x = .85, y = .15, size = 1, colour = "red", label = round(cor(em.pars, sg.pars[[j]]), 2))) +
-#     scale_colour_discrete(guide=FALSE) +
-#     scale_size_continuous(guide=FALSE) +
-#     theme_linedraw() +
-#     geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
-#     coord_fixed(xlim = c(0, 1), ylim = c(0, 1)) +
-#     ggtitle(cor.names[j]) + xlab("") + ylab("")
-#   })
-# do.call(grid.arrange, c(cor.plots, list(ncol = 5)))
+cor.plots <- lapply(1:length(sg.pars), function (j) {
+  df <- data.frame(EM = em.pars,
+                   SG = sg.pars[[j]])
+  ggplot() + geom_point(aes(x = EM, y = SG), data = df) +
+    geom_text(aes(x = .85, y = .15, size = 1, colour = "red", label = round(cor(em.pars, sg.pars[[j]]), 2))) +
+    scale_colour_discrete(guide=FALSE) +
+    scale_size_continuous(guide=FALSE) +
+    theme_linedraw() +
+    geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+    coord_fixed(xlim = c(0, 1), ylim = c(0, 1)) +
+    ggtitle(cor.names[j]) + xlab("") + ylab("")
+  })
+do.call(grid.arrange, c(cor.plots, list(ncol = 5)))
 
 vj = 1:2350
 vdel = 2351:3037

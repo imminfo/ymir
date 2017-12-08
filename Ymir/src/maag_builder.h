@@ -1042,42 +1042,50 @@ namespace ymir {
         // vector seq_col -> 0 means no such index in the matrix (column-wise), 1 otherwise.
         std::vector<seq_len_t> seq_col(seq_arr_size, 0);
 
+        // here we have two cases:
+        // 1. We need to remember indices of events (metadata_mode is ON). In this case we should save each D deletion event to a separate cell, even
+        // if position on the sequence (not gene!) is the same for this events.
+        // 2. We don't need information about indices of events (metadata_mode is OFF). In this case we could just sum up probabilities for events which
+        // have same positions on the sequence.
+
         // shifts for each pair of positions (i,j) (in case if (i,j) is duplicated)
-        std::vector<seq_len_t> shift_mat(seq_arr_size * seq_arr_size);
+        std::vector<seq_len_t> shift_mat(seq_arr_size * seq_arr_size, 0);
 
         // optimization for faster search for the max element in rows
         unique_ptr<bool[]> any_row_element(new bool[seq_arr_size]);
+        if (metadata_mode) {
+            for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
+                // std::fill(shift_mat.begin(), shift_mat.end(), 0);
+                std::fill(any_row_element.get(), any_row_element.get() + seq_arr_size, false);
 
-        for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
-            min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
-            std::fill(shift_mat.begin(), shift_mat.end(), 0);
-            std::fill(any_row_element.get(), any_row_element.get() + seq_arr_size, false);
+                for (seg_index_t d_align = 0; d_align < clonotype.numDivAlignments(d_index); ++d_align) {
+                    seq_len_t d_seq_start = clonotype.getDivSeqStart(d_index, d_align),
+                            d_seq_end = clonotype.getDivSeqEnd(d_index, d_align);
 
-            for (seg_index_t d_align = 0; d_align < clonotype.numDivAlignments(d_index); ++d_align) {
-                seq_len_t d_seq_start = clonotype.getDivSeqStart(d_index, d_align),
-                        d_seq_end = clonotype.getDivSeqEnd(d_index, d_align);
+                    for (seq_len_t i = d_seq_start; i <= d_seq_end - min_D_len + 1; ++i) {
+                        any_row_element[i] = true;
 
-                for (seq_len_t i = d_seq_start; i <= d_seq_end - min_D_len + 1; ++i) {
-                    any_row_element[i] = true;
+                        for (seq_len_t j = d_seq_start + min_D_len - static_cast<seq_len_t>(1); j <= d_seq_end; ++j) {
+                            ++shift_mat[i*seq_arr_size + j];
+                        }
+                    }
 
                     for (seq_len_t j = d_seq_start + min_D_len - static_cast<seq_len_t>(1); j <= d_seq_end; ++j) {
-                        ++shift_mat[i*seq_arr_size + j];
+                        seq_col[j] = 1;
                     }
                 }
 
-                for (seq_len_t j = d_seq_start + min_D_len - static_cast<seq_len_t>(1); j <= d_seq_end; ++j) {
-                    seq_col[j] = 1;
-                }
-            }
-
-            // for each row get max element, i.e., max number of repeats of a specific row index
-            for (seq_len_t i = 0; i < seq_arr_size; ++i) {
-                if (any_row_element[i]) {
-                    seq_row[i] = std::max(seq_row[i],
-                                          *std::max_element(shift_mat.begin() + i*seq_arr_size, shift_mat.begin() + (i+1)*seq_arr_size));
+                // for each row get max element, i.e., max number of repeats of a specific row index
+                for (seq_len_t i = 0; i < seq_arr_size; ++i) {
+                    if (any_row_element[i]) {
+                        seq_row[i] = std::max(seq_row[i],
+                                              *std::max_element(shift_mat.begin() + i*seq_arr_size, shift_mat.begin() + (i+1)*seq_arr_size));
+                    }
                 }
             }
         }
+        
 
         seq_len_t seq_row_nonzeros = 0, seq_ind = 0;
         std::vector<seq_len_t> seq_row_indices, seq_col_indices;
@@ -1143,29 +1151,18 @@ namespace ymir {
                               d_index,
                               seq_row[left_pos] + shift_mat[seq_arr_size*left_pos + right_pos],
                               seq_col[right_pos])
-                                =
+                                +=  // += because if metdata is OFF than we can just add the probs here
                                 _param_vec->event_prob(VDJ_DIV_DEL,
                                                        d_gene - 1,
                                                        d_gene_start + left_pos - d_seq_start,
                                                        d_len - (d_gene_end - (d_seq_end - right_pos)));
-                        if (metadata_mode) {
-                            events(DIVERSITY_GENES_MATRIX_INDEX,
-                                   d_index,
-                                   seq_row[left_pos] + shift_mat[seq_arr_size*left_pos + right_pos],
-                                   seq_col[right_pos])
-                                    =
-                                    _param_vec->event_index(VDJ_DIV_DEL,
-                                                            d_gene - 1,
-                                                            d_gene_start + left_pos - d_seq_start,
-                                                            d_len - (d_gene_end - (d_seq_end - right_pos)));
-                        }
 
                         if (error_mode) {
                             errors(1,
                                    d_index,
                                    seq_row[left_pos] + shift_mat[seq_arr_size*left_pos + right_pos],
                                    seq_col[right_pos])
-                                    =
+                                    += 
                                     clonotype.numDivMismatches(d_index,
                                                                j,
                                                                d_gene_start + left_pos - d_seq_start,
@@ -1182,7 +1179,20 @@ namespace ymir {
                             }
                         }
 
-                        ++shift_mat[seq_arr_size*left_pos + right_pos];
+                        if (metadata_mode) {
+                            events(DIVERSITY_GENES_MATRIX_INDEX,
+                                   d_index,
+                                   seq_row[left_pos] + shift_mat[seq_arr_size*left_pos + right_pos],
+                                   seq_col[right_pos])
+                                    =
+                                    _param_vec->event_index(VDJ_DIV_DEL,
+                                                            d_gene - 1,
+                                                            d_gene_start + left_pos - d_seq_start,
+                                                            d_len - (d_gene_end - (d_seq_end - right_pos)));
+
+                            // its always zeros if no metadata is needed
+                            ++shift_mat[seq_arr_size*left_pos + right_pos];
+                        }
                     }
                 }
             }

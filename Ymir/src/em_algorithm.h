@@ -31,7 +31,7 @@ namespace ymir {
                                                          const AlgorithmParameters &algo_param = AlgorithmParameters().set("niter", 10).set("sample", 50000).set("memory-safe", false),
                                                          ErrorMode error_mode = NO_ERRORS) const {
             cout << "Statistical inference on a PAM:\t" << model.name() << endl;
-            cout << "\tMurugan EM-algorithm.";
+            cout << "\nBatch EM-algorithm.";
             if (error_mode == COMPUTE_ERRORS) {
                 cout << "\t(with sequence errors)";
             }
@@ -69,19 +69,13 @@ namespace ymir {
 
             ModelParameterVector new_param_vec = model.event_probabilities();
             new_param_vec.fill(1);
-
-
-            //
-            // SET ERROR HERE
-            //
+            // Error probability
             new_param_vec.set_error_prob(.0003);
-
 
             new_param_vec.normaliseEventFamilies();
             model.updateModelParameterVector(new_param_vec);
 
             MAAGNucRepertoire maag_rep;
-
             if (!memory_safe) {
                 maag_rep = model.buildGraphs(rep_nonc, SAVE_METADATA, error_mode, true);
             }
@@ -117,10 +111,9 @@ namespace ymir {
                 //
                 // Memory safe inference - rebuild MAAGs at each step
                 //
+                std::cout << "Infer parameters..." << std::endl;
                 if (memory_safe) {
 #ifdef USE_OMP
-                    std::cout << "Infer parameters..." << std::endl;
-
                     auto max_thrs = omp_get_max_threads();
 
                     std::vector<size_t> blocks;
@@ -175,8 +168,6 @@ namespace ymir {
                 //
                 else {
 #ifdef USE_OMP
-                    std::cout << "Infer parameters..." << std::endl;
-
                     auto max_thrs = omp_get_max_threads();
 
                     std::vector<size_t> blocks;

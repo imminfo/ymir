@@ -46,8 +46,8 @@ int main(int argc, char* argv[]) {
     //                                       "/home/vadim/ymir/benchmark/data/traj.txt");
 
 
-    string input_alpha_file = "alpha.250k.txt";
-    string input_beta_file = "beta.250k.txt";
+    string input_alpha_file = "alpha.noncoding.100k.txt";
+    string input_beta_file = "beta.noncoding.20k.txt";
 
     ParserNuc parser(new NaiveCDR3NucleotideAligner());
 
@@ -119,9 +119,9 @@ int main(int argc, char* argv[]) {
 
 //    RUN_EM_INFERENCE(string("vj"), cloneset_vj, vj_single_model, niter, sample, error_mode)
 //    RUN_EM_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, niter, sample, error_mode)
-   // for(auto val_sample: vec_sample) {
-   //     RUN_EM_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, 40, val_sample, error_mode)
-   // }
+    for(auto val_sample: vec_sample) {
+        RUN_EM_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, 40, val_sample, error_mode)
+    }
 
 //    ModelParameterVector new_param_vec = vj_single_model.event_probabilities();
 //    new_param_vec.fill(1);
@@ -144,17 +144,17 @@ int main(int argc, char* argv[]) {
 //        }
 //    }
 
-     for(auto val_sample: vec_sample) {
-        for(auto val_block: vec_block) {
-            for (auto val_alpha: vec_alpha) {
-                for (auto val_beta: vec_beta) {
-                    for (auto val_K: vec_K) {
-                        // RUN_SG_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 40, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
-                        RUN_SG_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, 40, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
-                    }
-                }
-            }
-        }
-     }
+//     for(auto val_sample: vec_sample) {
+//        for(auto val_block: vec_block) {
+//            for (auto val_alpha: vec_alpha) {
+//                for (auto val_beta: vec_beta) {
+//                    for (auto val_K: vec_K) {
+//                        // RUN_SG_INFERENCE(string("vj"), cloneset_vj, vj_single_model, 40, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
+//                        RUN_SG_INFERENCE(string("vdj"), cloneset_vdj, vdj_single_model, 40, val_block, val_alpha, val_beta, val_K, val_sample, error_mode)
+//                    }
+//                }
+//            }
+//        }
+//     }
 
 }

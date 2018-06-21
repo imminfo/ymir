@@ -1,3 +1,4 @@
+#include "src/em_algorithm.h"
 #include "src/sg_algorithm.h"
 #include "src/parser.h"
 #include "src/writer.h"

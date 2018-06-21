@@ -9,7 +9,6 @@
 #include "alignment.h"
 #include "codon_table.h"
 
-
 namespace ymir {
 
 

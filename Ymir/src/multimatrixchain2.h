@@ -21,9 +21,9 @@
  * limitations under the License.
  */
 
- /*
-  *  CLASSIC MULTI MATRIX CHAIN
-  */
+/*
+ *  MULTI MATRIX CHAIN W/ MATRICES
+ */
 
 #ifndef _MULTIMATRIXCHAIN_H_
 #define _MULTIMATRIXCHAIN_H_
@@ -76,12 +76,6 @@ namespace ymir {
     typedef MultiMatrixChain<codon_hash> CodonMMC;
 
 
-    /**
-    * \class MultiMatrixChain
-    *
-    * \brief Class for storing lists of matrices, where one node in the list (called "chain") could
-    * contain more than one matrix.
-    */
     template <typename _Scalar>
     class MultiMatrixChain {
 
@@ -132,7 +126,7 @@ namespace ymir {
         struct Node {
         public:
 
-            Node() : _n(0), _start_index(0), _rows(0), _cols(0)
+            Node() : _n(0), _rows(0), _cols(0)
             { }
 
 
@@ -140,17 +134,29 @@ namespace ymir {
                 _n = n;
                 _rows = rows;
                 _cols = cols;
-                _start_index = start_index;
+                for (int i = 0; i < _n; ++i) {
+                    _matrices.push_back(matrix_t(_rows, _cols, 0));
+                }
             }
 
 
-            size_t operator() (matrix_ind_t mat, dim_t row, dim_t column) const {
+            _Scalar operator() (matrix_ind_t mat, dim_t row, dim_t column) const {
 #ifndef DNDEBUG
                 if (!(mat >= 0 && mat < _n)) { throw(std::runtime_error("Matrix index check failed!")); }
 
                 if (!(row >= 0 && row < _rows && column >= 0 && column < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
 #endif
-                return _start_index + mat * (_rows * _cols) + row * _cols + column;
+                return _matrices[mat](row, column);
+            }
+
+
+            _Scalar& operator() (matrix_ind_t mat, dim_t row, dim_t column) {
+#ifndef DNDEBUG
+                if (!(mat >= 0 && mat < _n)) { throw(std::runtime_error("Matrix index check failed!")); }
+
+                if (!(row >= 0 && row < _rows && column >= 0 && column < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
+#endif
+                return _matrices[mat](row, column);
             }
 
 
@@ -160,15 +166,22 @@ namespace ymir {
 
             dim_t cols() const { return _cols; }
 
-            size_t start() const { return _start_index; }
+//            size_t start() const { return _start_index; }
 
             size_t n_values() const { return _n * _rows * _cols; }
+
+            const matrix_t& matrix(matrix_ind_t mat) const {
+#ifndef DNDEBUG
+                if (!(mat >= 0 && mat < _n)) { throw(std::runtime_error("Matrix index check failed!")); }
+#endif
+                return _matrices[mat];
+            }
 
 
         protected:
 
-            size_t _start_index;
             matrix_ind_t _n;
+            std::vector<matrix_t> _matrices;
             dim_t _rows, _cols;
 
         };
@@ -176,7 +189,6 @@ namespace ymir {
     public:
 
         MultiMatrixChain() {
-            _values.reserve(5000);
         }
 
 
@@ -229,7 +241,7 @@ namespace ymir {
 #ifndef DNDEBUG
             if (node_i >= _chain.size()) { throw(std::runtime_error("Number of the Node is out of bounds."));}
 #endif
-            return _values[_chain[node_i](mat_i, row, col)];
+            return _chain[node_i](mat_i, row, col);
         }
 
 //        const _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
@@ -237,14 +249,14 @@ namespace ymir {
 #ifndef DNDEBUG
             if (node_i >= _chain.size()) { throw (std::runtime_error("Number of the Node is out of bounds.")); }
 #endif
-            return _values[_chain[node_i](mat_i, row, col)];
+            return _chain[node_i](mat_i, row, col);
         }
 
         _Scalar& at(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) {
 #ifndef DNDEBUG
             if (node_i >= _chain.size()) { throw(std::runtime_error("Number of the Node is out of bounds."));}
 #endif
-            return _values[_chain[node_i](mat_i, row, col)];
+            return _chain[node_i](mat_i, row, col);
         }
 
 //        const _Scalar& operator()(node_ind_t node_i, matrix_ind_t mat_i, dim_t row, dim_t col) const {
@@ -252,7 +264,7 @@ namespace ymir {
 #ifndef DNDEBUG
             if (node_i >= _chain.size()) { throw(std::runtime_error("Number of the Node is out of bounds."));}
 #endif
-            return _values[_chain[node_i](mat_i, row, col)];
+            return _chain[node_i](mat_i, row, col);
         }
         ///@}
 
@@ -277,19 +289,17 @@ namespace ymir {
         void initNode(node_ind_t node_i, matrix_ind_t n_matrices, dim_t rows, dim_t cols) {
             size_t prev_node_size = _chain[node_i].n_values();
             _chain[node_i].init(_values.size(), n_matrices, rows, cols);
-            _values.resize(_values.size() + _chain[node_i].n_values() - prev_node_size, 0);
+//            _values.resize(_values.size() + _chain[node_i].n_values() - prev_node_size, 0);
         }
 
 
         void swap(MultiMatrixChain &other) {
             _chain.swap(other._chain);
-            _values.swap(other._values);
         }
 
 
         void finish() {
             _chain.shrink_to_fit();
-            _values.shrink_to_fit();
 //            cout << _values.size() << endl;
 //            cout << _values.capacity() << endl;
         }
@@ -298,33 +308,24 @@ namespace ymir {
         void fill(node_ind_t node, matrix_ind_t mat, _Scalar val = 0) {
             for (dim_t r = 0; r < _chain[node].rows(); ++r) {
                 for (dim_t c = 0; c < _chain[node].cols(); ++c) {
-                    _values[_chain[node](mat, r, c)] = val;
+                    _chain[node](mat, r, c) = val;
                 }
             }
         }
 
 
-        matrix_t matrix(node_ind_t node, matrix_ind_t mat) const {
-            matrix_t res(_chain[node].rows(), _chain[node].cols(), 0);
-            for (dim_t r = 0; r < _chain[node].rows(); ++r) {
-                for (dim_t c = 0; c < _chain[node].cols(); ++c) {
-                    res(r, c) = (*this)(node, mat, r, c);
-                }
-            }
-            return res;
+        const matrix_t& matrix(node_ind_t node, matrix_ind_t mat) const {
+            return _chain[node].matrix(mat);
         }
 
 
 //        _Scalar operator[](size_t index) const { return _values[index]; }
+//        size_t values_size() const { return _values.size(); }
 
-
-        size_t values_size() const { return _values.size(); }
-        
 
     protected:
 
         std::vector<Node> _chain;
-        std::vector<_Scalar> _values;
 
     };
 

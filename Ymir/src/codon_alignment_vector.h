@@ -11,10 +11,6 @@
 
 namespace ymir {
 
-
-    typedef uint8_t codon_hash;
-
-
     codon_hash compute_codon_hash(const AlignmentVectorBase::events_storage_t &bits, seq_len_t start) {
         return codon_hash(  (bits[start]     << 5)
                           + (bits[start + 1] << 4)

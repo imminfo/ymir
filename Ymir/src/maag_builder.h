@@ -456,7 +456,7 @@ namespace ymir {
 
         if (verbose) {
             std::cout << "Building " << (size_t) cloneset.size() << " MAAGs..." << std::endl;
-            verbose_step = cloneset.size() / 10;
+            verbose_step = cloneset.size() / 10 + static_cast<size_t>(cloneset.size() < 10);
         }
 
         MAAGNucRepertoire res;
@@ -500,7 +500,7 @@ namespace ymir {
 
         if (verbose) {
             std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes (nuc)." << std::endl;
-            verbose_step = cloneset.size() / 10;
+            verbose_step = cloneset.size() / 10 + static_cast<size_t>(cloneset.size() < 10);
         }
 
         std::chrono::system_clock::time_point tp1 = std::chrono::system_clock::now();
@@ -513,14 +513,14 @@ namespace ymir {
 #ifndef USE_OMP
             if (verbose && (i+1) % verbose_step == 0 && (i+1) != cloneset.size()) {
                 cout << "[" << (int) ((100*(i+1)) / cloneset.size()) << "%] "
-                     << "Computed " << (int) (i+1) << " / " << (int) (cloneset.size()) << " assembling probabilities. "
+                     << "Computed " << (int) (i+1) << " / " << (int) (cloneset.size()) << " probabilities. "
                      << print_time(tp1, cloneset.size(), i) << endl;
             }
 #endif
         }
 
         if (verbose) {
-            std::cout << "[100%] Computed " << (size_t) cloneset.size() << " assembling probabilities in " << time_diff_now(tp1) << std::endl;
+            std::cout << "[100%] Computed " << (size_t) cloneset.size() << " probabilities in " << time_diff_now(tp1) << std::endl;
         }
 
         return res;
@@ -655,7 +655,7 @@ namespace ymir {
 
         if (verbose) {
             std::cout << "Updating " << (size_t) repertoire->size() << " MAAGs..." << std::endl;
-            verbose_step = repertoire->size() / 10;
+            verbose_step = repertoire->size() / 10 + static_cast<size_t>(repertoire->size() < 10);
         }
 
         std::chrono::system_clock::time_point tp1;
@@ -772,7 +772,7 @@ namespace ymir {
 
         if (verbose) {
             std::cout << "Building " << (size_t) cloneset.size() << " MAAGs..." << std::endl;
-            verbose_step = cloneset.size() / 10;
+            verbose_step = cloneset.size() / 10 + static_cast<size_t>(cloneset.size() < 10);
         }
 
         MAAGAARepertoire res;
@@ -818,7 +818,7 @@ namespace ymir {
 
         if (verbose) {
             std::cout << "Computing assembling probabilities on " << (size_t) cloneset.size() << " clonotypes (aa)." << std::endl;
-            verbose_step = cloneset.size() / 10;
+            verbose_step = cloneset.size() / 10 + static_cast<size_t>(cloneset.size() < 10);
         }
 
         std::chrono::system_clock::time_point tp1, tp2;
@@ -1042,12 +1042,18 @@ namespace ymir {
         // vector seq_col -> 0 means no such index in the matrix (column-wise), 1 otherwise.
         std::vector<seq_len_t> seq_col(seq_arr_size, 0);
 
+        seq_len_t seq_row_nonzeros = 0, seq_ind = 0, seq_col_nonzeros = 0;
+        std::vector<seq_len_t> seq_row_indices, seq_col_indices;
+        seq_row_indices.reserve(seq_arr_size);
+        seq_col_indices.reserve(seq_arr_size);
+
         // here we have two cases:
         // 1. We need to remember indices of events (metadata_mode is ON). In this case we should save each D deletion event to a separate cell, even
         // if position on the sequence (not gene!) is the same for this events.
         // 2. We don't need information about indices of events (metadata_mode is OFF). In this case we could just sum up probabilities for events which
         // have same positions on the sequence.
 
+//         /* VERSION WITH THE SHIFT MATRIX
         // shifts for each pair of positions (i,j) (in case if (i,j) is duplicated)
         std::vector<seq_len_t> shift_mat(seq_arr_size * seq_arr_size, 0);
 
@@ -1084,40 +1090,84 @@ namespace ymir {
                     }
                 }
             }
-        }
-        
 
-        seq_len_t seq_row_nonzeros = 0, seq_ind = 0;
-        std::vector<seq_len_t> seq_row_indices, seq_col_indices;
-        seq_row_indices.reserve(seq_arr_size);
-        seq_col_indices.reserve(seq_arr_size);
+            // make new vector seq_start -> 1based index in rows of Ddel matrices
+            for (seq_len_t i = 0; i < seq_arr_size; ++i) {
+                if (seq_row[i]) {
+                    seq_row_indices.push_back(i);
 
-        // make new vector seq_start -> 1based index in rows of Ddel matrices
-        for (seq_len_t i = 0; i < seq_arr_size; ++i) {
-            if (seq_row[i]) {
-                seq_row_indices.push_back(i);
+                    seq_row_num[i] = seq_row[i];
+                    seq_row_nonzeros += seq_row[i];
 
-                seq_row_num[i] = seq_row[i];
-                seq_row_nonzeros += seq_row[i];
-
-                seq_row[i] = seq_ind;
-                seq_ind += seq_row_num[i];
+                    seq_row[i] = seq_ind;
+                    seq_ind += seq_row_num[i];
+                }
             }
-        }
 
-        // make new vector seq_end -> 1based index in columns of Ddel matrices
-        seq_ind = 0;
-        for (seq_len_t i = 0; i < seq_arr_size; ++i) {
-            if (seq_col[i]) {
-                seq_col_indices.push_back(i);
+            // make new vector seq_end -> 1based index in columns of Ddel matrices
+            seq_ind = 0;
+            for (seq_len_t i = 0; i < seq_arr_size; ++i) {
+                if (seq_col[i]) {
+                    seq_col_indices.push_back(i);
 
-                seq_col[i] = seq_ind;
-                ++seq_ind;
+                    seq_col[i] = seq_ind;
+                    ++seq_ind;
+                }
             }
+            seq_col_nonzeros = seq_ind;
+        } else {
+            //
+            // NO SHIFT MATRIX
+            //
+            for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+                min_D_len = _param_vec->D_min_len(clonotype.getDiv(d_index));
+
+                for (seg_index_t d_align = 0; d_align < clonotype.numDivAlignments(d_index); ++d_align) {
+                    seq_len_t d_seq_start = clonotype.getDivSeqStart(d_index, d_align),
+                            d_seq_end = clonotype.getDivSeqEnd(d_index, d_align);
+                    seq_len_t d_gene_start = clonotype.getDivGeneStart(d_index, d_align),
+                            d_gene_end = clonotype.getDivGeneEnd(d_index, d_align);
+
+//                    std::cout << "seq:" << (int) d_seq_start << ":" << (int) d_seq_end << std::endl;
+//                    std::cout << "D:  " << (int) d_gene_start << ":" << (int) d_gene_end << std::endl;
+
+                    for (seq_len_t j = d_seq_start; j <= d_seq_end - min_D_len + static_cast<seq_len_t>(1); ++j) {
+                        seq_row[j] = 1;
+                    }
+                    for (seq_len_t j = d_seq_start + min_D_len - static_cast<seq_len_t>(1); j <= d_seq_end; ++j) {
+                        seq_col[j] = 1;
+                    }
+                }
+            }
+
+            // make new vector seq_start -> 1based index in rows of Ddel matrices
+            for (seq_len_t i = 0; i < seq_arr_size; ++i) {
+                if (seq_row[i]) {
+                    seq_row_indices.push_back(i);
+
+                    seq_row[i] = seq_ind;
+                    ++seq_ind;
+                }
+            }
+            seq_row_nonzeros = seq_ind;
+
+            // make new vector seq_end -> 1based index in columns of Ddel matrices
+            seq_ind = 0;
+            for (seq_len_t i = 0; i < seq_arr_size; ++i) {
+                if (seq_col[i]) {
+                    seq_col_indices.push_back(i);
+
+                    seq_col[i] = seq_ind;
+                    ++seq_ind;
+                }
+            }
+            seq_col_nonzeros = seq_ind;
         }
-        seq_len_t seq_col_nonzeros = seq_ind;
 
         probs.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
+//        std::cout << "size: " << (int) seq_row_nonzeros * seq_col_nonzeros << "  ";
+//        std::cout << "size: " << (int) seq_row_nonzeros << "  ";
+//        std::cout << "size: " << (int) seq_col_nonzeros << std::endl;
         if (metadata_mode) {
             events.initNode(DIVERSITY_GENES_MATRIX_INDEX, clonotype.nDiv(), seq_row_nonzeros, seq_col_nonzeros);
         }
@@ -1126,16 +1176,32 @@ namespace ymir {
         }
 
 
+//        std::cout << "matrix" << std::endl;
+//        std::cout << (int) seq_row_nonzeros << " : " << (int) seq_col_nonzeros << std::endl;
+//        for(auto val: seq_row) {
+//            std::cout << (int) val << " ";
+//        }
+//        std::cout << std::endl;
+//        for(auto val: seq_col) {
+//            std::cout << (int) val << " ";
+//        }
+//        std::cout << std::endl;
+
+
         seg_index_t d_index, d_gene;
         seq_len_t d_len;
         seq_len_t d_seq_start, d_seq_end, d_gene_start, d_gene_end;
 
         for (seg_index_t d_index = 0; d_index < clonotype.nDiv(); ++d_index) {
+//            size_t nonzeros = 0;
+
             d_gene = clonotype.getDiv(d_index);
             d_len = _genes->D()[d_gene].sequence.size();
             min_D_len = _param_vec->D_min_len(d_gene);
 
-            std::fill(shift_mat.begin(), shift_mat.end(), 0);
+//
+            std::fill(shift_mat.begin(), shift_mat.end(), 0);   // SHIFT MAT IS HERE !!!
+//
 
             // for each aligned Div segment get all possible smaller alignments and add them to the matrix.
             for (seg_index_t j = 0; j < clonotype.numDivAlignments(d_index); ++j) {
@@ -1145,22 +1211,28 @@ namespace ymir {
                 d_gene_start = clonotype.getDivGeneStart(d_index, j);
                 d_gene_end = clonotype.getDivGeneEnd(d_index, j);
 
+//                std::cout << "seq: " << (int) d_seq_start << ":" << (int) d_seq_end << std::endl;
+//                std::cout << "  D: " << (int) d_gene_start << ":" << (int) d_gene_end << std::endl;
+
                 for (seq_len_t left_pos = d_seq_start; left_pos <= d_seq_end - min_D_len + 1; ++left_pos) {
                     for (seq_len_t right_pos = left_pos + min_D_len - 1; right_pos <= d_seq_end; ++right_pos) {
                         probs(DIVERSITY_GENES_MATRIX_INDEX,
                               d_index,
                               seq_row[left_pos] + shift_mat[seq_arr_size*left_pos + right_pos],
+//                              seq_row[left_pos],
                               seq_col[right_pos])
                                 +=  // += because if metdata is OFF than we can just add the probs here
                                 _param_vec->event_prob(VDJ_DIV_DEL,
                                                        d_gene - 1,
                                                        d_gene_start + left_pos - d_seq_start,
                                                        d_len - (d_gene_end - (d_seq_end - right_pos)));
+//                        nonzeros++;
 
                         if (error_mode) {
                             errors(1,
                                    d_index,
                                    seq_row[left_pos] + shift_mat[seq_arr_size*left_pos + right_pos],
+//                                   seq_row[left_pos],
                                    seq_col[right_pos])
                                     += 
                                     clonotype.numDivMismatches(d_index,
@@ -1172,6 +1244,7 @@ namespace ymir {
                                 probs(DIVERSITY_GENES_MATRIX_INDEX,
                                       d_index,
                                       seq_row[left_pos] + shift_mat[seq_arr_size*left_pos + right_pos],
+//                                      seq_row[left_pos],
                                       seq_col[right_pos])
                                         *=
                                         _param_vec->error_prob()
@@ -1183,6 +1256,7 @@ namespace ymir {
                             events(DIVERSITY_GENES_MATRIX_INDEX,
                                    d_index,
                                    seq_row[left_pos] + shift_mat[seq_arr_size*left_pos + right_pos],
+//                                   seq_row[left_pos],
                                    seq_col[right_pos])
                                     =
                                     _param_vec->event_index(VDJ_DIV_DEL,
@@ -1191,12 +1265,26 @@ namespace ymir {
                                                             d_len - (d_gene_end - (d_seq_end - right_pos)));
 
                             // its always zeros if no metadata is needed
-                            ++shift_mat[seq_arr_size*left_pos + right_pos];
+                            ++shift_mat[seq_arr_size*left_pos + right_pos];   // SHIFT MAT IS HERE !!!
                         }
+
+
+//                        std::cout << "   poses: " << (int) d_gene_start + left_pos - d_seq_start << ":" << (int) d_len - (d_gene_end - (d_seq_end - right_pos)) << std::endl;
+//                        std::cout << "   values:"
+//                                  <<  _param_vec->event_prob(VDJ_DIV_DEL, d_gene - 1, d_gene_start + left_pos - d_seq_start, d_len - (d_gene_end - (d_seq_end - right_pos)))
+//                                  << " -- "
+//                                  << _param_vec->event_index(VDJ_DIV_DEL, d_gene - 1, d_gene_start + left_pos - d_seq_start, d_len - (d_gene_end - (d_seq_end - right_pos)))
+//                                  << std::endl;
+//                        std::cout << "   matrix: " << (int) seq_row[left_pos] << " -- " << (int) seq_col[right_pos] << std::endl;
                     }
                 }
             }
+
+//            std::cout << probs.matrix(DIVERSITY_GENES_MATRIX_INDEX, d_index).print() << std::endl;
+//            std::cout << events.matrix(DIVERSITY_GENES_MATRIX_INDEX, d_index).print() << std::endl;
+//            std::cout << (int) nonzeros << "(" << ((float) nonzeros) / (seq_row_nonzeros * seq_col_nonzeros) << ")\t";
         }
+//        std::cout << std::endl;
 
         // insert D3 and D5 positions
         vector<seq_len_t> D35_poses;

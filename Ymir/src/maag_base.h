@@ -8,7 +8,6 @@
 
 #include "multimatrixchain.h"
 
-
 namespace ymir {
 
 #define VJ_CHAIN_SIZE 4

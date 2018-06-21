@@ -61,9 +61,9 @@ namespace ymir {
 
     #define DEFAULT_MAX_INS_LENGTH 65
 
-    #ifndef DNDEBUG
-    #define YDEBUG
-    #endif
+//    #ifndef DNDEBUG
+//    #define YDEBUG
+//    #endif
 
     #define DEFAULT_AWE_V_RESERVE_SIZE 60
     #define DEFAULT_AWE_D_RESERVE_SIZE 4000
@@ -128,6 +128,8 @@ namespace ymir {
 
     typedef std::pair<event_ind_t, prob_t> event_pair_t;
 
+
+    typedef uint8_t codon_hash;
 
     /**
      * \enum MAAG_COMPUTE_PROB_ACTION

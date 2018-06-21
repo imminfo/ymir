@@ -31,7 +31,12 @@ namespace ymir {
         }
 
 
-        Matrix(_Dim rows, _Dim columns, _Scalar val = 0) : _rows(rows), _cols(columns) {
+        Matrix(_Dim rows, _Dim columns) : _rows(rows), _cols(columns) {
+            _data = new _Scalar[rows * columns];
+        }
+
+
+        Matrix(_Dim rows, _Dim columns, _Scalar val) : _rows(rows), _cols(columns) {
             _data = new _Scalar[rows * columns];
             this->fill(val);
         }
@@ -41,13 +46,16 @@ namespace ymir {
         Matrix(const Matrix &other) {
             _rows = other._rows;
             _cols = other._cols;
-            if (_data) { delete [] _data; }
-            if (_rows * _cols != 0) {
-                _data = new _Scalar[_rows * _cols];
-                for (_Dim r = 0; r < _rows; ++r) {
-                    for (_Dim c = 0; c < _cols; ++c) {
-                        _data[r * _cols + c] = other._data[r * _cols + c];
+            if (other._data) {
+                if (_rows * _cols != 0) {
+                    _data = new _Scalar[_rows * _cols];
+                    for (_Dim r = 0; r < _rows; ++r) {
+                        for (_Dim c = 0; c < _cols; ++c) {
+                            _data[r * _cols + c] = other._data[r * _cols + c];
+                        }
                     }
+                } else {
+                    _data = nullptr;
                 }
             } else {
                 _data = nullptr;
@@ -104,15 +112,15 @@ namespace ymir {
 
 // operator() with check
         _Scalar& operator()(_Dim row, _Dim col) {
-#ifdef YDEBUG
+#ifndef DNDEBUG
             if (!(row >= 0 && row < _rows && col >= 0 && col < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
 #endif
             return _data[row * _cols + col];
         }
 
 
-        const _Scalar& operator()(_Dim row, _Dim col) const {
-#ifdef YDEBUG
+        _Scalar operator()(_Dim row, _Dim col) const {
+#ifndef DNDEBUG
             if (!(row >= 0 && row < _rows && col >= 0 && col < _cols)) { throw(std::runtime_error("Rows / columns number check failed!")); }
 #endif
             return _data[row * _cols + col];
@@ -137,11 +145,11 @@ namespace ymir {
 
         // operator*
         Matrix operator*(const Matrix &other) const {
-#ifdef YDEBUG
+#ifndef DNDEBUG
             if (_cols != other._rows) { throw(std::runtime_error("Multiplication of matrices with wrong dimensions!")); }
 #endif
 
-            Matrix res(_rows, other._cols, 0);
+            Matrix res(_rows, other._cols);
             for (_Dim i = 0; i < _rows; ++i) {
                 for (_Dim j = 0; j < other._cols; ++j) {
                     for (_Dim k = 0; k < _cols; ++k) {

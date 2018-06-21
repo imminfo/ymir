@@ -29,8 +29,10 @@ int main(int argc, char* argv[]) {
     ClonesetNuc cloneset_vj, cloneset_vdj, cloneset_vj_noncoding, cloneset_vdj_noncoding;
 
 
-    string input_alpha_file = "alpha.full.500k.txt", input_alpha_file_nonc = "alpha.noncoding.100k.txt";
-    string input_beta_file = "beta.noncoding.500k.txt", input_beta_file_nonc = "beta.noncoding.100k.txt";
+    string input_alpha_file = "alpha.full.100k.txt", input_alpha_file_nonc = "alpha.noncoding.20k.txt";
+    string input_beta_file = "beta.noncoding.100k.txt", input_beta_file_nonc = "beta.noncoding.20k.txt";
+//    string input_alpha_file = "alpha.noncoding.20k.txt", input_alpha_file_nonc = "alpha.noncoding.20k.txt";
+//    string input_beta_file = "beta.noncoding.20k.txt", input_beta_file_nonc = "beta.noncoding.20k.txt";
 
 
     auto vdj_aligner_parameters_nuc = VDJAlignerParameters(3,
@@ -67,6 +69,10 @@ int main(int argc, char* argv[]) {
     //
     // TCR alpha chain repertoire - VJ recombination
     //
+    std::cout << "==========================================" << std::endl;
+    std::cout << "Parsing TRA" << std::endl;
+    std::cout << "==========================================" << std::endl;
+
     YMIR_BENCHMARK("Parsing VJ",
                    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file,
                                        &cloneset_vj,
@@ -74,17 +80,21 @@ int main(int argc, char* argv[]) {
                                        VJ_RECOMB,
                                        align_col_options,
                                        vdj_aligner_parameters_nuc))
-
-    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file_nonc,
-                        &cloneset_vj_noncoding,
-                        vj_single_genes,
-                        VJ_RECOMB,
-                        align_col_options,
-                        vdj_aligner_parameters_nuc);
+//
+//    parser.openAndParse(BENCH_DATA_FOLDER + input_alpha_file_nonc,
+//                        &cloneset_vj_noncoding,
+//                        vj_single_genes,
+//                        VJ_RECOMB,
+//                        align_col_options,
+//                        vdj_aligner_parameters_nuc);
 
     //
     // TCR beta chain repertoire - VDJ recombination
     //
+    std::cout << "==========================================" << std::endl;
+    std::cout << "Parsing TRB" << std::endl;
+    std::cout << "==========================================" << std::endl;
+
     YMIR_BENCHMARK("Parsing VDJ",
                    parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file,
                                        &cloneset_vdj,
@@ -93,28 +103,39 @@ int main(int argc, char* argv[]) {
                                        align_col_options,
                                        vdj_aligner_parameters_nuc))
 
-    parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file_nonc,
-                        &cloneset_vdj_noncoding,
-                        vdj_single_genes,
-                        VDJ_RECOMB,
-                        align_col_options,
-                        vdj_aligner_parameters_nuc);
+//    parser.openAndParse(BENCH_DATA_FOLDER + input_beta_file_nonc,
+//                        &cloneset_vdj_noncoding,
+//                        vdj_single_genes,
+//                        VDJ_RECOMB,
+//                        align_col_options,
+//                        vdj_aligner_parameters_nuc);
 
     //
     // VJ MAAG
     //
+    std::cout << "==========================================" << std::endl;
+    std::cout << "Computing probabilities for TRA" << std::endl;
+    std::cout << "==========================================" << std::endl;
+
     vector<prob_t> vec;
     ProbabilisticAssemblingModel vj_single_model(BENCH_DATA_FOLDER + "../../models/hTRA", EMPTY);
-//    YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS, false))
-//    YMIR_BENCHMARK("VJ prob", vec = vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS, SUM_PROBABILITY, false))
+    YMIR_BENCHMARK("VJ meta", vj_single_model.buildGraphs(cloneset_vj, SAVE_METADATA, NO_ERRORS, true))
+    YMIR_BENCHMARK("VJ prob", vec = vj_single_model.computeFullProbabilities(cloneset_vj, NO_ERRORS, SUM_PROBABILITY, true))
 //    std::cout << loglikelihood(vec) << std::endl;
 
     //
     // VDJ MAAG
     //
+    std::cout << "==========================================" << std::endl;
+    std::cout << "Computing probabilities for TRB" << std::endl;
+    std::cout << "==========================================" << std::endl;
+
     ProbabilisticAssemblingModel vdj_single_model(BENCH_DATA_FOLDER + "../../models/hTRB", EMPTY);
-    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS, false))
-    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS, SUM_PROBABILITY, false))
+//    std::vector<size_t> inds = {5};
+//    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj.subvec(inds), SAVE_METADATA, NO_ERRORS, true))
+//    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj.subvec(inds), NO_ERRORS, SUM_PROBABILITY, true))
+    YMIR_BENCHMARK("VDJ meta", vdj_single_model.buildGraphs(cloneset_vdj, SAVE_METADATA, NO_ERRORS, true))
+    YMIR_BENCHMARK("VDJ prob", vdj_single_model.computeFullProbabilities(cloneset_vdj, NO_ERRORS, SUM_PROBABILITY, true))
 
     //
     // VJ inference
@@ -128,11 +149,11 @@ int main(int argc, char* argv[]) {
     //
     // VDJ inference
     //
-    YMIR_BENCHMARK("VDJ EM",
-                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj_noncoding, vdj_single_model,
-                                                                EMAlgorithm::AlgorithmParameters()
-                                                                        .set("niter", 30),
-                                                                NO_ERRORS))
+//    YMIR_BENCHMARK("VDJ EM",
+//                   logLvec = EMAlgorithm().statisticalInference(cloneset_vdj_noncoding, vdj_single_model,
+//                                                                EMAlgorithm::AlgorithmParameters()
+//                                                                        .set("niter", 30),
+//                                                                NO_ERRORS))
 
     //
     // Results

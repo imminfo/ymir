@@ -166,7 +166,7 @@ namespace ymir {
                 }
                 return this->subvec(shifts);
             } else {
-                cerr << "Error in ClonesetView: the end index is lower than the start index." << endl;
+                std::cerr << "Error in ClonesetView: the end index is lower than the start index." << std::endl;
                 return ClonesetView();
             }
         };

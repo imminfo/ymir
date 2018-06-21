@@ -6,7 +6,7 @@
 #define YMIR_MAAG_BASE_H
 
 
-#include "multimatrixchain.h"
+#include "multimatrixchain3.h"
 
 namespace ymir {
 

@@ -401,26 +401,26 @@ namespace ymir {
         }
 
 
-        void print() const {
-            std::cout << *_sequence << std::endl;
-            std::cout << matrix(0, 0).print() << std::endl;
-            std::cout << matrix(1, 0).print() << std::endl;
-            std::cout << matrix(2, 0).print() << std::endl;
-            std::cout << matrix(3, 0).print() << std::endl;
-            std::cout << matrix(4, 0).print() << std::endl;
-            std::cout << matrix(5, 0).print() << std::endl;
-            std::cout << matrix(6, 0).print() << std::endl;
-            std::cout << "---------------------" << std::endl;
-        }
+//        void print() const {
+//            std::cout << *_sequence << std::endl;
+//            std::cout << matrix(0, 0).print() << std::endl;
+//            std::cout << matrix(1, 0).print() << std::endl;
+//            std::cout << matrix(2, 0).print() << std::endl;
+//            std::cout << matrix(3, 0).print() << std::endl;
+//            std::cout << matrix(4, 0).print() << std::endl;
+//            std::cout << matrix(5, 0).print() << std::endl;
+//            std::cout << matrix(6, 0).print() << std::endl;
+//            std::cout << "---------------------" << std::endl;
+//        }
 
 
-        void printCodons() const {
-            std::cout << "---------------------" << std::endl;
-            std::cout << _codons.matrix(0, 0).print() << std::endl;
-            std::cout << _codons.matrix(1, 0).print() << std::endl;
-            std::cout << _codons.matrix(2, 0).print() << std::endl;
-            std::cout << _codons.matrix(3, 0).print() << std::endl;
-        }
+//        void printCodons() const {
+//            std::cout << "---------------------" << std::endl;
+//            std::cout << _codons.matrix(0, 0).print() << std::endl;
+//            std::cout << _codons.matrix(1, 0).print() << std::endl;
+//            std::cout << _codons.matrix(2, 0).print() << std::endl;
+//            std::cout << _codons.matrix(3, 0).print() << std::endl;
+//        }
 
 
     protected:

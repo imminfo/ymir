@@ -22,7 +22,7 @@
  */
 
 /*
- *  MULTI MATRIX CHAIN W/ MATRICES
+ *  MULTI MATRIX CHAIN W/ EIGEN
  */
 
 #ifndef _MULTIMATRIXCHAIN_H_
@@ -32,6 +32,8 @@
 #include <vector>
 
 #include "types.h"
+#include "Eigen/Core"
+#include "Eigen/SparseCore"
 
 
 //#define YDEBUG
@@ -113,8 +115,7 @@ namespace ymir {
         *
         * \brief Type of matrices in the chain.
         */
-//        typedef Matrix<_Scalar, Dynamic, Dynamic> matrix_t;
-        typedef Matrix<_Scalar, dim_t> matrix_t;
+        typedef Eigen::Matrix<_Scalar, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
 
     protected:
 
@@ -135,7 +136,7 @@ namespace ymir {
                 _rows = rows;
                 _cols = cols;
                 for (int i = 0; i < _n; ++i) {
-                    _matrices.push_back(matrix_t(_rows, _cols, 0));
+                    _matrices.push_back(matrix_t::Zero(_rows, _cols));
                 }
             }
 

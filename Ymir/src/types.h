@@ -33,7 +33,9 @@
 #include <tuple>
 #include <vector>
 
-#include "jsoncpp.cpp"
+//#include "jsoncpp.cpp"
+#include "json.hpp"
+using json = nlohmann::json;
 
 #ifdef USE_OMP
 #include "omp.h"
@@ -130,6 +132,24 @@ namespace ymir {
 
 
     typedef uint8_t codon_hash;
+
+//    typedef Json::Value json_value;  // jsoncpp.h
+    typedef json json_value;  // json.hpp
+
+    json_value get_json_value(const json_value &obj, const json::object_t::key_type &key, json::value_t default_value) {
+        // jsoncpp.cpp
+        // return obj.get(key, default_value);
+        // json.hpp
+        return obj.value(key, default_value);
+    }
+
+    json_value get_json_value(const json_value &obj, const json::object_t::key_type &key, const char* default_value) {
+        return json_value(obj.value(key, default_value));
+    }
+
+    json_value get_json_value(const json_value &obj, const json::object_t::key_type &key, bool default_value) {
+        return obj.value(key, default_value);
+    }
 
     /**
      * \enum MAAG_COMPUTE_PROB_ACTION

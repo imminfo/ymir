@@ -53,7 +53,7 @@ namespace ymir {
 
 
             bool check(const string& param_name) const {
-                if (_json.get(param_name, "__NA__").asString() == "__NA__") {
+                if (_json.value(param_name, "__NA__") == "__NA__") {
                     cout << "Obligatory parameter '" << param_name << "' hasn't been found, please re-run the algorithm with the supplied parameter." << endl;
                     return false;
                 }
@@ -61,23 +61,23 @@ namespace ymir {
             }
 
 
-            Json::Value get(const string& param_name, const Json::Value& default_value) const {
-                return _json.get(param_name, default_value).asString();
+            json_value get(const string& param_name, const json_value& default_value) const {
+                return _json.value(param_name, default_value);
             }
 
 
-            AlgorithmParameters& set(const string& param_name, const Json::Value& value) {
+            AlgorithmParameters& set(const string& param_name, const json_value& value) {
                 _json[param_name] = value;
                 return *this;
             }
 
 
-            const Json::Value& operator[](const string& param_name) const { return _json[param_name]; }
+            const json_value& operator[](const string& param_name) const { return _json[param_name]; }
 
 
         private:
 
-            Json::Value _json;
+            json_value _json;
 
         };
 

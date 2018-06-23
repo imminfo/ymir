@@ -157,7 +157,7 @@ namespace ymir {
         *
         * \brief Parameters of this parser: parser's name, names of the columns, separators, sequences and other.
         */
-        typedef Json::Value ParserConfig;
+        typedef json_value ParserConfig;
 
 
         ParserBase() {

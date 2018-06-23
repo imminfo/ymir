@@ -230,12 +230,12 @@ namespace ymir {
         }
 
 
-        const Json::Value& algorithm_parameters() const {
+        const json_value& algorithm_parameters() const {
             return _algo_params;
         }
 
 
-        void set_algorithm_parameters(const std::string &name, const Json::Value &value) {
+        void set_algorithm_parameters(const std::string &name, const json_value &value) {
             _algo_params[name] = value;
         }
 
@@ -357,15 +357,15 @@ namespace ymir {
         Recombination recombination() const { return _recomb; }
 
 
-        string name() const { return _config.get("name", "Nameless model").asString(); }
+        string name() const { return _config.value("name", "Nameless model"); }
 
     protected:
 
         bool _status, _verbose;
         ModelBehaviour _behaviour;
 
-        Json::Value _config;
-        Json::Value _algo_params;
+        json_value _config;
+        json_value _algo_params;
         Recombination _recomb;
         string _model_path;
         unique_ptr<ModelParser> _parser;
@@ -396,10 +396,10 @@ namespace ymir {
             _status = false;
             if (ifs.is_open()) {
                 ifs >> _config;
-                if (_config.get("recombination", "undefined").asString() == "VJ") {
+                if (_config.value("recombination", "undefined") == "VJ") {
                     _recomb = VJ_RECOMB;
                     _status = true;
-                } else if (_config.get("recombination", "undefined").asString() == "VDJ") {
+                } else if (_config.value("recombination", "undefined") == "VDJ") {
                     _recomb = VDJ_RECOMB;
                     _status = true;
                 } else {
@@ -408,17 +408,17 @@ namespace ymir {
                 }
 
                 cout << "Probabilistic assembling model:\n\t" <<
-                        _config.get("name", "Nameless model").asString() <<
+                        _config.value("name", "Nameless model") <<
                         "\n\t(" <<
-                        _config.get("comment", "").asString() <<
+                        _config.value("comment", "") <<
                         ")\n\t" <<
                         "Path : " << folderpath <<
                         "\n\t" <<
-                        "Specimen : " << _config.get("specimen", "hobbit").asString() <<
+                        "Specimen : " << _config.value("specimen", "hobbit") <<
                         "\n\t" <<
-                        _config.get("recombination", "undefined").asString() <<
+                        _config.value("recombination", "undefined") <<
                         "-recombination  |  " <<
-                        ((_config.get("errors", 0).asDouble() != 0) ? "Sequence error model" : "No sequence error model") <<
+                        ((_config.value("errors", 0) != 0) ? "Sequence error model" : "No sequence error model") <<
                         endl << "\tFiles:"<< endl;
 
                 _status = true;
@@ -447,8 +447,8 @@ namespace ymir {
         void save_vj(const string &folderpath) const {
             AbstractTDContainer* container;
 
-            _genes->write(folderpath + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "vsegments.txt").asString(),
-                          folderpath + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "jsegments.txt").asString());
+            _genes->write(folderpath + _config.value("segments", json_value("")).value("variable", json_value("")).value("file", "vsegments.txt"),
+                          folderpath + _config.value("segments", json_value("")).value("joining", json_value("")).value("file", "jsegments.txt"));
 
             // V-J
             container = new TDMatrix(true);
@@ -462,7 +462,7 @@ namespace ymir {
             }
             container->addDataVector(_param_vec->get_iterator(1),
                                      _param_vec->get_iterator(_param_vec->eventClassSize(VJ_VAR_JOI_GEN) + 1));
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("v.j", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("v.j", json_value("")).value("file", .0)));
             delete container;
 
             // V del
@@ -479,7 +479,7 @@ namespace ymir {
                                          _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_DEL, i - 1, 0) + _param_vec->eventFamilySize(VJ_VAR_DEL, i - 1)));
             }
 
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("v.del", json_value("")).value("file", .0)));
 
             delete container;
 
@@ -494,7 +494,7 @@ namespace ymir {
                 container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VJ_JOI_DEL, i - 1, 0)),
                                          _param_vec->get_iterator(_param_vec->event_index(VJ_JOI_DEL, i - 1, 0) + _param_vec->eventFamilySize(VJ_JOI_DEL, i - 1)));
             }
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("j.del", json_value("")).value("file", .0)));
             delete container;
 
             // VJ ins
@@ -506,7 +506,7 @@ namespace ymir {
             }
             container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0)),
                                      _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_LEN, 0, 0) + _param_vec->eventFamilySize(VJ_VAR_JOI_INS_LEN, 0)));
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("ins.len", json_value("")).value("file", .0)));
             delete container;
 
             // VJ nuc
@@ -516,7 +516,7 @@ namespace ymir {
             container->addRowName("A"); container->addRowName("C"); container->addRowName("G"); container->addRowName("T");
             container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0)),
                                      _param_vec->get_iterator(_param_vec->event_index(VJ_VAR_JOI_INS_NUC, 0, 0) + 4));
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("ins.nucl", json_value("")).value("file", .0)));
 
             delete container;
         }
@@ -525,9 +525,9 @@ namespace ymir {
         void save_vdj(const string &folderpath) const {
             AbstractTDContainer* container;
 
-            _genes->write(folderpath + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "vsegments.txt").asString(),
-                          folderpath + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "jsegments.txt").asString(),
-                          folderpath + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "dsegments.txt").asString());
+            _genes->write(folderpath + _config.value("segments", json_value("")).value("variable", json_value("")).value("file", "vsegments.txt"),
+                          folderpath + _config.value("segments", json_value("")).value("joining", json_value("")).value("file", "jsegments.txt"),
+                          folderpath + _config.value("segments", json_value("")).value("diversity", json_value("")).value("file", "dsegments.txt"));
 
             // V
             container = new TDVector(true);
@@ -538,7 +538,7 @@ namespace ymir {
                 container->addRowName(_genes->V()[i].allele);
                 container->addDataValue(_param_vec->event_prob(VDJ_VAR_GEN, 0, i - 1));
             }
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("v", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("v", json_value("")).value("file", .0)));
             delete container;
 
             // J-D
@@ -553,7 +553,7 @@ namespace ymir {
             }
             container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_JOI_DIV_GEN, 0, 0)),
                                      _param_vec->get_iterator(_param_vec->eventClassSize(VDJ_JOI_DIV_GEN) + _param_vec->event_index(VDJ_JOI_DIV_GEN, 0, 0)));
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("j.d", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("j.d", json_value("")).value("file", .0)));
             delete container;
 
             // V del
@@ -567,7 +567,7 @@ namespace ymir {
                 container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DEL, i - 1, 0)),
                                          _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DEL, i - 1, 0) + _param_vec->eventFamilySize(VDJ_VAR_DEL, i - 1)));
             }
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("v.del", json_value("")).value("file", .0)));
             delete container;
 
             // J del
@@ -581,7 +581,7 @@ namespace ymir {
                 container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_JOI_DEL, i - 1, 0)),
                                          _param_vec->get_iterator(_param_vec->event_index(VDJ_JOI_DEL, i - 1, 0) + _param_vec->eventFamilySize(VDJ_JOI_DEL, i - 1)));
             }
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("j.del", json_value("")).value("file", .0)));
             delete container;
 
             // D del
@@ -592,7 +592,7 @@ namespace ymir {
                 container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_DEL, i - 1, 0, 0)),
                                          _param_vec->get_iterator(_param_vec->eventFamilySize(VDJ_DIV_DEL, i - 1) + _param_vec->event_index(VDJ_DIV_DEL, i - 1, 0, 0)));
             }
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("d.del", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("d.del", json_value("")).value("file", .0)));
             delete container;
 
             // VD ins + DJ ins
@@ -607,7 +607,7 @@ namespace ymir {
                                      _param_vec->get_iterator(_param_vec->event_index(VDJ_VAR_DIV_INS_LEN, 0, 0) + _param_vec->eventFamilySize(VDJ_VAR_DIV_INS_LEN, 0)));
             container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_LEN, 0, 0)),
                                      _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_LEN, 0, 0) + _param_vec->eventFamilySize(VDJ_DIV_JOI_INS_LEN, 0)));
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("ins.len", json_value("")).value("file", .0)));
             delete container;
 
             // VD nuc + DJ nuc
@@ -631,7 +631,7 @@ namespace ymir {
                                      _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_G, 0, 0) + 4));
             container->addDataVector(_param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_T, 0, 0)),
                                      _param_vec->get_iterator(_param_vec->event_index(VDJ_DIV_JOI_INS_NUC_T, 0, 0) + 4));
-            container->write(folderpath + _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("file", .0).asString());
+            container->write(folderpath + std::to_string(_config.value("probtables", json_value("")).value("ins.nucl", json_value("")).value("file", .0)));
             delete container;
         }
     };

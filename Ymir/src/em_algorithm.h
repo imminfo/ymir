@@ -42,17 +42,17 @@ namespace ymir {
             }
 
             cout << "\t#iterations: "
-                 << (int) algo_param["niter"].asUInt()
+                 << (int) algo_param["niter"]
                  << std::endl;
 
-            size_t sample = algo_param["sample"].asUInt();
+            size_t sample = algo_param["sample"];
             if (sample) {
                 std::cout << "\tsample size (doesn't work yet): "
                           << (int) sample
                           << std::endl;
             }
 
-            bool memory_safe = algo_param["memory-safe"].asBool();
+            bool memory_safe = algo_param["memory-safe"];
             if (memory_safe) {
                 std::cout << "\tworking in the memory-safe mode: rebuild graphs at each step"
                           << std::endl;
@@ -96,12 +96,12 @@ namespace ymir {
 
             std::chrono::system_clock::time_point tp1, tp2;
             tp1 = std::chrono::system_clock::now();
-            for (size_t iter = 1; iter <= algo_param["niter"].asUInt(); ++iter) {
+            for (size_t iter = 1; iter <= algo_param["niter"]; ++iter) {
                 if (iter == 1) {
-                    cout << endl << "Iteration:\t1 / " << (size_t) algo_param["niter"].asUInt() << endl;
+                    cout << endl << "Iteration:\t1 / " << (size_t) algo_param["niter"] << endl;
                 } else {
-                    cout << endl << "Iteration:\t" << (size_t) iter << " / " << (size_t) algo_param["niter"].asUInt()
-                    << print_time(tp1, algo_param["niter"].asUInt(), iter)
+                    cout << endl << "Iteration:\t" << (size_t) iter << " / " << (size_t) algo_param["niter"]
+                    << print_time(tp1, algo_param["niter"], iter)
                     << endl;
                 }
 

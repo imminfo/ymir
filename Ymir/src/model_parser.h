@@ -16,7 +16,7 @@ namespace ymir {
 
     public:
 
-        ModelParser(const std::string &model_path, Json::Value config, ModelBehaviour behav)
+        ModelParser(const std::string &model_path, json_value config, ModelBehaviour behav)
             : _model_path(model_path),
               _config(config),
               _behaviour(behav)
@@ -57,7 +57,7 @@ namespace ymir {
 
     protected:
 
-        Json::Value _config;
+        json_value _config;
         std::string _model_path;
         ModelBehaviour _behaviour;
         unique_ptr<VDJRecombinationGenes> _genes;
@@ -86,23 +86,26 @@ namespace ymir {
 
 
         bool parseEventProbabilitiesFromFiles() {
-            Json::Value pt = _config.get("probtables", "no-prob");
-            if (pt.size()) {
+            if (_config.find("probtables") != _config.end()) {
+                json_value pt = _config["probtables"];
+
                 AbstractTDContainer *container = nullptr;
                 string element = "", err_message = "";
                 vector<AbstractTDContainer*> containers;
                 containers.resize(10, nullptr);
 
                 // Parse tables with event probabilities.
-                for (Json::ArrayIndex i = 0; i < pt.size(); ++i) {
-                    element = pt.getMemberNames()[i];
-                    container = read_textdata(_model_path + pt[element]["file"].asString(),
-                                              pt[element]["type"].asString(),
-                                              pt[element].get("skip.first.column", true).asBool(),
-                                              pt[element].get("laplace", .0).asDouble(),
-                                              err_message);
+                for (size_t i = 0; i < pt.size(); ++i) {
+                    for (json::iterator it = pt.begin(); it != pt.end(); ++it) {
+                        element = it.key();
+                        container = read_textdata(_model_path + pt[element]["file"].get<std::string>(),
+                                                  pt[element]["type"].get<std::string>(),
+                                                  pt[element].value("skip.first.column", true),
+                                                  pt[element].value("laplace", .0),
+                                                  err_message);
 
-                    this->parseDataContainer(element, container, containers);
+                        this->parseDataContainer(element, container, containers);
+                    }
                 }
 
                 return this->makeModelParameterVector(containers);
@@ -344,7 +347,7 @@ namespace ymir {
     class VJModelParser : public ModelParser {
     public:
 
-        VJModelParser(const std::string &model_path, Json::Value config, ModelBehaviour behav)
+        VJModelParser(const std::string &model_path, json_value config, ModelBehaviour behav)
             : ModelParser(model_path, config, behav)
         {
         }
@@ -352,24 +355,24 @@ namespace ymir {
 
         bool parseGeneSegments() {
             cout << "\tV gene seg.:     ";
-            if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
+            if (_config.value("segments", json_value("")).value("variable", json_value("")).size() == 0) {
                 cout << "ERROR: no gene segments file in the model's .json." << endl;
 
                 return false;
             } else {
                 cout << "OK" << endl;
             }
-            string v_path = _model_path + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
+            string v_path = _model_path + _config.value("segments", json_value("")).value("variable", json_value("")).value("file", "");
 
             cout << "\tJ gene seg.:     ";
-            if (_config.get("segments", Json::Value("")).get("joining", Json::Value("")).size() == 0) {
+            if (_config.value("segments", json_value("")).value("joining", json_value("")).size() == 0) {
                 cout << "ERROR: no gene segments file in the model's .json." << endl;
 
                 return false;
             } else {
                 cout << "OK" << endl;
             }
-            string j_path = _model_path + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
+            string j_path = _model_path + _config.value("segments", json_value("")).value("joining", json_value("")).value("file", "");
 
             bool vok, jok;
 
@@ -377,11 +380,11 @@ namespace ymir {
 
             if (vok && jok) {
                 _genes->appendPalindromicNucleotides(VARIABLE,
-                                                     _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
-                                                     _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+                                                     _config.value("segments", json_value("")).value("variable", json_value("")).value("P.nuc.3'", 0),
+                                                     _config.value("segments", json_value("")).value("variable", json_value("")).value("P.nuc.5'", 0));
                 _genes->appendPalindromicNucleotides(JOINING,
-                                                     _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
-                                                     _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+                                                     _config.value("segments", json_value("")).value("joining", json_value("")).value("P.nuc.3'", 0),
+                                                     _config.value("segments", json_value("")).value("joining", json_value("")).value("P.nuc.5'", 0));
             }
 
             return vok && jok;
@@ -393,7 +396,7 @@ namespace ymir {
             AbstractTDContainer* container;
 
             // V-J
-            container = new TDMatrix(true, _config.get("probtables", Json::Value()).get("v.j", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDMatrix(true, _config.value("probtables", json_value("")).value("v.j", json_value("")).value("laplace", .0));
             for (auto i = 1; i <= _genes->V().max(); ++i){
                 container->addRowName(_genes->V()[i].allele);
             }
@@ -404,7 +407,7 @@ namespace ymir {
             containers[VJ_VAR_JOI_GEN] = container;
 
             // V del
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true, _config.value("probtables", json_value("")).value("v.del", json_value("")).value("laplace", .0));
             for (auto i = 1; i <= _genes->V().max(); ++i) {
                 container->addColumnName(_genes->V()[i].allele);
                 container->addDataVector(vector<prob_t>(_genes->V()[i].sequence.size() + 1));
@@ -412,7 +415,7 @@ namespace ymir {
             containers[VJ_VAR_DEL] = container;
 
             // J del
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true, _config.value("probtables", json_value("")).value("j.del", json_value("")).value("laplace", .0));
             for (auto i = 1; i <= _genes->J().max(); ++i){
                 container->addColumnName(_genes->J()[i].allele);
                 container->addDataVector(vector<prob_t>(_genes->J()[i].sequence.size() + 1));
@@ -420,13 +423,13 @@ namespace ymir {
             containers[VJ_JOI_DEL] = container;
 
             // VJ ins
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true, _config.value("probtables", json_value("")).value("ins.len", json_value("")).value("laplace", .0));
             container->addColumnName("VJ ins len");
-            container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1));
+            container->addDataVector(vector<prob_t>(_config.value("probtables", json_value("")).value("ins.len", json_value("")).value("max.len", DEFAULT_MAX_INS_LENGTH) + 1));
             containers[VJ_VAR_JOI_INS_LEN] = container;
 
             // VJ nuc
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true, _config.value("probtables", json_value("")).value("ins.nucl", json_value("")).value("laplace", .0));
             container->addColumnName("VJ nucs");
             container->addDataVector(vector<prob_t>(4));
             containers[VJ_VAR_JOI_INS_NUC] = container;
@@ -552,7 +555,7 @@ namespace ymir {
                              event_col_num,
                              laplace,
                              containers[VJ_JOI_DEL]->n_columns(),
-                             _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1);
+                             _config.value("probtables", json_value("")).value("ins.len", json_value("")).value("max.len", DEFAULT_MAX_INS_LENGTH) + 1);
 
                 this->addIns(containers[VJ_VAR_JOI_INS_NUC],
                              event_probs,
@@ -562,7 +565,7 @@ namespace ymir {
                              laplace,
                              1);
 
-                _param_vec.reset(new ModelParameterVector(VJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, _config.get("errors", 0).asDouble()));
+                _param_vec.reset(new ModelParameterVector(VJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, _config.value("errors", 0)));
                 is_ok = true;
             }
 
@@ -576,7 +579,7 @@ namespace ymir {
 
     public:
 
-        VDJModelParser(const std::string &model_path, Json::Value config, ModelBehaviour behav)
+        VDJModelParser(const std::string &model_path, json_value config, ModelBehaviour behav)
                 : ModelParser(model_path, config, behav)
         {
         }
@@ -584,50 +587,50 @@ namespace ymir {
 
         bool parseGeneSegments() {
             cout << "\tV gene seg.:     ";
-            if (_config.get("segments", Json::Value("")).get("variable", Json::Value("")).size() == 0) {
+            if (_config.value("segments", json_value("")).value("variable", json_value("")).size() == 0) {
                 cout << "ERROR: no gene segments file in the model's .json." << endl;
 
                 return false;
             } else {
                 cout << "OK" << endl;
             }
-            string v_path = _model_path + _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("file", "").asString();
+            string v_path = _model_path + _config.value("segments", json_value("")).value("variable", json_value("")).value("file", "");
 
             cout << "\tJ gene seg.:     ";
-            if (_config.get("segments", Json::Value("")).get("joining", Json::Value("")).size() == 0) {
+            if (_config.value("segments", json_value("")).value("joining", json_value("")).size() == 0) {
                 cout << "ERROR: no gene segments file in the model's .json." << endl;
 
                 return false;
             } else {
                 cout << "OK" << endl;
             }
-            string j_path = _model_path + _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("file", "").asString();
+            string j_path = _model_path + _config.value("segments", json_value("")).value("joining", json_value("")).value("file", "");
 
             bool vok, jok, dok = true;
 
             cout << "\tD gene seg.:     ";
-            if (_config.get("segments", Json::Value("")).get("diversity", Json::Value("")).size() == 0) {
+            if (_config.value("segments", json_value("")).value("diversity", json_value("")).size() == 0) {
                 cout << "ERROR: no gene segments file in the model's .json." << endl;
 
                 return false;
             } else {
-                string d_path = _model_path + _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("file", "").asString();
+                string d_path = _model_path + _config.value("segments", json_value("")).value("diversity", json_value("")).value("file", "");
                 _genes.reset(new VDJRecombinationGenes("VDJ.V", v_path, "VDJ.J", j_path, "VDJ.D", d_path, &vok, &jok, &dok));
-                _min_D_len = _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("min.len", DEFAULT_DIV_GENE_MIN_LEN).asUInt();
+                _min_D_len = _config.value("segments", json_value("")).value("diversity", json_value("")).value("min.len", DEFAULT_DIV_GENE_MIN_LEN);
                 cout << "OK" << endl;
             }
 
             if (vok && jok && dok) {
                 _genes->appendPalindromicNucleotides(VARIABLE,
-                                                     _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
-                                                     _config.get("segments", Json::Value("")).get("variable", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+                                                     _config.value("segments", json_value("")).value("variable", json_value("")).value("P.nuc.3'", 0),
+                                                     _config.value("segments", json_value("")).value("variable", json_value("")).value("P.nuc.5'", 0));
                 _genes->appendPalindromicNucleotides(JOINING,
-                                                     _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
-                                                     _config.get("segments", Json::Value("")).get("joining", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+                                                     _config.value("segments", json_value("")).value("joining", json_value("")).value("P.nuc.3'", 0),
+                                                     _config.value("segments", json_value("")).value("joining", json_value("")).value("P.nuc.5'", 0));
                 if (_genes->is_vdj()) {
                     _genes->appendPalindromicNucleotides(DIVERSITY,
-                                                         _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("P.nuc.3'", 0).asUInt(),
-                                                         _config.get("segments", Json::Value("")).get("diversity", Json::Value("")).get("P.nuc.5'", 0).asUInt());
+                                                         _config.value("segments", json_value("")).value("diversity", json_value("")).value("P.nuc.3'", 0),
+                                                         _config.value("segments", json_value("")).value("diversity", json_value("")).value("P.nuc.5'", 0));
                 }
             }
 
@@ -640,7 +643,7 @@ namespace ymir {
             AbstractTDContainer* container;
 
             // V
-            container = new TDVector(true, _config.get("probtables", Json::Value()).get("v", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVector(true, _config.value("probtables", json_value("")).value("v", json_value("")).value("laplace", .0));
             container->addDataVector(vector<prob_t>());
             for (auto i = 1; i <= _genes->V().max(); ++i) {
                 container->addRowName(_genes->V()[i].allele);
@@ -650,7 +653,7 @@ namespace ymir {
             cout << "\tV genes prob.:   " << "CREATED" << endl;
 
             // J-D
-            container = new TDMatrix(true, _config.get("probtables", Json::Value()).get("j.d", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDMatrix(true, _config.value("probtables", json_value("")).value("j.d", json_value("")).value("laplace", .0));
             for (auto i = 1; i <= _genes->J().max(); ++i) {
                 container->addRowName(_genes->J()[i].allele);
             }
@@ -662,7 +665,7 @@ namespace ymir {
             cout << "\tJ-D gene pairs:  " << "CREATED" << endl;
 
             // V del
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("v.del", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true, _config.value("probtables", json_value("")).value("v.del", json_value("")).value("laplace", .0));
             for (auto i = 1; i <= _genes->V().max(); ++i) {
                 container->addColumnName(_genes->V()[i].allele);
                 container->addDataVector(vector<prob_t>(_genes->V()[i].sequence.size() + 1));
@@ -671,7 +674,7 @@ namespace ymir {
             cout << "\tV delet. num.:   " << "CREATED" << endl;;
 
             // J del
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("j.del", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true, _config.value("probtables", json_value("")).value("j.del", json_value("")).value("laplace", .0));
             for (auto i = 1; i <= _genes->J().max(); ++i) {
                 container->addColumnName(_genes->J()[i].allele);
                 container->addDataVector(vector<prob_t>(_genes->J()[i].sequence.size() + 1));
@@ -680,7 +683,7 @@ namespace ymir {
             cout << "\tJ delet. num.:   " << "CREATED" << endl;
 
             // D del
-            container = new TDMatrixList(true, _config.get("probtables", Json::Value()).get("d.del", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDMatrixList(true, _config.value("probtables", json_value("")).value("d.del", json_value("")).value("laplace", .0));
             for (auto i = 1; i <= _genes->D().max(); ++i) {
                 container->addColumnName(_genes->D()[i].allele);
                 container->addDataVector(vector<prob_t>( (_genes->D()[i].sequence.size() + 1) * (_genes->D()[i].sequence.size() + 1) ));
@@ -691,16 +694,16 @@ namespace ymir {
             cout << "\tD delet. num.:   " << "CREATED" << endl;
 
             // VD ins + DJ ins
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true, _config.value("probtables", json_value("")).value("ins.len", json_value("")).value("laplace", .0));
             container->addColumnName("VD ins");
             container->addColumnName("DJ ins");
-            container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1));
-            container->addDataVector(vector<prob_t>(_config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1));
+            container->addDataVector(vector<prob_t>(_config.value("probtables", json_value("")).value("ins.len", json_value("")).value("max.len", DEFAULT_MAX_INS_LENGTH) + 1));
+            container->addDataVector(vector<prob_t>(_config.value("probtables", json_value("")).value("ins.len", json_value("")).value("max.len", DEFAULT_MAX_INS_LENGTH) + 1));
             containers[VDJ_VAR_DIV_INS_LEN] = container;
             cout << "\tVD/DJ ins. len.: " << "CREATED" << endl;
 
             // VD nuc + DJ nuc
-            container = new TDVectorList(true, _config.get("probtables", Json::Value()).get("ins.nucl", Json::Value()).get("laplace", .0).asDouble());
+            container = new TDVectorList(true, _config.value("probtables", json_value("")).value("ins.nucl", json_value("")).value("laplace", .0));
             for (auto i = 0; i < 8; ++i) {
                 container->addColumnName("VD/DJ nucs");
                 container->addDataVector(vector<prob_t>(4));
@@ -863,7 +866,7 @@ namespace ymir {
                              event_col_num,
                              laplace,
                              containers[VDJ_DIV_DEL]->n_rows(),
-                             _config.get("probtables", Json::Value()).get("ins.len", Json::Value()).get("max.len", DEFAULT_MAX_INS_LENGTH).asUInt64() + 1);
+                             _config.value("probtables", json_value("")).value("ins.len", json_value("")).value("max.len", DEFAULT_MAX_INS_LENGTH) + 1);
 
                 this->addIns(containers[VDJ_VAR_DIV_INS_NUC],
                              event_probs,
@@ -874,7 +877,7 @@ namespace ymir {
                              1);
 
                 for (seg_index_t i = 1; i <= _genes->D().max(); ++i) { min_D_len_vec.push_back(_min_D_len); }
-                _param_vec.reset(new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, _config.get("errors", 0).asDouble(), true, min_D_len_vec));
+                _param_vec.reset(new ModelParameterVector(VDJ_RECOMB, event_probs, event_lengths, event_classes, event_col_num, laplace, _config.value("errors", 0), true, min_D_len_vec));
                 is_ok = true;
             }
 

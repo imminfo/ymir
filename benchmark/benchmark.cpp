@@ -60,11 +60,13 @@ int main(int argc, char* argv[]) {
                                                     AlignmentColumnOptions::OVERWRITE,
                                                     AlignmentColumnOptions::REALIGN_PROVIDED);
 
-
-//    auto align_col_options = AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
-//                                                    AlignmentColumnOptions::OVERWRITE,
-//                                                    AlignmentColumnOptions::OVERWRITE);
-
+    if (argc == 3) {
+        if (argv[2] == "overwrite") {
+            align_col_options = AlignmentColumnOptions(AlignmentColumnOptions::OVERWRITE,
+                                                       AlignmentColumnOptions::OVERWRITE,
+                                                        AlignmentColumnOptions::OVERWRITE);
+        }
+    }
 
     //
     // TCR alpha chain repertoire - VJ recombination
